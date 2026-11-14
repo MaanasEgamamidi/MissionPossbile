@@ -1,0 +1,10 @@
+test_weather_data      exit=0 RESULT 15/15 (0.6 s)
+test_weather           exit=0 RESULT 66/66 (102.1 s)
+test_saves             exit=0 RESULT 56/56 (0.6 s)
+test_session           exit=0 RESULT 91/91 (29.4 s)
+test_tutorial          exit=0 RESULT 59/59 (21.8 s)
+test_rover             exit=0 RESULT 80/80 (7.8 s)
+test_net_game          exit=0 RESULT 20/20 (23.9 s)
+test_rover_drive       exit=0 RESULT 64/64 (117.3 s)
+test_progression       exit=0 RESULT 84/84 (26.8 s)
+ALL TESTS PASSED
