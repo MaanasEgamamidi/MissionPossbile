@@ -294,13 +294,17 @@ static func at_install_station(state: ColonyState, c: UpgradeDefinition, station
 		return false
 	if station_id == c.install_station:
 		return true
-	return c.install_kind != "" and String((state.stations[String(station_id)] as Dictionary).get("kind", "")) == c.install_kind
+	var kind := String((state.stations[String(station_id)] as Dictionary).get("kind", ""))
+	return (c.install_kind != "" and kind == c.install_kind) or (kind != "" and c.also_install_kinds.has(kind))
 
 
 ## The install station in words ("power panel in the Power Room").
 static func install_place_words(c: UpgradeDefinition) -> String:
 	var kind := c.install_kind
-	return "%s in the %s" % [StationPanels.name_of(kind).to_lower() if kind != "" else String(c.install_station), c.zone]
+	var words := "%s in the %s" % [StationPanels.name_of(kind).to_lower() if kind != "" else String(c.install_station), c.zone]
+	if c.also_install_kinds.has("solar"):
+		words += " or at any sun tracker outside"
+	return words
 
 
 ## Everything a card needs before it can be installed (not counting who installs it and where), in order:

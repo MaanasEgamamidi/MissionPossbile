@@ -1,0 +1,19 @@
+{
+ "_about": {
+  "category": "index",
+  "source_ids": [],
+  "note": "Evidence category of every number and claim of the scout update (scout rover, ore deposits, broken-down rover, ASTRA-style HUD). Categories: balance (game tuning, no source; never a NASA figure), illustrative (story text shown in place of a measurement), unchecked (a public NASA page named here but NOT yet entered in docs/source_register.md; the claim must be checked before it is shown as a citation)."
+ },
+ "scout_speed_m_per_hour": {"category": "balance", "source_ids": [], "note": "150 m per game hour, so a trip to the nearest site takes about one game hour. Chosen for pacing; the game does not claim it is a real rover speed."},
+ "scout_survey_hours": {"category": "balance", "source_ids": [], "note": "0.5 game hours of looking around at a site before the report is radioed home."},
+ "scout_assemble_parts": {"category": "balance", "source_ids": [], "note": "2 spare parts to finish the half-built scout."},
+ "scout_power": {"category": "illustrative", "source_ids": [], "note": "The scout is said to run on a radioisotope power unit, so it never needs charging, like NASA's Curiosity and Perseverance rovers. The game does not model its power."},
+ "ore_per_deposit": {"category": "balance", "source_ids": [], "note": "3 pieces of ore per deposit; each collect takes 1."},
+ "hematite_per_part": {"category": "balance", "source_ids": [], "note": "2 hematite make 1 spare part at the workbench (simple cast iron brackets and frames). A game simplification: no smelter is modelled and no motor or electronics are made from rock."},
+ "science_per_ore": {"category": "balance", "source_ids": [], "note": "1 science point per science ore studied at the workbench."},
+ "crew_rover_science_needed": {"category": "balance", "source_ids": [], "note": "3 science points and Resources level 1 are shown as the goal for taking the crew rover out. The crew rover itself belongs to the rover update (Prompt 10)."},
+ "SC1": {"category": "unchecked", "source_ids": [], "note": "NASA/JPL, Opportunity rover: hematite spherules ('blueberries') at Meridiani Planum. https://mars.nasa.gov/mer/ - to be entered in the source register."},
+ "SC2": {"category": "unchecked", "source_ids": [], "note": "NASA/JPL, Perseverance rover: olivine-rich rock on the floor of Jezero crater (Seitah). https://mars.nasa.gov/mars2020/ - to be entered in the source register."},
+ "SC3": {"category": "unchecked", "source_ids": [], "note": "NASA/JPL, Curiosity rover: calcium sulfate (gypsum/bassanite) veins at Gale crater, deposited by water. https://mars.nasa.gov/msl/ - to be entered in the source register."},
+ "SC4": {"category": "unchecked", "source_ids": [], "note": "NASA/JPL, Perseverance rover: carbonates at the margin of Jezero crater, a target in the search for signs of ancient life. https://mars.nasa.gov/mars2020/ - to be entered in the source register."}
+}

@@ -414,6 +414,12 @@ func _build_body() -> void:
 			computer_buttons["summary"] = _add_open_button(buttons, "Colony summary", func() -> UiPanel: return ColonySummaryPanel.new())
 			computer_buttons["upgrades"] = _add_open_button(buttons, "Upgrades", func() -> UiPanel: return UpgradeCardsPanel.new())
 			computer_buttons["blueprint"] = _add_open_button(buttons, "Blueprint map", func() -> UiPanel: return BlueprintPanel.new())
+			# Scout update: the scout rover can be sent from the colony computer as well as from its bay outside.
+			computer_buttons["scout"] = _add_open_button(buttons, "Scout rover", func() -> UiPanel:
+				var p := ScoutBayStationPanel.new()
+				p.station_id = station_id
+				p.kind = kind
+				return p)
 		"comms":
 			_add_heading(_body, "Messages from Earth")
 			var card := PanelContainer.new()

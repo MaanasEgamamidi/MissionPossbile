@@ -24,6 +24,10 @@ var collision: Node3D
 var lighting: ZoneLighting
 ## Sky, sun and fog follow the dust in the air (Prompt 09).
 var weather_presenter: WeatherPresenter
+## Scout update: the scout rover, the broken-down rover and the ore deposits in the world, and the mast camera.
+var scout_presenter: ScoutPresenter
+## Scout update: the mission-control HUD (vitals bar, goals, map, pop-ups, dock) laid around GameHud.
+var mission_hud: MissionHud
 var player: PlayerController
 var hud: GameHud
 ## Menus, panels, pause menu and subtitles (Prompt 05).
@@ -165,6 +169,11 @@ func _begin_play() -> void:
 	weather_presenter.name = "WeatherPresenter"
 	add_child(weather_presenter)
 	weather_presenter.setup(world, services)
+	scout_presenter = ScoutPresenter.new()
+	add_child(scout_presenter)
+	scout_presenter.setup(world, services, self)
+	mission_hud = MissionHud.new()
+	mission_hud.setup(world, services, self)
 	if check_weather_updates and DisplayServer.get_name() != "headless":
 		var refresh := WeatherRefresh.new()
 		refresh.name = "WeatherRefresh"

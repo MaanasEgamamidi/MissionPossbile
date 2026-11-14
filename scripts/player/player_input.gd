@@ -11,6 +11,10 @@ const ACTIONS: Dictionary = {
 	&"back": [KEY_ESCAPE], &"source_register": [KEY_BACKSPACE | KEY_MASK_SHIFT],
 	# Added in Prompt 05 (not in the pack's list, remappable): cargo and crew screens.
 	&"inventory": [KEY_I], &"crew": [KEY_C],
+	# Scout update (mission-control HUD, remappable): power drawer, build drawer at the solar field, fold the supplies,
+	# fold the goals, close a Mission Control message, the science behind the numbers.
+	&"power_view": [KEY_P], &"build": [KEY_B], &"hud_details": [KEY_H], &"goals": [KEY_J], &"advisor_ok": [KEY_K],
+	&"vitals_help": [KEY_F1],
 }
 ## Plain names for the settings screen, in display order.
 const ACTION_NAMES: Dictionary = {
@@ -18,6 +22,8 @@ const ACTION_NAMES: Dictionary = {
 	&"sprint": "Sprint", &"jump": "Jump", &"interact": "Use (interact)", &"grab": "Grab, drop, throw",
 	&"toggle_view": "First / third person", &"map": "Blueprint map", &"inventory": "Cargo", &"crew": "Crew",
 	&"push_to_talk": "Push to talk", &"back": "Close / pause", &"source_register": "Source register",
+	&"power_view": "Power and life support", &"build": "Build (at the solar field)", &"hud_details": "Fold the supplies",
+	&"goals": "Fold the goals", &"advisor_ok": "Close a Mission Control message", &"vitals_help": "Science behind the numbers",
 }
 static var _remapped: Dictionary = {}
 

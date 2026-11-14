@@ -190,6 +190,9 @@ func _test_stations() -> void:
 	var sites: Array = kinds.get("sample_site", [])
 	sites.sort()
 	var donors: Array = kinds.get("salvage", [])
+	# The scout update adds a sixth donor with no map object (the broken-down rover, data/stations_scout.json); it is
+	# checked in tests/test_scout.gd. This check stays about the five damaged map objects of Part S.
+	donors.erase("broken_rover")
 	donors.sort()
 	var want_sites := SITES.duplicate()
 	want_sites.sort()

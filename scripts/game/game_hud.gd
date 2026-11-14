@@ -26,6 +26,7 @@ const STATION_NAMES := {
 	"suits": "suit rack", "power": "power panel", "computer": "colony computer", "comms": "comms console",
 	"food": "greenhouse console", "board": "transceiver board", "lifesupport": "life support console",
 	"heal": "med station", "survivor": "patient", "solar": "sun tracker",
+	"scout_bay": "scout bay", "ore_deposit": "ore deposit", "salvage": "damaged machine",
 }
 ## Seconds a colony system alert stays in the message line.
 const ALERT_SECONDS := 6.0
@@ -80,6 +81,12 @@ var _hint_fading := false
 var _badge_for: StringName = &""
 ## The newest colony system alert shown (events.system_alert), or "".
 var last_alert_text := ""
+## Scout update: when set (by the mission-control HUD), colony alerts go to its pop-ups instead of the message line:
+## func(alert_id: StringName, level: StringName, text: String).
+var alert_sink := Callable()
+## Screen units at the top kept free for the vitals bar; messages then show just under it.
+var top_reserved := 0.0
+var _hazard: Label
 # interim power menu, kept so game_main works until UiRoot hosts station surfaces
 var _menu: Control
 var _menu_station: StringName = &""
@@ -360,6 +367,12 @@ func _build() -> void:
 	_time.name = "Time"
 	_time.theme_type_variation = UiTheme.HEADING
 	left_box.add_child(_time)
+	# Scout update: a dust storm on its way or running ("⚠ Dust storm in 6 h").
+	_hazard = Label.new()
+	_hazard.name = "Hazard"
+	_hazard.theme_type_variation = UiTheme.WARN
+	_hazard.visible = false
+	left_box.add_child(_hazard)
 	for i in MAX_READINGS:
 		var row := HBoxContainer.new()
 		row.name = "Reading%d" % i
@@ -683,6 +696,10 @@ func refresh() -> void:
 		for l in row.get_children():
 			(l as Label).theme_type_variation = variation
 	_ok_line.visible = low.is_empty()
+	var storm := StormOutlook.now(services.state())
+	_hazard.visible = String(storm.phase) != "calm"
+	_hazard.text = ("⚠ " if String(storm.phase) == "warned" else "✖ ") + String(storm.text)
+	_hazard.theme_type_variation = UiTheme.WARN if String(storm.phase) == "warned" else UiTheme.URGENT
 	_refresh_crew()
 	_banner_panel.visible = services.session.paused
 	var me := services.local_character()
@@ -781,8 +798,17 @@ func _on_action_resolved(result: ActionResult) -> void:
 		show_message(result.message, 3.0)
 
 
-func _on_system_alert(_alert_id: StringName, _level: StringName, text: String) -> void:
+func _on_system_alert(alert_id: StringName, level: StringName, text: String) -> void:
+	if alert_sink.is_valid():
+		last_alert_text = text.strip_edges().replace("CO2", "CO₂")
+		alert_sink.call(alert_id, level, text)
+		return
 	show_alert(text)
+
+
+## Scout update: the mission-control HUD has its own dock of keys, so the fading key strip is not needed.
+func use_dock(on: bool) -> void:
+	_hint_panel.visible = not on and not _hint_fading
 
 
 static func _key(action: StringName, fallback: String) -> String:
@@ -853,8 +879,10 @@ func _place_messages() -> void:
 	var gap := screen.x - 2.0 * (maxf(left.x, right.x) + EDGE + 20.0)
 	var top := float(EDGE)
 	var max_w := minf(gap, screen.x * 0.36)
+	if top_reserved > 0.0:
+		top = top_reserved + 10.0
 	if gap < 360.0:
-		top += maxf(left.y, right.y) + 12.0
+		top = maxf(top, EDGE + maxf(left.y, right.y) + 12.0)
 		max_w = screen.x * 0.6
 	_centre_margin.add_theme_constant_override(&"margin_top", roundi(top))
 	_fit_text(_message, max_w - 46.0)

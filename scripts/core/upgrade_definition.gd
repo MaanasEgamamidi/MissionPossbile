@@ -36,6 +36,8 @@ extends Resource
 @export var install_station: StringName = &""
 ## Station kind that also counts as the install station (for a station another part names, such as the workbench).
 @export var install_kind := ""
+## Other station kinds where the card may also be installed (scout update: the energy cards at a sun tracker).
+@export var also_install_kinds := PackedStringArray()
 ## Which part of the game applies the effect: "G" (progression, energy and life support), "F" (food), "S" (science).
 @export var effect_owner := ""
 ## True when the upgrade automates a chore (the chore then never comes back on a schedule).
@@ -66,6 +68,8 @@ static func from_dict(card: Dictionary, cost_override := -1) -> UpgradeDefinitio
 		d.evidence.append(StringName(String(e)))
 	d.install_station = StringName(String(card.get("install_station", "")))
 	d.install_kind = String(card.get("install_kind", ""))
+	for k in card.get("also_install_kinds", []):
+		d.also_install_kinds.append(String(k))
 	d.effect_owner = String(card.get("effect_owner", ""))
 	d.automation = bool(card.get("automation", false))
 	for l in card.get("source_labels", []):

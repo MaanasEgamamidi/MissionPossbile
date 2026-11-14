@@ -91,6 +91,8 @@ var progress := {}
 var weather := {}
 ## Prompt 12: tutorial stages, hints, campaign certification and optional mystery progress (TutorialSystem).
 var campaign := {}
+## Scout update: the robotic scout rover, its surveys and the special ores collected (ScoutSystem, ScoutActions).
+var scout := {}
 
 var data_snapshot_id := ""
 var weather_queue: Array = []
@@ -299,7 +301,7 @@ func to_dict() -> Dictionary:
 		"knowledge": knowledge.duplicate(true), "evidence": evidence.duplicate(true), "upgrades": upgrades.duplicate(true), "tasks": tasks.duplicate(true),
 		"discoveries": discoveries.duplicate(true), "rover": rover.duplicate(true),
 		"crops": crops.duplicate(true), "science": science.duplicate(true), "progress": progress.duplicate(true), "weather": weather.duplicate(true),
-		"campaign": campaign.duplicate(true),
+		"campaign": campaign.duplicate(true), "scout": scout.duplicate(true),
 		"data_snapshot_id": data_snapshot_id, "weather_queue": weather_queue.duplicate(true), "event_queue": event_queue.duplicate(true),
 		"ledger": ledger.duplicate(true), "counters": counters.duplicate(true),
 		# 64-bit values go out as strings: JSON numbers are doubles and would lose the low bits
@@ -343,6 +345,7 @@ func assign_from(d: Dictionary, keep_pose_of: StringName = &"") -> void:
 	progress = fresh.progress
 	weather = fresh.weather
 	campaign = fresh.campaign
+	scout = fresh.scout
 	event_queue = fresh.event_queue
 	rng_seed = fresh.rng_seed
 	rng_state = fresh.rng_state
@@ -450,6 +453,7 @@ static func from_dict(d: Dictionary) -> ColonyState:
 	s.progress = (d.get("progress", {}) as Dictionary).duplicate(true)
 	s.weather = (d.get("weather", {}) as Dictionary).duplicate(true)
 	s.campaign = (d.get("campaign", {}) as Dictionary).duplicate(true)
+	s.scout = (d.get("scout", {}) as Dictionary).duplicate(true)
 	s.event_queue = (d.get("event_queue", []) as Array).duplicate(true)
 	for k in (d.get("ledger", {}) as Dictionary):
 		s.ledger[String(k)] = float(d.ledger[k])

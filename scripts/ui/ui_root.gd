@@ -374,7 +374,7 @@ func _fit(panel: UiPanel) -> void:
 		_frame.get_theme_constant(&"margin_top") + _frame.get_theme_constant(&"margin_bottom"))
 	var min_size := panel.custom_minimum_size
 	if want.x > 0.0:
-		panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		panel.size_flags_horizontal = Control.SIZE_SHRINK_END if panel.align_right else Control.SIZE_SHRINK_CENTER
 		min_size.x = maxf(0.0, minf(want.x, room.x))
 	if want.y > 0.0:
 		panel.size_flags_vertical = Control.SIZE_SHRINK_CENTER

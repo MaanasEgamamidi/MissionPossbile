@@ -67,7 +67,8 @@
 			"function": "Adds battery modules and a guard: room lights and greenhouse lights can no longer use the last part of the battery, so the air and water machines keep running through a long night.",
 			"effect": "Battery capacity +25 % (800 → 1000 kWh). The last 20 % of the battery is kept for life support: lights are switched off first when only the reserve is left.",
 			"questions": ["energy_q_battery_night", "energy_q_net_power"], "evidence": ["energy_predict_net_power"],
-			"cost_parts": 3, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power", "zone": "Power Room",
+			"cost_parts": 3, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power",
+			"cost_parts": 3, "specialty": "electrical_comms", "install_station": "pw_panel", "also_install_kinds": ["solar"], "zone": "Power Room",
 			"effect_owner": "G", "automation": false, "source_ids": [],
 			"source_labels": ["Game balance: battery size and reserve share (fiction 2080 battery bank).", "Physics: no sunlight at night, so night power must be stored."]
 		},
@@ -76,7 +77,8 @@
 			"function": "Tunes the tracker motors so they follow the sun more exactly and use less power doing it.",
 			"effect": "Tracker drives use half the power (0.6 → 0.3 kW) and tracking panels give 10 % more power.",
 			"questions": ["energy_q_tracking", "energy_q_dust_output"], "evidence": ["energy_diagnose_output_loss"],
-			"cost_parts": 2, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power", "zone": "Power Room",
+			"cost_parts": 2, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power",
+			"cost_parts": 2, "specialty": "electrical_comms", "install_station": "pw_panel", "also_install_kinds": ["solar"], "zone": "Power Room",
 			"effect_owner": "G", "automation": false, "source_ids": [],
 			"source_labels": ["Physics: a panel facing the sun catches more light.", "Game balance: the size of the gain and the motor power."]
 		},
@@ -85,7 +87,8 @@
 			"function": "Gives the panel cleaner a spare drive and a self-test, so it fixes itself instead of waiting for a repair trip.",
 			"effect": "If the cleaner breaks, it repairs itself after one sol and keeps wiping the panels at sunrise. The repair chore goes away.",
 			"questions": ["energy_q_cleaner", "energy_q_diagnose"], "evidence": ["energy_verify_recovery"],
-			"cost_parts": 4, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power", "zone": "Power Room",
+			"cost_parts": 4, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power",
+			"cost_parts": 4, "specialty": "electrical_comms", "install_station": "pw_panel", "also_install_kinds": ["solar"], "zone": "Power Room",
 			"effect_owner": "G", "automation": true, "source_ids": [],
 			"source_labels": ["Game balance: one sol to self-repair.", "Simplified: Mars dust on panels is real (see the dust note in the register); a self-repairing cleaner is fiction 2080 equipment."]
 		},

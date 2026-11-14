@@ -1,0 +1,95 @@
+{
+ "_about": "Where the scout rover can be sent, what it reports, and the special ores (scout update). Positions are Godot metres (x east, z south). Site reports are game story written for ages 9-12; mineral facts cite the entries in data/model_sources_scout.json. A survey reveals every ore deposit within reveal_radius_m of the site on the map; deposits can also be found by walking.",
+ "dock": {"position": [17.0, 0.0, 24.5], "yaw_deg": 180.0},
+ "sites": [
+  {
+   "id": "east_plain",
+   "name": "East plain",
+   "position": [40.0, 0.0, 40.0],
+   "reveal_radius_m": 16.0,
+   "look_yaw_deg": 90.0,
+   "terrain": "Flat, firm ground. Easy driving.",
+   "report": "Flat, firm ground covered in small dark pebbles, next to an old rover that broke down here. The mast camera sees round grey beads in the soil: they look like hematite, an iron mineral. Good walking ground.",
+   "hazard": "",
+   "rover_note": "A crew rover could drive here easily."
+  },
+  {
+   "id": "crash_field",
+   "name": "Old crash site",
+   "position": [0.0, 0.0, 47.0],
+   "reveal_radius_m": 18.0,
+   "look_yaw_deg": 200.0,
+   "terrain": "Torn metal and scorched ground.",
+   "report": "Twisted metal from an old landing that went wrong. Sharp edges everywhere. Near the walls of the base the ground has greenish rock: it looks like olivine.",
+   "hazard": "Sharp metal: walk carefully, keep the suit safe.",
+   "rover_note": "Drive around the debris, not through it."
+  },
+  {
+   "id": "south_slope",
+   "name": "South slope",
+   "position": [23.0, 0.0, 56.0],
+   "reveal_radius_m": 14.0,
+   "look_yaw_deg": 180.0,
+   "terrain": "A gentle slope of light-coloured rock.",
+   "report": "Bright white lines run through the rock like cracks filled with chalk. They look like gypsum, a mineral that forms where water once flowed.",
+   "hazard": "Loose stones on the slope.",
+   "rover_note": "A crew rover can climb it slowly."
+  },
+  {
+   "id": "west_dunes",
+   "name": "West dunes",
+   "position": [-30.0, 0.0, 54.0],
+   "reveal_radius_m": 14.0,
+   "look_yaw_deg": 250.0,
+   "terrain": "Soft sand ripples.",
+   "report": "Rippled sand dunes, soft and deep. At the edge of the sand there is pale, crumbly rock that fizzes in the lab test: it looks like carbonate.",
+   "hazard": "Soft sand: wheels can sink and get stuck.",
+   "rover_note": "Keep a crew rover out of the deep sand."
+  },
+  {
+   "id": "far_crater",
+   "name": "Little crater",
+   "position": [70.0, 0.0, 72.0],
+   "reveal_radius_m": 10.0,
+   "look_yaw_deg": 135.0,
+   "terrain": "A small crater with a steep rim.",
+   "report": "A small crater about 30 metres across. Its rim shows layers of rock, like the pages of a book: each layer is a different time in Mars history. Too far to walk to safely in a suit.",
+   "hazard": "Steep rim: too far to walk.",
+   "rover_note": "A good first trip for the crew rover, once it is built."
+  }
+ ],
+ "ores": {
+  "hematite": {
+   "name": "Hematite",
+   "color": [0.36, 0.30, 0.31],
+   "use": "parts",
+   "what": "An iron mineral. On Mars it can form small round beads.",
+   "why": "Iron for simple metal parts: two hematite make one spare part at the workbench.",
+   "source_ids": ["SC1"]
+  },
+  "olivine": {
+   "name": "Olivine",
+   "color": [0.42, 0.50, 0.24],
+   "use": "science",
+   "what": "A green mineral found in volcanic rock.",
+   "why": "Science: it tells us how the rock formed. Each one studied raises the colony's science score.",
+   "source_ids": ["SC2"]
+  },
+  "gypsum": {
+   "name": "Gypsum",
+   "color": [0.92, 0.90, 0.84],
+   "use": "science",
+   "what": "A soft white mineral that forms when salty water dries up.",
+   "why": "Science: proof that water once flowed here. Each one studied raises the colony's science score.",
+   "source_ids": ["SC3"]
+  },
+  "carbonate": {
+   "name": "Carbonate rock",
+   "color": [0.78, 0.68, 0.52],
+   "use": "science",
+   "what": "Rock that forms in water, like chalk and limestone on Earth.",
+   "why": "Science: places like this are where scientists look for signs of ancient life. Each one studied raises the colony's science score.",
+   "source_ids": ["SC4"]
+  }
+ }
+}

@@ -55,6 +55,18 @@
 				{"id": "tank_liner", "name": "Tank liner", "compatible": false, "clue": "Pierced right through by the crash."},
 				{"id": "strap", "name": "Mounting strap", "compatible": false, "clue": "Bent and torn at the bolt."}
 			]
+		},
+		{
+			"object": "broken_rover",
+			"name": "Broken-down rover",
+			"story": "An old rover that broke down out on the plain, tipped on one side with a wheel gone. Its tool locker and some of its parts can still be used.",
+			"parts": [
+				{"id": "rover_toolkit", "name": "Tool kit", "compatible": true, "fits": "the workbench tool rack", "clue": "The locker is dusty but sealed: the wrenches and drivers inside are clean and whole.", "test": "Every tool fits its socket and turns smoothly (illustrative test)."},
+				{"id": "hub_motor", "name": "Wheel hub motor", "compatible": true, "fits": "the scout rover's wheels", "clue": "It turns by hand without grinding and its plug matches the scout's wheel sockets.", "test": "Spins both ways at full speed and stays cool (illustrative test)."},
+				{"id": "nav_camera", "name": "Navigation camera", "compatible": true, "fits": "the scout rover's mast", "clue": "The lens is scratched but the picture comes through clean.", "test": "Sends a sharp picture for ten minutes (illustrative test)."},
+				{"id": "cracked_wheel", "name": "Cracked wheel", "compatible": false, "clue": "Split right across the rim: it would break on the first rock."},
+				{"id": "dead_battery", "name": "Old battery pack", "compatible": false, "clue": "Swollen and leaking: unsafe to use, leave it sealed."}
+			]
 		}
 	]
 }

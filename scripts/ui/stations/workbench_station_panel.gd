@@ -13,6 +13,10 @@ var test_buttons: Dictionary = {}
 var _carried_box: VBoxContainer
 var _bench_box: VBoxContainer
 var _done_label: Label
+## Scout update: "Work it" buttons by ore kind, and the ore rows.
+var ore_buttons: Dictionary = {}
+var _ore_box: VBoxContainer
+var _ore_sig := ""
 var _job_status: Dictionary = {}
 var _sig := ""
 
@@ -30,7 +34,8 @@ func _shows_later_note() -> bool:
 func _what_you_can_do() -> PackedStringArray:
 	return PackedStringArray(["Put a salvaged part on the bench to clean and fit it (anyone).",
 		"Run its bench test when it is ready: a part that passes becomes one working spare part.",
-		"Only salvaged parts can be refurbished. Nothing is made from rock or soil."])
+		"Only salvaged parts can be refurbished: motors and electronics never come from rock.",
+		"Special ore from outside: hematite (iron) is cast into simple brackets and frames; other ores are studied for science."])
 
 
 func _build_body() -> void:
@@ -47,6 +52,10 @@ func _build_body() -> void:
 	_body.add_child(_bench_box)
 	_done_label = _add_text(_body, "", UiTheme.MUTED)
 	_done_label.name = "Finished"
+	_add_heading_with_help(_body, "Special ore from outside", "parts")
+	_ore_box = VBoxContainer.new()
+	_ore_box.name = "Ores"
+	_body.add_child(_ore_box)
 
 
 func _refresh_body(st: ColonyState) -> void:
@@ -80,6 +89,42 @@ func _refresh_body(st: ColonyState) -> void:
 	for pid: String in comps:
 		names.append("%s × %d" % [pid.replace("_", " "), int(comps[pid])])
 	_done_label.text = "Components made so far: %s." % (", ".join(names) if not names.is_empty() else "none yet")
+	_refresh_ores(st)
+
+
+## Scout update: each ore in the colony store, what working it gives, and a button to work it.
+func _refresh_ores(st: ColonyState) -> void:
+	var sig := JSON.stringify(st.scout.get("ores", {})) + "|" + str(ScoutSystem.science_points(st))
+	if sig == _ore_sig:
+		return
+	_ore_sig = sig
+	for child in _ore_box.get_children():
+		_ore_box.remove_child(child)
+		child.queue_free()
+	ore_buttons.clear()
+	var any := false
+	for kind in ScoutSystem.ore_kinds():
+		var have := ScoutSystem.ore_count(st, kind)
+		if have <= 0:
+			continue
+		any = true
+		var info := ScoutSystem.ore_info(kind)
+		var parts_use := String(info.get("use", "")) == "parts"
+		var row := HBoxContainer.new()
+		_ore_box.add_child(row)
+		var l := _add_text(row, "◆ %s × %d · %s" % [String(info.get("name", kind)), have,
+			("%d make one spare part" % ScoutSystem.HEMATITE_PER_PART) if parts_use else "study it: +1 science"])
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var b := Button.new()
+		b.name = "Ore_%s" % kind
+		b.text = "Cast a part" if parts_use else "Study it"
+		b.disabled = have < (ScoutSystem.HEMATITE_PER_PART if parts_use else 1)
+		b.pressed.connect(func() -> void: _ask(&"process_ore", {"kind": kind}, _on_answer))
+		row.add_child(b)
+		ore_buttons[kind] = b
+	if not any:
+		_add_text(_ore_box, "No ore in store. The scout rover marks ore deposits on the map; collect it outside.", UiTheme.MUTED)
+	_add_text(_ore_box, "Science score: %d" % ScoutSystem.science_points(st), UiTheme.MUTED)
 
 
 func _build_lists(st: ColonyState, carried: Array[String], samples: Array[String], bench: Dictionary) -> void:

@@ -25,6 +25,8 @@ var max_width := 0.0
 var max_height := 0.0
 ## True: an accent line is drawn along the panel's top edge, so every panel reads as part of one console.
 var accent_line := true
+## True: UiRoot puts the panel against the right edge (a drawer, like the power and build drawers) instead of centring it.
+var align_right := false
 
 
 ## Builds the panel. Subclasses call super.setup(p_services) first.
