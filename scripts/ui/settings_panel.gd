@@ -268,6 +268,17 @@ func _build_controls(box: VBoxContainer) -> void:
 	_toggle_sprint = _check(box, "Tap Shift to sprint (instead of holding it)", func(on: bool) -> void:
 		settings.toggle_sprint = on
 		_apply())
+	# Prompt 11: microphone, voice volume and per-player mute live in their own panel.
+	var voice := Button.new()
+	voice.name = "VoiceSettingsButton"
+	voice.text = "Voice and microphone…"
+	voice.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	voice.pressed.connect(func() -> void:
+		var p := VoiceSettingsPanel.new()
+		p.settings = settings
+		p.settings_path = settings_path
+		open_requested.emit(p))
+	box.add_child(voice)
 	var heading := _label(box, "Keys")
 	heading.theme_type_variation = UiTheme.HEADING
 	var help := _label(box, "Press Change, then the new key or mouse button. Esc cancels.")

@@ -24,7 +24,7 @@ const CARD_IDS: Array[String] = ["energy_battery_reserve", "energy_solar_trackin
 const EVIDENCE_IDS: Array[String] = ["energy_predict_net_power", "energy_diagnose_output_loss", "energy_verify_recovery",
 	"ls_distinguish_inputs", "ls_co2_removal", "ls_storage_vs_pressure", "food_compare_symptom", "food_adjust_one_cause",
 	"food_observe_response", "res_identify_compatible", "res_assembly_test", "sci_record_context", "sci_compare_controls",
-	"sci_apply_result"]
+	"sci_apply_result", "comms_radio_check"]
 const INSTALLERS := {"energy": "electrical_comms", "life_support": "medical_life_support", "food": "biology_food",
 	"resources": "field_engineering_geology", "science": ""}
 const SIZES := [[Vector2i(1280, 720), 1.0], [Vector2i(1920, 1080), 1.0], [Vector2i(1280, 720), 1.5]]
@@ -309,8 +309,11 @@ func _test_catalogue() -> void:
 		for e in c.evidence:
 			if not EVIDENCE_IDS.has(String(e)):
 				problems.append("evidence %s" % e)
-		if c.cost_parts <= 0 or c.cost_parts != pb.parts_for(String(c.id)):
-			problems.append("cost %d vs balance %d" % [c.cost_parts, pb.parts_for(String(c.id))])
+		# Prompt 11: the four radio cards cost 1-4 parts by contract (CommsStage.CARD_PARTS), not ProgressionBalance.
+		var comms_i := CommsStage.CARD_IDS.find(String(c.id))
+		var want_cost := CommsStage.CARD_PARTS[comms_i] if comms_i >= 0 else pb.parts_for(String(c.id))
+		if c.cost_parts <= 0 or c.cost_parts != want_cost:
+			problems.append("cost %d vs balance %d" % [c.cost_parts, want_cost])
 		if not _catalog.has(String(c.install_station)) and not STAND_INS.has(String(c.install_station)):
 			problems.append("install station %s" % c.install_station)
 		if not _objects.has(String(c.install_station)):
@@ -320,14 +323,15 @@ func _test_catalogue() -> void:
 		if not problems.is_empty():
 			bad.append("%s: %s" % [c.id, ", ".join(problems)])
 	var all_ids := true
-	for id in CARD_IDS:
+	for id in CARD_IDS + Array(CommsStage.CARD_IDS):
 		all_ids = all_ids and ids.has(id)
-	_check("catalogue: the 16 contract upgrade ids load into UpgradeDefinition with every field", cards.size() == 16 and all_ids and bad.is_empty(),
+	_check("catalogue: the 16 contract upgrade ids and the 4 radio cards load into UpgradeDefinition with every field", cards.size() == 16 + CommsStage.CARD_IDS.size() and all_ids and bad.is_empty(),
 		"%d cards; %s" % [cards.size(), "; ".join(bad)])
 	# the json cost matches the balance resource
 	var raw_costs := true
 	for c: Dictionary in ProgressionSystem.catalogue().cards:
-		raw_costs = raw_costs and int(c.cost_parts) == pb.parts_for(String(c.id))
+		if not CommsStage.CARD_IDS.has(String(c.id)):
+			raw_costs = raw_costs and int(c.cost_parts) == pb.parts_for(String(c.id))
 	_check("catalogue: parts costs in upgrades.json equal ProgressionBalance.card_parts", raw_costs and pb.card_parts.size() == 16)
 
 	# branching: in every sector at least two cards share a tier; every sector has tiers 1..3 and the cheapest card of
@@ -1011,7 +1015,8 @@ func _test_panels() -> void:
 		sectors_ok = sectors_ok and up.sector_text(sector).contains("level 0 of 3") and up.find_child("Sector_" + sector, true, false) != null
 	var lines := up.requirement_lines(&"energy_solar_tracking")
 	var locked_ok := up.install_button(&"energy_solar_tracking").disabled and up.reason_label(&"energy_solar_tracking").text.begins_with("Locked:")
-	_check("cards panel: 16 cards grouped in 5 sectors with the sector level", up.definitions.size() == 16 and up.install_buttons.size() == 16 and sectors_ok,
+	var n_cards := 16 + CommsStage.CARD_IDS.size()       # Prompt 11 added the four radio cards (energy sector)
+	_check("cards panel: %d cards grouped in 5 sectors with the sector level" % n_cards, up.definitions.size() == n_cards and up.install_buttons.size() == n_cards and sectors_ok,
 		"%d cards, %s" % [up.definitions.size(), up.sector_text("energy")])
 	_check("cards panel: each requirement is shown with ✖/✓ and words (level, questions, evidence, parts, installer, station)",
 		lines.size() == 7 and lines[0].begins_with("✖ Energy level 1 needed") and lines[1].begins_with("✖ Answer: ") and lines[3].begins_with("✖ Do: ")

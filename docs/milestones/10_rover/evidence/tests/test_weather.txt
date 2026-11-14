@@ -1,0 +1,93 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS offline boot: with no cache the shipped bundle is used (fixture-weather-w-v1@1)
+PASS offline boot: a new game pins the snapshot id and saves the site and archive dates with the game
+PASS the default shipped folder is res://data/weather/bundle and the cache user://weather_cache/current
+PASS no bundle at all: a built-in default, clearly labelled (no archive data, constant sky, no events)
+PASS fixture validates: manifest fields, sha256, units, missing values, monotonic time (3 products, 3 episodes)
+PASS the bundle's conventions are accepted: a non-PDS research-archive product (pds_lid 'none (...)'), an Ls range wrapping through 0/360 (359.928 -> 12.5), a time column `sol` in unit "1"
+PASS missing values are skipped, never used as numbers: wind -999.0 rows leave the measured mean (4.68 m/s)
+PASS invalid data is rejected with the problem named, and the shipped bundle stays in use (13 cases: units, flags, sha256, time, numbers, ranges, fields, header, sites, episodes, JSON)
+PASS a stale cache older than the shipped bundle is ignored
+PASS a newer valid cache built on the shipped bundle is used
+PASS a cache built on an older shipped bundle is ignored after a game update
+PASS a damaged cache never crashes: the shipped bundle is used and the reason is noted
+PASS route grid: baked grid loaded (280 x 266 cells of 2 m, 33804 reachable)
+INFO return routes: (52.0, 0.0, 0.0): walk 46.1 m (A* 46.1 m, straight line 33.9 m), 19.2 s at 2.4 m/s; (-20.0, 0.0, 40.0): walk 66.6 m (A* 66.6 m, straight line 48.5 m), 27.7 s at 2.4 m/s; (2.0, 0.0, 62.0): walk 54.7 m (A* 54.7 m, straight line 50.4 m), 22.8 s at 2.4 m/s
+PASS route grid: the walking cost home from the 3 outdoor test points is the same by the Dijkstra field and by A*, and never shorter than the straight line
+PASS route grid: the glass hall and tunnel are not walkable from outside, big rocks and the sun trackers are obstacles (10 of 11 big rocks near the base blocked)
+PASS route grid: an A* route home exists and ends at the tunnel's outer door
+PASS game Ls from the sol count: Ls 150 at sol 0, back to 150 after one Mars year, rising 5.31 deg in 10 sols
+PASS teach first: with no panel cleaned, no dust event in 5 sols and the first event is not scheduled
+PASS teach first: after a panel is cleaned (sol 5.0) the first event starts later (sol 5.35), with a warning before it
+PASS teach first: the first event is minor (the smallest archive episode, severity 0.24 <= 0.35)
+PASS readiness: a colony that is not ready (battery 1 kWh, below 180) has its first event held back (moved 48 h)
+PASS teach first: panels cleaned at sol 0.2, the condition is the 2-sol mark (sol 2.00) and the first event starts after it (sol 2.53)
+PASS teach first: the evidence energy_diagnose_output_loss also counts as taught
+PASS deterministic replay: the same seed gives the same queue, the same events and the same opacity curve (2960 ticks, 2 events), run twice
+PASS wind: an episode whose wind was not measured (-999.0) never shows a -999 wind; the source is labelled (archive background wind, archive background wind (not measured for this episode), this episode's measured wind)
+PASS deterministic replay: another seed gives another sequence
+PASS the opacity changes smoothly (largest step between 0.1 h ticks 0.0134) and stays bounded (highest 0.85 <= 4.0)
+INFO save -> reload: largest opacity difference from the run that never saved 1.1102230246251565e-16 over 494 ticks (Godot's JSON reads a few numbers back to the last bit, see SaveService)
+PASS save -> reload mid-storm continues identically: the same storm, queue, events and random state; opacity on every tick for 2 sols equal to the unsaved run within 1e-9 and bit-identical between two loads
+PASS late join: a ColonyState.from_dict(to_dict()) replica (and a client's assign_from) has the same weather, queue, snapshot id and opacity
+PASS events: a system_alert warning ahead of each event, then weather_changed start, peak and end (alert, warning, start, peak, end, alert, warning, start, peak, end)
+PASS the warning says: archive observations from Jezero, played faster; not a forecast for this colony; walk back; clean the panels
+INFO warning margin: sol 20 min, point (52.0, 0.0, 0.0): outside true, walk home 46 m = 19.2 s, needed 2.0 x 19.2 s = 38.5 s (0.79 game h), warning lead 4.09 game h = 199 real s (margin 10.3 x)
+INFO warning margin: sol 20 min, point (-20.0, 0.0, 40.0): outside true, walk home 67 m = 27.7 s, needed 2.0 x 27.7 s = 55.5 s (1.14 game h), warning lead 4.05 game h = 197 real s (margin 7.1 x)
+INFO warning margin: sol 20 min, point (2.0, 0.0, 62.0): outside true, walk home 55 m = 22.8 s, needed 2.0 x 22.8 s = 45.6 s (0.94 game h), warning lead 4.09 game h = 199 real s (margin 8.7 x)
+INFO warning margin: sol 5 min, point (52.0, 0.0, 0.0): outside true, walk home 46 m = 19.2 s, needed 2.0 x 19.2 s = 38.5 s (3.16 game h), warning lead 5.28 game h = 64 real s (margin 3.3 x)
+INFO warning margin: sol 5 min, point (-20.0, 0.0, 40.0): outside true, walk home 67 m = 27.7 s, needed 2.0 x 27.7 s = 55.5 s (4.56 game h), warning lead 5.26 game h = 64 real s (margin 2.3 x)
+INFO warning margin: sol 5 min, point (2.0, 0.0, 62.0): outside true, walk home 55 m = 22.8 s, needed 2.0 x 22.8 s = 45.6 s (3.75 game h), warning lead 5.21 game h = 63 real s (margin 2.8 x)
+PASS warning lead >= margin x walking time home along a real route, at 3 outdoor test points (20-minute and 5-minute sols)
+INFO lead with nobody outside (the farthest sun tracker counts): 5.21 game h; with crew_1 at (-90, 0, 90): 11.26 game h
+PASS warning lead follows the longest current outdoor return (a far walker needs a longer warning)
+INFO seed spread over 20 seeds, 20 sols each, one cleaning round at the start: events per run min 2.00, mean 2.15, max 3.00 (n 20)
+INFO   first event start (sol): min 2.28, mean 2.40, max 2.55 (n 20); first gap after the teaching condition (game h): min 6.94, mean 9.82, max 13.59 (n 20)
+INFO   later gaps (sols, end to next start): min 1.00, mean 2.20, max 3.72 (n 23)
+INFO   durations (sols): min 1.13, mean 2.12, max 3.95 (n 43)
+INFO   severities (share of the observed opacity rise): min 0.24, mean 0.37, max 0.78 (n 43)
+INFO   darkest sky (tau): min 0.55, mean 0.67, max 1.23 (n 43)
+INFO   recovery intervals after events (game h): min 23.14, mean 23.83, max 25.18 (n 43)
+INFO   lowest battery in any run: 336.7 kWh with weather, 482.7 kWh in the controls without weather (life-support reserve 120 kWh)
+INFO   hours below the reserve outside any event, all 20 seeds: 0.0 h with weather; 0.0 h in the controls without weather
+PASS different seeds give different gaps (22 distinct), durations (38), severities (25) and first gaps (20) over 20 seeds
+PASS no fixed interval: later gaps span at least 1.5 sols across seeds
+PASS first event in every seed: minor, the smallest episode, after the teaching condition and the 2-sol mark
+PASS escalation: later events get stronger on average than the first (mean severity of 3rd+ events above the first's)
+PASS escalation stays recoverable over 20 sols with only one cleaning round: nobody reaches zero health (weather runs 0, control runs 0), events are spaced by the recovery interval, and the battery is below the 120 kWh reserve because of the weather only inside an event and never longer than it
+PASS recovery intervals vary with readiness (min 23.14, mean 23.83, max 25.18 (n 43))
+INFO maintained colony (cleaner repaired), 20 seeds x 20 sols: events per run min 3.00, mean 3.50, max 4.00 (n 20); gaps (sols) min 1.00, mean 2.32, max 3.97 (n 50); durations (sols) min 1.13, mean 2.52, max 5.29 (n 70); severities min 0.24, mean 0.48, max 1.04 (n 70); darkest sky (tau) min 0.55, mean 0.79, max 1.38 (n 70); lowest battery 470 kWh
+PASS a maintained colony gets the full escalation without harm (more events, stronger later ones, nobody down, battery above the reserve)
+PASS refresh: a conditional GET with If-None-Match and If-Modified-Since from the manifest, a timeout and a size cap
+PASS refresh: 304 = up to date, not a failure; the next check is in 1 hour
+PASS refresh: no check before it is due
+PASS refresh: 200 with a new product -> a complete validated bundle swapped in as the cache (product replaced, sha256 recomputed, episodes kept, product marked updated)
+PASS refresh: the status says the new data is used from the next new game or load
+PASS a refresh mid-storm does not change the running storm: the game keeps its pinned snapshot and runs exactly like a twin without the refresh
+PASS a new game after the refresh uses the new data (fixture-weather-w-v1@r20270115T090000Z)
+PASS a load after the refresh adopts the new data for new events, and keeps every issued event and the running storm
+PASS refresh: the previous cache is kept as a backup when a newer one is swapped in
+PASS refresh: a 200 with the archive's original file (not a bundle CSV) is marked as 'update published', not a failure; the validated bundle stays in use
+PASS refresh: the next check asks with the published file's ETag, so the same file is not downloaded again
+INFO refresh failures: HTTP 500 -> Check failed: fx_meda_tau: the archive answered HTTP 500. The last valid data is kept. | timeout -> Check failed: fx_meda_tau: no answer in time (timeout). The last valid data is kept. | oversize -> Check failed: fx_meda_tau: the file is larger than allowed, the download was stopped. The last valid data is kept. | interrupted download (partial file) -> Check failed: fx_meda_tau: the download was interrupted and is incomplete (300 of 2000 bytes). The last valid data is kept. | invalid flags -> New data was rejected: product fx_meda_tau: 1 bad cells (first: row 2 flag tau_flag is 2.5 (flags are whole numbers 0..255)). The last valid data is kept. | invalid value (opacity 75, outside the plausible range for unit 1) -> New data was rejected: product fx_meda_tau: 1 bad cells (first: row 2 column tau = 75.0 1 is outside the plausible range). The last valid data is kept. | time going backwards -> New data was rejected: product fx_meda_tau: time column 'sol' goes backwards at row 2. The last valid data is kept. | no connection -> Check failed: fx_meda_tau: no connection to the archive (offline?). The last valid data is kept.
+PASS refresh: HTTP 500, timeout, oversize, interrupted download, invalid flags/values/time and no connection all leave the cache untouched (an unrecognised file is an original archive file: marked as published, tested above)
+PASS refresh: retries back off 1, 2, 4, 8, 16, 32, 60, 60 minutes ([1, 2, 4, 8, 16, 32, 60, 60])
+PASS refresh: a rejected download names the reason and keeps the last valid data
+PASS refresh: the next good answer resets the backoff
+PASS refresh: the status (observation period, last check, last result) is saved for the screens
+PASS weather screen: the panel for stations of kind weather (scripts/ui/stations/weather_station_panel.gd) shows both labels ('archive observations from Jezero, played faster', 'not a forecast for this colony')
+PASS weather screen: active data (site, archive dates, status, data id), opacity and solar effect in words, and the warning
+PASS weather screen: 'I heard the warning' asks the host and every screen shows who heard it
+PASS acknowledge_weather_warning is refused when there is no warning
+PASS weather screen passes layout at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS weather screen: keyboard focus on every control
+PASS presenter: sun and sky dim with the opacity (sun 1.00 -> 0.41 at tau 2), fog thickens, all bounded (never below 25 %, fog <= 0.020), and it scales whatever ZoneLighting set
+PASS presenter: a bounded cloud of dust particles (160 at most) only around an outdoor player on a dusty day
+PASS presenter: setup gives the session's WeatherSystem the session (warnings use the real sol length)
+PASS no script or engine errors during the test
+RESULT 66/66
+WARNING: 528 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 20 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

@@ -1,0 +1,96 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS stations: the garage station is on the map's print garage, the charger beside it, both outside
+PASS map: the drivable rover sf_rover stands in sf_print_garage (fallback park pose = its origin)
+PASS map: the parked rover is in the garage and within the charger's cable reach
+PASS stations: their panels come from scripts/ui/stations/<kind>_station_panel.gd
+PASS new game: no rover yet, empty battery, four empty seats, parked at the garage
+PASS reach: the garage, the charger and the 9 new donors each have a clear standing spot within reach (on the ground outside)
+  sf_print_garage: clear spot 0.0 m away
+  garage_charger: clear spot 0.0 m away
+  sf_crash_stage: clear spot 0.0 m away
+  sf_crash_shield: clear spot 1.8 m away
+  sf_crash_debris_a: clear spot 0.0 m away
+  sf_crash_debris_b: clear spot 0.0 m away
+  sf_crash_debris_c: clear spot 0.6 m away
+  pr_bat_hv_alarm: clear spot 0.8 m away
+  pr_bat_rack_alarm.001: clear spot 1.0 m away
+  pr_bat_rack_alarm.002: clear spot 0.8 m away
+  gr_rack_fault: clear spot 1.0 m away
+PASS donors: the five P08 donors are still first and unchanged in salvage.json
+PASS donors: 9 new donors are existing map objects with a salvage station, 2+ compatible and 2+ unusable parts with clues
+PASS donors: 14 salvage stations, one per donor in salvage.json
+PASS donors: a new donor gives a part through the P08 flow (inspect, recover, refurbish, bench test: +1 spare part); an unusable part is refused
+PASS supply/demand: every number of the table in model_sources_rover.json matches the data files
+PASS supply/demand: the shortfall is flagged (a fully upgraded rover is not reachable from approved map salvage), the campaign needs 1 part
+  supply: start 10 + recovered 14 (base) / 28 (with the refurbishing jig) = 24 / 38; listed compatible 29
+  demand: facility cards 42 + comms 10 + rover 50 = 102; shortfall 64
+PASS sources: every RoverBalance field has a category in model_sources_rover.json; every cited id is in the register
+PASS sources: Mars gravity is the register's S01 value (3.73 m/s²) and the curves are labelled fictional, not NASA data
+PASS costs: the steps cost 1, 2, 3, 4 parts; one stat to 5 costs 10, all five 50
+PASS stats: each slider raises its own stat at every level (speed, push, battery, cargo, grip)
+PASS stats: the cargo slider changes cargo capacity only, never the four seats
+PASS stats: real cargo changes the forecasts (range, pulling away, slope) without changing the levels' stats
+PASS range: honest = stored energy / (kWh per km x terrain factor), with the crew and cargo aboard (0.39 km from 10 kWh)
+PASS stats: more torque climbs steeper, more grip allows a steeper slope before slipping
+PASS energy: more with cargo, more with crew, more on a climb (m g h at Mars g); downhill recovers nothing
+PASS energy: c m g d + m g h over the drivetrain efficiency, with the map distance factor (2.4090 kWh)
+PASS assemble: refused for the wrong specialist, from too far away and at the wrong station
+PASS assemble: a refit before the build, a level of 6, an unknown stat and missing check answers are refused; nothing changed
+PASS challenge: deterministic, covers the changed modules (biggest change first, at most 3), each with 3 modules, 3 sockets and 3 answers
+PASS challenge: different stats give different modules and checks
+PASS challenge: a wrong check answer explains why, changes nothing, costs nothing and gives a changed example
+PASS challenge: answers to the old example are refused as out of date
+PASS assemble: a custom build beyond any example (speed 2, battery 3, traction 2) costs exactly 5 parts after the check
+PASS assemble: the first build creates no energy (the battery is empty until charged) and records evidence res_rover_assembly once
+PASS assemble: a second assembly is refused (use refit)
+PASS refit: an unaffordable change is refused with the numbers, and nothing changes
+PASS refit: a plan equal to the rover is refused (nothing to change)
+PASS refit: lowering the battery 3 -> 1 gives back its 3 parts; the same request again is a duplicate and gives nothing
+PASS refit: replaying the refund under a new request id is refused (its transaction number is used)
+PASS refit: raising the battery again uses the same 3 parts (refits fully reuse invested parts)
+PASS refit: refused when the rover is away from the garage
+PASS refit: with enough parts all five stats reach level 5, exactly 50 parts invested, no hidden cap
+PASS refit: four seats in every configuration
+PASS charging: the battery fills to its capacity and no further (56 kWh at level 5)
+PASS refit: a smaller battery keeps only what fits (56 -> 20 kWh) and records the 36 kWh that left with the modules
+PASS refit: a bigger battery keeps the stored energy (20 kWh) and does not fill it
+PASS ledger: colony and rover battery identities hold through charging and refits (worst 5.968558980384842e-13)
+PASS cargo: anyone may load; 4 crates (100 kg) fit the level-1 bay, the 5th is refused as too heavy
+PASS cargo: loaded items are held by the rover (nobody can pick them off the ground)
+PASS cargo: a refit to a cargo bay smaller than the load (125 kg aboard, 100 kg bay) is refused and says to unload
+PASS cargo: loaded items move with the rover's pose (positions saved right)
+PASS cargo: unloading puts the item in the actor's pack; from too far it is refused
+PASS save/load: every rover field (levels, battery, cargo, seats, pose, charging, trip, refit number, example number) comes back the same, mid-refit with cargo aboard
+PASS save/load: replaying an old refund request after the load refunds nothing (its transaction number is used)
+PASS save/load: the refit goes on after the load with the saved example number
+PASS seats: four people ride (driver in seat 0, three passengers), each recorded in rover.seats
+PASS seats: a seated character is placed at its seat
+PASS seats: a fifth person is refused (all four seats taken); a seated person cannot take a second seat
+PASS seats: there is no seat 4 (bad request)
+PASS seats: a driver disconnect frees the driver's seat (the character returns to the hub); the passengers keep theirs
+PASS seats: an emergency recovery frees that character's seat
+PASS seats: a parked character's seat is free on the next tick
+PASS seats: releasing a seated character (peer 2) frees its seat; the rover is empty again
+PASS exit: the host checks the exit index and puts the character at the pose + exit offset; the seat is freed; leaving twice is refused
+PASS enter: the garage is outside, so getting in needs the suit on; with it on it works (and inside no suit is needed)
+PASS enter: refused from too far away
+PASS charging: refused from too far (actor) and with the rover out of cable reach; anyone can plug in at the charger
+PASS charging: 2 game hours at 5.0 kW move exactly 10.0 kWh from the colony battery; the rover gets 90 % of it (all ledgered)
+PASS charging: at the colony's charging reserve (280 kWh) it takes only the 0.01 kWh above it, then pauses with a reason, still plugged in
+PASS charging: over 2 game hours near the reserve the charger never takes the colony battery below it
+PASS charging: a colony power deficit pauses charging (direct system step)
+PASS charging: driving away from the charger stops charging and says why
+PASS note_driven: more energy with cargo aboard and on a climb; the trip totals and the ledger count it
+PASS note_driven: an empty battery gives only what it holds (0.2 kWh), then nothing (coast and brake only), with one alert
+PASS garage panel: five sliders 1-5 with the level now, planned and the parts given back (speed 5 -> 3 gives 7)
+PASS garage panel: stats now and planned, battery stored, honest range with the cargo aboard
+PASS garage panel: anyone can plan, but only the field specialist ⛏ gets the button (others are told who can)
+PASS garage panel: the engineer answers the check in the panel and refits (speed 5 -> 3, 7 parts back)
+PASS charger panel: shows the rover battery, the colony cost and plugs the rover in or out
+PASS layout garage (engineer, 3 check cards) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus garage (engineer, 3 check cards)
+PASS layout charger at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus charger
+PASS no script or engine errors during the test
+RESULT 80/80

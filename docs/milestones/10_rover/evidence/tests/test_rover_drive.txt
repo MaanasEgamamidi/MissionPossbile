@@ -1,0 +1,116 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS rover.json names the map rover and its garage
+PASS six wheels, four seats, at least four exits
+PASS garage park pose is the map placement turned to face -Z forward  [X: (-0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, -0.0), O: (8.3, -0.00136, 23.0)] vs [X: (0.0, 0.0, -1.0), Y: (0.0, 1.0, 0.0), Z: (1.0, 0.0, 0.0), O: (8.3, -0.00136, 23.0)]
+PASS parked rover faces out of the garage door (world +x)
+PASS every seat fits in the measured cabin (feet, head and backpack clear)
+PASS choose_seat: driver first, then the first free passenger seat, -1 when full
+PASS pose survives the JSON save form
+PASS malformed poses are refused
+PASS RoverSystem.note_driven is found at run time (static) and called with distance and climb  12.00
+PASS ... or as a method of the RoverSystem in the simulation's post_systems
+PASS fallback charge takes RoverModel.energy_kwh_for_move from the rover battery  0.23313 kWh
+PASS fallback never takes more than is stored
+INFO stand-ins registered: []
+LEG to (23.0, 31.0): at (20.9, 28.9) y -0.00, arrived true, 12.2 m in 5.0 s, stuck 0, max tilt 2.0 deg
+LEG to (14.0, 46.0): at (14.6, 47.6) y -0.03, arrived true, 11.9 m in 7.8 s, stuck 0, max tilt 2.2 deg
+LEG to (18.0, 40.0): at (16.3, 39.9) y -0.07, arrived true, 14.3 m in 11.0 s, stuck 0, max tilt 1.1 deg
+LEG to (6.0, 39.0): at (7.5, 40.3) y -0.03, arrived true, 11.9 m in 6.4 s, stuck 0, max tilt 1.5 deg
+LEG to (-5.0, 36.0): at (-4.2, 36.2) y -0.02, arrived true, 12.5 m in 13.4 s, stuck 0, max tilt 0.2 deg
+LEG to (6.0, 44.0): at (3.5, 44.2) y -0.03, arrived true, 10.2 m in 8.5 s, stuck 0, max tilt 0.4 deg
+LEG to (15.0, 50.0): at (12.9, 48.7) y -0.03, arrived true, 10.6 m in 4.9 s, stuck 0, max tilt 0.5 deg
+LEG to (15.0, 66.0): at (15.0, 63.5) y -0.20, arrived true, 15.6 m in 6.8 s, stuck 0, max tilt 3.5 deg
+LEG to (-12.0, 66.0): at (-9.5, 66.1) y 0.12, arrived true, 26.6 m in 11.8 s, stuck 0, max tilt 6.2 deg
+LEG to (-29.5, 69.5): at (-27.1, 69.0) y 2.79, arrived true, 18.0 m in 8.2 s, stuck 0, max tilt 22.2 deg
+LEG to (-24.0, 61.0): at (-25.5, 59.0) y 0.19, arrived true, 12.9 m in 13.6 s, stuck 0, max tilt 25.9 deg
+LEG to (-8.0, 63.0): at (-10.4, 62.3) y -0.03, arrived true, 15.7 m in 6.8 s, stuck 0, max tilt 7.4 deg
+LEG to (15.0, 66.0): at (12.5, 65.7) y -0.16, arrived true, 23.2 m in 8.8 s, stuck 0, max tilt 2.5 deg
+LEG to (15.0, 50.0): at (15.3, 52.5) y -0.03, arrived true, 15.7 m in 8.3 s, stuck 0, max tilt 3.6 deg
+LEG to (23.0, 41.0): at (21.4, 42.9) y -0.14, arrived true, 11.7 m in 5.4 s, stuck 0, max tilt 1.6 deg
+LEG to (31.5, 38.0): at (29.2, 38.9) y -0.09, arrived true, 8.8 m in 4.2 s, stuck 0, max tilt 1.2 deg
+LEG to (31.5, 25.5): at (32.0, 27.9) y 0.02, arrived true, 12.3 m in 6.2 s, stuck 0, max tilt 9.3 deg
+LEG to (24.0, 23.1): at (25.4, 23.5) y -0.01, arrived true, 8.6 m in 5.7 s, stuck 0, max tilt 3.5 deg
+LEG to (15.0, 23.0): at (16.5, 22.9) y 0.10, arrived true, 9.1 m in 5.5 s, stuck 0, max tilt 4.3 deg
+LEG to (8.8, 23.0): at (9.2, 23.0) y 0.10, arrived true, 7.3 m in 7.2 s, stuck 0, max tilt 3.5 deg
+TABLE physics 60 Hz, Mars gravity 3.73 m/s2; stats (RoverModel) top 3.00 m/s, drive 3000 N, mu 0.45, mass 1400 kg (+160 kg crew aboard); accounting: RoverSystem.note_driven
+TABLE settle      origin y 0.098 m, 6/6 wheels down, tilt 0.0 deg
+TABLE straight    0 -> 2.70 m/s in 1.85 s over 2.5 m (left the garage at x 20.9)
+TABLE cruise      full throttle on the open straight: 2.95 m/s over the last 10 m, peak 2.97 m/s (top 3.00 m/s)
+TABLE braking     from 2.97 m/s: 2.78 m in 1.85 s (friction limit 2.63 m at mu 0.45)
+TABLE tight turn  radius 2.70 m at 1.40 m/s, full lock (steering geometry 2.68 m), 395 deg in 14.4 s
+TABLE cargo       0 -> 2 m/s: 2.22 s at 1560 kg, 4.77 s with 800 kg more (2360 kg)
+TABLE no battery  full throttle 3 s: moved 0.004 m, speed 0.001 m/s
+TABLE long route  garage -> sf_crash_shield (front 4.9 m from its centre, 3.3 m from its side) -> dunes -> rocks -> garage: 239.2 m in 140.4 s, energy 4.8353 kWh (charged 4.8353, counted 239.2 m), height -0.23..3.10 m, stuck 0, flips 0, back in garage: true
+TABLE rough       dunes and rock field: 181.3 m, height -0.23..3.10 m, max tilt 25.9 deg, wheel contact 99.6 %, stuck 0, flips 0
+TABLE exits       clear when parked [true, true, true, true, true, true]; all boxed -> first clear -1, still seated true; box 2 removed -> first clear 2, out true (0.00 m from the exit) ["You got out of the rover."]
+TABLE four seats  ["crew_1", "crew_2", "crew_3", "crew_4"], taken seat refused true (missing_prerequisite), seated bodies 3 at seats (worst 0.000 m), crew mass +640 kg
+INFO drive took 71.8 s of real time
+PASS drive completed  ["ok", &"setup", &"prop_cache", &"accounting", &"physics_hz", &"stats", &"capacity_kwh", &"settled", &"cue_before", &"boarded", &"role_after_boarding", &"hud_text", &"eye_above_floor", &"straight", &"cruise", &"brake", &"turn", &"cargo", &"empty_battery", &"route", &"rough", &"trip_battery_used_kwh", &"odometer_m", &"exits", &"seats", &"ctx"]
+PASS map rover found, its static boxes switched off, its lamps moved onto the body  { "object": "sf_rover", "mesh_found": true, "static_shapes_off": 3, "lights_moved": 7, &"garage_triangles_dropped": 212 }
+PASS physics at 60 Hz
+PASS settles on six wheels, level, at rest in the garage  { "y": 0.09846831858158, "speed": 0.00000736860693, "wheels": 6, "tilt_deg": 0.0 }
+PASS cue under the crosshair offers the driver's seat  [E] Get in: driver's seat
+PASS E boards the driver's seat (host action), the body stops colliding
+PASS seated eye at the seat's head height  1.29 m
+PASS HUD shows speed, battery, range, cargo, seats and the keys  Rover: you are driving
+Speed  0.0 m/s  (0 km/h)
+Battery  19.99 kWh  (100 %)
+Range about 0.7 km with this load
+Cargo  0 of 100 kg
+Driver: Electrical and communications  (you)
+Front: free
+Rear left: free
+Rear right: free
+
+WASD drive · Space brake · E get out · Tab view
+PASS straight run reaches 90 % of top speed in a time the drive force allows  1.85 s (ideal 1.40 s)
+PASS drives out of the garage (its rear past the door at x 11.5)  x 20.9
+PASS cruise holds top speed and never exceeds it by more than 5 %  2.95 m/s, peak 2.97
+PASS braking distance is friction-limited under Mars gravity  2.78 m from 2.97 m/s (limit 2.63 m)
+PASS tight turn radius close to the steering geometry  2.70 m (geometry 2.68 m) at 1.40 m/s
+PASS 800 kg of cargo slows acceleration about in proportion to mass  2.22 s -> 4.77 s (mass x 1.51)
+PASS empty battery: full throttle does not move the rover  { "moved_m": 0.00383440079167, "speed": 0.00120977847837, "hud": "Rover: you are driving\nSpeed  0.0 m/s  (0 km/h)\nBattery  0.00 kWh  (0 %)\nRange about 0.7 km with this load\nCargo  0 of 100 kg\nDriver: Electrical and communications  (you)\nFront: free\nRear left: free\nRear right: free\nBattery empty: the rover can only coast and brake.\nWASD drive · Space brake · E get out · Tab view" }
+PASS empty battery is shown on the HUD
+PASS long route: stopped beside the salvage donor (front within 4 m of it)  3.3 m from its side, 4.9 m from its centre
+PASS long route: drove back into the garage  (9.224413, 0.09853, 22.99423)
+PASS long route: never stuck, never flipped  stuck 0 flips 0
+PASS long route is long (over 150 m)  239.2 m
+PASS host counted the driven distance (within 5 %)  239.2 of 239.2 m
+PASS driving energy charged equals the battery drop  4.83525 kWh, accounting RoverSystem.note_driven
+PASS driving energy goes through the host's RoverSystem.note_driven (ledger, trip, odometer, empty-battery alert)  RoverSystem.note_driven
+PASS saved pose follows the live body  0.000 m
+PASS rough ground: climbed the dune (over 2.5 m up)  max height 3.10 m
+PASS rough ground: no flip, tilt under 30 degrees  25.9 deg
+PASS rough ground: wheels on the ground at least 90 % of the time  99.6 %
+PASS parked in the garage at least one exit is clear  [true, true, true, true, true, true]
+PASS every exit boxed in: getting out is refused, still seated, and the HUD says why  ["Every way out is blocked. Drive a little way into the open, then press E again."]
+PASS one exit cleared: out through that exit, standing, colliding again  0.00 m
+PASS standing on the ground after getting out
+PASS four crew aboard: driver and three passengers  ["crew_1", "crew_2", "crew_3", "crew_4"]
+PASS a taken seat is refused and no fifth seat exists
+PASS the rover carries the crew's mass  +640 kg
+PASS other crew are drawn seated at their seats; their walking copies are hidden
+PASS riders out again: seated copies gone, walking copies back  ["ok", "ok", "ok"], 0 left, seats ["crew_1", "", "", ""]
+PASS client joined the host
+PASS host and client game scenes each built their rover
+PASS host provides the rover pose with the body positions
+PASS client shows the rover where the host has it  0.000 m
+PASS host has the client's body beside the rover
+INFO client after E: messages ["You are in the driver\'s seat. Battery 10 kWh: about 430 m of driving. Space brakes; E gets out."], host seats ["crew_2", "", "", ""]
+PASS client boards the driver's seat through the host
+PASS roles: client drives, host follows (kinematic copy)
+PASS client drove the rover out  8.7 m
+PASS host accepted the driver's poses (~20 Hz) and none were refused  69 accepted, 0 refused
+PASS host's saved pose and kinematic copy match the driver's body  0.000 m / 0.000 m
+PASS host charged the client's driving to the rover battery  0.15941 kWh for 8.80 m
+PASS poses from a non-driver, an impossible jump or garbage are refused
+PASS driver's seat freed: host simulates the parked rover with the brake on  moved 0.00 m
+PASS client's character stands again when its seat is freed
+PASS client now follows the host's parked rover
+PASS clean run: the engine error log stayed empty
+RESULT 64/64
+WARNING: 217 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

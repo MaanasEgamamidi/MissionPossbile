@@ -1,0 +1,147 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS for_station: right panel for every station (21 base + those added by data files), suit rack included
+PASS power panel has a switch for every zone
+PASS switch Greenhouse off sends exactly one set_zone_power with the right zone and value
+PASS load text updates after Greenhouse off
+PASS cause and effect sentence for Greenhouse
+PASS switch Hangar bay off sends exactly one set_zone_power with the right zone and value
+PASS load text updates after Hangar bay off
+PASS cause and effect sentence for Hangar bay
+PASS refused switch: one request, host answers too_far
+PASS refused switch flips back and shows the reason
+PASS switch reflects the state on refresh
+PASS computer buttons open Colony summary, Upgrades and Blueprint
+PASS station readings show values with units, a status mark and a ? button
+PASS upgrade cards load into UpgradeDefinition (16 + 4 radio cards, all five sectors)
+PASS cards show cost vs parts, the locked reason, and a disabled install button
+PASS locked reasons in words: sector level, questions to answer, things to do
+PASS keyboard focus moves between the cards
+PASS blueprint draws without errors
+PASS blueprint converts coordinates (room centre within 1 px, west left, north up)
+PASS blueprint shows an unpowered room dimmed with ✖
+PASS clicking a room shows its name, power state and load
+PASS legend lists every symbol used
+PASS zoom doubles the plan and Centre on me puts you in the middle
+PASS layout Station_hg_control_board (Workbench) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_hg_control_board (Workbench)
+PASS layout Station_it_transceiver (Transceiver board) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_it_transceiver (Transceiver board)
+PASS layout Station_rk_treadmill (Exercise corner) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_rk_treadmill (Exercise corner)
+PASS layout Station_md_survivor (Patient) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_md_survivor (Patient)
+PASS layout Station_md_heal_station (Med station) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_md_heal_station (Med station)
+PASS layout Station_mb_ct_console (Old record) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_mb_ct_console (Old record)
+PASS layout Station_mb_glovebox (Lab glovebox) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_mb_glovebox (Lab glovebox)
+PASS layout Station_cm_colony_computer (Colony computer) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_cm_colony_computer (Colony computer)
+PASS layout Station_cm_comms_console (Comms console) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_cm_comms_console (Comms console)
+PASS layout Station_cr_wall_display (Weather screen) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_cr_wall_display (Weather screen)
+PASS layout Station_cr_console_alarm (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_cr_console_alarm (Salvage donor)
+PASS layout Station_cr_console_001 (Old record) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_cr_console_001 (Old record)
+PASS layout Station_gr_w_hab_screen (Old record) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gr_w_hab_screen (Old record)
+PASS layout Station_gr_rack_fault (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gr_rack_fault (Salvage donor)
+PASS layout Station_gh_console (Greenhouse console) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gh_console (Greenhouse console)
+PASS layout Station_al_suit_rack (Suit rack) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_al_suit_rack (Suit rack)
+PASS layout Station_ak_terminal (Old record) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ak_terminal (Old record)
+PASS layout Station_pw_panel (Power panel) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pw_panel (Power panel)
+PASS layout Station_pr_bat_hv_alarm (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pr_bat_hv_alarm (Salvage donor)
+PASS layout Station_pr_bat_rack_alarm (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pr_bat_rack_alarm (Salvage donor)
+PASS layout Station_pr_bat_rack_alarm_001 (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pr_bat_rack_alarm_001 (Salvage donor)
+PASS layout Station_pr_bat_rack_alarm_002 (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pr_bat_rack_alarm_002 (Salvage donor)
+PASS layout Station_pr_swgr_burnt (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pr_swgr_burnt (Salvage donor)
+PASS layout Station_pr_panelboard (Old record) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pr_panelboard (Old record)
+PASS layout Station_pr_fsp_console (Old record) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pr_fsp_console (Old record)
+PASS layout Station_ls_console (Life support console) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ls_console (Life support console)
+PASS layout Station_ls_filter_old (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ls_filter_old (Salvage donor)
+PASS layout Station_sf_crash_shield (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_crash_shield (Salvage donor)
+PASS layout Station_sf_crash_tank (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_crash_tank (Salvage donor)
+PASS layout Station_sf_crash_debris_a (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_crash_debris_a (Salvage donor)
+PASS layout Station_sf_crash_debris_b (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_crash_debris_b (Salvage donor)
+PASS layout Station_sf_crash_debris_c (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_crash_debris_c (Salvage donor)
+PASS layout Station_sf_solar_tracker (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker (Sun tracker)
+PASS layout Station_sf_solar_tracker_001 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_001 (Sun tracker)
+PASS layout Station_sf_solar_tracker_002 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_002 (Sun tracker)
+PASS layout Station_sf_solar_tracker_003 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_003 (Sun tracker)
+PASS layout Station_sf_solar_tracker_004 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_004 (Sun tracker)
+PASS layout Station_sf_solar_tracker_005 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_005 (Sun tracker)
+PASS layout Station_sf_solar_tracker_006 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_006 (Sun tracker)
+PASS layout Station_sf_solar_tracker_007 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_007 (Sun tracker)
+PASS layout Station_sf_solar_tracker_008 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_008 (Sun tracker)
+PASS layout Station_sf_solar_tracker_009 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_009 (Sun tracker)
+PASS layout Station_sf_solar_tracker_010 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_010 (Sun tracker)
+PASS layout Station_sf_solar_tracker_011 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_011 (Sun tracker)
+PASS layout Station_sf_junction_box (Old record) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_junction_box (Old record)
+PASS layout Station_sf_print_garage (Rover garage) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_print_garage (Rover garage)
+PASS layout Station_gd_planter (Planter 1) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gd_planter (Planter 1)
+PASS layout Station_gd_planter_001 (Planter 2) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gd_planter_001 (Planter 2)
+PASS layout Station_gd_planter_002 (Planter 3) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gd_planter_002 (Planter 3)
+PASS layout Station_gd_planter_003 (Planter 4) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gd_planter_003 (Planter 4)
+PASS layout Station_gd_planter_004 (Planter 5) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gd_planter_004 (Planter 5)
+PASS layout Station_gd_planter_005 (Planter 6) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gd_planter_005 (Planter 6)
+PASS layout Station_gd_hydro (Hydroponics unit) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gd_hydro (Hydroponics unit)
+PASS layout Station_garage_charger (Rover charger) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_garage_charger (Rover charger)
+PASS layout Station_site_east_rocks (Sample site) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_site_east_rocks (Sample site)
+PASS layout Station_site_mast_boulders (Sample site) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_site_mast_boulders (Sample site)
+PASS layout Station_site_crash_crust (Sample site) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_site_crash_crust (Sample site)
+PASS layout Station_sf_crash_stage (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_crash_stage (Salvage donor)
+PASS layout UpgradeCards (Upgrades) at 1280x720, 1920x1080 and text 1.5
+PASS focus UpgradeCards (Upgrades)
+PASS layout Blueprint (Blueprint) at 1280x720, 1920x1080 and text 1.5
+PASS focus Blueprint (Blueprint)
+PASS no errors during the test
+RESULT 144/144

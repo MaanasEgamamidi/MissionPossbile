@@ -390,7 +390,7 @@ func _what_you_can_do() -> PackedStringArray:
 			return PackedStringArray(["See the colony summary: stores, power and how long they last.",
 				"Look at the upgrade cards for the facilities.", "Open the blueprint map of the base."])
 		"comms":
-			return PackedStringArray(["Read messages from Earth.", "Learn why a radio message to Earth takes minutes."])
+			return PackedStringArray(["Read messages from Earth.", "Learn why a radio message to Earth takes minutes.", "Repair the colony radio (radio repairs)."])
 		"food":
 			return PackedStringArray(["See how much food is in store.", "See how much the crew eats each sol."])
 		"heal":
@@ -435,6 +435,12 @@ func _build_body() -> void:
 				+ "minutes to reach Earth, and the answer takes minutes to come back.")
 			why_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			why.add_child(ExplainButton.make("sources"))
+			# Prompt 11: the colony radio's stage and its repair cards (installed at this console).
+			var radio := HBoxContainer.new()
+			_body.add_child(radio)
+			var radio_text := _add_text(radio, CommsStage.stage_text(CommsStage.stage(services.state())))
+			radio_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			_add_open_button(radio, "Radio repairs", func() -> UiPanel: return UpgradeCardsPanel.new())
 		"food":
 			_add_reading(&"food", "❀", "Food in store", "food")
 			_add_reading(&"food_use", "↓", "The crew eats", "stock_vs_flow")

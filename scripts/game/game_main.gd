@@ -28,6 +28,12 @@ var weather_presenter: WeatherPresenter
 var scout_presenter: ScoutPresenter
 ## Scout update: the mission-control HUD (vitals bar, goals, map, pop-ups, dock) laid around GameHud.
 var mission_hud: MissionHud
+## Prompt 11: private proximity voice and the colony radio (VoiceService adds its HUD corner itself).
+var voice: VoiceService
+## Prompt 10: the shared four-seat rover (body, seats, driving, HUD widget, network pose).
+var rover: RoverPresenter
+## Prompt 12: tutorial tracker, hints, specialist cues and the colony journal.
+var tutorial: TutorialPresenter
 var player: PlayerController
 var hud: GameHud
 ## Menus, panels, pause menu and subtitles (Prompt 05).
@@ -138,6 +144,11 @@ func _begin_play() -> void:
 	hud.name = "Hud"
 	add_child(hud)
 	hud.setup(services)
+	# Prompt 12: tutorial tracker, hints, specialist cues and the colony journal (J).
+	tutorial = TutorialPresenter.new()
+	tutorial.name = "TutorialPresenter"
+	add_child(tutorial)
+	tutorial.setup(world, services, self)
 	# One thing at a time on screen: the HUD steps aside while a panel or menu is open.
 	if not ui.menu_mode_changed.is_connected(_on_menu_mode_changed):
 		ui.menu_mode_changed.connect(_on_menu_mode_changed)
@@ -175,6 +186,16 @@ func _begin_play() -> void:
 	scout_presenter.setup(world, services, self)
 	mission_hud = MissionHud.new()
 	mission_hud.setup(world, services, self)
+	# Prompt 11: voice. After the HUD (its corner goes under GameHud) and the doors (it reads them for sound).
+	voice = VoiceService.new()
+	voice.name = "Voice"
+	add_child(voice)
+	voice.setup(world, services, self)
+	# Prompt 10: the rover. After the crew and the props: it hides the static map copy and drives its own body.
+	rover = RoverPresenter.new()
+	rover.name = "RoverPresenter"
+	add_child(rover)
+	rover.setup(world, services, self)
 	if check_weather_updates and DisplayServer.get_name() != "headless":
 		var refresh := WeatherRefresh.new()
 		refresh.name = "WeatherRefresh"

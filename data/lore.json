@@ -1,0 +1,119 @@
+{
+	"schema": 1,
+	"note": "Prompt 12 optional mystery: how a power, reserve and distribution cascade made the first crew leave the colony, and how everyone got home safely. Read by TutorialSystem and shown by StoryLogPanel and the record station panel. Every record is FICTION (the 2080 colony is invented), attached to an existing damaged object or console of the map, found by a real action there: 'read_record' at a record station (data/stations_lore.json) or 'inspect_donor' at a salvage donor (data/salvage.json). 'science' says which real fact the record touches; 'source_ids' are entries of docs/source_register.md (empty when the line is a general engineering principle or a game rule, which the text then says). Developer or community narrative advice was not used and is never scientific evidence. Solving the mystery is never required.",
+	"premise": "Fiction. In 2079 the first crew of this colony had to leave. A chain of small power problems, not one big accident, left the base too weak to run. All four of them flew home safely and put the base to sleep for the next crew: you.",
+	"fiction_label": "Fiction: a record left by the first crew (2079).",
+	"records": [
+		{
+			"id": "rec_battery_rack", "title": "Battery rack alarm", "station": "pr_bat_rack_alarm", "via": "inspect_donor",
+			"place": "a battery rack with a fault alarm in the Power Room",
+			"text": "Power log, sol 211. Rack 3 swelled and its alarm tripped, so we switched it out. That was the safe choice. But now the colony battery holds less than our plans say, and nobody changed the reserve on the wall chart. Ade, electrical.",
+			"science": "Real principle: a damaged battery cell is unsafe and must be taken out of use. The colony's battery numbers are game balance.",
+			"source_ids": []
+		},
+		{
+			"id": "rec_power_console", "title": "Night shift note", "station": "pr_fsp_console", "via": "read_record",
+			"place": "a console in the Power Room",
+			"text": "Night shift. The battery was empty by 04:00 again. Room lights, grow lights and both oxygen makers all ran at once. Each one looked small on its own. Together they were too much for our smaller battery. Priya.",
+			"science": "Real: a Mars sol lasts 24 h 39 min (S02), and solar panels give nothing at night, so a battery must carry the colony until sunrise.",
+			"source_ids": ["S02"]
+		},
+		{
+			"id": "rec_crash_tank", "title": "Cargo lander record", "station": "sf_crash_tank", "via": "inspect_donor",
+			"place": "the crashed cargo lander's tank outside",
+			"text": "Cargo record. The supply lander carried no crew. Its landing failed, and the spare battery racks inside were lost. That is why the colony never got the bigger battery it was planned with.",
+			"science": "Real: Mars gravity is 3.73 m/s² (S01), weaker than Earth's, but a lander still has to brake hard to land safely.",
+			"source_ids": ["S01"]
+		},
+		{
+			"id": "rec_junction_box", "title": "Tag on a solar junction box", "station": "sf_junction_box", "via": "read_record",
+			"place": "a junction box beside the western solar field",
+			"text": "Tag, sol 198. Cleaner wiper jammed. Spare part ordered from Earth. Panels at 60 percent and falling. We clean by hand when we can, but the dusty sky makes every working day shorter. Tomas.",
+			"science": "Real: the amount of dust in the Mars air changes, and a dusty sky lets less sunlight through. The game's dust episodes come from measured dust maps (W10).",
+			"source_ids": ["W10"]
+		},
+		{
+			"id": "rec_greenhouse_screen", "title": "Greenhouse screen", "station": "gr_w_hab_screen", "via": "read_record",
+			"place": "a screen in the Greenhouse room",
+			"text": "Greenhouse note. The lettuce went pale and leggy after three dark nights without grow lights. When the lights came back, the plants recovered in two sols. Plants are patient. Batteries are not. Lina.",
+			"science": "Real: NASA has grown lettuce under lights in the Veggie chamber on the ISS (S11). The game's crop times are shortened.",
+			"source_ids": ["S11"]
+		},
+		{
+			"id": "rec_air_filter", "title": "Old air filter tag", "station": "ls_filter_old", "via": "inspect_donor",
+			"place": "the old air filter unit in Life Support",
+			"text": "Life support log. We took this filter out early to save fan power. The air stayed safe the whole time, because the CO₂ scrubber was always the last machine on the list to lose power. Good rule. Keep it.",
+			"science": "Real: on the ISS, life support takes carbon dioxide out of the cabin air (S08). The game's load order is a game rule.",
+			"source_ids": ["S08"]
+		},
+		{
+			"id": "rec_switchgear", "title": "Switchgear incident card", "station": "pr_swgr_burnt", "via": "inspect_donor",
+			"place": "the burnt switchgear cabinet in the Power Room",
+			"text": "Incident card. To save cable, too many loads were wired to one line. When the battery got low, everything pulled hard at once and this cabinet overheated. The breaker did its job: it cut the power before anything worse happened. Nobody was hurt.",
+			"science": "Real principle: a breaker opens a circuit when too much current flows, so the wires do not overheat. This general engineering idea is not from the source register.",
+			"source_ids": []
+		},
+		{
+			"id": "rec_panelboard", "title": "Sticker on the panelboard", "station": "pr_panelboard", "via": "read_record",
+			"place": "a panelboard on the Power Room wall",
+			"text": "Sticker. Room lights, grow lights and the radio heater all share line B. Line B trips first. Plan: give the grow lights their own line when spare parts arrive. (They never arrived.)",
+			"science": "Game rule: the colony switches whole groups of loads off by priority when power runs short. That order is game design, not a NASA rule.",
+			"source_ids": []
+		},
+		{
+			"id": "rec_alarm_console", "title": "Command log", "station": "cr_console_alarm", "via": "inspect_donor",
+			"place": "the console with a fault alarm in the Command Room",
+			"text": "Command log, sol 219. During the long dusty spell the radio lost power again and again. Its damaged buffer held our voices back, so we talked face to face at the hub instead. Earth answered: come home safely, the next crew will finish the job.",
+			"science": "Game rule: the colony radio's delay is damaged equipment buffering speech. It is not network lag and not the time a signal needs to reach Earth.",
+			"source_ids": []
+		},
+		{
+			"id": "rec_airlock_log", "title": "Airlock log", "station": "ak_terminal", "via": "read_record",
+			"place": "the terminal in the Airlock",
+			"text": "Airlock log, sol 224. Last cycle before the trip home. Four suits out, four crew aboard the return ship. Base put to sleep: heaters low, scrubber on, notes left at the consoles for whoever comes next.",
+			"science": "Game rule: each time the outer airlock door opens, the cabin loses a little air and the colony refills it from its reserves. The amounts are game balance.",
+			"source_ids": []
+		},
+		{
+			"id": "rec_med_console", "title": "Final health check", "station": "mb_ct_console", "via": "read_record",
+			"place": "a console in the Med Bay",
+			"text": "Final health check: all four crew healthy and rested. The stored meals lasted to the end. Note for the next crew: keep a few sols of food in store, and grow more than you think you need.",
+			"science": "Real: growing food in space is being tested on the ISS (S11). The colony's food numbers are game balance.",
+			"source_ids": ["S11"]
+		},
+		{
+			"id": "rec_handover", "title": "Handover note", "station": "cr_console.001", "via": "read_record",
+			"place": "a console in the Command Room",
+			"text": "To the next crew. We did not leave because of one big mistake. A smaller battery, a jammed cleaner, a dusty sky and too many loads on one line failed together. Keep a reserve. Clean the panels. Give important things their own power. You can do better. The first crew.",
+			"science": "Game summary: the same chain can happen in your colony: battery, sunlight and load all matter at once.",
+			"source_ids": []
+		}
+	],
+	"discoveries": [
+		{
+			"id": "disc_small_battery", "title": "A smaller battery than planned",
+			"clues": ["rec_battery_rack", "rec_power_console", "rec_crash_tank"],
+			"text": "The colony was planned with a bigger battery, but the spare racks were lost in a cargo landing and one rack failed. Nobody updated the reserve, so the nights ran the battery flat."
+		},
+		{
+			"id": "disc_less_sun", "title": "Dust and a jammed cleaner",
+			"clues": ["rec_junction_box", "rec_greenhouse_screen"],
+			"text": "With the cleaner jammed and dust in the sky, the panels gave less power each day. The grow lights went dark at night and the plants grew pale."
+		},
+		{
+			"id": "disc_one_line", "title": "Too much on one line",
+			"clues": ["rec_switchgear", "rec_panelboard", "rec_air_filter"],
+			"text": "Lights, grow lights and the radio heater shared one line. When the battery was low it overloaded and the switchgear overheated. The air stayed safe because the scrubber kept its power to the end."
+		},
+		{
+			"id": "disc_safe_return", "title": "Everyone went home safely",
+			"clues": ["rec_alarm_console", "rec_airlock_log", "rec_med_console"],
+			"text": "The crew kept talking, kept eating and kept the air clean. When Earth called them home, all four left healthy and put the base to sleep for the next crew."
+		}
+	],
+	"final": {
+		"id": "disc_cascade_solved", "title": "The cascade, solved",
+		"requires": ["disc_small_battery", "disc_less_sun", "disc_one_line", "disc_safe_return"],
+		"text": "It was not one failure but a chain: a smaller battery, less sunlight and too many loads on one line. The first crew stayed safe and went home. Your colony now runs on what they learned."
+	}
+}

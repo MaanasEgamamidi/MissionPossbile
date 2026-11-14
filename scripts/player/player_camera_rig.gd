@@ -17,9 +17,18 @@ const THIRD_PERSON_FEET_MARGIN: float = 0.08
 const FILL_ENERGY: float = 0.7
 const FILL_RANGE_M: float = 3.5
 
+## Prompt 10: standing eye height and third-person distance, restored when getting up from a seat; the vehicle whose
+## body the chase arm ignores while seated.
+var _standing_eye: float = 1.65
+var _standing_arm: float = 2.5
+var _seated: bool = false
+var _vehicle_rid: RID = RID()
+
 ## Builds the eye cameras and excludes the owning body from the spring arm.
 func setup(config: GameConfig, body: CollisionObject3D, eye_height: float) -> void:
 	position.y = eye_height
+	_standing_eye = eye_height
+	_standing_arm = config.third_person_distance_m
 	_first = Camera3D.new()
 	_first.name = "FirstPerson"
 	_first.fov = config.fov_degrees
@@ -69,6 +78,33 @@ func set_first_person(on: bool) -> void:
 		_first.current = on
 		_third.current = not on
 		_fill.visible = not on
+
+## Prompt 10: seated in a vehicle. The eye sits `eye_height` above the seat anchor; third person becomes a chase
+## camera `chase_length` behind the head whose spring arm ignores `vehicle`'s own body (it still meets walls and
+## the ground). set_seated(false) restores the standing eye and the configured third-person distance.
+func set_seated(on: bool, eye_height: float = 0.0, chase_length: float = 0.0, vehicle: CollisionObject3D = null) -> void:
+	if _vehicle_rid.is_valid():
+		_arm.remove_excluded_object(_vehicle_rid)
+		_vehicle_rid = RID()
+	_seated = on
+	if on:
+		position.y = eye_height
+		_arm.spring_length = chase_length
+		if vehicle != null:
+			_vehicle_rid = vehicle.get_rid()
+			_arm.add_excluded_object(_vehicle_rid)
+	else:
+		position = Vector3(0.0, _standing_eye, 0.0)
+		_arm.spring_length = _standing_arm
+	_frame_third_person()
+
+## True while set_seated(true) is in effect.
+func is_seated() -> bool:
+	return _seated
+
+## The third-person spring arm (tests, the vehicle chase view).
+func spring_arm() -> SpringArm3D:
+	return _arm
 
 ## Render layers the third-person fill light affects (the player's current lighting zone).
 func set_fill_layers(mask: int) -> void:

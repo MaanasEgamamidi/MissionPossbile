@@ -1,0 +1,82 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS stations: 3 sample sites, the lab glovebox, the 5 P08 salvage donors (more from Prompt 10) and the workbench
+PASS stations: every donor is an existing damaged object of the map with data in salvage.json
+PASS stations: sample sites are in the Exterior zone and have data in samples.json
+PASS stations: each new station kind has its own panel at scripts/ui/stations/<kind>_station_panel.gd
+PASS stations: StationPanels.for_station opens those panels
+PASS sample sites stand on walkable ground (height grid, flat, clear of objects and rocks, near the airlock)
+  site_east_rocks: ground 0.000 vs -0.001, slope 0.013, sf_ltv 3.97 m clear, rock 2.34 m, 13 m from the airlock
+  site_mast_boulders: ground -0.030 vs -0.028, slope 0.006, sf_light_mast.002 3.03 m clear, rock 2.61 m, 15 m from the airlock
+  site_crash_crust: ground -0.050 vs -0.050, slope 0.000, sf_crash_stage 5.25 m clear, rock 13.29 m, 34 m from the airlock
+PASS sources: every ScienceBalance field has a category in model_sources_science.json; every cited id is in the register
+PASS sources: references cite S06 for mission/instrument/site/archive only and label their mineral values illustrative
+PASS sources: nutrient settings come from the balance resource (0..1)
+PASS specialist: the electrical specialist cannot take a sample (wrong_specialty)
+PASS specialist: anyone may inspect a donor, but taking a part out needs the field specialist
+PASS distance: every science and salvage action is refused from too far away
+PASS stations: take_sample only works at a sample site (wrong_target)
+PASS take_sample: a sample item goes into the field specialist's pack
+PASS take_sample: provenance stored (site, game time, sol, time of day, sky conditions, who)
+PASS take_sample: evidence sci_record_context with the site, time and conditions
+PASS take_sample: a site gives at most 3 samples, then says so
+PASS take_sample: refused with a full pack (cargo_full)
+PASS lab: interpreting before measuring is refused
+PASS lab: the second reference needs the sample comparison upgrade
+PASS lab: analyze_sample measures the sample against the reference and the blank control
+PASS lab: a wrong interpretation gives feedback in words and a retry variant (new numbers, new order)
+PASS lab: a wrong interpretation costs nothing: no health change, no store change, no result, no evidence, sample kept
+PASS lab: the right interpretation gives a lab result: a nutrient setting with its uncertainty
+PASS lab: evidence sci_compare_controls names the reference and the control
+PASS lab: the worked-out sample leaves the pack (kept in the lab's store) and cannot be worked out twice
+PASS upgrades: sample comparison opens the second reference; calibration gives a smaller uncertainty
+PASS apply_result: from the lab it needs the evidence-based settings upgrade
+PASS apply_result: at the greenhouse console the result is used for a real setting
+PASS apply_result: a result is used once (repeat request is a duplicate, a new request is refused)
+PASS upgrades: evidence-based settings applies a lab result straight from the lab to every bed
+PASS inspect_donor: shows every part of the donor with a clue
+PASS inspect_donor: choosing a part that does not fit says why, with no penalty and no evidence
+PASS inspect_donor: the compatible part was already chosen by the electrical specialist earlier (evidence res_identify_compatible)
+PASS recover_part: the field specialist takes the part out as a salvaged_<part> item
+PASS recover_part: a donor part is recovered once (duplicate request repeats the answer only; a new request is refused)
+PASS recover_part: a donor gives 1 part, then says nothing more can be saved
+PASS recover_part: a part that does not fit cannot be taken out
+PASS save/load: sample labels, lab results and spare parts come back the same
+PASS save/load: a recovered donor part stays recovered after a reload
+PASS a second player (as the field specialist) cannot recover the same part again
+PASS refurbish: a rock sample cannot be turned into a part (no electronics from rock)
+PASS refurbish: consumes exactly the carried salvaged part and adds nothing yet (it waits for its bench test)
+PASS bench_test: refused until the part is ready, with the time left in words
+PASS bench_test: the test passes and adds exactly one spare part (ledger parts_from_salvage)
+PASS bench_test: a finished part cannot be tested (and counted) twice
+PASS refurbish: the colony stores obey the ledger: no matter made (items -1, parts +1)
+PASS bench test required: a kind made before still waits for its test without the repeat assembly upgrade
+PASS upgrades: component refurbishment recovers one more part from a donor and takes less time
+PASS upgrades: with repeat assembly a new kind (blower wheel) still goes to the bench test
+PASS upgrades: repeat assembly skips the bench test for a kind made before (one part at once, input used up)
+PASS upgrades: salvage inspection shows every compatible part at once
+PASS upgrades: without salvage inspection a part must be chosen first
+PASS evidence: each of the 5 science and resources ids is recorded once, however often the task is repeated
+PASS evidence: the science evidence came in the order of the activity (context, comparison, applied)
+PASS panel sample site: disabled for a non-specialist with the reason in words
+PASS panels only read state (refresh changes nothing)
+PASS panel sample site: the field specialist takes a sample and the label is shown
+PASS panel lab: the comparison table shows control, reference and sample with the reference's provenance and its 'illustrative' label
+PASS panel lab: a wrong choice shows feedback, a right one gives a result with its uncertainty
+PASS panel lab: without the upgrade 'Use for every bed' is disabled and says where to use the result
+PASS panel salvage: a wrong choice is marked 'does not fit' with the reason
+PASS panel salvage: 'Take it out' for a fitting part is disabled for a non-specialist, with the reason
+PASS panel salvage: the field specialist takes out the part chosen as fitting
+PASS panel workbench: refurbish, wait (button off with the time left), then the bench test adds one part
+PASS layout Sample site (site_east_rocks) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Sample site (site_east_rocks)
+PASS layout Lab glovebox (mb_glovebox) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Lab glovebox (mb_glovebox)
+PASS layout Salvage donor (pr_bat_rack_alarm) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Salvage donor (pr_bat_rack_alarm)
+PASS layout Salvage donor (sf_crash_tank) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Salvage donor (sf_crash_tank)
+PASS layout Workbench (hg_control_board) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Workbench (hg_control_board)
+PASS no script or engine errors during the test
+RESULT 76/76

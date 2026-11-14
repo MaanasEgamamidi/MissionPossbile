@@ -370,6 +370,62 @@
 					"answers": ["Nothing", "Whether that bed responds as expected, because the sites may differ", "Only the battery"], "correct": 1,
 					"explanation": "New conditions can change the answer. Watch the bed's growth to check the result transfers."}
 			]
+		},
+		{
+			"id": "comms_q_buffer_delay", "sector": "energy", "role": "check", "title": "Why the colony radio is slow",
+			"variants": [
+				{"example": "buffer_30s", "text": "Ana is outside and says \"I found the crash site!\". Inside, Ben hears it 30 seconds later. What makes the wait?",
+					"answers": ["The damaged radio stores and cleans up her words before it sends them", "Her words travel to Earth and back", "The base's computer network is slow"], "correct": 0,
+					"explanation": "The colony radio is damaged: it has to buffer and process speech before it sends it. That equipment wait is the delay. It is not the computer network, and Earth is not involved at all."},
+				{"example": "after_repair", "text": "After a radio repair, speech from outside arrives after 15 s instead of 30 s. What did the repair change?",
+					"answers": ["The distance to Earth", "How long the radio holds and processes speech", "How fast sound moves in the air"], "correct": 1,
+					"explanation": "A better buffer and processor hold your words for a shorter time. The distance to Earth did not change, and outside there is almost no air to carry sound anyway."}
+			]
+		},
+		{
+			"id": "comms_q_radio_check", "sector": "energy", "role": "check", "title": "Radio check at the comms console",
+			"records_evidence": "comms_radio_check", "answer_at_kind": "comms",
+			"variants": [
+				{"example": "stage_readout", "text": "The comms console shows: speech delay 30 s. Cara is outside and asks \"Can I come in?\" at 10:00:00. When does the base hear her question?",
+					"answers": ["At 10:00:00", "At 10:00:30", "At 10:30:00"], "correct": 1,
+					"explanation": "The radio holds speech for 30 s, so a question asked at 10:00:00 is heard at 10:00:30, and the answer needs another 30 s to reach Cara. Keep radio messages short and clear."},
+				{"example": "round_trip", "text": "The comms console shows a 15 s speech delay. Dan outside asks a question and the base answers at once. How long after asking does Dan hear the answer?",
+					"answers": ["About 15 s", "About 30 s", "No time at all"], "correct": 1,
+					"explanation": "15 s for the question to come in plus 15 s for the answer to go out: about 30 s in total. That is why radio talk needs patience until the radio is repaired."}
+			]
+		},
+		{
+			"id": "comms_q_earth_delay", "sector": "energy", "role": "check", "title": "Why messages from Earth stay slow",
+			"variants": [
+				{"example": "earth_message", "text": "The colony radio is repaired to stage 2. Will messages from Earth now arrive faster?",
+					"answers": ["Yes, twice as fast", "No: Earth messages take minutes because Earth is so far away, and the colony radio cannot change that", "Yes, they arrive at once"], "correct": 1,
+					"explanation": "Radio waves travel at the speed of light, but Earth is so far away that a message still needs many minutes, depending on where the planets are. The colony radio's own wait is a different thing."},
+				{"example": "two_waits", "text": "Which wait does a colony radio repair make shorter?",
+					"answers": ["The time a message takes to cross space to Earth", "The time the colony radio holds speech while it processes it", "Both of them"], "correct": 1,
+					"explanation": "The repair fixes the colony's own equipment. The trip to Earth is set by the distance and the speed of light, so it stays the same."}
+			]
+		},
+		{
+			"id": "comms_q_inside_outside", "sector": "energy", "role": "check", "title": "Nearby voice or radio?",
+			"variants": [
+				{"example": "both_inside", "text": "Ana and Ben are both inside the base, 3 m apart in the mess hall. How does Ben hear Ana?",
+					"answers": ["Over the radio, after the delay", "Directly and at once, like normal talking", "Not at all"], "correct": 1,
+					"explanation": "Inside, the air carries her voice: people near her hear her at once. The radio is only used when someone is outside."},
+				{"example": "one_outside", "text": "Ana is outside by the solar panels. Ben is inside in the command room. How does Ben hear Ana?",
+					"answers": ["Directly through the wall", "He cannot hear her even with a working radio", "Over the radio, after the radio's delay"], "correct": 2,
+					"explanation": "Outside there is almost no air to carry sound, so suits use the radio. When either person is outside, speech goes over the radio and arrives after its delay."}
+			]
+		},
+		{
+			"id": "comms_q_plan_delay", "sector": "energy", "role": "check", "title": "Talking with a radio delay",
+			"variants": [
+				{"example": "five_seconds", "text": "The radio delay is 5 s. Cara outside needs to know whether the airlock is ready. What is the best way to ask?",
+					"answers": ["Many quick words without waiting", "One short, clear question, then wait for the answer", "Shout louder"], "correct": 1,
+					"explanation": "With a delay, talking over each other makes a mess. Say one clear thing, then wait at least twice the delay for the answer."},
+				{"example": "no_answer", "text": "Dan asks a question over a radio with a 15 s delay and hears nothing for 10 s. What should he do?",
+					"answers": ["Wait: the answer needs about 30 s to come back", "Repeat the question at once", "Switch the radio off"], "correct": 0,
+					"explanation": "15 s for his question to arrive plus 15 s for the answer: about 30 s. Repeating too early only adds more messages waiting in the radio."}
+			]
 		}
 	]
 }

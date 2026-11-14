@@ -20,6 +20,11 @@ static func from_manifest(manifest_path: String, zones: ColonyZones) -> Dictiona
 			continue
 		var extra: Dictionary = extra_for_object(name)
 		if not extra.is_empty():
+			# A data entry may move the station off the object's origin (for example a garage whose origin is under the
+			# parked rover), so the reach and distance checks use a point a player can actually stand near.
+			if (extra.get("position", null) is Array) and (extra.position as Array).size() >= 3:
+				var q0: Array = extra.position
+				p = Vector3(float(q0[0]), float(q0[1]), float(q0[2]))
 			stations[name] = _record(extra, zones.zone_of(String(object.area), p), p)
 			continue
 		if not object.has("inter"):

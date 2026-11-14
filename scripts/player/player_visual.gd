@@ -600,8 +600,9 @@ func _process(delta: float) -> void:
 			_limbs[0].rotation.x = -1.1
 			_limbs[1].rotation.x = -0.9 if _state != &"use" else swing * 0.2
 		&"seated":
-			_limbs[2].rotation.x = -PI / 2.0
-			_limbs[3].rotation.x = -PI / 2.0
+			# legs forward (the stand-in faces -Z; a positive turn about X swings a hanging leg toward -Z)
+			_limbs[2].rotation.x = PI / 2.0
+			_limbs[3].rotation.x = PI / 2.0
 		&"idle":
 			_limbs[0].rotation.x = sin(_time * 1.5) * 0.025
 

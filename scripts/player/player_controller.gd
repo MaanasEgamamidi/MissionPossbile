@@ -6,6 +6,9 @@ extends CharacterBody3D
 signal perspective_changed(first_person: bool)
 ## Host answer for each interaction, pickup or drop request.
 signal action_answered(result: ActionResult)
+## Prompt 10: E on a vehicle (aimed at while standing) or E while seated in one. The vehicle's presenter decides
+## whether that means getting in or out; `vehicle` is the vehicle body (null while seated: the seat's own vehicle).
+signal vehicle_interact(vehicle: Node)
 ## Shared engineering configuration.
 var config: GameConfig
 ## Designer movement tuning.
@@ -49,6 +52,11 @@ const RUNNING_LANDING_SPEED: float = 1.0
 const LAND_INTERRUPT_AFTER_S: float = 0.2
 ## Current locomotion choice: idle, walk or sprint.
 var _locomotion: StringName = &"idle"
+## Prompt 10: the seat anchor this body sits on (null when standing), its vehicle, and the standing collision
+## layers to restore. While seated the body follows the anchor, does not collide and ignores movement input.
+var _seat: Node3D
+var _collider: CollisionShape3D
+var _standing_layers := Vector2i.ZERO
 
 ## Builds the collider, cameras and visible body using the supplied crew record.
 func setup(p_config: GameConfig, p_tuning: PlayerTuning, p_character: CharacterState, p_submit: Callable, p_report_position: Callable) -> void:
@@ -70,6 +78,7 @@ func setup(p_config: GameConfig, p_tuning: PlayerTuning, p_character: CharacterS
 	collider.shape = capsule
 	collider.position.y = tuning.body_height_m / 2.0
 	add_child(collider)
+	_collider = collider
 	_visual = PlayerVisual.new()
 	add_child(_visual)
 	_visual.set_suit(character.suit_on)
@@ -113,10 +122,73 @@ func teleport(world_position: Vector3, yaw: float) -> void:
 func held_item() -> CarryItem:
 	return _held if is_instance_valid(_held) else null
 
+## Prompt 10: sits this body on `anchor` (a seat of `vehicle`): no collision, no movement input, the body follows the
+## seat and plays the seated pose, the eye drops to `eye_height` above the anchor and third person becomes a chase
+## camera `chase_length` behind that ignores the vehicle's own body. Look stays free (relative to the vehicle).
+func sit(anchor: Node3D, vehicle: CollisionObject3D, eye_height: float, chase_length: float) -> void:
+	if anchor == null:
+		return
+	if _seat == null:
+		_standing_layers = Vector2i(collision_layer, collision_mask)
+	_seat = anchor
+	collision_layer = 0
+	collision_mask = 0
+	_collider.disabled = true
+	velocity = Vector3.ZERO
+	_jumped = false
+	_air_time = 0.0
+	_sprint_latched = false
+	_rig.set_seated(true, eye_height, chase_length, vehicle)
+	_follow_seat()
+	_visual.rotation = Vector3.ZERO
+	_visual.clear_hold()
+	_visual.play(&"seated")
+
+
+## Prompt 10: gets up from the seat and stands upright at `world_position` facing `yaw` (radians).
+func stand(world_position: Vector3, yaw: float) -> void:
+	if _seat == null:
+		teleport(world_position, yaw)
+		return
+	_seat = null
+	_rig.set_seated(false)
+	global_transform = Transform3D(Basis.IDENTITY, global_position)   # upright again (the seat followed the vehicle's tilt)
+	collision_layer = _standing_layers.x
+	collision_mask = _standing_layers.y
+	_collider.disabled = false
+	teleport(world_position, yaw)
+	_visual.play(&"idle")
+
+
+## True while sitting in a vehicle seat.
+func is_seated() -> bool:
+	return _seat != null and is_instance_valid(_seat)
+
+
+## The seat anchor sat on, or null.
+func seat_anchor() -> Node3D:
+	return _seat if is_seated() else null
+
+
+## World yaw of the view while seated or standing (the vehicle's heading plus the look).
+func view_yaw() -> float:
+	return _rig.global_basis.get_euler().y
+
+
+func _follow_seat() -> void:
+	if is_seated():
+		global_transform = _seat.global_transform
+
+
+func _process(_delta: float) -> void:
+	# Seated: follow the seat every drawn frame, after the vehicle's physics step, so the camera never lags it.
+	_follow_seat()
+
+
 ## Closest crosshair hit within reach; walls block interaction rays.
 func aimed_target() -> Dictionary:
 	var empty := {"kind": "", "id": &"", "node": null}
-	if not is_inside_tree():
+	if not is_inside_tree() or is_seated():
 		return empty
 	var cam := _rig.camera()
 	var start := cam.global_position
@@ -138,6 +210,9 @@ func aimed_target() -> Dictionary:
 		return {"kind": "ladder", "id": StringName(node.name), "node": node}
 	if node is CarryItem:
 		return {"kind": "item", "id": node.item_id, "node": node}
+	if node.has_meta("vehicle_id"):
+		# Prompt 10: a vehicle body (the rover). E on it is handled by its presenter (vehicle_interact).
+		return {"kind": "vehicle", "id": StringName(node.get_meta("vehicle_id")), "node": node}
 	if node.has_meta("station_id"):
 		return {"kind": "station", "id": StringName(node.get_meta("station_id")), "node": node}
 	# Looking at the station's own solid body (a rack, console or panel) counts as looking at the station:
@@ -166,6 +241,9 @@ func _physics_process(delta: float) -> void:
 	if character == null:
 		return
 	_visual.set_camera_obstructed(not is_first_person() and _rig.camera().global_position.distance_to(_rig.global_position) < 0.6)
+	if is_seated():
+		_seated_step()
+		return
 	# Edge tracking also supports Input.action_press in headless tests.
 	for action: StringName in [&"toggle_view", &"interact", &"grab", &"jump", &"sprint"]:
 		var pressed := input_enabled and Input.is_action_pressed(action)
@@ -248,6 +326,24 @@ func _physics_process(delta: float) -> void:
 	if report_position.is_valid():
 		report_position.call(global_position, _rig.yaw())
 
+## Prompt 10: one physics step in a seat. Tab still switches the view and E asks the vehicle to let this body out;
+## movement, jump, sprint and grab do nothing here (WASD and Space drive and brake through the vehicle's presenter).
+func _seated_step() -> void:
+	for action: StringName in [&"toggle_view", &"interact", &"grab", &"jump", &"sprint"]:
+		var pressed := input_enabled and Input.is_action_pressed(action)
+		if pressed and not bool(_buttons.get(action, false)):
+			match action:
+				&"toggle_view": set_first_person(not is_first_person())
+				&"interact": vehicle_interact.emit(null)
+		_buttons[action] = pressed
+	_follow_seat()
+	_visual.rotation = Vector3.ZERO
+	_visual.set_suit(character.suit_on)
+	_rig.set_fill_layers(_visual.zone_layers())
+	_visual.play(&"seated")
+	if report_position.is_valid():
+		report_position.call(global_position, view_yaw())
+
 ## Idle below 0.15 m/s, walk up to SPRINT_ABOVE (2.6 m/s), sprint above, with +-0.15 m/s hysteresis at the walk/sprint split.
 ## Coasting to a stop with no input below the walk clip's slowest scale settles into idle instead of slow-motion steps.
 func _pick_locomotion(ground_speed: float, no_input: bool) -> StringName:
@@ -304,6 +400,9 @@ func _interact() -> void:
 	if target.kind == "ladder":
 		_ladder = target.node as ClimbableLadder
 		velocity = Vector3.ZERO
+		return
+	if target.kind == "vehicle" and held_item() == null:
+		vehicle_interact.emit(target.node)
 		return
 	if target.kind != "station":
 		if target.kind == "item" or held_item() != null:

@@ -22,6 +22,9 @@ Milestone records:
 | Prompt 07 — Power, water and two oxygen processes | [milestones/07_power_life_support/HANDOFF.md](milestones/07_power_life_support/HANDOFF.md) | 2026-11-12 |
 | Prompt 08 — Food, science, fabrication and earned upgrades | [milestones/08_food_science_upgrades/HANDOFF.md](milestones/08_food_science_upgrades/HANDOFF.md) | 2026-11-14 |
 | Prompt 09 — NASA weather archive, refresh and varied weather | [milestones/09_weather/HANDOFF.md](milestones/09_weather/HANDOFF.md) | 2026-11-14 |
+| Prompt 10 — Salvage rover builder and driving | [milestones/10_rover/HANDOFF.md](milestones/10_rover/HANDOFF.md) | 2026-11-14 |
+| Prompt 11 — Proximity voice and radio progression (synthetic tests only) | [milestones/11_voice/HANDOFF.md](milestones/11_voice/HANDOFF.md) | 2026-11-14 |
+| Prompt 12 — Tutorial campaign and optional narrative | [milestones/12_tutorial/HANDOFF.md](milestones/12_tutorial/HANDOFF.md) | 2026-11-14 |
 
 Prompt 01 deliverables, all in `milestones/01_audit/`: `inventory.md`, `authority_matrix.md`, `camera_manifest.json` and `.csv`, `coverage_sheet.md`, `asset_readiness.md`, `contradictions.md`, `evidence/`, `tools/`.
 

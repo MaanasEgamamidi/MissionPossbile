@@ -1,0 +1,62 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS data: ten stages in the supplied order (arrival, airlock, hub, solar, energy, greenhouse, health, comms, independent problem, hub and exploration)
+PASS data: every objective has a known kind, words, an explanation, hints, real stations, questions and actions; with four players none asks to switch crew
+PASS data: three stage 9 variants, each with a problem, at least two hints and a solved line
+PASS lore: 12 records (8-14), each 10-60 words (longest 50), on an existing damaged object or console of its kind, with science and a place; no graphic or alien words
+PASS lore: four discoveries and a final one; every clue exists and every record (except the handover note) is a clue
+PASS lore: the premise and the record label say it is fiction, and the premise is hopeful (everyone got home safely)
+PASS lore: 7 record stations on existing map objects, each holding one record, none claimed by another part
+PASS sources: every record's source id is a VERIFIED register entry; records without one say they are a game rule or a general principle
+PASS sources: every tutorial and campaign number has a category (requirement, design, balance or fiction) in model_sources_campaign.json
+PASS actions: every action the tutorial and story watch is registered and observed (TutorialActions registered last): inspect_donor, refill_suit, clean_panel, set_zone_power, plant, inspect_bed, exercise, take_sample
+PASS actions: a watched action gives the same answer and changes the colony the same way
+PASS solo: one player completes all ten stages with real actions only, switching crew only at the hub (biology for the greenhouse, electrical for comms, field engineer to explore)
+PASS solo: save/load at every stage boundary resumes the same stage and the same objective, without injecting the stage 9 fault twice (11 boundaries)
+PASS solo: the specialist steps were done (cleaner repaired by the electrical specialist, comms reached by them)
+PASS solo: the tutorial earned energy and life-support competence through its own steps (energy tier 1 at stage 4, the life-support answer at stage 5)
+PASS solo: free exploration reached: tutorial done, certification waiting for the sectors, a first-crew record found on the way
+PASS solo: after the tutorial one player brings all five sectors to tier 1 with real actions (food symptom, salvage, field sample), and the radio works
+PASS solo: the certification sol starts after the tutorial and completes after one full sol with every reserve above zero (lowest 60.38)
+PASS solo: the mystery is optional: the milestone completed with 1 of 12 records found
+PASS solo: after the milestone everything keeps working: questions, switches, the simulation, save/load; the milestone stays complete
+PASS four players: all ten stages done with real actions, no crew switch (switching refused as disabled), every step by one player
+PASS four players: nothing shown to the group asks anyone to switch crew; the cues name who should act (171 lines checked)
+PASS four players: work was shared (4 different crew members completed steps); no step waited for two players at once
+PASS order: a stage 4 action done during stage 1 is not counted; stage 4 asks for it again
+PASS order: inside a stage, a step done early is kept but completes only after the step before it
+PASS order: objectives were completed in the data's order across stages
+PASS order: a stage 6 action done during stage 5 does not count for stage 6; nothing of stage 6 is done when it starts
+PASS repeat: doing a finished stage's work again adds nothing (stage records, evidence, knowledge and objectives unchanged)
+PASS replay: only finished stages can be replayed; the reminder asks for the stage's work again and ends by itself
+PASS replay: nothing in the reminder counted twice (stage records, evidence, knowledge, main objectives and stage unchanged)
+PASS replay: a reminder can be stopped and shows explanations even when mastered
+PASS hints: none at first, one after 75 real seconds without progress, one more every 60 s, one per request, never more than there are
+PASS mastery: a question the colony already knows skips its step and its explanation; an unknown step shows its explanation
+PASS mastery: a finished stage's explanations are skipped from then on
+PASS cues: your own specialist step, a step another player's specialist does, a switch cue only when nobody plays the specialist (never with four players)
+PASS stage 9: the variant comes from the colony seed (same seed, same variant); seeds 1, 2, 3 give 2 different variants; all three appear
+PASS stage 9 greenhouse_breaker (seed 2): injected into the real colony, harmless for two sols, not injected again after save/load, solved with real power-panel actions held for an hour
+PASS stage 9 trackers_stopped (seed 1): injected into the real colony, harmless for two sols, not injected again after save/load, solved with real power-panel actions held for an hour
+PASS stage 9 lighting_overload (seed 5): injected into the real colony, harmless for two sols, not injected again after save/load, the breaker re-opens while the room lights are too many, solved with real power-panel actions held for an hour
+PASS certification: locked during the tutorial
+PASS certification: waits for all five sectors and the radio, then the sol starts
+PASS certification: an emergency recovery restarts the sol (12.4 h were done) and keeps running
+PASS certification: the food store reaching zero restarts the sol and holds it until food is back; then it starts again
+PASS certification: a suit refill that takes the last oxygen restarts the sol at once
+PASS certification: restarts never wipe progress (knowledge, evidence, upgrades, tiers, tutorial)
+PASS certification: save/load mid-sol keeps the count; one full sol later the first milestone is complete
+PASS certification: after completion a later shortage or rescue does not undo the milestone
+PASS story: a record is found once by reading it at its console; reading again adds nothing; elsewhere or from afar it is refused
+PASS story: inspecting salvage donors finds their records; three clues make the discovery, recorded once
+PASS story: all 12 records and 5 discoveries (the final one last) are found, each exactly once, saved in state.discoveries
+PASS story: discoveries survive save/load
+PASS story: finding records changes nothing in the tutorial or the colony stores
+PASS hud: the tracker is under the GameHud and shows stage 1 with its first step
+PASS hud: at 1280x720 the tracker is on screen and covers neither the colony corner, the crew box nor the crosshair
+PASS hud: a hint after 80 s without progress, a second on request (H), none again once the step is done
+PASS journal: fits 1280x720, 1920x1080 and text 1.5; every button takes focus
+PASS journal: 'Answer the question here' opens only where the step's question can be answered (the colony computer)
+PASS hud: with four players the screens are in team mode, the crew-selection step names who leads, and nothing asks to switch
+PASS no script or engine errors during the test
+RESULT 59/59
