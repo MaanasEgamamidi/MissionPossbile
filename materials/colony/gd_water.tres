@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_glass.gdshader" id="1"]
+
+[resource]
+resource_name = "gd_water"
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.69131, 0.80932, 0.92091, 1)
+shader_parameter/opacity = 0.55
+shader_parameter/roughness = 0.03
+shader_parameter/edge_opacity = 0.85
+shader_parameter/dust_k = 1
+shader_parameter/dust_color = Color(0.63425, 0.44297, 0.30353, 1)

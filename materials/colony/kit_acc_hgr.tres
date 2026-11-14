@@ -1,0 +1,27 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_surface.gdshader" id="1"]
+
+[resource]
+resource_name = "kit_acc_hgr"
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.88627, 0.40392, 0.1647, 1)
+shader_parameter/roughness = 0.45
+shader_parameter/metallic = 0
+shader_parameter/specular = 0.5
+shader_parameter/class_id = 1
+shader_parameter/var = 0.07
+shader_parameter/wear = 0.3
+shader_parameter/grime = 0.35
+shader_parameter/bump = 0.012
+shader_parameter/bscale = 320
+shader_parameter/coat = 0
+shader_parameter/edge_color = Color(0.76738, 0.77357, 0.77971, 1)
+shader_parameter/edge_metal = 1
+shader_parameter/edge_rough = 0.35
+shader_parameter/dust_k = 1
+shader_parameter/dust_color = Color(0.63425, 0.44297, 0.30353, 1)
+shader_parameter/dust_roughness = 0.93
+shader_parameter/dust_gain = 1
+shader_parameter/grime_gain = 1
+shader_parameter/bump_gain = 1

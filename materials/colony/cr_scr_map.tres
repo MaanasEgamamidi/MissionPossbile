@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_screen.gdshader" id="1"]
+
+[resource]
+resource_name = "cr_scr_map"
+shader = ExtResource("1")
+shader_parameter/emission = Color(0.17255, 0.4549, 0.44314, 1)
+shader_parameter/emission_energy = 2.4

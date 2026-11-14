@@ -1,0 +1,27 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_surface.gdshader" id="1"]
+
+[resource]
+resource_name = "pp_coverall"
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.33725, 0.40392, 0.47843, 1)
+shader_parameter/roughness = 0.85
+shader_parameter/metallic = 0
+shader_parameter/specular = 0.5
+shader_parameter/class_id = 4
+shader_parameter/var = 0.06
+shader_parameter/wear = 0
+shader_parameter/grime = 0.25
+shader_parameter/bump = 0.035
+shader_parameter/bscale = 1200
+shader_parameter/coat = 0
+shader_parameter/edge_color = Color(0.76738, 0.77357, 0.77971, 1)
+shader_parameter/edge_metal = 1
+shader_parameter/edge_rough = 0.35
+shader_parameter/dust_k = 1
+shader_parameter/dust_color = Color(0.63425, 0.44297, 0.30353, 1)
+shader_parameter/dust_roughness = 0.93
+shader_parameter/dust_gain = 1
+shader_parameter/grime_gain = 1
+shader_parameter/bump_gain = 1

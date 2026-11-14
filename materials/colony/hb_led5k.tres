@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_glow.gdshader" id="1"]
+
+[resource]
+resource_name = "hb_led5k"
+shader = ExtResource("1")
+shader_parameter/emission = Color(0.93333, 0.9451, 1, 1)
+shader_parameter/emission_energy = 10.56

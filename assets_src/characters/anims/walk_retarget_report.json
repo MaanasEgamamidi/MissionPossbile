@@ -1,0 +1,62 @@
+{
+ "fbx": "G:/nasa app/mars_colony_godot/assets_src/characters/anims/Walking.fbx",
+ "glb": "G:/nasa app/mars_colony_godot/assets/characters/astronaut.glb",
+ "source_frames": [
+  1,
+  32
+ ],
+ "last_frame_vs_first_deg": 13.04,
+ "root_motion_per_cycle_m": [
+  0.0,
+  -1.648,
+  0.0
+ ],
+ "source_speed_m_s": 1.545,
+ "rest_lowest_z": -0.0,
+ "frames": 32,
+ "seconds": 1.0667,
+ "foot_min_residual_mm": [
+  -0.0,
+  0.0
+ ],
+ "glb_animations": [
+  {
+   "name": "idle",
+   "seconds": 4
+  },
+  {
+   "name": "walk",
+   "seconds": 1.0667
+  },
+  {
+   "name": "sprint",
+   "seconds": 0.7
+  },
+  {
+   "name": "jump",
+   "seconds": 0.4
+  },
+  {
+   "name": "land",
+   "seconds": 0.4
+  },
+  {
+   "name": "carry",
+   "seconds": 2
+  },
+  {
+   "name": "use",
+   "seconds": 1
+  },
+  {
+   "name": "suit",
+   "seconds": 1
+  },
+  {
+   "name": "seated",
+   "seconds": 0.0333
+  }
+ ],
+ "glb_bytes": 2067044,
+ "saved_blend": true
+}

@@ -1,0 +1,27 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_surface.gdshader" id="1"]
+
+[resource]
+resource_name = "kit_seam"
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.1517, 0.1517, 0.1517, 1)
+shader_parameter/roughness = 0.8
+shader_parameter/metallic = 0
+shader_parameter/specular = 0.5
+shader_parameter/class_id = 2
+shader_parameter/var = 0.04
+shader_parameter/wear = 0
+shader_parameter/grime = 0.25
+shader_parameter/bump = 0.03
+shader_parameter/bscale = 520
+shader_parameter/coat = 0
+shader_parameter/edge_color = Color(0.76738, 0.77357, 0.77971, 1)
+shader_parameter/edge_metal = 1
+shader_parameter/edge_rough = 0.35
+shader_parameter/dust_k = 1
+shader_parameter/dust_color = Color(0.63425, 0.44297, 0.30353, 1)
+shader_parameter/dust_roughness = 0.93
+shader_parameter/dust_gain = 1
+shader_parameter/grime_gain = 1
+shader_parameter/bump_gain = 1

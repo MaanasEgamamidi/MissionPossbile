@@ -1,0 +1,15 @@
+# Godot 4 import cache and editor state
+.godot/
+*.translation
+
+# experiment leftovers
+data/_exp/
+scenes/world/_exp_world*
+scenes/world/lighting/_exp_env.tres
+
+# test output
+_test_saves/
+tests/tmp/
+
+# logs
+*.log

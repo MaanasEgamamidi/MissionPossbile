@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_glass.gdshader" id="1"]
+
+[resource]
+resource_name = "sf_hall_glass"
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.1517, 0.17184, 0.18975, 1)
+shader_parameter/opacity = 0.35
+shader_parameter/roughness = 0.03
+shader_parameter/edge_opacity = 0.85
+shader_parameter/dust_k = 0.2
+shader_parameter/dust_color = Color(0.63425, 0.44297, 0.30353, 1)

@@ -1,0 +1,7 @@
+[gd_resource type="StandardMaterial3D" format=3]
+
+[resource]
+resource_name = "decal_scorch"
+transparency = 1
+albedo_color = Color(0.18975, 0.17184, 0.1517, 0.55)
+roughness = 1

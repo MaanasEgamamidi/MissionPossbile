@@ -1,0 +1,116 @@
+class_name PlayerInput
+extends RefCounted
+## Runtime input defaults and portable remaps; no project settings edits.
+
+## Default physical keys; negative values encode mouse buttons.
+const ACTIONS: Dictionary = {
+	&"move_forward": [KEY_W], &"move_back": [KEY_S],
+	&"move_left": [KEY_A], &"move_right": [KEY_D], &"sprint": [KEY_SHIFT],
+	&"jump": [KEY_SPACE], &"interact": [KEY_E], &"grab": [KEY_G, -MOUSE_BUTTON_LEFT],
+	&"toggle_view": [KEY_TAB], &"map": [KEY_M], &"push_to_talk": [KEY_V],
+	&"back": [KEY_ESCAPE], &"source_register": [KEY_BACKSPACE | KEY_MASK_SHIFT],
+}
+static var _remapped: Dictionary = {}
+
+## Adds defaults without removing existing user bindings.
+static func ensure_actions() -> void:
+	# Godot ships F5 on its file-dialog refresh action. Reserve it for the app;
+	# remove only this engine default, never a player's gameplay remap.
+	if InputMap.has_action(&"ui_filedialog_refresh"):
+		for event: InputEvent in InputMap.action_get_events(&"ui_filedialog_refresh"):
+			if event is InputEventKey and (event.keycode == KEY_F5 or event.physical_keycode == KEY_F5):
+				InputMap.action_erase_event(&"ui_filedialog_refresh", event)
+	for action: StringName in ACTIONS:
+		if not InputMap.has_action(action):
+			InputMap.add_action(action)
+		if _remapped.has(action):
+			continue
+		for code: int in ACTIONS[action]:
+			var event: InputEvent = _default_event(code)
+			if not InputMap.action_has_event(action, event):
+				InputMap.action_add_event(action, event)
+
+## Replaces an action's bindings with one chosen event.
+static func rebind(action: StringName, event: InputEvent) -> void:
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	InputMap.action_erase_events(action)
+	InputMap.action_add_event(action, event)
+	_remapped[action] = true
+
+## Restores the defaults for one action.
+static func reset(action: StringName) -> void:
+	if not ACTIONS.has(action):
+		return
+	_remapped.erase(action)
+	if not InputMap.has_action(action):
+		InputMap.add_action(action)
+	InputMap.action_erase_events(action)
+	for code: int in ACTIONS[action]:
+		InputMap.action_add_event(action, _default_event(code))
+
+## Saves remapped InputEvents as Godot's textual variants inside JSON.
+static func save(path: String) -> Error:
+	var data: Dictionary = {}
+	for action: StringName in _remapped:
+		var events: Array[String] = []
+		for event: InputEvent in InputMap.action_get_events(action):
+			events.append(var_to_str(event))
+		data[String(action)] = events
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		return FileAccess.get_open_error()
+	file.store_string(JSON.stringify(data, "\t"))
+	return file.get_error()
+
+## Loads saved remaps after validating all event records.
+static func load(path: String) -> Error:
+	var file := FileAccess.open(path, FileAccess.READ)
+	if file == null:
+		return FileAccess.get_open_error()
+	var data: Variant = JSON.parse_string(file.get_as_text())
+	if not data is Dictionary:
+		return ERR_PARSE_ERROR
+	var decoded: Dictionary = {}
+	for action: String in data:
+		if not ACTIONS.has(StringName(action)) or not data[action] is Array:
+			return ERR_INVALID_DATA
+		var events: Array[InputEvent] = []
+		for record: Variant in data[action]:
+			if not record is String:
+				return ERR_INVALID_DATA
+			var event: Variant = str_to_var(record)
+			if not event is InputEvent:
+				return ERR_INVALID_DATA
+			events.append(event)
+		decoded[StringName(action)] = events
+	ensure_actions()
+	for action: StringName in decoded:
+		InputMap.action_erase_events(action)
+		for event: InputEvent in decoded[action]:
+			InputMap.action_add_event(action, event)
+		_remapped[action] = true
+	return OK
+
+## Human-readable bindings for help and settings screens.
+static func describe(action: StringName) -> String:
+	var names := PackedStringArray()
+	for event: InputEvent in InputMap.action_get_events(action):
+		if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+			names.append("Left mouse")
+		elif event is InputEventKey:
+			var key: int = event.physical_keycode if event.physical_keycode else event.keycode
+			names.append(("Shift+" if event.shift_pressed else "") + OS.get_keycode_string(key))
+		else:
+			names.append(event.as_text())
+	return " / ".join(names)
+
+static func _default_event(code: int) -> InputEvent:
+	if code < 0:
+		var mouse := InputEventMouseButton.new()
+		mouse.button_index = -code
+		return mouse
+	var key := InputEventKey.new()
+	key.physical_keycode = code & KEY_CODE_MASK
+	key.shift_pressed = (code & KEY_MASK_SHIFT) != 0
+	return key

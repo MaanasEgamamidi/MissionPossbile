@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_glass.gdshader" id="1"]
+
+[resource]
+resource_name = "glass_mb_bag"
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.99448, 0.99617, 0.9966, 1)
+shader_parameter/opacity = 0.35
+shader_parameter/roughness = 0.03
+shader_parameter/edge_opacity = 0.85
+shader_parameter/dust_k = 0.6
+shader_parameter/dust_color = Color(0.63425, 0.44297, 0.30353, 1)
