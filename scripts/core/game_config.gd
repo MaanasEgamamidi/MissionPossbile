@@ -2,6 +2,7 @@ class_name GameConfig
 extends Resource
 ## Engineering and session settings. Nothing here is a scientific constant unless it says so and names its source.
 ## Designer balance values live in GameBalance.
+# Push check (2026-11-14): this line was pushed to both GitHub repositories, JoseVGerald and MaanasEgamamidi.
 
 ## Length of a Martian solar day in hours: 24 h 39 min 35.244 s (NASA GISS Mars24 notes, source S02).
 ## Used only to express game time in hours; the playable sol length is `sol_minutes_default`.
