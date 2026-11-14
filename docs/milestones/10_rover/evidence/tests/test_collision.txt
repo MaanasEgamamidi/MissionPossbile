@@ -1,0 +1,68 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+STATS {"bodies":19,"boxes":1420,"doors":24,"leaves":52,"stations":65}
+PASS 24 doors, 52 leaves, 21 base stations + 44 from data files (got 65)
+PASS exact collider count for every eligible manifest object
+PASS one static body per manifest area
+PASS all 1250 first-box centres (rotated=404 scaled=55 max_error=0.000004m)
+TRANSFORM hb_fl (15.0, -0.08, 1.0)
+TRANSFORM hgw_door_small_leaf.002 (30.0, 1.0995, -7.2492)
+TRANSFORM xc_floor.016 (11.0, -0.08, -3.0)
+TRANSFORM co_floor.031 (13.0, -0.08, -9.0)
+TRANSFORM co_chair.026 (7.224554, 0.4248, -15.04923)
+TRANSFORM ms_beanbag_orange (22.75, 0.31, -18.35)
+TRANSFORM mb_headwall (-9.0, 1.36, -17.766)
+TRANSFORM cmw_door_leaf.001 (24.0, 1.0745, -12.7508)
+TRANSFORM wb_floor.004 (-7.0, -0.08, -1.0)
+TRANSFORM eq_wall (37.0, 1.51, -20.0)
+TRANSFORM sc_e_panel (33.9602, 1.75, 1.0)
+TRANSFORM gr_floor.041 (9.0, -0.08, 11.0)
+TRANSFORM msw_pillar.002 (-10.0, 1.5093, 0.0)
+TRANSFORM ak_wn_1 (17.0, 2.18, 2.1482)
+TRANSFORM pr_floor.027 (39.0, -0.08, 3.0)
+TRANSFORM pr_panelboard.001 (27.42, 1.45, 9.748)
+TRANSFORM pg_floor.001 (15.0, -0.08, -11.0)
+TRANSFORM sf_blast_wall.004 (-32.13102, 1.2, 19.97415)
+TRANSFORM gd_hydro (54.55, 1.025, 23.4)
+TRANSFORM rf_fascia.014 (37.0, 3.27, 10.0)
+PASS static and station layers, metadata and radius
+PASS floor Hangar bay y=-0.0000
+PASS floor Crew corridor y=-0.0000
+PASS floor Mess hall y=-0.0000
+PASS ray across hangar wall blocked
+PASS attach all synthetic door visuals
+PASS closed door blocks ray
+PASS player opens door within 1.0 physics second
+PASS open door ray passes
+PASS visual leaves move by signed door_slide
+PASS door closes after player leaves
+PASS locked door stays shut beside player
+PASS sloped bumpy world-space mesh samples max_error=0.000000
+PASS height sampling clamps edges
+PASS bilinear interpolation
+PASS empty sample cells filled from neighbours
+PASS heightfield ray 0 error=0.00097
+PASS heightfield ray 1 error=0.00151
+PASS heightfield ray 2 error=0.00035
+PASS heightfield ray 3 error=0.00051
+PASS heightfield ray 4 error=0.00321
+PASS heightfield ray 5 error=0.00274
+PASS heightfield ray 6 error=0.00092
+PASS heightfield ray 7 error=0.00020
+PASS heightfield ray 8 error=0.00037
+PASS heightfield ray 9 error=0.00050
+PASS save tool input scene
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+HEIGHTMAP 9x9 -> res://tests/tmp/terrain_height.res
+PASS tool writes loadable matching resource
+PROPS {"cache":"off","hulls":1,"ms":0.804,"scan_ms":0.715,"shapes_ms":0.065,"skipped_covered":1,"skipped_doorway":0,"skipped_other":3,"trimesh_triangles":24,"trimeshes":1}
+PASS props: crate hull, corridor trimesh, boxed object left to its box
+PASS props: decal, overhead lamp and floor get no collision
+PASS props: world layer, object name kept, trimesh two-sided
+PASS props: walker stopped at the crate face (x=302.18, face 302.50)
+PASS props: walker passes over the decal (z=298.00)
+PASS props: corridor stays open end to end (x=305.50)
+PASS props: corridor wall stops the walker from inside (z=310.78)
+PASS props: corridor wall stops the walker from outside (z=311.62)
+RESULT 40/40

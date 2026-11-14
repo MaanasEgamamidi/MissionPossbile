@@ -57,7 +57,7 @@ func start_note_text() -> String:
 
 func _build_body() -> void:
 	var fb := FoodBalance.shared()
-	_station_help.extra_text += "\n\nBiology and food specialists know the greenhouse best, but anyone in the crew can use it."
+	_add_text(_body, "%s Biology and food specialists know the greenhouse best, but anyone in the crew can use it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]), UiTheme.MUTED)
 	_add_heading(_body, "Warnings")
 	_alerts_box = VBoxContainer.new()
 	_alerts_box.name = "Alerts"
@@ -73,7 +73,6 @@ func _build_body() -> void:
 	_add_reading(&"food_left", "⧗", "Food lasts", "food", store)
 	_add_reading(&"food_growing", "↗", "Meals growing in the beds", "food", store)
 	_start_note = _add_text(store, "", UiTheme.MUTED)
-	_start_note.hide()
 
 	# ---- grow lights
 	_add_heading_with_help(_body, "Grow lights", "zones_power")
@@ -85,7 +84,7 @@ func _build_body() -> void:
 	_lights_status = _add_text(_body, "")
 
 	# ---- water
-	_add_heading_with_help(_body, "Greenhouse water", "water_allocation", "Drinking water comes first. Beds only use water that arrives; it then goes to the wastewater tank for the recycler.")
+	_add_heading_with_help(_body, "Greenhouse water", "water_allocation")
 	_add_reading(&"allocated", "≈", "Water sent to the greenhouse", "water_allocation", _body)
 	_add_reading(&"delivered", "⇣", "Water that really arrives", "water_allocation", _body)
 	var row := HFlowContainer.new()
@@ -113,6 +112,7 @@ func _build_body() -> void:
 	water_button.text = "Send water"
 	water_button.pressed.connect(func() -> void: _ask(&"set_greenhouse_water", {"greenhouse_l_per_hour": water_slider.value}, _on_answer))
 	row.add_child(water_button)
+	_add_text(_body, "Drinking water always comes first: the greenhouse only gets water above the drinking reserve. The beds use only the water that really arrives; it then goes to the wastewater tank for the recycler.", UiTheme.MUTED)
 	_update_water_label()
 
 	# ---- beds
@@ -121,7 +121,11 @@ func _build_body() -> void:
 	_beds_box.name = "Beds"
 	_body.add_child(_beds_box)
 
-	_station_help.extra_text += "\n\nPlants make food from light, so without light they stop growing. Water carries food through the plant and keeps it firm; too little slows growth and causes wilting. Nutrients build new leaves; too few turn leaves yellow and slow growth. Lettuce takes about %s sols and tomato about %s sols here, compared with weeks to months on Earth. Lettuce has been grown on the International Space Station; tomato is a plan there. Neither proves that crops grow on Mars." % [num(float(FoodBalance.crop("lettuce").get("cycle_sols", 0.0))), num(float(FoodBalance.crop("tomato").get("cycle_sols", 0.0)))]
+	# ---- why
+	_add_heading_with_help(_body, "Why light, water and nutrients matter", "food")
+	_add_text(_body, "Plants make their food from light, so with no light they stop growing. Water carries food through the plant and keeps it firm: too little and it slows down and wilts. Nutrients build new leaves: too few and the leaves turn yellow and growth slows.")
+	_add_text(_body, "Time is squeezed in the colony: lettuce takes about %s sols here and tomato about %s sols, but weeks to months on Earth. Lettuce has been grown on the International Space Station; tomato is only a plan there. Neither proves that crops grow on Mars." % [
+		num(float(FoodBalance.crop("lettuce").get("cycle_sols", 0.0))), num(float(FoodBalance.crop("tomato").get("cycle_sols", 0.0)))], UiTheme.MUTED)
 
 	# ---- automation and lab results
 	_add_heading_with_help(_body, "Automation", "upgrades")
@@ -180,8 +184,6 @@ func _refresh_body(st: ColonyState) -> void:
 	var start_sols := bal.food_meals_start / maxf(per_sol, bal.meals_per_sol)
 	_start_note.text = "Stored meals cover the start: the colony landed with %s meals, about %s sols for %d crew, while the first crops grow." % [
 		num(bal.food_meals_start, 0), num(start_sols, 0), maxi(1, int(crew))]
-
-	_station_help.extra_text = _station_help_base + "\n\n" + _start_note.text
 
 	# lights
 	var on := CropSystem.lights_switched_on(st)

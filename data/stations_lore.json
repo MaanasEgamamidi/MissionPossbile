@@ -1,0 +1,12 @@
+{
+	"note": "Prompt 12 optional story: record stations on existing consoles and boxes of the map (no new objects). Each holds one record of data/lore.json, found with the read_record action. The salvage donors carry the other records (found with inspect_donor). Positions come from the map objects (data/colony_manifest.json).",
+	"stations": [
+		{"object": "pr_fsp_console", "kind": "record", "name": "Old record", "short": "Record", "symbol": "✎", "specialty": ""},
+		{"object": "sf_junction_box", "kind": "record", "name": "Old record", "short": "Record", "symbol": "✎", "specialty": ""},
+		{"object": "gr_w_hab_screen", "kind": "record", "name": "Old record", "short": "Record", "symbol": "✎", "specialty": ""},
+		{"object": "pr_panelboard", "kind": "record", "name": "Old record", "short": "Record", "symbol": "✎", "specialty": ""},
+		{"object": "ak_terminal", "kind": "record", "name": "Old record", "short": "Record", "symbol": "✎", "specialty": ""},
+		{"object": "mb_ct_console", "kind": "record", "name": "Old record", "short": "Record", "symbol": "✎", "specialty": ""},
+		{"object": "cr_console.001", "kind": "record", "name": "Old record", "short": "Record", "symbol": "✎", "specialty": ""}
+	]
+}

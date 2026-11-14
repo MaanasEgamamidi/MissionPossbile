@@ -10,6 +10,15 @@
 		{"object": "pr_swgr_burnt", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
 		{"object": "cr_console_alarm", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
 		{"object": "sf_crash_tank", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
-		{"object": "hg_control_board", "kind": "workbench", "name": "Workbench", "symbol": "⚒", "specialty": ""}
+		{"object": "hg_control_board", "kind": "workbench", "name": "Workbench", "symbol": "⚒", "specialty": ""},
+		{"id": "sf_crash_stage", "position": [-9.5, -0.05, 48.94], "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": "", "note": "Prompt 10. The map object sf_crash_stage; its origin is inside its own collision (a 6.5 m x 5.4 m box), so the station stands at a clear spot 0.6 m from its west face (checked in tests/test_rover.gd)."},
+		{"object": "sf_crash_shield", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "sf_crash_debris_a", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "sf_crash_debris_b", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "sf_crash_debris_c", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "pr_bat_hv_alarm", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "pr_bat_rack_alarm.001", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "pr_bat_rack_alarm.002", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "gr_rack_fault", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""}
 	]
 }

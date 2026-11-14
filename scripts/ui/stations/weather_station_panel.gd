@@ -55,7 +55,7 @@ func _build_body() -> void:
 	card.add_child(_labels_card)
 	_add_text(_labels_card, "! " + ARCHIVE_LABEL + ".", UiTheme.WARN)
 	_add_text(_labels_card, "! " + NOT_FORECAST_LABEL + ".", UiTheme.WARN)
-	_station_help.extra_text += "\n\nDust events replay measurements at Jezero crater. The time between events is a game choice, not the frequency observed on Mars."
+	_add_text(_labels_card, "The dust events replay dust measured at Jezero crater on Mars. The time between events is a game choice (much faster than on Mars), not how often NASA saw dust storms.", UiTheme.MUTED)
 
 	_add_heading_with_help(_body, "Dust warning", "panel_dust")
 	_warning_text = _add_text(_body, "")

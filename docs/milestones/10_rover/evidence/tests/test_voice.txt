@@ -1,0 +1,95 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+INFO SYNTHETIC test: no microphone, no speaker; speech is a generated sine and 'heard' means decoded.
+PASS stages: delays 0..4 are no link, 30, 15, 5, 0 s
+PASS stages: stage counts the cards installed in order (only card 2 installed is still stage 0)
+PASS stages: words for the HUD
+PASS cards: comms_radio_1..4 cost 1-4 parts, electrical specialist at the comms console, chained in order, energy levels 0-3
+PASS cards: the effect says the delay is the radio's buffering, not network delay and not Earth-Mars light time
+PASS cards: the practical evidence is the radio check answered at the comms console (existing answer_question action)
+PASS cards: every radio question has 3 answers, an explanation and a different retry variant
+PASS install: the radio check answered at the comms console records the evidence; only the electrical specialist installs card 1 -> stage 1
+PASS install: card 2 waits for Energy level 1 (the colony's electrical learning)
+PASS install: card 2 needs card 1 first (installed in order)
+PASS router: same zone, gain 1 at 0 and 5 m, 0.5 at 15 m, silent at 25 and 30 m
+PASS router: the fade from 5 to 25 m never rises
+PASS router: two people 2 m apart in the mess hall talk nearby at full level, even with no radio (stage 0)
+PASS router: 24 room doors become portals between two zones (door 5 joins the mess hall and the crew corridor)
+PASS router: through an open door, half level along speaker->door->listener (7.21 m): 0.483
+PASS router: a half-open door gives half of that, a closed door silence (reason door_closed), another room's door does not help
+PASS router: rooms with no door between them are silent (one door, not a chain of doors)
+PASS router: a door the manifest does not list (exit tunnel inner door 901) becomes a portal from its position
+PASS router: outside->inside, inside->outside and outside->outside use the radio at the stage delay; stage 0 is silent
+PASS router: the radio is not spatial: an indoor listener anywhere on the map hears an outdoor speaker at full level
+PASS router: the HUD words for the speaker
+PASS router: a rover passenger outside counts as outside (radio, 5 s at stage 3), even though their body was last inside
+PASS router: seated in the rover parked in the garage is inside (nearby voice); getting out uses the body's own place
+PASS packets: start, frame and end headers round trip (stream, sequence, frame number, times, character, format)
+PASS packets: elapsed time from the speaker's own clock (wraps at 32 bits)
+PASS packets: anything malformed parses to nothing
+PASS packets: sequence numbers wrap (0 is newer than 65535)
+PASS packets: a frame header is small (25 bytes with a 6-letter id); the largest start packet fits NetSession.VOICE_PACKET_MAX
+PASS schedule: stage 1 plays the 10 frames in order, never before start + 30 s + reorder window + i x 20 ms (first at +30.085 s), then ends
+PASS schedule: stage 2 plays the 10 frames in order, never before start + 15 s + reorder window + i x 20 ms (first at +15.085 s), then ends
+PASS schedule: stage 3 plays the 10 frames in order, never before start + 5 s + reorder window + i x 20 ms (first at +5.085 s), then ends
+PASS schedule: stage 4 plays the 10 frames in order, never before start + 0 s + reorder window + i x 20 ms (first at +0.085 s), then ends
+PASS schedule: disorder is put back in order; a missing frame with the next one present is rebuilt by FEC from the next packet; a gap is skipped as lost
+PASS schedule: a frame that comes after its time is dropped as late
+PASS schedule: when the start packet is lost, the first frame seen opens the utterance on the speaker's own timing (frames 0-1 lost, 2 by FEC)
+PASS schedule: an upgrade mid-transmission keeps the old 30 s for speech already in the radio (first at 30.08 s)
+PASS schedule: the next utterance uses the new 5 s but never overtakes the older one (it starts at 32.06 s, after 32.06 s)
+PASS schedule: a stalled stream waits (no frame skipped), then goes on from the late frames, later than planned, never earlier
+PASS schedule: no packet for 1 s and no end packet ends the utterance cleanly (timeout)
+PASS bounds: 40 s per speaker = 2000 frames of 20 ms; above the longest delay (30 s)
+PASS bounds: at most 16 utterances wait per speaker; the 17th drops the oldest whole one with a note
+PASS bounds: more than 2000 frames waiting for one speaker drops the oldest utterance (1200 left)
+PASS bounds: all speakers together keep at most 6000 frames (4800 now; the oldest speaker's utterance was dropped)
+PASS bounds: a frame number beyond 60 s is rejected
+PASS clear: mute clears that speaker's waiting and playing speech (end event 'cleared'), others keep theirs; the rest of that utterance is dropped
+PASS clear: the muted speaker's next utterance is new again
+PASS clear: a disconnect forgets the speaker
+PASS clear: leaving the session clears everything
+PASS clear: a new stream id from the same peer (the voice restarted) replaces its old speech
+PASS clear: an utterance with no route (stage 0, someone outside) queues nothing and its frames are dropped
+PASS schedule: two speakers at once each come out whole and in order, side by side
+INFO in-process scheduling latency at stage 4 (frame complete -> released, 60 Hz loop, no network): mean 68.0 ms, max 76.7 ms over 50 frames
+PASS latency: at stage 4 the buffer adds only the reorder window (in-process, 77 ms max)
+PASS codec: TwoVoIP 6.1 classes and every method the voice code calls exist in this build
+INFO codec: 50 frames of a synthetic 440 Hz sine, 79-108 bytes each with the 25-byte header; decoded peak 0.592, frequency 440.0 Hz
+PASS codec: real TwoVoIP Opus encode -> game packet (header as the encoder prefix) -> decode of a synthetic sine (one frame by FEC) gives the same tone
+PASS settings: microphone, own mute and voice volume are saved with the other settings (defaults: default mic, not muted, 100 %)
+PASS sources: every voice number has a category in model_sources_voice.json (contract, balance, engineering or physics)
+PASS privacy: the voice code never opens a file, records or saves audio (no file or recording calls in scripts/voice)
+PASS privacy: the saved and replicated colony state has no voice data in it
+PASS catch-up: the voice code never changes pitch_scale (no speed-up or slow-down) and uses no MQTT
+PASS net: a host and two headless clients are connected, each with a crew member
+PASS net: a machine without a microphone is told so and stays playable (B: headless)
+PASS net: 30 reliable voice packets from client A arrive at client B through the host relay, from A's peer id, unchanged and in order (in-process ENet)
+INFO unreliable relay: 30 of 30 frames-like packets arrived at B (in-process ENet can drop unreliable packets)
+PASS net: unreliable voice packets that arrive through the relay are unchanged, from A, and in order
+INFO transport: A sent 30 frames (reliable on the voice channel), the host received 30; ENet's PEER_PACKET_THROTTLE statistic on A's link to the host reads 1 of 32 (when frames were sent unreliable, this throttle dropped about half of them)
+PASS net: every voice frame A sent reached the host (voice packets go reliable and ordered on the voice channel)
+INFO in-process end-to-end at the nearby route (speaker send -> released to the listener's player, one process, 127.0.0.1): mean 66 ms, max 69 ms over 30 frames; plus the 40 ms player buffer target and the audio output latency, not measured here
+PASS net: inside the mess hall, A's synthetic speech is sent by push-to-talk and B (no microphone) hears it nearby, decoded into the player (30 frames)
+PASS net: the near-immediate route is measured in-process and stays under the 200 ms target on average (mean 66 ms + 40 ms buffer target; in-process only)
+PASS net: no catch-up: every voice player keeps pitch_scale 1.0
+PASS net: stage 0 and A outside: B hears nothing, B's HUD says there is no radio link, A's HUD says nobody can hear
+PASS net: going outside shows what changed for the voice
+INFO radio stage 3: requested delay 5.000 s; measured in-process from push-to-talk to the first decoded frame 5.098 s
+PASS net: radio stage 3: A outside, B inside hears A after the 5 s equipment delay (measured 5.10 s), not before; the HUD shows the message waiting
+PASS net: two speakers at once (host nearby, A by radio at stage 4) are both heard by B on their own players
+PASS net: B mutes A: nothing of A is decoded or left waiting
+PASS net: when A disconnects, B clears A's waiting radio speech
+PASS net: leaving the session clears every voice buffer
+INFO voice counters at B: { "sent_frames": 0, "sent_packets": 0, "received_packets": 245, "bad_packets": 60, "decoded_frames": 103, "fec_frames": 0, "lost_frames": 0, "overflow_frames": 0, "utterances_sent": 0 }; scheduler { "opened": 6, "late": 0, "duplicate": 0, "fec": 0, "lost": 0, "stalls": 0, "timeouts": 0, "dropped_utterances": 0, "dropped_frames": 0, "unrouted": 1, "rejected": 0, "released": 103 }; at A: { "sent_frames": 125, "sent_packets": 137, "received_packets": 26, "bad_packets": 0, "decoded_frames": 24, "fec_frames": 0, "lost_frames": 0, "overflow_frames": 0, "utterances_sent": 6 }
+PASS hud: the voice corner sits bottom right inside the screen, clear of the colony corner, crew card, hints, status and crosshair
+PASS hud: transmitting shows the route: nearby, nearby + crew outside by radio, then radio when outside, and the change note
+PASS hud: own microphone muted is shown
+PASS settings panel: fits 1280x720 and 1920x1080 (text 1.0 and 1.5), every control reachable by keyboard
+PASS settings panel: per-player mute and volume reach the voice service; muting my microphone saves in the settings
+PASS settings panel: the input level meter moves with the (synthetic) input while the panel is open; nothing is sent without V
+PASS settings panel: closing it saves the voice settings
+PASS settings: Controls has a 'Voice and microphone…' button that opens the voice settings with the same settings
+PASS credits: TwoVoIP (MIT) and Opus, SpeexDSP and RNNoise (BSD-style) are listed with the tools; groups unchanged
+PASS no script or engine errors during the test
+RESULT 84/84

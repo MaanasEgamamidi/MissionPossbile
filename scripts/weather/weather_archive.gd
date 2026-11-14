@@ -31,6 +31,9 @@ const REFRESH_FIELDS: Array[String] = ["product_id", "url", "max_bytes", "timeou
 ## Coarse plausibility limits per unit [low, high] for data columns (flag columns are checked separately).
 const UNIT_RANGES := {"Pa": [0.0, 3000.0], "hPa": [0.0, 30.0], "K": [100.0, 400.0], "m/s": [-150.0, 150.0], "deg": [-360.0, 720.0],
 	"1": [-0.001, 50.0], "sol": [-1.0, 100000.0], "s": [0.0, 1.0e10], "h": [0.0, 1.0e7], "W/m2": [0.0, 2000.0], "%": [0.0, 100.0]}
+## Ranges by column name, checked before the unit range: a count column ("samples" = 1 Hz readings in a bin, unit "1")
+## is not a dimensionless ratio and can be in the hundreds (P15 fix F-01, playtest issue PT-01).
+const COLUMN_RANGES := {"samples": [0.0, 100000.0]}
 ## Products further apart than this (degrees of latitude or longitude) are not one place.
 const SAME_SITE_DEG := 5.0
 
@@ -460,7 +463,7 @@ func _check_csv(p: Dictionary, file: String) -> void:
 					if bad_first == "":
 						bad_first = "row %d flag %s is %s (flags are whole numbers 0..255)" % [r, name, cell]
 				continue
-			var range_: Array = UNIT_RANGES.get(unit, [-INF, INF])
+			var range_: Array = COLUMN_RANGES.get(name.to_lower(), UNIT_RANGES.get(unit, [-INF, INF]))
 			if v < float(range_[0]) or v > float(range_[1]):
 				bad += 1
 				if bad_first == "":

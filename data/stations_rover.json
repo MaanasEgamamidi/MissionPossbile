@@ -1,0 +1,7 @@
+{
+	"_about": "Stations of the rover part (Prompt 10, part 1); see StationCatalog. The drivable rover is sf_rover, parked in the 3D-printed garage sf_print_garage outside the base (data/colony_manifest.json: both at Blender (8.0-8.3, -23.0), Godot (8.0-8.3, 0, 23.0), both turned +90 degrees; the garage door faces +x like the rover's headlights). The garage station is on the garage object, moved to the floor between the parked rover's right side and the garage wall (Godot (8.0, 0, 25.4)), because the garage's origin is inside the parked rover. The charger is a new id at the garage's power-cable end: sf_cable_g runs from the base to the garage's north-west corner and the garage has a green status light (FX_sf_print_garage.002, material kit_led_grn) at Blender (6.2, -20.45, 1.27), beside the rover's rear left. No mesh is added.",
+	"stations": [
+		{"object": "sf_print_garage", "position": [8.0, 0.0, 25.4], "kind": "garage", "name": "Rover garage", "short": "Garage", "symbol": "⌂", "specialty": ""},
+		{"id": "garage_charger", "position": [6.2, 0.0, 20.7], "kind": "rover_charger", "name": "Rover charger", "short": "Charger", "symbol": "↯", "specialty": ""}
+	]
+}

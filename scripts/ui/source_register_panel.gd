@@ -145,7 +145,6 @@ func _build() -> void:
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
-	header.add_child(ExplainButton.make("", "This register lists where the facts in the game come from. For each one it says how well it was checked, and which numbers are game balance or made up for the game.", "Sources"))
 	var close := Button.new()
 	close.name = "CloseButton"
 	close.text = "Close"
@@ -153,6 +152,12 @@ func _build() -> void:
 	close.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(close)
 
+	var intro := Label.new()
+	intro.name = "Intro"
+	intro.text = "This register lists where the facts in the game come from. For each one it says how well it was checked, and which numbers are game balance or made up for the game."
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_child(intro)
 
 	var filters := HBoxContainer.new()
 	box.add_child(filters)

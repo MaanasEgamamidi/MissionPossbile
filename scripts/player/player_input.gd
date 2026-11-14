@@ -15,6 +15,8 @@ const ACTIONS: Dictionary = {
 	# fold the goals, close a Mission Control message, the science behind the numbers.
 	&"power_view": [KEY_P], &"build": [KEY_B], &"hud_details": [KEY_H], &"goals": [KEY_J], &"advisor_ok": [KEY_K],
 	&"vitals_help": [KEY_F1],
+	# Added in Prompt 12 (remappable): a tutorial hint on request (N) and the colony journal / story log (L). H and J are the mission HUD's folds.
+	&"tutorial_hint": [KEY_N], &"journal": [KEY_L],
 }
 ## Plain names for the settings screen, in display order.
 const ACTION_NAMES: Dictionary = {
@@ -24,6 +26,7 @@ const ACTION_NAMES: Dictionary = {
 	&"push_to_talk": "Push to talk", &"back": "Close / pause", &"source_register": "Source register",
 	&"power_view": "Power and life support", &"build": "Build (at the solar field)", &"hud_details": "Fold the supplies",
 	&"goals": "Fold the goals", &"advisor_ok": "Close a Mission Control message", &"vitals_help": "Science behind the numbers",
+	&"tutorial_hint": "Tutorial hint", &"journal": "Colony journal",
 }
 static var _remapped: Dictionary = {}
 

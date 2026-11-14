@@ -67,6 +67,115 @@
 				{"id": "cracked_wheel", "name": "Cracked wheel", "compatible": false, "clue": "Split right across the rim: it would break on the first rock."},
 				{"id": "dead_battery", "name": "Old battery pack", "compatible": false, "clue": "Swollen and leaking: unsafe to use, leave it sealed."}
 			]
+		},
+		{
+			"object": "sf_crash_stage",
+			"added_by": "Prompt 10 (rover economy). Map evidence: a large static wreck at the crash site with charred (sf_char) and gouged (sf_gouge) materials.",
+			"name": "Crashed rocket stage",
+			"story": "The upper stage of the cargo lander broke up when it crashed. Its outside is burnt, but some machine parts deep inside were shielded from the fire.",
+			"parts": [
+				{"id": "cable_harness", "name": "Wiring harness", "compatible": true, "fits": "the rover's wiring", "clue": "The cables inside the stage wall are not melted, and their plugs are the same kind as the rover's.", "test": "Every wire carries the test current with no break (illustrative test)."},
+				{"id": "actuator_motor", "name": "Valve actuator motor", "compatible": true, "fits": "the rover's steering", "clue": "A small electric motor behind a metal shield. It still turns smoothly when you spin it by hand.", "test": "Turns both ways at the test voltage and stays cool (illustrative test)."},
+				{"id": "bearing", "name": "Turntable bearing", "compatible": true, "fits": "the rover's wheel hubs", "clue": "It rolls smoothly with no grinding, and its dust seal is whole.", "test": "Spins for a minute with no noise or wobble (illustrative test)."},
+				{"id": "nozzle", "name": "Engine nozzle", "compatible": false, "clue": "Cracked and bent by the crash, and nothing in the colony needs a rocket nozzle."},
+				{"id": "skin_panel", "name": "Outer skin panel", "compatible": false, "clue": "Scorched and torn: the crash fire burnt it."}
+			]
+		},
+		{
+			"object": "sf_crash_shield",
+			"added_by": "Prompt 10 (rover economy). Map evidence: the cargo lander's heat shield at the crash site, charred (sf_char) and gouged (sf_gouge).",
+			"name": "Crashed heat shield",
+			"story": "The heat shield that protected the cargo lander on the way down. It was thrown clear in the crash and landed on its edge.",
+			"parts": [
+				{"id": "mount_bracket", "name": "Titanium mounting bracket", "compatible": true, "fits": "the rover's suspension mounts", "clue": "From the back of the shield, away from the heat: straight, no cracks, and its bolt holes match the rover's.", "test": "Holds the test load without bending (illustrative test)."},
+				{"id": "temp_sensor", "name": "Temperature sensor", "compatible": true, "fits": "the rover's battery monitor", "clue": "Its wires are whole, and it reads the air temperature correctly when tested.", "test": "Reads the same as the colony thermometer (illustrative test)."},
+				{"id": "shield_tile", "name": "Heat shield tile", "compatible": false, "clue": "It burnt away on purpose to protect the lander: what is left is charred and crumbly."},
+				{"id": "honeycomb", "name": "Honeycomb core", "compatible": false, "clue": "Crushed flat by the impact."}
+			]
+		},
+		{
+			"object": "sf_crash_debris_a",
+			"added_by": "Prompt 10 (rover economy). Map evidence: a flat field of lander pieces (charred sf_char, torn foil sf_mli) east of the crash site.",
+			"name": "Crash debris, east side",
+			"story": "Pieces of the cargo lander lie spread over the ground east of the crash. Most are scrap, but a few were packed cargo.",
+			"parts": [
+				{"id": "pallet_rollers", "name": "Cargo pallet rollers", "compatible": true, "fits": "the rover's cargo bay rails", "clue": "Metal rollers from a cargo pallet. They still roll freely and none is bent.", "test": "Every roller turns under the test load (illustrative test)."},
+				{"id": "cable_reel", "name": "Insulated cable reel", "compatible": true, "fits": "the charger cable", "clue": "The insulation has no cuts and the copper ends are clean.", "test": "Passes the insulation test with no leak of current (illustrative test)."},
+				{"id": "foil_blanket", "name": "Foil insulation blanket", "compatible": false, "clue": "Shiny foil torn into strips: it cannot be patched."},
+				{"id": "charred_panel", "name": "Charred panel", "compatible": false, "clue": "Black and brittle from the crash fire."}
+			]
+		},
+		{
+			"object": "sf_crash_debris_b",
+			"added_by": "Prompt 10 (rover economy). Map evidence: a flat field of lander pieces (charred sf_char, torn foil sf_mli) west of the crash site.",
+			"name": "Crash debris, west side",
+			"story": "More pieces of the cargo lander, thrown to the west. A sealed box and a coiled hose are among the scrap.",
+			"parts": [
+				{"id": "junction_box", "name": "Sealed junction box", "compatible": true, "fits": "the power panel wiring", "clue": "Its lid kept the dust out, and the terminals inside are clean and bright.", "test": "Every terminal connects at the test current (illustrative test)."},
+				{"id": "pressure_hose", "name": "Pressure hose", "compatible": true, "fits": "the oxygen tank manifold", "clue": "Both end fittings are whole, and it holds air when you block one end and blow.", "test": "Holds pressure with no leak for an hour (illustrative test)."},
+				{"id": "bent_strut", "name": "Aluminium strut", "compatible": false, "clue": "Bent too far to straighten safely."},
+				{"id": "foil_scraps", "name": "Foil scraps", "compatible": false, "clue": "Torn foil insulation: it is too damaged to use."}
+			]
+		},
+		{
+			"object": "sf_crash_debris_c",
+			"added_by": "Prompt 10 (rover economy). Map evidence: lander pieces (charred sf_char, torn foil sf_mli) near the heat shield.",
+			"name": "Crash debris near the heat shield",
+			"story": "A trail of pieces between the heat shield and the rocket stage. Some came from a spare-parts crate that burst open.",
+			"parts": [
+				{"id": "coil_spring", "name": "Suspension spring", "compatible": true, "fits": "the rover's suspension", "clue": "A coil spring that springs back to its full length when you press it.", "test": "Takes the test load and springs back every time (illustrative test)."},
+				{"id": "fastener_kit", "name": "Sealed box of bolts", "compatible": true, "fits": "any colony repair", "clue": "The box was sealed. The bolts are clean, and the thread matches the colony's own.", "test": "Every bolt screws in and holds its tightening force (illustrative test)."},
+				{"id": "melted_case", "name": "Melted plastic case", "compatible": false, "clue": "Melted out of shape in the crash fire."},
+				{"id": "torn_foil", "name": "Torn foil", "compatible": false, "clue": "Shredded insulation foil."}
+			]
+		},
+		{
+			"object": "pr_bat_hv_alarm",
+			"added_by": "Prompt 10 (rover economy). Map evidence: the high-voltage battery unit in the Power Room whose screen shows a fault alarm (scr_red), like pr_bat_rack_alarm.",
+			"name": "High-voltage battery unit with a fault alarm",
+			"story": "The control unit of one battery string. Its fault alarm is on and it is switched out of the colony battery. The fault is in its control board.",
+			"parts": [
+				{"id": "contactor", "name": "High-voltage contactor", "compatible": true, "fits": "the rover's battery switch", "clue": "The big switch clicks firmly, and its contacts are not pitted or burnt.", "test": "Switches the test current on and off 100 times without a miss (illustrative test)."},
+				{"id": "current_sensor", "name": "Current sensor", "compatible": true, "fits": "the rover's battery monitor", "clue": "It reads the same current as the colony's meter when tested.", "test": "Reads within the meter's own accuracy at three test currents (illustrative test)."},
+				{"id": "control_board", "name": "Control board", "compatible": false, "clue": "A burnt patch around one chip: this is what set off the alarm."},
+				{"id": "hv_fuse", "name": "Main fuse", "compatible": false, "clue": "Blown: a fuse is made to break once and must be replaced, not reused."}
+			]
+		},
+		{
+			"object": "pr_bat_rack_alarm.001",
+			"added_by": "Prompt 10 (rover economy). Map evidence: a second Power Room battery rack with a fault alarm (same asset as pr_bat_rack_alarm, screens scr_red and scr_amber).",
+			"name": "Second battery rack with a fault alarm",
+			"story": "Another battery rack switched out of the colony battery by its fault alarm. Only some of its modules failed.",
+			"parts": [
+				{"id": "battery_module", "name": "Healthy battery module", "compatible": true, "fits": "the rover's battery", "clue": "This module is on the side away from the alarm: its case is flat, not swollen, and it shows the right voltage.", "test": "Charges and gives back its energy at the right voltage (illustrative test)."},
+				{"id": "bus_bar", "name": "Copper bus bar", "compatible": true, "fits": "the power panel wiring", "clue": "Clean copper, no burn marks; the bolt holes match the power panel.", "test": "Carries the test current with no heating (illustrative test)."},
+				{"id": "swollen_module", "name": "Swollen battery module", "compatible": false, "clue": "Its case bulges: a swollen battery is unsafe to use."},
+				{"id": "alarm_sensor", "name": "Alarm sensor board", "compatible": false, "clue": "Corroded where a cell leaked onto it."}
+			]
+		},
+		{
+			"object": "pr_bat_rack_alarm.002",
+			"added_by": "Prompt 10 (rover economy). Map evidence: a third Power Room battery rack with a fault alarm (same asset as pr_bat_rack_alarm, screens scr_red and scr_amber).",
+			"name": "Third battery rack with a fault alarm",
+			"story": "A third rack the alarm switched out. Its cooling fan and some modules look fine.",
+			"parts": [
+				{"id": "battery_module", "name": "Healthy battery module", "compatible": true, "fits": "the rover's battery", "clue": "Flat case, clean terminals and the right voltage on the meter.", "test": "Charges and gives back its energy at the right voltage (illustrative test)."},
+				{"id": "cooling_fan", "name": "Rack cooling fan", "compatible": true, "fits": "the rover's battery cooling", "clue": "It spins freely, and its plug matches the rover's fan socket.", "test": "Spins at full speed for ten minutes and stays cool (illustrative test)."},
+				{"id": "leaky_module", "name": "Leaking battery module", "compatible": false, "clue": "Crusty white marks at a seam: it has leaked and is unsafe."},
+				{"id": "cracked_display", "name": "Rack display", "compatible": false, "clue": "Cracked screen that shows nothing."}
+			]
+		},
+		{
+			"object": "gr_rack_fault",
+			"added_by": "Prompt 10 (rover economy). Map evidence: the greenhouse grow rack showing a fault (red fault light kit_led_red, amber screen scr_amber).",
+			"name": "Grow rack with a fault light",
+			"story": "A greenhouse grow rack that shows a red fault light. Its plants were moved to the beds; the rack's pump seized, but other parts work.",
+			"parts": [
+				{"id": "led_driver", "name": "LED light driver", "compatible": true, "fits": "the rover's headlights", "clue": "It powers a test lamp steadily with no flicker.", "test": "Runs a test lamp at full brightness for an hour (illustrative test)."},
+				{"id": "flow_valve", "name": "Water valve", "compatible": true, "fits": "the greenhouse water lines", "clue": "It opens and closes smoothly and has the same thread as the colony's pipes.", "test": "Holds water pressure with no drip for an hour (illustrative test)."},
+				{"id": "pump", "name": "Seized pump", "compatible": false, "clue": "Stuck solid with dried nutrient salts: this is the fault."},
+				{"id": "grow_tray", "name": "Cracked grow tray", "compatible": false, "clue": "Split along the bottom: it would leak."}
+			]
 		}
 	]
 }

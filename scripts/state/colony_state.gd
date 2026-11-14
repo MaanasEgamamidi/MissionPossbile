@@ -124,6 +124,8 @@ static func _empty_ledger() -> Dictionary:
 		"regulator_n2_kg", "airlock_o2_lost_kg", "airlock_n2_lost_kg", "airlock_co2_lost_kg", "airlock_cycles",
 		# food
 		"meals_eaten", "recovery_meals",
+		# rover (Prompt 10, RoverSystem): charger draw from the colony battery and its loss, driving, refit clamp
+		"rover_charge_kwh", "rover_charge_loss_kwh", "rover_drive_kwh", "rover_refit_clamped_kwh",
 	]:
 		l[k] = 0.0
 	return l

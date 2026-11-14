@@ -86,7 +86,8 @@ func _build_body() -> void:
 		_forecast_box.add_child(l)
 	forecast_row.add_child(ExplainButton.make("battery_forecast"))
 
-	_add_heading_with_help(_body, "Room switches", "zones_power", "Each room uses power while its lights are on. Switch off rooms nobody needs to make the battery last longer.")
+	_add_heading_with_help(_body, "Room switches", "zones_power")
+	_add_text(_body, "Each room uses power while its lights are on. Switch off rooms nobody needs to make the battery last longer.", UiTheme.MUTED)
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -104,18 +105,20 @@ func _build_body() -> void:
 		grid.add_child(button)
 		switches[zone] = button
 
-	_add_heading_with_help(_body, "Machines", "load", "Machines use power too. The two oxygen makers ask for more power the more oxygen they make.")
+	_add_heading_with_help(_body, "Machines", "load")
+	_add_text(_body, "Machines use power too. The two oxygen makers ask for more power the more oxygen they make.", UiTheme.MUTED)
 	var machines := VBoxContainer.new()
 	machines.name = "Machines"
 	_body.add_child(machines)
 	for id in EQUIPMENT_ORDER:
 		_add_equipment_switch(machines, id)
 
-	_add_heading_with_help(_body, "Loads without power", "load_shedding", shedding_order_text())
+	_add_heading_with_help(_body, "Loads without power", "load_shedding")
 	_shed_why = _add_text(_body, "")
 	_shed_box = VBoxContainer.new()
 	_shed_box.name = "Shed"
 	_body.add_child(_shed_box)
+	_add_text(_body, shedding_order_text(), UiTheme.MUTED)
 
 
 ## The shedding order in one sentence.

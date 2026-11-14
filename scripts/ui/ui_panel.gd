@@ -58,10 +58,8 @@ func can_close() -> bool:
 func _draw() -> void:
 	if not accent_line or size.x < 80.0:
 		return
-	# A thin instrument rule, with a small coloured marker at the leading edge.
-	var p := UiTheme.palette()
-	draw_rect(Rect2(1.0, 0.0, size.x - 2.0, 1.0), p.border)
-	draw_rect(Rect2(1.0, 0.0, minf(72.0, size.x - 2.0), 3.0), p.accent)
+	# The panel style has round corners: the line starts and ends where the top edge is straight.
+	draw_rect(Rect2(18.0, 0.0, size.x - 36.0, 4.0), UiTheme.palette().accent)
 
 
 static func _first_focusable(node: Node) -> Control:

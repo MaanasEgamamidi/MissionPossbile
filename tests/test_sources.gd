@@ -404,14 +404,7 @@ func _check_register_panel() -> void:
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	await _frames()
 	var text := _labels_text(panel)
-	var help: ExplainButton
-	for candidate in panel.find_children("*", "ExplainButton", true, false):
-		if (candidate as ExplainButton).custom_title == "Sources":
-			help = candidate as ExplainButton
-	help.open_popup()
-	await _frames()
-	_check("register explains its purpose in help", not text.contains("This register lists where the facts") and _labels_text(help.popup_window()).contains("This register lists where the facts"))
-	help.close_popup()
+	_check("register explains what it is at the top", text.contains("This register lists where the facts in the game come from."))
 	var total := SourceLibrary.claims().size() + SourceLibrary.sources().size()
 	_check("register lists every claim and source", panel.visible_entry_ids().size() == total, "%d of %d" % [panel.visible_entry_ids().size(), total])
 	await _layout_checks(panel, "SourceRegisterPanel")
@@ -644,15 +637,6 @@ func _check_explain_button() -> void:
 	await _frames()
 	_check("a button outside any panel still emits sources_requested", loose_asked.size() == 1 and loose_asked[0] == "" and loose.last_register == null, str(loose_asked))
 	loose.queue_free()
-
-	var custom := ExplainButton.make("", "Panel-specific guidance.", "Station help")
-	root.add_child(custom)
-	custom.open_popup()
-	await _frames()
-	var custom_text := _labels_text(custom.popup_window())
-	_check("custom help shows its title and guidance without a sources button", custom_text.contains("Station help") and custom_text.contains("Panel-specific guidance.") and not custom.sources_button().visible)
-	custom.close_popup()
-	custom.queue_free()
 
 	var unknown := ExplainButton.make("no_such_id")
 	root.add_child(unknown)

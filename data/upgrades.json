@@ -1,6 +1,6 @@
 {
 	"schema": 2,
-	"note": "Prompt 08 upgrade catalogue: 16 cards in five sectors. Loaded by ProgressionSystem.cards() into UpgradeDefinition.",
+	"note": "Prompt 08 upgrade catalogue: 16 cards in five sectors, plus the four Prompt 11 colony radio cards (energy sector, see comms_note). Loaded by ProgressionSystem.cards() into UpgradeDefinition.",
 	"numbers": "Every parts cost, tier and effect size here is game balance (ProgressionBalance), not a NASA figure. Mechanisms name their source id in docs/source_register.md.",
 	"tier_rule": "Per sector: tier 0 unfamiliar; tier 1 = a guided task done and its explanation question answered; tier 2 = a diagnosis in a changed example (a different situation from the guided one) plus the next practical evidence; tier 3 = a transfer to new operating conditions or a controlled comparison. Tiers are shared colony progress and never go down.",
 	"sectors": {
@@ -59,8 +59,10 @@
 		"res_assembly_test": {"sector": "resources", "words": "Refurbish a component that passes its bench test"},
 		"sci_record_context": {"sector": "science", "words": "Take a field sample with its site, time and conditions"},
 		"sci_compare_controls": {"sector": "science", "words": "Compare the sample with the reference and a control in the lab"},
-		"sci_apply_result": {"sector": "science", "words": "Apply a lab result to a real colony setting"}
+		"sci_apply_result": {"sector": "science", "words": "Apply a lab result to a real colony setting"},
+		"comms_radio_check": {"sector": "energy", "words": "Run the radio check at the comms console and read what the delay means (question at the comms console)"}
 	},
+	"comms_note": "Prompt 11: the four colony radio cards comms_radio_1..4 are in the energy sector (electrical systems, installed by the electrical and comms specialist) because ProgressionSystem has five tier sectors and communications is not one of them. They install in order at the comms console: each needs the one before (prerequisites) and a higher Energy level (0, 1, 2, 3). Costs 1, 2, 3, 4 parts and the delays 30 s, 15 s, 5 s, near-immediate are contract values from the brief (CommsStage). The delay is the damaged radio's buffering and processing, not network delay and not Earth-Mars light time.",
 	"cards": [
 		{
 			"id": "energy_battery_reserve", "title": "Battery reserve for life support", "sector": "energy", "tier": 1,
@@ -208,6 +210,42 @@
 			"cost_parts": 3, "specialty": "", "install_station": "mb_glovebox", "install_kind": "lab", "zone": "Med Bay",
 			"effect_owner": "S, F", "automation": false, "source_ids": [],
 			"source_labels": ["Game balance.", "A lab result is a model value in this game, not a measurement of the fictional map."]
+		},
+		{
+			"id": "comms_radio_1", "title": "Radio repair 1: restart the transmitter", "sector": "energy", "tier": 0,
+			"function": "Restarts the damaged colony radio with a patched memory buffer, so crew outside can talk with the base again.",
+			"effect": "The radio passes speech after 30 s (radio stage 1 of 4). Before this there is no radio link outside. The wait is the damaged radio's own buffering and processing, not network delay and not Earth–Mars light time. Messages from Earth are not made faster.",
+			"questions": ["comms_q_buffer_delay", "comms_q_radio_check"], "evidence": ["comms_radio_check"],
+			"cost_parts": 1, "specialty": "electrical_comms", "install_station": "cm_comms_console", "install_kind": "comms", "zone": "Command Room",
+			"effect_owner": "V", "automation": false, "source_ids": [],
+			"source_labels": ["Contract (the brief): radio stages 0-4 with delays none, 30 s, 15 s, 5 s, near-immediate, and costs 1, 2, 3, 4 parts.", "Fiction: a damaged 2080 radio that has to buffer speech; the delay is not a real radio figure."]
+		},
+		{
+			"id": "comms_radio_2", "title": "Radio repair 2: faster speech buffer", "sector": "energy", "tier": 1, "prerequisites": ["comms_radio_1"],
+			"function": "Replaces the radio's slow speech buffer with a working memory module.",
+			"effect": "The radio passes speech after 15 s instead of 30 s (radio stage 2 of 4). Speech already waiting in the radio keeps its old wait; new speech uses the new one. Messages from Earth are not made faster.",
+			"questions": ["comms_q_earth_delay", "comms_q_radio_check"], "evidence": ["comms_radio_check"],
+			"cost_parts": 2, "specialty": "electrical_comms", "install_station": "cm_comms_console", "install_kind": "comms", "zone": "Command Room",
+			"effect_owner": "V", "automation": false, "source_ids": [],
+			"source_labels": ["Contract (the brief): 15 s at stage 2, 2 parts.", "Physics: radio waves travel at the speed of light, so the Earth-Mars wait depends on the distance between the planets, not on the colony radio."]
+		},
+		{
+			"id": "comms_radio_3", "title": "Radio repair 3: repaired signal processor", "sector": "energy", "tier": 2, "prerequisites": ["comms_radio_2"],
+			"function": "Fits a refurbished processing board, so the radio cleans up speech much faster.",
+			"effect": "The radio passes speech after 5 s instead of 15 s (radio stage 3 of 4). Messages from Earth are not made faster.",
+			"questions": ["comms_q_inside_outside", "comms_q_radio_check"], "evidence": ["comms_radio_check", "res_assembly_test"],
+			"cost_parts": 3, "specialty": "electrical_comms", "install_station": "cm_comms_console", "install_kind": "comms", "zone": "Command Room",
+			"effect_owner": "V", "automation": false, "source_ids": [],
+			"source_labels": ["Contract (the brief): 5 s at stage 3, 3 parts.", "The board is a component refurbished and bench-tested at the workbench (existing evidence res_assembly_test)."]
+		},
+		{
+			"id": "comms_radio_4", "title": "Radio repair 4: full radio restored", "sector": "energy", "tier": 3, "prerequisites": ["comms_radio_3"],
+			"function": "Completes the radio repair: the buffer only holds speech for a moment.",
+			"effect": "The radio passes speech almost at once (radio stage 4 of 4). Only the computer network's own small delay is left. Messages from Earth still take many minutes: that is the distance, not the radio.",
+			"questions": ["comms_q_plan_delay", "comms_q_inside_outside"], "evidence": ["comms_radio_check"],
+			"cost_parts": 4, "specialty": "electrical_comms", "install_station": "cm_comms_console", "install_kind": "comms", "zone": "Command Room",
+			"effect_owner": "V", "automation": false, "source_ids": [],
+			"source_labels": ["Contract (the brief): near-immediate at stage 4, 4 parts.", "Engineering: the remaining delay is the network and the voice buffer (target under 200 ms on a LAN, not yet measured with real microphones)."]
 		}
 	]
 }

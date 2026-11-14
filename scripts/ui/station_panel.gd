@@ -73,8 +73,6 @@ var _title: Label
 var _zone_label: Label
 var _power_label: Label
 var _power_explain: ExplainButton
-var _station_help: ExplainButton
-var _station_help_base := ""
 var _scroll: ScrollContainer
 var _body: VBoxContainer
 var _readings_box: VBoxContainer
@@ -100,7 +98,6 @@ func setup(p_services: GameServices) -> void:
 	theme_type_variation = UiTheme.PANEL
 	_build_frame()
 	_build_body()
-	_station_help_base = _station_help.extra_text
 	if _shows_later_note():
 		var later := Label.new()
 		later.text = LATER_NOTE
@@ -323,9 +320,6 @@ func _build_frame() -> void:
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	header.add_child(_title)
-	_station_help = ExplainButton.make("", "\n".join(_what_you_can_do()), _title_text())
-	_station_help.name = "StationHelp"
-	header.add_child(_station_help)
 	_close_button = Button.new()
 	_close_button.text = "Close"
 	_close_button.pressed.connect(func() -> void: close_requested.emit())
@@ -350,6 +344,10 @@ func _build_frame() -> void:
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.add_child(_body)
 
+	_add_heading(_body, "What you can do here")
+	for line in _what_you_can_do():
+		_add_text(_body, "•  " + line)
+
 	var readings_section := VBoxContainer.new()
 	_body.add_child(readings_section)
 	_add_heading(readings_section, "Readings")
@@ -364,7 +362,11 @@ func _build_frame() -> void:
 	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message.visible = false
 	column.add_child(_message)
-	_station_help.extra_text += "\n\nPress %s or %s to close." % [_key_name(&"interact", "E"), _key_name(&"back", "Esc")]
+	var hint := Label.new()
+	hint.theme_type_variation = UiTheme.MUTED
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.text = "Press %s or %s to close." % [_key_name(&"interact", "E"), _key_name(&"back", "Esc")]
+	column.add_child(hint)
 
 
 ## The words after the symbol in the header. Sun trackers add their number.
@@ -388,7 +390,7 @@ func _what_you_can_do() -> PackedStringArray:
 			return PackedStringArray(["See the colony summary: stores, power and how long they last.",
 				"Look at the upgrade cards for the facilities.", "Open the blueprint map of the base."])
 		"comms":
-			return PackedStringArray(["Read messages from Earth.", "Learn why a radio message to Earth takes minutes."])
+			return PackedStringArray(["Read messages from Earth.", "Learn why a radio message to Earth takes minutes.", "Repair the colony radio (radio repairs)."])
 		"food":
 			return PackedStringArray(["See how much food is in store.", "See how much the crew eats each sol."])
 		"heal":
@@ -427,7 +429,18 @@ func _build_body() -> void:
 			card.add_child(list)
 			_add_text(list, "Mission control: \"Welcome to Mars! Keep the lights on and the air fresh.\" (example message)")
 			_add_text(list, "No new messages yet. Real messages arrive with the colony systems update.", UiTheme.MUTED)
-			_station_help.extra_text += "\n\nEarth is very far away. Radio messages take minutes to reach Earth, and answers take minutes to return."
+			var why := HBoxContainer.new()
+			_body.add_child(why)
+			var why_text := _add_text(why, "Earth is very far away. A radio message travels as fast as light, but it still takes "
+				+ "minutes to reach Earth, and the answer takes minutes to come back.")
+			why_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			why.add_child(ExplainButton.make("sources"))
+			# Prompt 11: the colony radio's stage and its repair cards (installed at this console).
+			var radio := HBoxContainer.new()
+			_body.add_child(radio)
+			var radio_text := _add_text(radio, CommsStage.stage_text(CommsStage.stage(services.state())))
+			radio_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			_add_open_button(radio, "Radio repairs", func() -> UiPanel: return UpgradeCardsPanel.new())
 		"food":
 			_add_reading(&"food", "❀", "Food in store", "food")
 			_add_reading(&"food_use", "↓", "The crew eats", "stock_vs_flow")
@@ -532,12 +545,12 @@ func _add_heading(parent: Control, text: String) -> Label:
 
 
 ## A heading with a "?" button at its end.
-func _add_heading_with_help(parent: Control, text: String, explanation_id: String, extra: String = "") -> Label:
+func _add_heading_with_help(parent: Control, text: String, explanation_id: String) -> Label:
 	var row := HBoxContainer.new()
 	parent.add_child(row)
 	var l := _add_heading(row, text)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(ExplainButton.make(explanation_id, extra))
+	row.add_child(ExplainButton.make(explanation_id))
 	return l
 
 

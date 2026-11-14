@@ -7,7 +7,9 @@ extends SceneTree
 ##
 ## --quality  GraphicsQuality level (1 = Medium, 2 = High)       --cap  0 = uncapped (vsync off), 60 = vsync + 60 FPS cap
 ## --seconds  sampled seconds per view (after 2 s warm-up)      --host host a LAN session (clients join separately)
-## --rover    drive the rover along its route in the "rover_route" view if the rover presenter exists
+## --switches=N  after the views, switch Medium <-> High N times and record process memory after each (growth check)
+## The "rover_route" view boards the rover (built, charged, suited driver) and drives it out of the garage by holding
+## the throttle with a slow steering sweep: real physics, no teleport.
 ##
 ## The game itself is started (no menu, a fresh colony in a temporary save folder, no weather refresh) at 1920x1080.
 ## Each view places the local player (first person) at a viewpoint inside the named room or outdoors and records every
@@ -39,8 +41,7 @@ func _initialize() -> void:
 	var cap := int(_args.get("cap", "0"))
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if cap > 0 else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = cap
-	root.size = WINDOW
-	DisplayServer.window_set_size(WINDOW)
+	_force_window()
 	var save_dir := OS.get_user_data_dir().path_join("perf_bench_saves")
 	DirAccess.make_dir_recursive_absolute(save_dir)
 	var game_script := load("res://scripts/game/game_main.gd") as Script
@@ -65,8 +66,11 @@ func _process(delta: float) -> bool:
 				_setup()
 				_phase = "next"
 		"next":
+			for a: StringName in [&"move_forward", &"move_left", &"move_right"]:
+				Input.action_release(a)
 			_view_i += 1
 			if _view_i >= _views.size():
+				_quality_switches()
 				_finish()
 				return true
 			_enter_view(_views[_view_i])
@@ -90,7 +94,18 @@ func _process(delta: float) -> bool:
 	return false
 
 
+## project.godot starts the window maximized (window/size/mode=2), which on this desktop gave a 2560x1369 render.
+## The benchmark needs 1920x1080: leave the maximized state first, then size and centre the window.
+func _force_window() -> void:
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_size(WINDOW)
+	var screen := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
+	DisplayServer.window_set_position(screen.position + (screen.size - WINDOW) / 2)
+	root.size = WINDOW
+
+
 func _setup() -> void:
+	_force_window()
 	var quality := int(_args.get("quality", "2"))
 	GraphicsQuality.apply(self, quality)
 	_vp_rid = root.get_viewport_rid()
@@ -188,6 +203,20 @@ func _enter_view(v: Dictionary) -> void:
 			i += 1
 	if String(v.kind) == "storm":
 		st.dust_tau = 0.5
+	if String(v.kind) == "rover":
+		var rp: RoverPresenter = _game.get("rover")
+		if rp != null and rp.body != null:
+			RoverModel.ensure(st)
+			st.rover["built"] = true
+			st.rover["battery_kwh"] = float(RoverModel.stats(st.rover.levels, 0.0).get("battery_capacity_kwh", 10.0))
+			services.local_character().suit_on = true
+			var stand: Variant = rp.exit_ground(1)
+			if stand != null:
+				player.teleport((stand as Vector3) + Vector3.UP * 0.05, yaw)
+			for i in 3:
+				await physics_frame
+			var r := services.request(&"rover_enter", &"", {"seat": 0})
+			print("ROVER boarding: ", r.ok, " ", r.message)
 	_proc_mem_before = _process_memory()
 
 
@@ -199,14 +228,37 @@ func _update_view(v: Dictionary, delta: float) -> void:
 		var span := float(_args.get("seconds", "8")) + 2.0
 		var x := fmod(_t + (0.0 if _phase == "warm" else 2.0), span) / span
 		st.dust_tau = 0.5 + 2.0 * sin(PI * x)
-	if String(v.kind) == "rover" and _args.has("rover"):
-		var presenter: Node = _game.get_node_or_null("RoverPresenter")
-		if presenter != null and presenter.has_method("bench_drive"):
-			presenter.call("bench_drive", delta)
+	if String(v.kind) == "rover":
+		Input.action_press(&"move_forward")
+		var steer := sin(_t * 0.6)
+		if steer > 0.35:
+			Input.action_press(&"move_right")
+			Input.action_release(&"move_left")
+		elif steer < -0.35:
+			Input.action_press(&"move_left")
+			Input.action_release(&"move_right")
+		else:
+			Input.action_release(&"move_left")
+			Input.action_release(&"move_right")
 	var player: PlayerController = _game.get("player")
 	if String(v.kind) != "rover":
 		# Slow look around (fast turns are a separate check): 20 degrees per second.
 		player.camera_rig().add_look(deg_to_rad(20.0) * delta, 0.0)
+
+
+var _switch_memory: Array = []
+## Medium <-> High repeatedly; process memory after each switch (a steady value means no growth).
+func _quality_switches() -> void:
+	var n := int(_args.get("switches", "0"))
+	var quality := int(_args.get("quality", "2"))
+	for i in n:
+		GraphicsQuality.apply(self, GraphicsQuality.Level.MEDIUM if i % 2 == 0 else GraphicsQuality.Level.HIGH)
+		var mem := _process_memory()
+		mem["switch"] = i + 1
+		mem["static_mb"] = Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
+		mem["video_mb"] = Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0
+		_switch_memory.append(mem)
+	GraphicsQuality.apply(self, quality)
 
 
 func _sample(frame_ms: float) -> Dictionary:
@@ -225,7 +277,8 @@ func _sample(frame_ms: float) -> Dictionary:
 
 
 func _summarise(v: Dictionary, frames: Array) -> Dictionary:
-	var out := {"view": v.name, "kind": v.kind, "frames": frames.size()}
+	var out := {"view": v.name, "kind": v.kind, "frames": frames.size(), "render_size": [root.size.x, root.size.y],
+		"window_size": [DisplayServer.window_get_size().x, DisplayServer.window_get_size().y]}
 	var summary := {}
 	for key: String in ["frame_ms", "cpu_ms", "gpu_ms", "process_ms", "physics_ms", "draw_calls", "objects", "primitives", "video_mem_mb", "static_mem_mb"]:
 		var values: Array = frames.map(func(f: Dictionary) -> float: return float(f[key]))
@@ -270,7 +323,7 @@ func _finish() -> void:
 		"host_session": _args.has("host"), "debug_build": OS.is_debug_build(),
 		"date": Time.get_datetime_string_from_system(),
 	}
-	var report := {"info": info, "views": _results}
+	var report := {"info": info, "views": _results, "quality_switch_memory": _switch_memory}
 	var path: String = _args.get("out", OS.get_user_data_dir().path_join("perf_bench.json"))
 	var f := FileAccess.open(path, FileAccess.WRITE)
 	if f != null:

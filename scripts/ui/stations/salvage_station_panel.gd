@@ -65,12 +65,13 @@ func _build_body() -> void:
 	look_button.text = "Look it over"
 	look_button.pressed.connect(_on_look)
 	look_row.add_child(look_button)
-	look_row.add_child(ExplainButton.make("upgrades", "With the salvage inspection upgrade, looking it over marks every part that fits."))
+	var hint := _add_text(look_row, "With the salvage inspection upgrade, looking it over marks every part that fits.", UiTheme.MUTED)
+	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_add_heading_with_help(_body, "Parts", "parts")
 	_parts_box = VBoxContainer.new()
 	_parts_box.name = "Parts"
 	_body.add_child(_parts_box)
-	_station_help.extra_text += "\n\nWhich parts fit is made up for the game. Taking a part out uses nothing from colony stores."
+	_add_text(_body, "Which parts fit is made up for the game. Taking a part out uses nothing from the colony stores.", UiTheme.MUTED)
 
 
 func _refresh_body(st: ColonyState) -> void:

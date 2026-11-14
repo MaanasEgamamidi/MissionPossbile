@@ -85,8 +85,6 @@ var _camera_obstructed := false
 var _suited: bool = false
 var _zone_mask: int = 1
 var _identity: int = 0
-## Rack trim and markings are independent of the wearer.
-var _suit_identity: int = -1
 var _state: StringName = &"idle"
 var _speed: float = 1.0
 var _time: float = 0.0
@@ -182,7 +180,7 @@ func set_model(scene: PackedScene) -> void:
 			if _animation.has_animation(clip):
 				_animation.get_animation(clip).loop_mode = Animation.LOOP_NONE
 	set_first_person(_first_person)
-	set_suit(_suited, _suit_identity)
+	set_suit(_suited)
 	set_crew_identity(_identity)
 	_state = &""
 	play(&"idle")
@@ -230,14 +228,9 @@ func set_zone_layers(mask: int) -> void:
 func zone_layers() -> int:
 	return _zone_mask
 
-## Shows helmet, pack and suit overlays. A rack slot selects its trim and markings; -1 uses the crew look.
-func set_suit(on: bool, slot: int = -1) -> void:
-	var identity := clampi(slot, -1, 3) if on else -1
-	var changed := identity != _suit_identity
-	_suit_identity = identity
+## Shows helmet, pack and suit overlays without duplicating limbs.
+func set_suit(on: bool) -> void:
 	_suited = on
-	if changed:
-		set_crew_identity(_identity)
 	if _helmet != null:
 		_helmet.visible = on
 	for part: Node3D in _suit_parts:
@@ -254,14 +247,12 @@ func set_suit(on: bool, slot: int = -1) -> void:
 func set_crew_identity(index: int = 0) -> void:
 	_identity = clampi(index, 0, 3)
 	var look := CrewLooks.look(_identity)
-	var suit_index := _suit_identity if _suit_identity >= 0 else _identity
-	var suit_look := CrewLooks.look(suit_index)
-	_patch_material.albedo_color = suit_look.accent
+	_patch_material.albedo_color = look.accent
 	_patch_material.roughness = 1.0
 	_patch_material.emission_enabled = true
-	_patch_material.emission = suit_look.accent
+	_patch_material.emission = look.accent
 	_patch_material.emission_energy_multiplier = CrewLooks.IDENT_EMISSION
-	_patch_dark_material.albedo_color = CrewLooks.accent_dark(suit_index)
+	_patch_dark_material.albedo_color = CrewLooks.accent_dark(_identity)
 	_patch_dark_material.roughness = 1.0
 	var feminine := float(look.feminine)
 	for part: MeshInstance3D in _parts:
@@ -308,15 +299,14 @@ func _look_copy(material: Material, color: Color, skin: bool) -> Material:
 	return copy
 
 ## Hair: this crew member's Hair_* unsuited, their HairIn_* (and beard) under the helmet. Suit symbol and band: this
-## selected suit's Ident_Symbol_* / Ident_Band_*, only while the suit is on.
+## crew member's Ident_Symbol_* / Ident_Band_*, only while the suit is on.
 func _apply_look_parts() -> void:
 	var look := CrewLooks.look(_identity)
 	var wanted: Array = look.hair_suited if _suited else look.hair
 	for hair: MeshInstance3D in _hair_parts:
 		hair.visible = wanted.has(hair.name)
-	var suit_look := CrewLooks.look(_suit_identity if _suit_identity >= 0 else _identity)
-	var symbol := "Ident_Symbol_" + String(suit_look.symbol)
-	var band := "Ident_Band_" + String(suit_look.band)
+	var symbol := "Ident_Symbol_" + String(look.symbol)
+	var band := "Ident_Band_" + String(look.band)
 	for part: MeshInstance3D in _ident_parts:
 		part.visible = _suited and (part.name == symbol or part.name == band)
 
@@ -610,8 +600,9 @@ func _process(delta: float) -> void:
 			_limbs[0].rotation.x = -1.1
 			_limbs[1].rotation.x = -0.9 if _state != &"use" else swing * 0.2
 		&"seated":
-			_limbs[2].rotation.x = -PI / 2.0
-			_limbs[3].rotation.x = -PI / 2.0
+			# legs forward (the stand-in faces -Z; a positive turn about X swings a hanging leg toward -Z)
+			_limbs[2].rotation.x = PI / 2.0
+			_limbs[3].rotation.x = PI / 2.0
 		&"idle":
 			_limbs[0].rotation.x = sin(_time * 1.5) * 0.025
 

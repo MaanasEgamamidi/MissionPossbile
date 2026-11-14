@@ -1,0 +1,5 @@
+test_game_services     exit=0 RESULT 25/25 (12.7 s)
+test_life_support      exit=0 RESULT 88/88 (59.3 s)
+test_hud_panels        exit=0 RESULT 89/89 (8.8 s)
+test_food              exit=0 RESULT 85/85 (20.7 s)
+ALL TESTS PASSED

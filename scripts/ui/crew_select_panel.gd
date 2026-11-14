@@ -26,12 +26,21 @@ func setup(p_services: GameServices) -> void:
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
-	header.add_child(ExplainButton.make("crew_switching", "You can change crew member at the hub. Crew nobody plays wait there and use no supplies."))
 	_close = Button.new()
 	_close.name = "Close"
 	_close.text = "Close"
 	_close.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(_close)
+	var rule_row := HBoxContainer.new()
+	rule_row.name = "Rule"
+	var rule := Label.new()
+	rule.name = "RuleText"
+	rule.text = "You can change crew member at the hub. Crew nobody plays wait there and use no supplies."
+	rule.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	rule.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rule_row.add_child(rule)
+	rule_row.add_child(ExplainButton.make("crew_switching"))
+	box.add_child(rule_row)
 	_answer = Label.new()
 	_answer.name = "Answer"
 	_answer.theme_type_variation = UiTheme.MUTED

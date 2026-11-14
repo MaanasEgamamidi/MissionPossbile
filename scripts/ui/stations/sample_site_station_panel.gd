@@ -81,7 +81,7 @@ func _build_body() -> void:
 	_label_lines.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_label_lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.add_child(_label_lines)
-	_station_help.extra_text += "\n\nWhich rock lies at each site is made up for the game. The lab compares it with a real kind of reference."
+	_add_text(_body, "Which rock lies at which site is made up for the game. The lab compares it with a real kind of reference.", UiTheme.MUTED)
 
 
 func _refresh_body(st: ColonyState) -> void:

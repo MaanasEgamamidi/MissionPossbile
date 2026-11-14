@@ -152,7 +152,7 @@ func _identities(st: ColonyState, b: GameBalance, start: Dictionary) -> Dictiona
 	for k: StringName in ColonyState.STORE_KEYS:
 		d[k] = float(now.stores[k]) - float(start.stores[k])
 	return {
-		"battery": d[&"battery_kwh"] - (l.battery_in_kwh - l.battery_loss_kwh - l.battery_out_kwh),
+		"battery": d[&"battery_kwh"] - (l.battery_in_kwh - l.battery_loss_kwh - l.battery_out_kwh - float(l.get("rover_charge_kwh", 0.0))),
 		"solar": l.solar_offered_kwh - l.solar_used_kwh - l.solar_curtailed_kwh,
 		"load served": l.load_served_kwh - (l.solar_used_kwh - l.battery_in_kwh + l.battery_out_kwh),
 		"clean water": d[&"water_l"] - (l.water_recycled_l - l.water_used_l - l.greenhouse_water_l - l.electrolysis_water_l - l.recovery_water_l),

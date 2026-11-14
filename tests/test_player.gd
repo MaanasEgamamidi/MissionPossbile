@@ -597,19 +597,6 @@ func _test_crew_looks() -> void:
 	b.set_suit(false)
 	_check("looks: suited shows the in-helmet hair (beard stays), the crew's own symbol and band", suited_hair == ["HairIn_Bob", "Ident_Band_Dots", "Ident_Symbol_Circle"]
 		and suited_b == ["HairIn_Buzz", "Hair_Beard", "Ident_Band_Chevron", "Ident_Symbol_Diamond"] and shown.call(a) == ["Hair_Bob"], "%s / %s" % [suited_hair, suited_b])
-	# A biology crew member can wear any rack suit without becoming its original crew member.
-	for slot in 4:
-		a.set_suit(true, slot)
-		var look := CrewLooks.look(slot)
-		var visible_parts: Array[String] = shown.call(a)
-		var suit := a.find_child("Suit_Torso", true, false) as MeshInstance3D
-		_check("rack suit %d keeps its colour and markings on another wearer" % slot,
-			visible_parts.has("Ident_Symbol_" + String(look.symbol)) and visible_parts.has("Ident_Band_" + String(look.band))
-			and (_override_of(suit, "Mat_Ident") as StandardMaterial3D).albedo_color.is_equal_approx(look.accent)
-			and (_override_of(suit, "Mat_IdentDark") as StandardMaterial3D).albedo_color.is_equal_approx(CrewLooks.accent_dark(slot))
-			and a.crew_identity() == 2 and visible_parts.has("HairIn_Bob"))
-	a.set_suit(false)
-	_check("returning rack suit restores unsuited appearance", shown.call(a) == ["Hair_Bob"])
 	a.set_first_person(true)
 	var fp_ok := true
 	for hair: Node in a.find_children("Hair*", "MeshInstance3D", true, false):

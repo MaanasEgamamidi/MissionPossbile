@@ -74,7 +74,7 @@ func _build_body() -> void:
 	clean_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
 	clean_button.pressed.connect(_on_clean)
 	_body.add_child(clean_button)
-	_station_help.extra_text += "\n\nCleaning by hand wipes the dust off this panel, restoring its full power."
+	_add_text(_body, "Cleaning by hand wipes the dust off this one panel, so it makes its full power again.", UiTheme.MUTED)
 	var repair_row := HBoxContainer.new()
 	_body.add_child(repair_row)
 	repair_button = Button.new()

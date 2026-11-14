@@ -11,6 +11,24 @@ const GROUPS: Array[Array] = [
 	["science", "Science sources"],
 ]
 
+## Prompt 11: the voice libraries, listed with the tools (addons/twovoip/VERSION.txt and LICENSE.txt).
+const VOICE_CREDITS: Array[Dictionary] = [
+	{"id": "twovoip", "kind": "tool", "name": "TwoVoIP 6.1 (Godot voice extension)",
+		"by": "Julian Todd, K. S. Ernest (iFire) Lee, Gordon MacPherson and Marc Weber",
+		"licence_words": "MIT licence: free to use, change and share, as long as the copyright notice and licence text are kept (addons/twovoip/LICENSE.txt).",
+		"used_for": "Voice chat between players: squeezes microphone sound into small Opus packets and plays them back on the other computers. The game's own voice code is adapted from its helper scripts.",
+		"url": "https://github.com/goatchurchprime/two-voip-godot-4"},
+	{"id": "opus", "kind": "tool", "name": "Opus audio codec (libopus, inside TwoVoIP)", "by": "Xiph.Org Foundation and contributors",
+		"licence_words": "BSD-style licence: free to use and share, as long as the copyright notice is kept. Its full text is in the library's own source files (it is not copied into this build).",
+		"used_for": "Compresses speech so it is small enough to send many times a second."},
+	{"id": "speexdsp", "kind": "tool", "name": "SpeexDSP resampler (inside TwoVoIP)", "by": "Xiph.Org Foundation and contributors",
+		"licence_words": "BSD-style licence: free to use and share, as long as the copyright notice is kept. Its full text is in the library's own source files (it is not copied into this build).",
+		"used_for": "Changes the microphone's sample rate to the one the codec uses."},
+	{"id": "rnnoise", "kind": "tool", "name": "RNNoise noise suppression (inside TwoVoIP)", "by": "Jean-Marc Valin, Mozilla, Xiph.Org Foundation and contributors",
+		"licence_words": "BSD-style licence: free to use and share, as long as the copyright notice is kept. Its full text is in the library's own source files (it is not copied into this build).",
+		"used_for": "Part of the voice library. The game does not switch noise suppression on."},
+]
+
 var _list: VBoxContainer
 var _scroll: ScrollContainer
 
@@ -54,7 +72,6 @@ func _build() -> void:
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
-	header.add_child(ExplainButton.make("", "The engine, tools, models and science pages this game was made with, and the licence of each one. A licence is a set of rules for using someone's work.", "Credits"))
 	var close := Button.new()
 	close.name = "CloseButton"
 	close.text = "Close"
@@ -62,6 +79,11 @@ func _build() -> void:
 	close.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(close)
 
+	var intro := Label.new()
+	intro.text = "The engine, tools, models and science pages this game was made with, and the licence of each one. A licence is a set of rules for using someone's work."
+	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	intro.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_child(intro)
 
 	_scroll = ScrollContainer.new()
 	_scroll.name = "Credits"
@@ -76,7 +98,7 @@ func _build() -> void:
 
 	for group: Array in GROUPS:
 		var entries: Array[Dictionary] = []
-		for c: Dictionary in SourceLibrary.credits():
+		for c: Dictionary in SourceLibrary.credits() + VOICE_CREDITS:
 			if String(c.get("kind", "")) == String(group[0]):
 				entries.append(c)
 		if entries.is_empty():

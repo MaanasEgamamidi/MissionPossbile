@@ -84,7 +84,7 @@ func _build() -> void:
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
-	header.add_child(ExplainButton.make("blueprint", "Click a room for its name and power use. Drag to move the map; use the mouse wheel or + and − keys to zoom. Press %s or %s to close." % [StationPanel._key_name(&"map", "M"), StationPanel._key_name(&"back", "Esc")]))
+	header.add_child(ExplainButton.make("blueprint"))
 	_close_button = Button.new()
 	_close_button.text = "Close"
 	_close_button.pressed.connect(func() -> void: close_requested.emit())
@@ -115,7 +115,7 @@ func _build() -> void:
 	side.add_child(card)
 	info_label = Label.new()
 	info_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	info_label.text = "Select a room"
+	info_label.text = "Click a room to see its name, its power and how much it uses."
 	card.add_child(info_label)
 
 	var legend_title := Label.new()
@@ -136,6 +136,12 @@ func _build() -> void:
 		line.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_legend_box.add_child(line)
 
+	var hint := Label.new()
+	hint.theme_type_variation = UiTheme.MUTED
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.text = "Drag to move the map. Use the mouse wheel or the + and − keys to zoom. Press %s or %s to close." % [
+		StationPanel._key_name(&"map", "M"), StationPanel._key_name(&"back", "Esc")]
+	column.add_child(hint)
 
 
 func _button(parent: Control, text: String, on_press: Callable) -> Button:

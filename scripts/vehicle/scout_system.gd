@@ -49,7 +49,7 @@ static var _data: Dictionary = {}
 static func data() -> Dictionary:
 	if _data.is_empty():
 		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(DATA_PATH))
-		_data = parsed if parsed is Dictionary else {"sites": [], "ores": {}, "dock": {"position": [17.0, 0.0, 24.5]}}
+		_data = parsed if parsed is Dictionary else {"sites": [], "ores": {}, "dock": {"position": [18.0, 0.0, 14.5]}}
 	return _data
 
 
@@ -73,7 +73,7 @@ static func ore_kinds() -> PackedStringArray:
 
 
 static func dock_position() -> Vector3:
-	return _v3((data().get("dock", {}) as Dictionary).get("position", [17.0, 0.0, 24.5]))
+	return _v3((data().get("dock", {}) as Dictionary).get("position", [18.0, 0.0, 14.5]))
 
 
 static func dock_yaw() -> float:

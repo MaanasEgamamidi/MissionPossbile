@@ -58,15 +58,20 @@ func setup(p_services: GameServices) -> void:
 	_items_box.name = "Items"
 	content.add_child(_items_box)
 
-	var explain_row := HBoxContainer.new()
-	explain_row.name = "CacheExplain"
 	var heading := Label.new()
 	heading.name = "CachesHeading"
 	heading.text = "Caches you know of"
 	heading.theme_type_variation = UiTheme.HEADING
-	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	explain_row.add_child(heading)
-	explain_row.add_child(ExplainButton.make("recovery", "A cache is cargo left behind when a crew member was brought back to the hub. Walk there to pick it up again."))
+	content.add_child(heading)
+	var explain_row := HBoxContainer.new()
+	explain_row.name = "CacheExplain"
+	var explain := Label.new()
+	explain.text = "A cache is the cargo left behind when a crew member was brought back to the hub. Walk there to pick it up again."
+	explain.theme_type_variation = UiTheme.MUTED
+	explain.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	explain.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	explain_row.add_child(explain)
+	explain_row.add_child(ExplainButton.make("recovery"))
 	content.add_child(explain_row)
 	_caches_box = VBoxContainer.new()
 	_caches_box.name = "Caches"

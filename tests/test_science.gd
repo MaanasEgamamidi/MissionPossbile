@@ -196,18 +196,17 @@ func _test_stations() -> void:
 	donors.sort()
 	var want_sites := SITES.duplicate()
 	want_sites.sort()
-	var want_donors := DONORS.duplicate()
-	want_donors.sort()
-	_check("stations: 3 sample sites, the lab glovebox, 5 salvage donors from damaged map objects and the workbench",
-		sites == want_sites and kinds.get("lab", []) == ["mb_glovebox"] and donors == want_donors and kinds.get("workbench", []) == ["hg_control_board"],
+	_check("stations: 3 sample sites, the lab glovebox, the 5 P08 salvage donors (more from Prompt 10) and the workbench",
+		sites == want_sites and kinds.get("lab", []) == ["mb_glovebox"] and DONORS.all(func(x: String) -> bool: return donors.has(x)) and kinds.get("workbench", []) == ["hg_control_board"],
 		str(kinds.get("sample_site", [])) + str(kinds.get("lab", [])) + str(kinds.get("salvage", [])) + str(kinds.get("workbench", [])))
 	var manifest: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(GameServices.MANIFEST_PATH))
 	var names := {}
 	for o: Dictionary in manifest.objects:
 		names[String(o.name)] = true
 	var damaged := true
-	for d: String in DONORS:
-		damaged = damaged and names.has(d) and (d.contains("old") or d.contains("alarm") or d.contains("burnt") or d.contains("crash")) and not ScienceActions.donor_info(d).is_empty()
+	# Prompt 10 (rover economy) adds donors; every salvage station, old and new, must be a damaged map object
+	for d: String in donors:
+		damaged = damaged and names.has(d) and (d.contains("old") or d.contains("alarm") or d.contains("burnt") or d.contains("crash") or d.contains("fault")) and not ScienceActions.donor_info(d).is_empty()
 	_check("stations: every donor is an existing damaged object of the map with data in salvage.json", damaged)
 	var outside := true
 	for s: String in SITES:

@@ -63,7 +63,7 @@ func notes_text() -> String:
 
 
 func _build_body() -> void:
-	_station_help.extra_text += "\n\nBiology and food specialists know this job best, but anyone in the crew can do it."
+	_add_text(_body, "%s Biology and food specialists know this job best, but anyone in the crew can do it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]), UiTheme.MUTED)
 	_alerts_box = VBoxContainer.new()
 	_alerts_box.name = "Alerts"
 	_body.add_child(_alerts_box)
@@ -75,10 +75,8 @@ func _build_body() -> void:
 	_add_reading(&"harvest_in", "⧗", "Time to harvest", "sol_length")
 	_crop_note = _add_text(_body, "", UiTheme.MUTED)
 	_time_note = _add_text(_body, "", UiTheme.MUTED)
-	_crop_note.hide()
-	_time_note.hide()
 
-	_add_heading_with_help(_body, "What the plants get", "food", "Growth rate = full speed × light × water × nutrients. No light stops growth; too little water or nutrients slows it. A bed that stays dry for a sol wilts and must be planted again.")
+	_add_heading_with_help(_body, "What the plants get", "food")
 	var inputs := VBoxContainer.new()
 	inputs.name = "Inputs"
 	_body.add_child(inputs)
@@ -86,6 +84,7 @@ func _build_body() -> void:
 	_add_reading(&"water", "≈", "Soil water", "water_allocation", inputs)
 	_add_reading(&"nutrients", "✿", "Nutrients", "food", inputs)
 	_add_reading(&"drip", "⇣", "Drip line", "water_allocation", inputs)
+	_add_text(inputs, "Growth rate = full speed × light × water × nutrients. No light stops growth; too little water or nutrients slows it. A bed that stays dry for a sol wilts and must be planted again.", UiTheme.MUTED)
 
 	_add_heading(_body, "What you see")
 	_symptoms_box = VBoxContainer.new()
@@ -214,8 +213,6 @@ func _refresh_body(st: ColonyState) -> void:
 		_crop_note.text = "Lettuce has been grown on the International Space Station (an ISS analog, not Mars evidence). Tomato is a plan, not yet grown on the ISS."
 		_time_note.text = "Time is squeezed: lettuce takes about %s sols here and tomato about %s sols; on Earth they take weeks to months." % [
 			num(float(FoodBalance.crop("lettuce").get("cycle_sols", 0.0))), num(float(FoodBalance.crop("tomato").get("cycle_sols", 0.0)))]
-
-	_station_help.extra_text = _station_help_base + "\n\n" + notes_text()
 
 	# inputs
 	var lit := CropSystem.lights_working(st, fb)

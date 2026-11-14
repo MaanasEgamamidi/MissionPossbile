@@ -1,0 +1,129 @@
+{
+	"info": {
+		"adapter": "NVIDIA GeForce RTX 4060 Ti",
+		"api": "1.4.341",
+		"cap_fps": 0,
+		"cores": 20,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-12700KF",
+		"date": "2026-11-14T10:52:06",
+		"debug_build": true,
+		"driver": "vulkan",
+		"driver_info": [
+			"NVIDIA",
+			"32.0.16.1088"
+		],
+		"engine": "4.7.2-stable (official)",
+		"host_session": false,
+		"quality": "High",
+		"renderer": "forward_plus",
+		"vendor": "NVIDIA",
+		"vsync": false,
+		"window": [
+			1920,
+			1080
+		]
+	},
+	"quality_switch_memory": [
+		{
+			"buffer_mb": 512.962459564209,
+			"level": "High",
+			"private_mb": 2795.3046875,
+			"static_mb": 616.627625465393,
+			"switch": 0,
+			"texture_mb": 380.10107421875,
+			"video_mb": 934.415786743164,
+			"working_set_mb": 1795.1875
+		},
+		{
+			"buffer_mb": 512.948406219482,
+			"level": "Medium",
+			"private_mb": 3060.9296875,
+			"static_mb": 616.576512336731,
+			"switch": 1,
+			"texture_mb": 173.68603515625,
+			"video_mb": 727.986679077148,
+			"working_set_mb": 2058.53125
+		},
+		{
+			"buffer_mb": 512.948406219482,
+			"level": "High",
+			"private_mb": 3103.71484375,
+			"static_mb": 616.712288856506,
+			"switch": 2,
+			"texture_mb": 380.10107421875,
+			"video_mb": 934.401718139648,
+			"working_set_mb": 2102.68359375
+		},
+		{
+			"buffer_mb": 512.948406219482,
+			"level": "Medium",
+			"private_mb": 3077.7109375,
+			"static_mb": 616.584919929504,
+			"switch": 3,
+			"texture_mb": 173.68603515625,
+			"video_mb": 727.986679077148,
+			"working_set_mb": 2077.6328125
+		},
+		{
+			"buffer_mb": 512.948406219482,
+			"level": "High",
+			"private_mb": 3078.6796875,
+			"static_mb": 616.720772743225,
+			"switch": 4,
+			"texture_mb": 380.10107421875,
+			"video_mb": 934.401718139648,
+			"working_set_mb": 2078.83984375
+		},
+		{
+			"buffer_mb": 513.051483154297,
+			"level": "Medium",
+			"private_mb": 3112.66015625,
+			"static_mb": 616.60168170929,
+			"switch": 5,
+			"texture_mb": 173.68603515625,
+			"video_mb": 728.089828491211,
+			"working_set_mb": 2114.37109375
+		},
+		{
+			"buffer_mb": 512.948406219482,
+			"level": "High",
+			"private_mb": 3110.66796875,
+			"static_mb": 616.731377601624,
+			"switch": 6,
+			"texture_mb": 380.10107421875,
+			"video_mb": 934.401718139648,
+			"working_set_mb": 2112.43359375
+		},
+		{
+			"buffer_mb": 512.948406219482,
+			"level": "Medium",
+			"private_mb": 3131.578125,
+			"static_mb": 616.603985786438,
+			"switch": 7,
+			"texture_mb": 173.68603515625,
+			"video_mb": 727.986679077148,
+			"working_set_mb": 2134.49609375
+		},
+		{
+			"buffer_mb": 513.051483154297,
+			"level": "High",
+			"private_mb": 3088.19921875,
+			"static_mb": 616.745736122131,
+			"switch": 8,
+			"texture_mb": 380.10107421875,
+			"video_mb": 934.504867553711,
+			"working_set_mb": 2091.2421875
+		},
+		{
+			"buffer_mb": 513.051483154297,
+			"level": "High",
+			"private_mb": 3088.71875,
+			"static_mb": 616.758633613586,
+			"switch": -1,
+			"texture_mb": 380.10107421875,
+			"video_mb": 934.504867553711,
+			"working_set_mb": 2091.953125
+		}
+	],
+	"views": []
+}

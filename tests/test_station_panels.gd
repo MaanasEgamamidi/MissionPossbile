@@ -206,7 +206,8 @@ func _test_upgrades() -> void:
 			and UpgradeCardsPanel.SECTORS.has(String(extra.get("sector", ""))) and not String(extra.get("effect", "")).is_empty() \
 			and not d.questions.is_empty() and not d.evidence.is_empty() and d.install_station != &""
 	# Prompt 08: the real catalogue (16 cards) replaced the 8 placeholder cards.
-	_check("upgrade cards load into UpgradeDefinition (16 cards, all five sectors)", up.definitions.size() == 16
+	# Prompt 11 added the four radio cards (energy sector).
+	_check("upgrade cards load into UpgradeDefinition (16 + 4 radio cards, all five sectors)", up.definitions.size() == 16 + CommsStage.CARD_IDS.size()
 		and fields_ok and sectors.size() == 5 and not up.note.is_empty(), "%d cards, sectors %s" % [up.definitions.size(), sectors.keys()])
 
 	var bad := PackedStringArray()

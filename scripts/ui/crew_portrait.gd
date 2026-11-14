@@ -66,7 +66,7 @@ func visual() -> PlayerVisual:
 ## Shows the suit on or off in the 3D portrait and renders it again.
 func set_suit(on: bool) -> void:
 	if _visual != null:
-		_visual.set_suit(on, character.suit_slot if character != null else -1)
+		_visual.set_suit(on)
 		_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
 
 
@@ -125,7 +125,7 @@ func _build_rig() -> void:
 	_visual.set_crew_identity(look if look >= 0 else index)
 	_visual.set_first_person(false)
 	if character != null:
-		_visual.set_suit(character.suit_on, character.suit_slot)
+		_visual.set_suit(character.suit_on)
 	# head and shoulders, seen from the front (the body faces -Z)
 	var camera := Camera3D.new()
 	camera.name = "Camera"

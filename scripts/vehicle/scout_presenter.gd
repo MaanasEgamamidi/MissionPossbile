@@ -86,7 +86,7 @@ func _build() -> void:
 	_bay = ScoutModels.bay()
 	_kit = ScoutModels.scout(true)
 	_scout = ScoutModels.scout(false)
-	var bay_pos := _station_pos(st, "scout_bay", Vector3(17.0, 0.0, 21.5))
+	var bay_pos := _station_pos(st, "scout_bay", Vector3(18.0, 0.0, 17.0))
 	_place(_bay, bay_pos, 0.0)
 	_place(_kit, ScoutSystem.dock_position(), ScoutSystem.dock_yaw())
 	# Visibility is set before the models enter the tree, and later only when it really changes: the renderer

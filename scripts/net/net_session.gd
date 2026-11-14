@@ -7,7 +7,7 @@ extends Node
 ##   0  reliable, ordered: requests, answers, colony snapshots and forwarded GameEvents. One channel, so a client always
 ##      has the new state before the event that tells the UI to read it.
 ##   1  unreliable, ordered: body positions, about 20 per second each way, and "motion extras" (the rover's pose).
-##   2  voice (Prompt 11): encoded audio packets, unreliable ordered (headers reliable). The host relays a client's
+##   2  voice (Prompt 11): encoded audio packets, reliable ordered (see send_voice). The host relays a client's
 ##      packets to the other clients; every machine decides itself how to play them (VoiceRouter).
 ##
 ## What travels:
@@ -70,6 +70,10 @@ var _dirty := false                    # host: send an update this frame
 var _state_left := 0.0
 var _motion_left := 0.0
 var _send_left := 0.0                  # client: time until the next position may go out
+var _same_pose_left := 0.0             # client: an unchanged pose is sent again when this runs out
+## Client: an unchanged body pose is repeated this often (seconds), so one lost unreliable packet cannot leave the
+## host and the other players with an old position of a player who stands still.
+const SAME_POSE_REPEAT_S := 0.5
 var _join_left := 0.0
 var _counter := 0
 var _forwarders := {}                  # signal name -> Callable, so leave() can disconnect them
@@ -209,18 +213,25 @@ func send_position(character_id: StringName, position: Vector3, yaw: float) -> v
 	if _send_left > 0.0:
 		return
 	var last: Array = _last_sent_pose.get(character_id, [])
-	if not last.is_empty() and (last[0] as Vector3).distance_squared_to(position) < 1e-6 and absf(float(last[1]) - yaw) < 1e-3:
+	if not last.is_empty() and (last[0] as Vector3).distance_squared_to(position) < 1e-6 and absf(float(last[1]) - yaw) < 1e-3 and _same_pose_left > 0.0:
 		return
 	_send_left = 1.0 / MOTION_HZ
+	_same_pose_left = SAME_POSE_REPEAT_S
 	_last_sent_pose[character_id] = [position, yaw]
 	_rpc_position.rpc_id(1, String(character_id), position, yaw)
 
 
 ## Sends this machine's voice packet to the other players. A client sends it to the host, which relays it; the host
-## sends it to every client. `reliable` is for stream headers and footers. Offline it does nothing.
+## sends it to every client. Offline it does nothing.
+## Every voice packet goes reliable and ordered on the voice channel (`reliable` is kept for callers). Measured in
+## tests/test_voice.gd: sent unreliable, 14-17 of a client's 30 frames reached the host, because ENet's packet throttle
+## (read at 1 of 32 on that link) drops unreliable packets while the 5 Hz reliable colony snapshots make round-trip
+## times vary. On a LAN a resent packet costs about one round trip; the voice channel is separate, so voice never
+## holds up the colony state or body poses. The listener's reorder window, FEC and timed buffer stay in place.
 func send_voice(packet: PackedByteArray, reliable := false) -> void:
 	if packet.is_empty() or packet.size() > VOICE_PACKET_MAX:
 		return
+	reliable = true
 	match _role:
 		&"client":
 			if reliable:
@@ -308,6 +319,7 @@ func _process(delta: float) -> void:
 				_broadcast_positions()
 		&"client":
 			_send_left -= delta
+			_same_pose_left -= delta
 		&"joining":
 			_join_left -= delta
 			if _join_left <= 0.0:
