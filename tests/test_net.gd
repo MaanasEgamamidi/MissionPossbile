@@ -58,6 +58,16 @@ func _repair_rule(task: Dictionary, move: Dictionary) -> Dictionary:
 	return {"accepted": true, "puzzle_state": {"step": expected}, "progress": float(expected) / 2.0, "complete": expected == 2}
 
 
+func _cassette_answer(pending: ActionResult) -> ActionResult:
+	if not pending.pending:
+		return pending
+	await _until(func() -> bool: return _client_results.any(func(result: ActionResult) -> bool: return result.request_id == pending.request_id))
+	for result: ActionResult in _client_results:
+		if result.request_id == pending.request_id:
+			return result
+	return ActionResult.failure(pending.request_id, &"timeout", "No authoritative cassette answer arrived.")
+
+
 func _run() -> void:
 	var dir := ProjectSettings.globalize_path("res://").path_join("_test_saves/net")
 	DirAccess.make_dir_recursive_absolute(dir)
@@ -83,6 +93,10 @@ func _run() -> void:
 	second.close()
 	# F04: join a real ENet colony while the host is midway through a resumable puzzle.
 	var repair_actor := host.local_character()
+	var command_tape := "cassette_command_center"
+	host.session.report_position(1, repair_actor.id, CharacterState._v3(host.state().stations[command_tape].position), 0.0)
+	var first_tape := host.request(&"cassette_collect", StringName(command_tape))
+	_check("cassette fixture: host collects into shared library", first_tape.ok and host.state().repair.collected_cassettes == [command_tape] and repair_actor.cargo.is_empty())
 	var comms_at := CharacterState._v3(host.state().stations["repair_t01"].position)
 	host.session.report_position(1, repair_actor.id, comms_at, 0.0)
 	host.session.repair_runtime.register_rule("T01", _repair_rule, true)
@@ -105,6 +119,32 @@ func _run() -> void:
 	_check("join: client never ticks or saves", client.save_now() == ERR_UNCONFIGURED and not client.is_authority())
 	_check("repair late join: current puzzle and seed arrive", client.state().repair.tasks.T01.progress == 0.5 and client.state().repair.tasks.T01.puzzle_state == {"step": 1} and client.state().repair.tasks.T01.puzzle_seed == host.state().repair.tasks.T01.puzzle_seed)
 	_check("repair late join: live operator lease arrives", client.session.repair_runtime.locks.has("T01") and int(client.session.repair_runtime.locks.T01.peer) == 1)
+	_check("cassette late join: shared collection arrives", client.state().repair.collected_cassettes == [command_tape] and host.snapshot().colony.repair.collected_cassettes == [command_tape])
+	for attempt: Array in [[&"cassette_open", {}], [&"cassette_select", {"cassette_id": command_tape}], [&"cassette_read", {"cassette_id": command_tape, "page": 0}]]:
+		var refused := await _cassette_answer(client.request(attempt[0], &"cassette_player_command_center", attempt[1]))
+		_check("cassette remote: %s refused away from player" % attempt[0], not refused.ok and not bool(refused.changes.get("authorized", false)) and not host.session.cassette_runtime.readers.has(str(cpeer)))
+	var tape_at := CharacterState._v3(host.state().stations[command_tape].position)
+	await _until(func() -> bool:
+		client.report_position(mine.id, tape_at, 0.0)
+		return host.state().character(mine.id).position.distance_to(tape_at) < 0.01)
+	var repeated_tape := await _cassette_answer(client.request(&"cassette_collect", StringName(command_tape)))
+	_check("cassette competing peer: one shared entry", repeated_tape.reason == &"already_collected" and host.state().repair.collected_cassettes.count(command_tape) == 1 and client.state().repair.collected_cassettes.count(command_tape) == 1)
+	var player_at := CharacterState._v3(host.state().stations[CassetteCatalog.PLAYER_ID].position)
+	await _until(func() -> bool:
+		client.report_position(mine.id, player_at, 0.0)
+		return host.state().character(mine.id).position.distance_to(player_at) < 0.01)
+	var opened_tape := await _cassette_answer(client.request(&"cassette_open", StringName(CassetteCatalog.PLAYER_ID)))
+	_check("cassette player: host authorizes local reader", opened_tape.ok and bool(opened_tape.changes.get("authorized", false)) and client.session.cassette_runtime.is_authorized(cpeer))
+	var selected_tape := await _cassette_answer(client.request(&"cassette_select", StringName(CassetteCatalog.PLAYER_ID), {"cassette_id": command_tape}))
+	var read_tape := await _cassette_answer(client.request(&"cassette_read", StringName(CassetteCatalog.PLAYER_ID), {"cassette_id": command_tape, "page": 1}))
+	_check("cassette player: selection and page replicate before answer", selected_tape.ok and read_tape.ok and client.session.cassette_runtime.readers[str(cpeer)].cassette_id == command_tape and int(client.session.cassette_runtime.readers[str(cpeer)].page) == 1)
+	var beyond_tape := await _cassette_answer(client.request(&"cassette_read", StringName(CassetteCatalog.PLAYER_ID), {"cassette_id": command_tape, "page": 999}))
+	_check("cassette player: nonexistent page refused", not beyond_tape.ok and int(client.session.cassette_runtime.readers[str(cpeer)].page) == 1)
+	var departure := host.config.hub_position
+	await _until(func() -> bool:
+		client.report_position(mine.id, departure, 0.0)
+		return not host.session.cassette_runtime.readers.has(str(cpeer)) and not client.session.cassette_runtime.readers.has(str(cpeer)))
+	_check("cassette movement: authorization revoked on both peers", not host.session.cassette_runtime.readers.has(str(cpeer)) and not client.session.cassette_runtime.is_authorized(cpeer))
 	# Both room milestones then travel as ordinary authoritative updates, including seen-shot history.
 	host.request(&"task_move", &"repair_t01", {"generation": 1, "move": "step", "value": 2})
 	host.session.report_position(1, hosts.id, CharacterState._v3(host.state().stations["repair_t02"].position), 0.0)
@@ -115,12 +155,24 @@ func _run() -> void:
 	host.state().repair.seen_beauty_shots.append("command_center")
 	host.events.state_changed.emit(&"repair_fixture")
 	_check("repair updates: room milestone and shot history arrive", completed.ok and await _until(func() -> bool: return client.state().repair.rooms.command_center.first_completed and client.state().repair.seen_beauty_shots == ["command_center"] and not client.session.repair_runtime.locks.has("T01") and not client.session.repair_runtime.locks.has("T02")))
+	var power_tape := "cassette_power_supply"
+	var power_tape_at := CharacterState._v3(host.state().stations[power_tape].position)
+	host.session.report_position(1, hosts.id, power_tape_at, 0.0)
+	await _until(func() -> bool:
+		client.report_position(mine.id, power_tape_at, 0.0)
+		return host.state().character(mine.id).position.distance_to(power_tape_at) < 0.01)
+	# Submit both before yielding: the authoritative host must serialize them into one collection.
+	var racing_remote := client.request(&"cassette_collect", StringName(power_tape))
+	var racing_host := host.request(&"cassette_collect", StringName(power_tape))
+	var racing_answer := await _cassette_answer(racing_remote)
+	_check("cassette simultaneous pickup: one winning shared entry", racing_host.ok and racing_answer.reason == &"already_collected" and host.state().repair.collected_cassettes.count(power_tape) == 1 and client.state().repair.collected_cassettes.count(power_tape) == 1)
 
 	# ---- client body -> host
 	var spot := host.state().items["crate_1"].position as Array
 	var crate_at := Vector3(float(spot[0]), float(spot[1]), float(spot[2]))
-	client.report_position(mine.id, crate_at + Vector3(0.5, 0, 0), 1.0)
-	_check("motion: host sees the client's body", await _until(func() -> bool: return host.state().character(mine.id).position.distance_to(crate_at + Vector3(0.5, 0, 0)) < 0.01))
+	_check("motion: host sees the client's body", await _until(func() -> bool:
+		client.report_position(mine.id, crate_at + Vector3(0.5, 0, 0), 1.0)
+		return host.state().character(mine.id).position.distance_to(crate_at + Vector3(0.5, 0, 0)) < 0.01))
 	_check("motion: client keeps its own pose through updates", await _until(func() -> bool: return false, 0.5) or client.state().character(mine.id).position.distance_to(crate_at + Vector3(0.5, 0, 0)) < 0.01)
 	host.session.report_position(1, hosts.id, Vector3(3, 0, 4), 0.5)
 	_check("motion: client sees the host's body", await _until(func() -> bool: return client.state().character(hosts.id).position.distance_to(Vector3(3, 0, 4)) < 0.01))
@@ -174,6 +226,7 @@ func _run() -> void:
 	_check("rejoin: works on the same port", client.net.join("127.0.0.1", PORT) == OK and await _until(func() -> bool: return client.net.is_client()))
 	_check("rejoin: gets a crew member again", client.local_character() != null)
 	_check("repair rejoin: milestone retained without stuck lease", client.state().repair.rooms.command_center.first_completed and client.state().repair.seen_beauty_shots == ["command_center"] and not client.session.repair_runtime.locks.has("T03"))
+	_check("cassette rejoin: library persists and playback stays closed", client.state().repair.collected_cassettes == [command_tape, power_tape] and client.session.cassette_runtime.readers.is_empty())
 	var rejoined_actor := client.local_character()
 	await _until(func() -> bool:
 		client.report_position(rejoined_actor.id, rings_at, 0.0)

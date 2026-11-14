@@ -1,8 +1,8 @@
 # Mars Colony — Godot 4.7.2 project
 
-The `revisions` branch implements the prompt pack's F01-F06 foundation (pages 1-17): stable room/task contracts, authoritative role checks and operator leases, additive saves and LAN snapshots, a shared task-panel sample, 19 reserved interaction locations, and collision-checked Med Bay spawn/recovery spots. See [the foundation handoff](docs/revisions/HANDOFF.md) for APIs, verification and limitations.
+The `revisions` branch implements F01-F06 foundations and C01-C04 cassettes (pages 1-21). Collect six shared room tapes with E, then read their local NASA photos and two-page briefings at the Command Room cassette player. Inventory shows collection status only. See [the cassette handoff](docs/revisions/CASSETTE_HANDOFF.md) and [foundation handoff](docs/revisions/HANDOFF.md) for APIs, verification and limitations.
 
-Cassette collection/playback, actual room puzzles, new hazard timing, restoration art and completion shots begin in later sections and are deferred. Existing colony gameplay remains available. No human playtest has been run for this foundation batch.
+The user-approved briefings clearly preview the twelve future repair puzzles; exact puzzle controls remain deferred. New hazard timing, restoration art and completion shots also remain later work. The performance update from `main` is merged. No human playtest has been run for these changes.
 
 Open `project.godot` with Godot 4.7.2. The main scene is `scenes/game.tscn` (the map alone is `scenes/world/colony_world.tscn`).
 

@@ -27,6 +27,10 @@ var max_height := 0.0
 var accent_line := true
 ## True: UiRoot puts the panel against the right edge (a drawer, like the power and build drawers) instead of centring it.
 var align_right := false
+## In-game reading/task surfaces release focus when a critical alert interrupts them.
+var interrupt_on_critical := false
+## Optional viewport fractions for a world-visible surface (0 uses the usual sizing).
+var viewport_fraction := Vector2.ZERO
 
 
 ## Builds the panel. Subclasses call super.setup(p_services) first.
@@ -53,6 +57,10 @@ func first_focus() -> Control:
 ## A panel can veto closing (for example while capturing a key for remapping).
 func can_close() -> bool:
 	return true
+
+
+func interrupt(_reason := "") -> void:
+	close_requested.emit()
 
 
 func _draw() -> void:

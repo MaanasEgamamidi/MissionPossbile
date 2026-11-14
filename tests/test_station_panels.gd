@@ -62,6 +62,8 @@ func _test_for_station() -> void:
 		# Prompt 07: the life-support console, the suit rack and the 12 sun trackers have their own panels.
 		var ok := false
 		match kind:
+			"cassette_player_anchor", "cassette_player":
+				ok = panel is CassettePlayerPanel and (panel as CassettePlayerPanel).station_id == CassetteLibrary.PLAYER_ID
 			"suits":
 				ok = panel is SuitRackPanel
 			"power":
@@ -73,7 +75,9 @@ func _test_for_station() -> void:
 			_:
 				ok = panel is StationPanel and not (panel is PowerStationPanel or panel is LifeSupportStationPanel
 					or panel is SolarStationPanel or panel is SuitRackPanel)
-		ok = ok and panel != null and (panel as StationPanel).kind == kind
+		ok = ok and panel != null
+		if panel is StationPanel:
+			ok = ok and (panel as StationPanel).kind == kind
 		if panel != null:
 			ok = ok and bool(panel.get_meta(&"station_surface", false)) and StringName(panel.get_meta(&"station_id", &"")) == StringName(id)
 			# Built-in kinds use their kind's name; data-file stations may name themselves (beds are numbered: "Planter 2").

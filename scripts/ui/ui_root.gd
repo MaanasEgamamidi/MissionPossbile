@@ -116,8 +116,8 @@ func show_critical_alert(message: String, seconds := 6.0) -> void:
 	_critical_banner.visible = true
 	_critical_left = maxf(seconds, 0.1)
 	var panel := top()
-	if panel is TaskPanel:
-		(panel as TaskPanel).interrupt(message)
+	if panel != null and panel.interrupt_on_critical:
+		panel.interrupt(message)
 
 
 func _on_system_alert(_id: StringName, level: StringName, message: String) -> void:
@@ -414,6 +414,10 @@ func _fit(panel: UiPanel) -> void:
 	var room := _screen.size
 	if room.x <= 0.0 or room.y <= 0.0:
 		room = get_viewport().get_visible_rect().size if is_inside_tree() else Vector2(1920, 1080)
+	if panel.viewport_fraction.x > 0.0:
+		want.x = room.x * clampf(panel.viewport_fraction.x, 0.1, 0.95)
+	if panel.viewport_fraction.y > 0.0:
+		want.y = room.y * clampf(panel.viewport_fraction.y, 0.1, 0.95)
 	room -= Vector2(_frame.get_theme_constant(&"margin_left") + _frame.get_theme_constant(&"margin_right"),
 		_frame.get_theme_constant(&"margin_top") + _frame.get_theme_constant(&"margin_bottom"))
 	var min_size := panel.custom_minimum_size

@@ -152,6 +152,7 @@ func _test_mapping() -> void:
 		var panel := StationPanels.for_station(StringName(id), services)
 		var ok := false
 		match kind:
+			"cassette_player_anchor": ok = panel is CassettePlayerPanel and (panel as CassettePlayerPanel).station_id == CassetteLibrary.PLAYER_ID
 			"power": ok = panel is PowerStationPanel
 			"lifesupport": ok = panel is LifeSupportStationPanel
 			"solar": ok = panel is SolarStationPanel

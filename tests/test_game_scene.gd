@@ -1,7 +1,7 @@
 extends SceneTree
 ## End-to-end checks of the assembled game scene (services + collision + player + HUD), run without the heavy map
 ## visuals. Input is injected with Input.action_press; physics is the real engine at 60 Hz, sped up with time_scale.
-## Run: godot --headless --path . --script res://tests/test_game_scene.gd [-- --doors-only]
+## Run: godot --headless --path . --script res://tests/test_game_scene.gd [-- --suit-only]
 
 var _passed := 0
 var _total := 0
@@ -35,6 +35,33 @@ func _place(pos: Vector3, yaw: float) -> void:
 	await _frames(3)
 
 
+func _suit_checks() -> void:
+	var services := main.services
+	var me := services.local_character()
+	var player := main.player
+	var rack: Dictionary = services.state().stations["al_suit_rack"]
+	var rack_pos := CharacterState._v3(rack.position)
+	# The rendered walkthrough uses this measured clear approach, facing the rack from inside the Airlock.
+	# Do not choose an arbitrary point whose short probe capsule can miss a low fixture or the head clearance.
+	var spot := Vector3(16.4, 0.0, 7.5)
+	await _place(spot, 0.0)
+	_check("suit approach is grounded, reported and within real reach", player.is_on_floor() and absf(player.global_position.y) < 0.1 and me.position.distance_to(player.global_position) < 0.05 and me.position.distance_to(rack_pos) <= services.config.interact_distance_m,
+		"body=%s host=%s rack=%s distance=%.2f" % [player.global_position, me.position, rack_pos, me.position.distance_to(rack_pos)])
+	var tank := me.suit_charge
+	var result := main._submit(&"begin_suit_check", &"al_suit_rack", {"on": true})
+	_check("suit check starts at the rack", result.ok, "%s (planned %.2f m; body %s; host %s; rack %s; actual %.2f m)" % [result.message, spot.distance_to(rack_pos), player.global_position, me.position, rack_pos, me.position.distance_to(rack_pos)])
+	await _frames(30)
+	_check("after 0.5 s the suit is not on yet", not me.suit_on and services.session.suit_check_progress(me.id) > 0.3)
+	await _frames(45)
+	_check("after 1.25 s the suit is on and the tank is unchanged", me.suit_on and me.suit_charge == tank)
+	result = main._submit(&"begin_suit_check", &"al_suit_rack", {"on": false})
+	await _frames(20)
+	await _place(services.config.hub_position, 0.0)
+	await _frames(90)
+	_check("leaving the rack cancels the check: suit still on", result.ok and me.suit_on and services.session.suit_check_progress(me.id) < 0.0,
+		"%.2f m from rack" % me.position.distance_to(rack_pos))
+
+
 func _initialize() -> void:
 	# Real speed for everything timed in real seconds; the long walking checks further down are sped up.
 	var dir := ProjectSettings.globalize_path("res://").path_join("_test_saves/scene")
@@ -59,6 +86,13 @@ func _initialize() -> void:
 	_check("standing on the hub floor", player.is_on_floor() and absf(player.global_position.y) < 0.03, "y=%.3f" % player.global_position.y)
 	_check("host position follows the body", me.position.distance_to(player.global_position) < 0.05)
 	_check("three parked crew are shown, none of them is a second local body", main._crew_visuals.size() == 3)
+	if OS.get_cmdline_user_args().has("--suit-only"):
+		await _suit_checks()
+		_release_all()
+		services.saves.delete_all()
+		print("RESULT %d/%d" % [_passed, _total])
+		quit(0 if _passed == _total else 1)
+		return
 
 	# ---- walking under Mars gravity, reported to the host
 	var start := player.global_position
@@ -130,23 +164,7 @@ func _initialize() -> void:
 	_check("no duplicate or lost item", st.invariants_ok().is_empty() and st.items.size() == 3)
 
 	# ---- suit check at the suit rack: one real second, then 20 % slower, tank untouched
-	var rack: Dictionary = st.stations["al_suit_rack"]
-	var rack_pos := Vector3(float(rack.position[0]), 0.0, float(rack.position[2]))
-	var spot := _free_spot_near(rack_pos, 1.6)
-	await _place(spot, 0.0)
-	var tank := me.suit_charge
-	r = main._submit(&"begin_suit_check", &"al_suit_rack", {"on": true})
-	_check("suit check starts at the rack", r.ok, "%s (stood %.2f m away)" % [r.message, spot.distance_to(rack_pos)])
-	await _frames(30)
-	_check("after 0.5 s the suit is not on yet", not me.suit_on and services.session.suit_check_progress(me.id) > 0.3)
-	await _frames(45)
-	_check("after 1.25 s the suit is on and the tank is unchanged", me.suit_on and me.suit_charge == tank)
-	r = main._submit(&"begin_suit_check", &"al_suit_rack", {"on": false})
-	await _frames(20)
-	await _place(services.config.hub_position, 0.0)          # leave the rack before the second is up
-	await _frames(90)
-	_check("leaving the rack cancels the check: suit still on", r.ok and me.suit_on and services.session.suit_check_progress(me.id) < 0.0,
-		"%.2f m from rack" % me.position.distance_to(rack_pos))
+	await _suit_checks()
 
 	# ---- suit slowdown measured on open ground outdoors
 	var run := _open_run(Vector3(-27.0, 0.0, 33.0), 14.0)                 # a clear straight line near the landing pad
@@ -261,8 +279,8 @@ func _open_run(around: Vector3, length: float) -> Array:
 func _free_spot_near(around: Vector3, radius: float) -> Vector3:
 	var space := root.get_world_3d().direct_space_state
 	var shape := CapsuleShape3D.new()
-	shape.radius = 0.34
-	shape.height = 1.7
+	shape.radius = main.player.tuning.body_radius_m + 0.02
+	shape.height = main.player.tuning.body_height_m + 0.04
 	var q := PhysicsShapeQueryParameters3D.new()
 	q.shape = shape
 	q.collision_mask = Layers.WORLD | Layers.DOOR
@@ -270,7 +288,7 @@ func _free_spot_near(around: Vector3, radius: float) -> Vector3:
 		for i in 16:
 			var a := TAU * float(i) / 16.0
 			var p := around + Vector3(cos(a), 0.0, sin(a)) * ring
-			q.transform = Transform3D(Basis(), p + Vector3(0, 0.95, 0))
+			q.transform = Transform3D(Basis(), p + Vector3.UP * (0.05 + main.player.tuning.body_height_m * 0.5))
 			if space.intersect_shape(q, 1).is_empty():
 				var down := PhysicsRayQueryParameters3D.create(p + Vector3(0, 1.0, 0), p + Vector3(0, -1.0, 0), Layers.WORLD)
 				var hit := space.intersect_ray(down)

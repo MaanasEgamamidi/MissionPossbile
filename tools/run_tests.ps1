@@ -3,7 +3,8 @@ param(
 		"test_science", "test_progression", "test_weather_data", "test_weather", "test_ui_framework", "test_sources", "test_hud_panels",
 		"test_station_panels", "test_p07_panels", "test_player", "test_net", "test_net_game", "test_game_scene", "test_graphics_quality",
 		"test_rover", "test_rover_drive", "test_voice", "test_tutorial", "test_scout", "test_crew_collision", "test_pdf_fixes",
-		"test_repair_foundations", "test_task_panel", "test_repair_anchors"),
+		"test_repair_foundations", "test_task_panel", "test_repair_anchors", "test_perf",
+		"test_cassettes", "test_cassette_ui", "test_cassette_assets"),
 	[string]$LogDir = "",
 	[switch]$Import
 )

@@ -1,0 +1,9 @@
+test_cassette_ui       exit=0 RESULT 76/76 (7.8 s)
+test_ui_framework      exit=0 RESULT 125/125 (7.6 s)
+test_task_panel        exit=0 RESULT 29/29 (5.6 s)
+test_game_scene        exit=1 RESULT 28/32 (43 s)
+    FAIL suit check starts at the rack: Move closer to use this. (planned 1.60 m; body (15.54384, 2.509142, 8.304588); host (15.54384, 2.509142, 8.304588); rack (16.4, 0.0, 9.55); actual 2.93 m)
+    FAIL after 0.5 s the suit is not on yet: 
+    FAIL after 1.25 s the suit is on and the tank is unchanged: 
+    FAIL leaving the rack cancels the check: suit still on: 33.77 m from rack
+FAILED TESTS: 1

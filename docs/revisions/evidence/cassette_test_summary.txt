@@ -1,0 +1,18 @@
+test_cassettes         exit=0 RESULT 84/84 (6.6 s)
+test_cassette_ui       exit=0 RESULT 56/56 (7.4 s)
+test_cassette_assets   exit=0 RESULT 57/57 (1 s)
+test_repair_foundations exit=0 RESULT 119/119 (3.5 s)
+test_task_panel        exit=0 RESULT 29/29 (5.8 s)
+test_game_services     exit=0 RESULT 25/25 (14.9 s)
+test_saves             exit=1 RESULT 53/56 (2.3 s)
+    FAIL rotation exact files: unexpected result
+    FAIL zero backups: unexpected result
+    FAIL delete all: unexpected result
+test_ui_framework      exit=0 RESULT 125/125 (7.6 s)
+test_hud_panels        exit=0 RESULT 89/89 (5.6 s)
+test_station_panels    exit=0 RESULT 196/196 (30 s)
+test_p07_panels        exit=1 RESULT 53/54 (14.1 s)
+    FAIL every station of a new game maps to the right panel class (21 base + those added by data files): 84 stations { "workbench": 1, "board": 1, "gym": 1, "survivor": 1, "heal": 1, "record": 7, "lab": 1, "computer": 1, "comms": 1, "weather": 1, "salvage": 15, "food": 1, "suits": 1, "power": 1, "lifesupport": 1, "solar": 12, "garage": 1, "bed": 7, "repair_task": 12, "cassette_anchor": 6, "cassette_player_anchor": 1, "rover_charger": 1, "sample_site": 3, "scout_bay": 1, "ore_deposit": 5 }, wrong: cassette_player_command_center (cassette_player_anchor)
+test_net_game          exit=0 RESULT 21/21 (22.2 s)
+test_repair_anchors    exit=0 RESULT 113/113 (24.5 s)
+FAILED TESTS: 2

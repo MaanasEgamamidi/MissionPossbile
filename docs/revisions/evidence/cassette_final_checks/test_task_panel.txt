@@ -1,0 +1,32 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS layout (1280, 720) text 1.0 UI 1.0
+PASS focus styles (1280, 720) text 1.0 UI 1.0
+PASS world visible around task
+PASS layout (1280, 720) text 1.5 UI 1.0
+PASS focus styles (1280, 720) text 1.5 UI 1.0
+PASS world visible around task
+PASS layout (1280, 720) text 1.5 UI 2.0
+PASS focus styles (1280, 720) text 1.5 UI 2.0
+PASS world visible around task
+PASS layout (1920, 1080) text 1.0 UI 1.0
+PASS focus styles (1920, 1080) text 1.0 UI 1.0
+PASS world visible around task
+PASS layout (1920, 1080) text 1.5 UI 1.0
+PASS focus styles (1920, 1080) text 1.5 UI 1.0
+PASS world visible around task
+PASS layout (1920, 1080) text 1.5 UI 2.0
+PASS focus styles (1920, 1080) text 1.5 UI 2.0
+PASS world visible around task
+PASS sample frees mouse without pausing
+PASS authoritative clock advances with sample open
+PASS Tab reaches every sample action
+PASS keyboard activates labeled sample shape: moves=1 progress=33.3333333333333 focus=Activate:<Button#651710957470>
+PASS host wait disables puzzle controls but leaves cancel
+PASS stale response recovers and uses host generation
+PASS Esc closes and restores capture
+PASS critical alert interrupts task and is above frame
+PASS critical interruption leaves simulation running
+PASS recovery closes task and restores capture
+PASS disconnect closes task
+RESULT 29/29

@@ -10,6 +10,7 @@ var _caches_box: VBoxContainer
 var _close: Button
 var _signature := ""
 var _pending_request := ""
+var _cassette_rows: Dictionary = {}
 
 
 func setup(p_services: GameServices) -> void:
@@ -57,6 +58,22 @@ func setup(p_services: GameServices) -> void:
 	_items_box = VBoxContainer.new()
 	_items_box.name = "Items"
 	content.add_child(_items_box)
+	var cassette_heading := Label.new()
+	cassette_heading.name = "CassetteHeading"
+	cassette_heading.text = "Shared cassette library"
+	cassette_heading.theme_type_variation = UiTheme.HEADING
+	content.add_child(cassette_heading)
+	var cassette_note := Label.new()
+	cassette_note.name = "CassettePlaybackLocation"
+	cassette_note.text = "Play at Command Room cassette player."
+	cassette_note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	content.add_child(cassette_note)
+	for entry: Dictionary in CassetteLibrary.metadata():
+		var row := Label.new()
+		row.name = String(entry.id).validate_node_name()
+		row.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		content.add_child(row)
+		_cassette_rows[String(entry.id)] = row
 
 	var heading := Label.new()
 	heading.name = "CachesHeading"
@@ -106,6 +123,11 @@ func refresh() -> void:
 	parts.append("|")
 	for c: Dictionary in services.state().caches:
 		parts.append("%s:%d" % [c.get("id", ""), (c.get("items", []) as Array).size()])
+	var collected: Array = services.state().repair.get("collected_cassettes", [])
+	for entry: Dictionary in CassetteLibrary.metadata():
+		var id := String(entry.id)
+		parts.append(id + (":collected" if collected.has(id) else ":missing"))
+		(_cassette_rows[id] as Label).text = "%s - %s" % [entry.title, "Collected" if collected.has(id) else "Missing"]
 	var signature := ",".join(parts)
 	if signature != _signature:
 		_signature = signature

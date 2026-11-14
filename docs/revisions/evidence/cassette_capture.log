@@ -1,0 +1,553 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.325 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 5050 Laptop GPU
+
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+   GDScript backtrace (most recent call first):
+       [0] setup (res://scripts/vehicle/rover_presenter.gd:113)
+       [1] _begin_play (res://scripts/game/game_main.gd:204)
+       [2] _on_menu_new (res://scripts/game/game_main.gd:330)
+       [3] _initialize (res://tools/godot/capture_cassette_player.gd:32)
+       [4] _frames (res://tools/godot/capture_cassette_player.gd:11)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+COLLECT cassette_command_center ok=true 
+COLLECT cassette_power_supply ok=true 
+COLLECT cassette_greenhouse ok=true 
+COLLECT cassette_green_dome ok=true 
+COLLECT cassette_med_bay ok=true 
+COLLECT cassette_hangar ok=true 
+SHOT cassette_command_center_1080 result=0
+SHOT cassette_power_supply_1080 result=0
+SHOT cassette_greenhouse_1080 result=0
+SHOT cassette_green_dome_1080 result=0
+SHOT cassette_med_bay_1080 result=0
+SHOT cassette_hangar_1080 result=0
+SHOT player_1280_normal result=0
+SHOT player_1280_large_high_contrast result=0
+SHOT player_1280_large_controls result=0
+SHOT player_1920_normal result=0
+SHOT player_1920_large_high_contrast result=0
+SHOT player_1920_large_controls result=0
+SHOT inventory_metadata_only result=0
+SHOT playback_critical_interrupt result=0
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: geom->softshadow_count==0 - BUG!
+   at: _instance_unpair (servers/rendering/renderer_scene_cull.cpp:348)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_scenario (servers/rendering/renderer_scene_cull.cpp:844)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+ERROR: BUG, indexing did not unpair geometries from light.
+   at: instance_set_base (servers/rendering/renderer_scene_cull.cpp:616)
+WARNING: 14 RIDs of type "Texture" were leaked.
+   at: finalize (servers/rendering/rendering_device.cpp:8900)
+WARNING: 137 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

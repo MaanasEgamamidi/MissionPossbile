@@ -1,5 +1,5 @@
 extends SceneTree
-## F06: the imported map, real collision, local walking/aiming, spawn and old-save integration.
+## F06/C01/C02: imported-map walking, collision-safe spawn, real cassette pickups and restricted playback.
 
 var passed := 0
 var total := 0
@@ -79,15 +79,45 @@ func _initialize() -> void:
 			approached = main.player.global_position.distance_to(before) > 0.05
 			if approached: break
 		_check("walk and aim " + id, approached, str(main.player.aimed_target()))
-		var panel := StationPanels.for_station(StringName(id), services)
-		_check("reserved station opens " + id, panel != null and panel.panel_title() == String(entry.name))
-		if panel != null: panel.free()
+		if entry.kind == "cassette_anchor":
+			await _capture(id + "_before")
+			main.player._interact()
+			await _frames(1)
+			_check("E collects physical room cassette " + id, CassetteCatalog.collected(services.state(), id) and not main.ui.is_open())
+			var cassette_area := main.cassette_presenter.cassette_nodes.get(id) as Area3D
+			_check("collected cassette disappears from live world " + id, cassette_area != null and not cassette_area.visible and cassette_area.collision_layer == 0)
+			await _capture(id + "_collected")
+		elif entry.kind == "cassette_player_anchor":
+			await _capture("command_player_before")
+			main.player._interact()
+			await _frames(1)
+			var player_panel := main.ui.top() as CassettePlayerPanel
+			_check("physical player opens host-authorized Command Room reader", player_panel != null and services.session.cassette_runtime.is_authorized(1))
+			if player_panel != null:
+				player_panel.select_tape("cassette_command_center")
+				_check("collected briefing and NASA photo appear at real player", player_panel.photo.texture != null and not player_panel.briefing_text.text.is_empty())
+				player_panel.read_page(1)
+				_check("physical player authorizes next real page", player_panel.page_index == 1 and not player_panel.briefing_text.text.is_empty())
+				await _capture("command_player_reading")
+			main.ui.close_all()
+			await _frames(1)
+		else:
+			var panel := StationPanels.for_station(StringName(id), services)
+			_check("task anchor station opens " + id, panel != null and panel.panel_title() == String(entry.name))
+			if panel != null: panel.free()
 		if not captured.has(entry.room_id):
 			captured[entry.room_id] = true
 			await _capture(String(entry.room_id))
 	_check("twelve task anchors and six distinct tapes", task_count == 12 and tape_ids.size() == 6)
 	_check("greenhouse and dome cassette distinct", tape_ids.has("cassette_greenhouse") and tape_ids.has("cassette_green_dome"))
 	_check("player only in Command Room", (services.state().stations["cassette_player_command_center"] as Dictionary).zone == "Command Room")
+	_check("all six live room cassettes collected once", services.state().repair.collected_cassettes.size() == 6)
+	var all_hidden := true
+	for area: Area3D in main.cassette_presenter.cassette_nodes.values():
+		all_hidden = all_hidden and not area.visible and area.collision_layer == 0
+	_check("all six collected props remain hidden in imported world", all_hidden)
+	main._submit(&"use_station", &"cassette_player_command_center", {})
+	_check("direct station request away exposes no reader", not main.ui.is_open() and not services.session.cassette_runtime.is_authorized(1))
 	services.saves.delete_all()
 	main.queue_free()
 	await process_frame
@@ -109,9 +139,27 @@ func _frames(count: int) -> void:
 
 func _capture(label: String) -> void:
 	if capture_dir.is_empty() or DisplayServer.get_name() == "headless": return
+	var original_camera: Camera3D
+	var hero_camera: Camera3D
+	if label == "command_player_before":
+		# Evidence-only framing: do not move the actor or alter its authoritative station reach.
+		original_camera = main.player.camera_rig().camera()
+		main.player.visual().set_first_person(false)
+		hero_camera = Camera3D.new()
+		hero_camera.fov = 60.0
+		main.add_child(hero_camera)
+		var station_at := CharacterState._v3(main.services.state().stations[CassetteCatalog.PLAYER_ID].position)
+		hero_camera.global_position = station_at + Vector3(1.4, 1.8, 1.6)
+		hero_camera.look_at(station_at + Vector3(0, 0.8, 0))
+		hero_camera.make_current()
+	await _frames(20)
 	await process_frame
 	await RenderingServer.frame_post_draw
 	root.get_texture().get_image().save_png(capture_dir.path_join(label + ".png"))
+	if hero_camera != null:
+		main.player.visual().set_first_person(main.player.camera_rig().is_first_person())
+		original_camera.make_current()
+		hero_camera.queue_free()
 
 func _check(label: String, ok: bool, detail := "") -> void:
 	total += 1

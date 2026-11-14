@@ -1,0 +1,59 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS direct instantiation away reveals no content
+PASS player lists all six missing locked entries
+PASS opening library alone reveals no tape content
+PASS uncollected direct selection fails closed
+PASS inventory exposes six metadata-only statuses
+PASS real pickup cassette_command_center
+PASS real pickup cassette_power_supply
+PASS real pickup cassette_greenhouse
+PASS real pickup cassette_green_dome
+PASS real pickup cassette_med_bay
+PASS real pickup cassette_hangar
+PASS inventory updates shared pickup state without cargo change
+PASS offline photo and matching briefing cassette_command_center
+PASS host-authorized page cassette_command_center
+PASS offline photo and matching briefing cassette_power_supply
+PASS host-authorized page cassette_power_supply
+PASS offline photo and matching briefing cassette_greenhouse
+PASS host-authorized page cassette_greenhouse
+PASS offline photo and matching briefing cassette_green_dome
+PASS host-authorized page cassette_green_dome
+PASS offline photo and matching briefing cassette_med_bay
+PASS host-authorized page cassette_med_bay
+PASS offline photo and matching briefing cassette_hangar
+PASS host-authorized page cassette_hangar
+PASS reading never pauses the colony
+PASS clock continues while briefing visible
+PASS layout (1280, 720) text1.0 UI1.0
+PASS world at every edge and corners
+PASS photo remains left and preserves aspect
+PASS keyboard focus styles
+PASS layout (1280, 720) text1.5 UI1.0
+PASS world at every edge and corners
+PASS photo remains left and preserves aspect
+PASS keyboard focus styles
+PASS layout (1280, 720) text1.5 UI2.0
+PASS world at every edge and corners
+PASS photo remains left and preserves aspect
+PASS keyboard focus styles
+PASS layout (1920, 1080) text1.0 UI1.0
+PASS world at every edge and corners
+PASS photo remains left and preserves aspect
+PASS keyboard focus styles
+PASS layout (1920, 1080) text1.5 UI1.0
+PASS world at every edge and corners
+PASS photo remains left and preserves aspect
+PASS keyboard focus styles
+PASS layout (1920, 1080) text1.5 UI2.0
+PASS world at every edge and corners
+PASS photo remains left and preserves aspect
+PASS keyboard focus styles
+PASS pending host request clears previous text and photo
+PASS late approved response after moving away cannot reveal content
+PASS critical warning closes playback and restores cursor
+PASS recovery closes playback
+PASS disconnect closes playback
+PASS invalidated station clears content and closes
+RESULT 56/56

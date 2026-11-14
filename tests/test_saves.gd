@@ -7,7 +7,8 @@ var _service: SaveService
 var _payload: Dictionary
 
 func _initialize() -> void:
-	_service = SaveService.new(ProjectSettings.globalize_path("res://").path_join("_test_saves"))
+	# Other verification tools also write under _test_saves; exact-file assertions own this subdirectory only.
+	_service = SaveService.new(ProjectSettings.globalize_path("res://").path_join("_test_saves/save_integrity"))
 	_payload = _make_payload()
 	_fresh()
 	_check("fresh start", _service.read().status == &"no_save" and not _service.has_save())

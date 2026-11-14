@@ -1,0 +1,7 @@
+test_saves             exit=0 RESULT 56/56 (1.8 s)
+test_cassettes         exit=0 RESULT 88/88 (9.2 s)
+test_cassette_ui       exit=0 RESULT 56/56 (8.7 s)
+test_cassette_assets   exit=0 RESULT 57/57 (1.2 s)
+test_net               exit=0 RESULT 56/56 (16.6 s)
+test_perf              exit=0 RESULT 48/48 (90.4 s)
+ALL TESTS PASSED

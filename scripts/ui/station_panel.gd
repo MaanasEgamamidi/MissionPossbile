@@ -394,9 +394,12 @@ func _what_you_can_do() -> PackedStringArray:
 			var words := String(StationPanels.SPECIALTY_WORDS.get(StringName(role), "All crew members"))
 			return PackedStringArray(["Repair location reserved for %s." % words, "This room's puzzle will become available in a later task update."])
 		"cassette_anchor":
-			return PackedStringArray(["Room cassette location reserved. Collection arrives in the cassette update.", "Instructional tapes will be readable at the Command Room player."])
+			var record: Dictionary = services.state().stations.get(String(station_id), {})
+			var id := String(record.get("cassette_id", station_id))
+			var title := String(CassetteCatalog.TAPES.get(id, {}).get("title", "Room"))
+			return PackedStringArray(["%s cassette - %s." % [title, "Collected" if CassetteCatalog.collected(services.state(), id) else "Missing"], CassetteCatalog.PLAY_INSTRUCTION])
 		"cassette_player_anchor":
-			return PackedStringArray(["Command Room playback location reserved.", "Playback arrives in the cassette update and will not require room repairs."])
+			return PackedStringArray([CassetteCatalog.PLAY_INSTRUCTION, "Use the player to choose a collected tape. Room repairs are not required."])
 		"computer":
 			return PackedStringArray(["See the colony summary: stores, power and how long they last.",
 				"Look at the upgrade cards for the facilities.", "Open the blueprint map of the base."])

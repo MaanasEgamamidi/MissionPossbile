@@ -119,12 +119,16 @@ func _run() -> void:
 		var panel := StationPanels.for_station(StringName(id), client.services)
 		if panel == null:
 			continue
+		var restricted_player := panel is CassettePlayerPanel
 		client.ui.open(panel)
 		await process_frame
-		panel.refresh()
+		if is_instance_valid(panel):
+			panel.refresh()
+		else:
+			_check("stations: unauthorized cassette player closes without exposing content", restricted_player and client.ui.top() == null)
 		client.ui.close_all()
 		opened += 1
-	_check("stations: every station screen opens on a client", opened > 0, "%d screens" % opened)
+	_check("stations: client routes station screens and restricts remote playback", opened > 0, "%d station routes" % opened)
 
 	host.services.request(&"set_zone_power", &"", {})       # a refused host request must not show on the client
 	var before := client.hud.current_messages().size()

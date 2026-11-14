@@ -72,6 +72,13 @@ static func for_station(station_id: StringName, services: GameServices) -> UiPan
 	if record.is_empty():
 		return null
 	var kind := String(record.get("kind", ""))
+	if kind in ["cassette_player_anchor", "cassette_player"]:
+		var reader := CassettePlayerPanel.new()
+		reader.station_id = station_id
+		reader.set_meta(&"station_surface", true)
+		reader.set_meta(&"station_id", station_id)
+		reader.setup(services)
+		return reader
 	var panel: StationPanel
 	# A later milestone adds a panel for a kind by creating res://scripts/ui/stations/<kind>_station_panel.gd
 	# (a script extending StationPanel). It takes precedence over the built-in panels below.

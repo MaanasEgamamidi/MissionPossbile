@@ -51,6 +51,8 @@ var garden_airlock_doors: Array[DoorController] = []
 var rigged_bodies := false
 ## What PropCollision built at load (hulls, trimeshes, skipped, ms); empty when the map is not loaded.
 var prop_collision_stats := {}
+## C01: shared room cassettes and the single Command Room playback deck.
+var cassette_presenter: CassettePresenter
 
 var _crew_visuals := {}          # character id -> PlayerVisual (crew the local player does not control)
 var _item_nodes := {}            # item id -> CarryItem
@@ -140,6 +142,10 @@ func _ready() -> void:
 ## Everything that needs a running colony: HUD, crew bodies, items, lights. Called once, after the menu.
 func _begin_play() -> void:
 	_playing = true
+	cassette_presenter = CassettePresenter.new()
+	cassette_presenter.name = "CassettePresenter"
+	add_child(cassette_presenter)
+	cassette_presenter.setup(services, collision)
 	hud = GameHud.new()
 	hud.name = "Hud"
 	add_child(hud)
@@ -473,6 +479,9 @@ func _move_crew(delta: float) -> void:
 ## Everything the local player asks for goes to the host through here.
 func _submit(action: StringName, target: StringName, params: Dictionary) -> ActionResult:
 	if action == &"use_station":
+		var record: Dictionary = services.state().stations.get(String(target), {})
+		if String(record.get("kind", "")) == "cassette_anchor":
+			return services.request(&"cassette_collect", target)
 		# Opening a station's surface changes nothing; every control on it is its own validated request.
 		var panel := StationPanels.for_station(target, services)
 		if panel != null:

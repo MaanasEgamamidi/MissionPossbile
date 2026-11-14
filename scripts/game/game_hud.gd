@@ -796,6 +796,8 @@ func _on_action_resolved(result: ActionResult) -> void:
 	# On the host every player's answers pass through here; show only this player's own.
 	if result.peer != 0 and result.peer != services.local_peer():
 		return
+	if result.ok and not result.duplicate and bool(result.changes.get("collected", false)) and result.changes.has("cassette_id"):
+		show_message("Collected: %s. %s" % [String(result.changes.get("title", "Room cassette")), CassetteCatalog.PLAY_INSTRUCTION], 5.0)
 	if not result.ok and not result.duplicate and not result.pending and result.reason != &"paused":
 		show_message(result.message, 3.0)
 

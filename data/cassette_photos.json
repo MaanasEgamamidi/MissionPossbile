@@ -1,0 +1,146 @@
+{
+  "schema": 1,
+  "accessed_on": "2026-11-14",
+  "usage_guidance_url": "https://www.nasa.gov/nasa-brand-center/images-and-media/",
+  "usage_notes": "Factual educational in-game photo panels with visible credits, no NASA endorsement, no promotional or merchandise permission implied. NASA guidance distinguishes third-party copyright and recognizable-person publicity rights; review those restrictions before any commercial/promotional reuse. No crop or creative alteration is applied. These photographs depict ISS hardware or an Earth prototype, never an operating Mars colony.",
+  "photos": [
+    {
+      "room_id": "command_center",
+      "source_id": "CN01",
+      "image_id": "iss073e0252501",
+      "title": "Radio communications aboard the ISS",
+      "source_url": "https://www.nasa.gov/missions/station/iss-research/nasa-astronaut-jonny-kim-advances-research-aboard-space-station/",
+      "original_asset_url": "https://images-assets.nasa.gov/image/iss073e0252501/iss073e0252501~large.jpg",
+      "download_url": "https://images-assets.nasa.gov/image/iss073e0252501/iss073e0252501~large.jpg?w=1600&fit=clip",
+      "local_path": "res://assets/cassettes/command_center.jpg",
+      "caption": "NASA astronaut Jonny Kim uses a ham radio to speak with students from the International Space Station. This is ISS communications, not a Mars control room.",
+      "credit": "NASA",
+      "creator": "NASA; individual photographer not identified on the official page",
+      "identifiable_people": true,
+      "crop": "none",
+      "candidate_note": "Selected the ham-radio photograph in the article, not its Cupola hero photograph or author avatar.",
+      "sha256": "77028b000e9fcfa81a117bcbdef07886106ee146ef4b21484ae837375f42c081",
+      "bytes": 483283,
+      "dimensions": [
+        1920,
+        1280
+      ],
+      "processing": "NASA-served bounded-width JPEG; full frame, no local image edits"
+    },
+    {
+      "room_id": "power_supply",
+      "source_id": "CN02",
+      "image_id": "ISS038-E-042665",
+      "title": "ISS solar arrays above Earth",
+      "source_url": "https://www.nasa.gov/image-article/solar-array-panels-russian-segment-of-space-station/",
+      "original_asset_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss038e042665.jpg",
+      "download_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss038e042665.jpg?w=1600",
+      "local_path": "res://assets/cassettes/power_supply.jpg",
+      "caption": "Solar arrays on the Russian segment of the International Space Station, photographed by an Expedition 38 crew member on February 5, 2014. Earth is visible beyond the station.",
+      "credit": "NASA",
+      "creator": "Expedition 38 crew member; individual photographer not identified on the official page",
+      "identifiable_people": false,
+      "crop": "none",
+      "candidate_note": "Replaced the appendix's ESA/NASA-credited solar-array image with this NASA-credited ISS photograph to avoid assuming NASA guidance also licenses a partner's photograph.",
+      "sha256": "ba6b3c8ab3bfd81a1eb4a70af7ca90143967ba9ef1e1496bbdfeeaebc4042316",
+      "bytes": 115755,
+      "dimensions": [
+        1041,
+        693
+      ],
+      "processing": "NASA-served bounded-width JPEG; full frame, no local image edits"
+    },
+    {
+      "room_id": "greenhouse",
+      "source_id": "CN03",
+      "image_id": "iss064e004220",
+      "title": "Radishes in the ISS Advanced Plant Habitat",
+      "source_url": "https://www.nasa.gov/image-article/astronauts-grow-radishes-second-advanced-plant-habitat-experiment/",
+      "original_asset_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss064e004220.jpg",
+      "download_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss064e004220.jpg?w=1600",
+      "local_path": "res://assets/cassettes/greenhouse.jpg",
+      "caption": "Radishes growing in the Plant Habitat-02 experiment aboard the International Space Station, photographed on November 11, 2020. The chamber supports controlled plant-growth research.",
+      "credit": "NASA/Kate Rubins",
+      "creator": "Kate Rubins",
+      "identifiable_people": false,
+      "crop": "none",
+      "candidate_note": "Appendix candidate retained; the photograph shows plants and habitat equipment.",
+      "sha256": "9bb69ea538ebcf7abc9567751a66a8df10dec1b669dd8124c6b234433fe5a903",
+      "bytes": 117990,
+      "dimensions": [
+        1041,
+        694
+      ],
+      "processing": "NASA-served bounded-width JPEG; full frame, no local image edits"
+    },
+    {
+      "room_id": "green_dome",
+      "source_id": "CN04",
+      "image_id": "30795688500_ed64d9f74b_o",
+      "title": "Advanced Plant Habitat ground development unit",
+      "source_url": "https://www.nasa.gov/image-article/prototype-of-space-stations-advanced-plant-habitat/",
+      "original_asset_url": "https://www.nasa.gov/wp-content/uploads/2023/03/30795688500_ed64d9f74b_o.jpg",
+      "download_url": "https://www.nasa.gov/wp-content/uploads/2023/03/30795688500_ed64d9f74b_o.jpg?w=1600",
+      "local_path": "res://assets/cassettes/green_dome.jpg",
+      "caption": "A NASA Advanced Plant Habitat engineering development unit at Kennedy Space Center in Florida, 2016. This photographed ground prototype is an engineering analogy, not a Martian garden dome.",
+      "credit": "NASA/Bill White",
+      "creator": "Bill White",
+      "identifiable_people": false,
+      "crop": "none",
+      "candidate_note": "Appendix candidate retained and explicitly labeled as an Earth ground project.",
+      "sha256": "7ec5064b3ce568fce60a86bbb44682ee54a366dfdb4b4a79c5bbc77918334b47",
+      "bytes": 75962,
+      "dimensions": [
+        1041,
+        694
+      ],
+      "processing": "NASA-served bounded-width JPEG; full frame, no local image edits"
+    },
+    {
+      "room_id": "med_bay",
+      "source_id": "CN05",
+      "image_id": "ISS036-E-035750",
+      "title": "Ultrasound research in the ISS Columbus laboratory",
+      "source_url": "https://www.nasa.gov/image-article/astronauts-perform-spinal-ultrasound-investigation/",
+      "original_asset_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss036e035750.jpg",
+      "download_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss036e035750.jpg?w=1600",
+      "local_path": "res://assets/cassettes/med_bay.jpg",
+      "caption": "NASA astronaut Chris Cassidy performs an ultrasound on ESA astronaut Luca Parmitano in the ISS Columbus laboratory on August 21, 2013. This is medical research, not a game reagent recipe.",
+      "credit": "NASA",
+      "creator": "NASA; individual photographer not identified on the official page",
+      "identifiable_people": true,
+      "crop": "none",
+      "candidate_note": "Appendix candidate retained; image identity verified against the official caption.",
+      "sha256": "71168ac20b3583e63ca5f48b9a6a658699231f46ba9693991994ae981625868f",
+      "bytes": 162261,
+      "dimensions": [
+        1041,
+        693
+      ],
+      "processing": "NASA-served bounded-width JPEG; full frame, no local image edits"
+    },
+    {
+      "room_id": "hangar",
+      "source_id": "CN06",
+      "image_id": "iss064e013338",
+      "title": "Spacesuit and tool preparation in Quest",
+      "source_url": "https://www.nasa.gov/image-article/flight-engineer-michael-hopkins-works-inside-quest-airlock/",
+      "original_asset_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss064e013338.jpg",
+      "download_url": "https://www.nasa.gov/wp-content/uploads/2023/03/iss064e013338.jpg?w=1600",
+      "local_path": "res://assets/cassettes/hangar.jpg",
+      "caption": "NASA astronaut Michael Hopkins prepares tools and U.S. spacesuits inside the ISS Quest airlock on December 17, 2020. This is real ISS suit staging, not a fictional Mars leak repair.",
+      "credit": "NASA",
+      "creator": "NASA; individual photographer not identified on the official page",
+      "identifiable_people": true,
+      "crop": "none",
+      "candidate_note": "Appendix candidate retained; image identity verified against the official caption.",
+      "sha256": "d6da4f51c9506f3ff56ccbcb85fa4b4b41dfafb6590696c8ac2ccf0ea29c29bb",
+      "bytes": 118447,
+      "dimensions": [
+        1041,
+        694
+      ],
+      "processing": "NASA-served bounded-width JPEG; full frame, no local image edits"
+    }
+  ]
+}

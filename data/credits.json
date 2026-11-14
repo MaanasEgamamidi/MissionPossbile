@@ -24,7 +24,10 @@
    "url": "https://godotengine.org/",
    "used_for": "The game engine that runs the whole game.",
    "note": "The register (L04) says the engine's licence notice still has to be added when the game is packaged.",
-   "source_ids": ["T01", "L04"]
+   "source_ids": [
+    "T01",
+    "L04"
+   ]
   },
   {
    "id": "blender",
@@ -48,7 +51,9 @@
    "url": "",
    "used_for": "The body mesh of the first crew character (version 1). The current crew (version 2) is built from PlayerCharacter.fbx.",
    "note": "Open issue C-19 / I-12 in the project docs.",
-   "source_ids": ["L01"]
+   "source_ids": [
+    "L01"
+   ]
   },
   {
    "id": "player_character_fbx",
@@ -84,7 +89,97 @@
    "url": "",
    "used_for": "The real facts about Mars, the space station and plants in space that the game shows.",
    "note": "Open the source register to see every page.",
-   "source_ids": ["S01", "S02", "S08", "S09", "S11"]
+   "source_ids": [
+    "S01",
+    "S02",
+    "S08",
+    "S09",
+    "S11"
+   ]
+  },
+  {
+   "id": "cassette_photo_command_center",
+   "kind": "asset",
+   "name": "Radio communications aboard the ISS",
+   "by": "NASA",
+   "licence": "NASA media guidance",
+   "licence_words": "Factual educational use with credit; no endorsement. See NASA guidance for third-party and recognizable-person restrictions.",
+   "url": "https://www.nasa.gov/missions/station/iss-research/nasa-astronaut-jonny-kim-advances-research-aboard-space-station/",
+   "used_for": "Offline photograph in the Command Room cassette player.",
+   "note": "Image iss073e0252501. Full frame; no crop. Factual educational in-game photo panels with visible credits, no NASA endorsement, no promotional or merchandise permission implied. NASA guidance distinguishes third-party copyright and recognizable-person publicity rights; review those restrictions before any commercial/promotional reuse. No crop or creative alteration is applied. These photographs depict ISS hardware or an Earth prototype, never an operating Mars colony.",
+   "source_ids": [
+    "CN01"
+   ]
+  },
+  {
+   "id": "cassette_photo_power_supply",
+   "kind": "asset",
+   "name": "ISS solar arrays above Earth",
+   "by": "NASA",
+   "licence": "NASA media guidance",
+   "licence_words": "Factual educational use with credit; no endorsement. See NASA guidance for third-party and recognizable-person restrictions.",
+   "url": "https://www.nasa.gov/image-article/solar-array-panels-russian-segment-of-space-station/",
+   "used_for": "Offline photograph in the Command Room cassette player.",
+   "note": "Image ISS038-E-042665. Full frame; no crop. Factual educational in-game photo panels with visible credits, no NASA endorsement, no promotional or merchandise permission implied. NASA guidance distinguishes third-party copyright and recognizable-person publicity rights; review those restrictions before any commercial/promotional reuse. No crop or creative alteration is applied. These photographs depict ISS hardware or an Earth prototype, never an operating Mars colony.",
+   "source_ids": [
+    "CN02"
+   ]
+  },
+  {
+   "id": "cassette_photo_greenhouse",
+   "kind": "asset",
+   "name": "Radishes in the ISS Advanced Plant Habitat",
+   "by": "NASA/Kate Rubins",
+   "licence": "NASA media guidance",
+   "licence_words": "Factual educational use with credit; no endorsement. See NASA guidance for third-party and recognizable-person restrictions.",
+   "url": "https://www.nasa.gov/image-article/astronauts-grow-radishes-second-advanced-plant-habitat-experiment/",
+   "used_for": "Offline photograph in the Command Room cassette player.",
+   "note": "Image iss064e004220. Full frame; no crop. Factual educational in-game photo panels with visible credits, no NASA endorsement, no promotional or merchandise permission implied. NASA guidance distinguishes third-party copyright and recognizable-person publicity rights; review those restrictions before any commercial/promotional reuse. No crop or creative alteration is applied. These photographs depict ISS hardware or an Earth prototype, never an operating Mars colony.",
+   "source_ids": [
+    "CN03"
+   ]
+  },
+  {
+   "id": "cassette_photo_green_dome",
+   "kind": "asset",
+   "name": "Advanced Plant Habitat ground development unit",
+   "by": "NASA/Bill White",
+   "licence": "NASA media guidance",
+   "licence_words": "Factual educational use with credit; no endorsement. See NASA guidance for third-party and recognizable-person restrictions.",
+   "url": "https://www.nasa.gov/image-article/prototype-of-space-stations-advanced-plant-habitat/",
+   "used_for": "Offline photograph in the Command Room cassette player.",
+   "note": "Image 30795688500_ed64d9f74b_o. Full frame; no crop. Factual educational in-game photo panels with visible credits, no NASA endorsement, no promotional or merchandise permission implied. NASA guidance distinguishes third-party copyright and recognizable-person publicity rights; review those restrictions before any commercial/promotional reuse. No crop or creative alteration is applied. These photographs depict ISS hardware or an Earth prototype, never an operating Mars colony.",
+   "source_ids": [
+    "CN04"
+   ]
+  },
+  {
+   "id": "cassette_photo_med_bay",
+   "kind": "asset",
+   "name": "Ultrasound research in the ISS Columbus laboratory",
+   "by": "NASA",
+   "licence": "NASA media guidance",
+   "licence_words": "Factual educational use with credit; no endorsement. See NASA guidance for third-party and recognizable-person restrictions.",
+   "url": "https://www.nasa.gov/image-article/astronauts-perform-spinal-ultrasound-investigation/",
+   "used_for": "Offline photograph in the Command Room cassette player.",
+   "note": "Image ISS036-E-035750. Full frame; no crop. Factual educational in-game photo panels with visible credits, no NASA endorsement, no promotional or merchandise permission implied. NASA guidance distinguishes third-party copyright and recognizable-person publicity rights; review those restrictions before any commercial/promotional reuse. No crop or creative alteration is applied. These photographs depict ISS hardware or an Earth prototype, never an operating Mars colony.",
+   "source_ids": [
+    "CN05"
+   ]
+  },
+  {
+   "id": "cassette_photo_hangar",
+   "kind": "asset",
+   "name": "Spacesuit and tool preparation in Quest",
+   "by": "NASA",
+   "licence": "NASA media guidance",
+   "licence_words": "Factual educational use with credit; no endorsement. See NASA guidance for third-party and recognizable-person restrictions.",
+   "url": "https://www.nasa.gov/image-article/flight-engineer-michael-hopkins-works-inside-quest-airlock/",
+   "used_for": "Offline photograph in the Command Room cassette player.",
+   "note": "Image iss064e013338. Full frame; no crop. Factual educational in-game photo panels with visible credits, no NASA endorsement, no promotional or merchandise permission implied. NASA guidance distinguishes third-party copyright and recognizable-person publicity rights; review those restrictions before any commercial/promotional reuse. No crop or creative alteration is applied. These photographs depict ISS hardware or an Earth prototype, never an operating Mars colony.",
+   "source_ids": [
+    "CN06"
+   ]
   }
  ]
 }

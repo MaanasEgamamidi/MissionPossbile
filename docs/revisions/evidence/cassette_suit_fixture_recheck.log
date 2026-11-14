@@ -1,0 +1,17 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS game starts: new colony, host plays crew_1
+PASS starts in first person, FOV 72
+PASS standing on the hub floor  y=0.000
+PASS host position follows the body
+PASS three parked crew are shown, none of them is a second local body
+PASS suit approach is grounded, reported and within real reach  body=(16.4, 0.000195, 7.5) host=(16.4, 0.000195, 7.5) rack=(16.4, 0.0, 9.55) distance=2.05
+PASS suit check starts at the rack   (planned 2.05 m; body (16.4, 0.000195, 7.5); host (16.4, 0.000195, 7.5); rack (16.4, 0.0, 9.55); actual 2.05 m)
+PASS after 0.5 s the suit is not on yet
+PASS after 1.25 s the suit is on and the tank is unchanged
+PASS leaving the rack cancels the check: suit still on  33.77 m from rack
+RESULT 10/10
+WARNING: 108 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 24 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

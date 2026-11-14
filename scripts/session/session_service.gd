@@ -28,6 +28,7 @@ var outside_test: Callable = func(_point: Vector3) -> bool: return false
 ## Optional host room lookup, wired by GameServices for room-specific repair validation.
 var zone_at_position := Callable()
 var repair_runtime := RepairRuntime.new()
+var cassette_runtime: CassetteRuntime
 ## True when every connected peer votes to pause.
 var paused: bool = false
 var _votes: Dictionary = {}
@@ -39,12 +40,14 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	config = p_config
 	balance = p_balance
 	events = p_events
+	cassette_runtime = CassetteRuntime.new(self)
 	sim = ColonySim.new()
 	sim.set_events(events)
 	rng = RandomNumberGenerator.new()
 	actions = ActionService.new()
 	BuiltinActions.register(actions)
 	RepairActions.register(actions)
+	CassetteActions.register(actions)
 	SystemActions.register(actions)
 	# Prompts 08 and 09: each part registers its actions and adds its simulation system.
 	FoodActions.register(actions)
@@ -74,6 +77,7 @@ func begin(p_state: ColonyState, p_clock: SolClock) -> void:
 	_votes.clear()
 	_suit_checks.clear()
 	repair_runtime.clear_session()
+	cassette_runtime.clear_session()
 	_accumulator = 0.0
 	_restore_suit_slots()
 	_recompute_pause()
@@ -82,6 +86,7 @@ func begin(p_state: ColonyState, p_clock: SolClock) -> void:
 func advance(real_delta: float) -> int:
 	if state == null:
 		return 0
+	cassette_runtime.prune(self)
 	_advance_suit_checks(0.0 if paused else real_delta)
 	if paused:
 		return 0
@@ -106,6 +111,7 @@ func advance(real_delta: float) -> int:
 func submit(action_request: ActionRequest) -> ActionResult:
 	if state != null:
 		repair_runtime.prune(self)
+		cassette_runtime.prune(self)
 	return actions.resolve(self, action_request)
 
 ## Builds a fresh request using the peer's current character.
@@ -152,6 +158,7 @@ func report_position(peer: int, character_id: StringName, position: Vector3, yaw
 	if outside_test.is_valid():
 		actor.outside = bool(outside_test.call(position))
 	repair_runtime.prune(self)
+	cassette_runtime.prune(self)
 	return true
 
 ## Queues one airlock cycle (host). The next tick takes its air loss from the cabin; the regulator then tops the
@@ -167,6 +174,7 @@ func recover_character(id: StringName) -> Dictionary:
 	if actor == null:
 		return info
 	repair_runtime.release_character(id)
+	cassette_runtime.release_character(id)
 	if not actor.cargo.is_empty():
 		var cache_id: String = "cache_%d" % int(state.counters["cache"])
 		state.counters["cache"] = int(state.counters["cache"]) + 1
@@ -216,12 +224,13 @@ func replica_dict() -> Dictionary:
 	var votes := {}
 	for peer: int in _votes:
 		votes[peer] = bool(_votes[peer])
-	return {"peers": peers.duplicate(), "paused": paused, "votes": votes, "suit_checks": checks, "repair": repair_runtime.replica_dict()}
+	return {"peers": peers.duplicate(), "paused": paused, "votes": votes, "suit_checks": checks, "repair": repair_runtime.replica_dict(), "cassettes": cassette_runtime.replica_dict()}
 
 
 ## Client: copies the host's session facts (see replica_dict). Emits nothing; the host's forwarded events do that.
 func apply_replica(d: Dictionary) -> void:
 	repair_runtime.apply_replica(d.get("repair", {}))
+	cassette_runtime.apply_replica(d.get("cassettes", {}))
 	peers.clear()
 	for p in d.get("peers", [HOST_PEER]):
 		peers.append(int(p))
@@ -260,6 +269,7 @@ func _recompute_pause() -> void:
 
 func _release(actor: CharacterState) -> void:
 	repair_runtime.release_character(actor.id)
+	cassette_runtime.release_character(actor.id)
 	_cancel_suit_check(actor.id)
 	actor.owner_peer = 0
 	actor.position = actor.hub_spot

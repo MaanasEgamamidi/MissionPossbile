@@ -54,6 +54,7 @@ func setup(p_services: GameServices) -> void:
 		return
 	_built = true
 	name = "TaskPanel"
+	interrupt_on_critical = true
 	theme_type_variation = UiTheme.PANEL
 	max_width = 1100.0
 	max_height = 820.0

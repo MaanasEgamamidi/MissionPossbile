@@ -1,6 +1,6 @@
 # Revisions execution ledger
 
-This ledger tracks only PDF pages 1-17. C01 and all later sections are intentionally unassigned.
+This ledger records the original PDF pages 1-17 assignment. The subsequently authorized C01-C04 batch is tracked in `CASSETTE_HANDOFF.md`; S01 and later sections remain outside the current assignment.
 
 | Unit | Dependencies | Owner | Implementation / evidence |
 | --- | --- | --- | --- |
@@ -29,4 +29,8 @@ This ledger tracks only PDF pages 1-17. C01 and all later sections are intention
 
 ## Verification record
 
-F01-F06 are implemented and verified within this assignment. `FINAL_VERIFICATION.md` records the newest passing result for all 30 suites: 2042/2042 checks, with zero FAIL/SCRIPT ERROR/Parse Error lines in those selected logs. The fresh broad-run import passed. Two initial collision/title failures remain in raw logs for transparency and were corrected and rerun successfully; the final report selects the newer corrected results. `HANDOFF.md` records public APIs, decisions, visual evidence and remaining human/rendering verification limits. No prior milestone results are counted as current. C01 and later work remain unassigned.
+F01-F06 were implemented and verified within the original assignment. `FINAL_VERIFICATION.md` records its final passing result for all 30 suites: 2042/2042 checks, with zero FAIL/SCRIPT ERROR/Parse Error lines in those selected logs. Its fresh broad-run import passed. Two initial collision/title failures remain in raw logs for transparency and were corrected and rerun successfully. `HANDOFF.md` records the foundation public APIs, decisions, visual evidence and remaining human/rendering verification limits. Subsequent C01-C04 changes and their fresh verification results are recorded separately in `CASSETTE_HANDOFF.md`; these foundation counts are not presented as the current cassette batch's final results.
+
+## Subsequent cassette batch
+
+C01-C04 are complete within the user's approved scope, including truthful preview briefings while T puzzles remain deferred. Current affected-suite verification is 17 suites and 1261/1261 checks; compilation covers 258 scripts and actual exported offline cassette assets pass 6/6. `CASSETTE_VERIFICATION.md` contains the selected current evidence matrix and corrected save-isolation/P07-mapping/suit-placement fixture explanations. `CASSETTE_HANDOFF.md` contains the C execution ledger, public APIs, six photo credits/content records and remaining human/rendering limits. Stop before S01; no later section is implemented by this batch.

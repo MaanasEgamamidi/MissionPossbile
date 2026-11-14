@@ -1,0 +1,122 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS six room and twelve task identities
+PASS T01 access electrical_comms
+PASS T01 access medical_life_support
+PASS T01 access biology_food
+PASS T01 access field_engineering_geology
+PASS T02 access electrical_comms
+PASS T02 access medical_life_support
+PASS T02 access biology_food
+PASS T02 access field_engineering_geology
+PASS T03 access electrical_comms
+PASS T03 access medical_life_support
+PASS T03 access biology_food
+PASS T03 access field_engineering_geology
+PASS T04 access electrical_comms
+PASS T04 access medical_life_support
+PASS T04 access biology_food
+PASS T04 access field_engineering_geology
+PASS T05 access electrical_comms
+PASS T05 access medical_life_support
+PASS T05 access biology_food
+PASS T05 access field_engineering_geology
+PASS T06 access electrical_comms
+PASS T06 access medical_life_support
+PASS T06 access biology_food
+PASS T06 access field_engineering_geology
+PASS T07 access electrical_comms
+PASS T07 access medical_life_support
+PASS T07 access biology_food
+PASS T07 access field_engineering_geology
+PASS T08 access electrical_comms
+PASS T08 access medical_life_support
+PASS T08 access biology_food
+PASS T08 access field_engineering_geology
+PASS T09 access electrical_comms
+PASS T09 access medical_life_support
+PASS T09 access biology_food
+PASS T09 access field_engineering_geology
+PASS T10 access electrical_comms
+PASS T10 access medical_life_support
+PASS T10 access biology_food
+PASS T10 access field_engineering_geology
+PASS T11 access electrical_comms
+PASS T11 access medical_life_support
+PASS T11 access biology_food
+PASS T11 access field_engineering_geology
+PASS T12 access electrical_comms
+PASS T12 access medical_life_support
+PASS T12 access biology_food
+PASS T12 access field_engineering_geology
+PASS host can claim
+PASS same puzzle has one operator
+PASS helper can operate other general puzzle
+PASS specialist and helper work concurrently in same room
+PASS no production rule accepts completion
+PASS untrusted completion boolean rejected
+PASS wrong room metadata rejected
+PASS wrong physical room rejected
+PASS reclaim after room corrected
+PASS idle lease expires
+PASS new operator after timeout
+PASS disconnect releases all owned puzzles
+PASS loss of reach releases claim
+PASS role revalidated on move
+PASS role revalidated on resume
+PASS death releases puzzle
+PASS recovery releases puzzle
+PASS T01 rejects invalid move
+PASS T01 accepted partial progress
+PASS T01 host establishes first milestone
+PASS T01 duplicate applies once
+PASS T01 fresh replay cannot complete again
+PASS T02 rejects invalid move
+PASS T02 accepted partial progress
+PASS T02 host establishes first milestone
+PASS T02 duplicate applies once
+PASS T02 fresh replay cannot complete again
+PASS both task milestones complete room
+PASS wear separates current condition from achievement
+PASS wear preserves shot history
+PASS stale generation rejected
+PASS new generation can be claimed
+PASS unsupported partial puzzle resets only in disk projection
+PASS safe partial puzzle persists in disk projection
+PASS disk state has no operator leases
+PASS old save additive defaults preserve colony
+PASS partial puzzle progress and seed roundtrip
+PASS collection and shot history roundtrip
+PASS reload retains encounter health and equipment
+PASS reload and replica retain exposure accumulator
+PASS late join reconstructs partial puzzle and lease
+PASS late join retains exposure
+PASS restart drops transient lease
+PASS old payload disk save
+PASS old payload disk load
+PASS migrated payload save again
+PASS reopened migration retains progress
+PASS real snapshot separates safe and unsafe partial state
+PASS real snapshot stores exposure
+PASS real GameServices writes fixture only
+PASS GameServices disk restore keeps ongoing encounter
+PASS disk restore resumes safe puzzle without lease
+PASS exposed switch rejected
+PASS release cannot bypass exposure
+PASS persisted exposure blocks switching
+PASS release cannot bypass hub-only specialist switch
+PASS unsafe indoor atmosphere blocks switch
+PASS solo route can select crew_2
+PASS solo route can select crew_3
+PASS solo route can select crew_4
+PASS solo route can select crew_1
+PASS switching preserves health and tank
+PASS recovery clears exposure through existing recovery flow
+PASS recovery updates outside before autosave
+PASS exposed disconnect uses costed recovery
+PASS disconnect recovery classifies safe parked position
+PASS duplicate disconnect does not charge recovery twice
+PASS protected disconnect preserves equipment and health
+PASS normal parking refreshes outside flag immediately
+PASS unprotected disconnect cannot bypass current hazard
+RESULT 119/119
