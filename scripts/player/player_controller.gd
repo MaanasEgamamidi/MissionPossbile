@@ -23,6 +23,13 @@ var _visual: PlayerVisual
 var _held: CarryItem
 var _buttons: Dictionary = {}
 var _was_on_floor: bool = true
+## Seconds since the body last stood on the floor; 0 while grounded.
+var _air_time: float = 0.0
+## True from a jump press until the next touchdown.
+var _jumped: bool = false
+## Shorter flights than this (a stair step-up, a bump, a floor-contact flicker) neither show the in-air
+## pose nor play the landing; a jump always does both.
+const MIN_AIR_TIME_S: float = 0.15
 
 ## Builds the collider, cameras and visible body using the supplied crew record.
 func setup(p_config: GameConfig, p_tuning: PlayerTuning, p_character: CharacterState, p_submit: Callable, p_report_position: Callable) -> void:
@@ -77,6 +84,8 @@ func visual() -> PlayerVisual:
 func teleport(world_position: Vector3, yaw: float) -> void:
 	global_position = world_position
 	velocity = Vector3.ZERO
+	_jumped = false
+	_air_time = 0.0
 	_rig.add_look(yaw - _rig.yaw(), -_rig.pitch())
 	_visual.rotation.y = yaw
 
@@ -138,6 +147,10 @@ func _physics_process(delta: float) -> void:
 				&"jump":
 					if is_on_floor():
 						velocity.y = sqrt(2.0 * GameConfig.MARS_GRAVITY * tuning.jump_height_m)
+						_jumped = true
+						# Push-off first; the looping in-air "jump" takes over when this hold ends.
+						# A rig without a jump_start clip skips it and goes straight to "jump".
+						_visual.play_once(&"jump_start", clampf(_visual.clip_length(&"jump_start", 0.25), 0.1, 0.5))
 		_buttons[action] = pressed
 	var axis := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if input_enabled else Vector2.ZERO
 	var direction := Basis(Vector3.UP, _rig.yaw()) * Vector3(axis.x, 0, axis.y)
@@ -160,12 +173,20 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	if airborne and not is_on_floor():
 		velocity.y -= GameConfig.MARS_GRAVITY * delta * 0.5
-	if is_on_floor() and not _was_on_floor:
-		_visual.play_once(&"land", 0.4)
+	if is_on_floor():
+		if not _was_on_floor and (_jumped or _air_time >= MIN_AIR_TIME_S):
+			# The landing absorb holds for the clip's own length; movement asked for meanwhile waits,
+			# then walking or sprinting resumes on the next play() after the hold.
+			_visual.play_once(&"land", clampf(_visual.clip_length(&"land", 0.4), 0.25, 0.6))
+		_air_time = 0.0
+		_jumped = false
+	else:
+		_air_time += delta
 	_was_on_floor = is_on_floor()
 	_visual.rotation.y = _rig.yaw()
 	_visual.set_suit(character.suit_on)
-	var gait: StringName = &"carry" if held_item() != null else (&"jump" if not is_on_floor() else (&"sprint" if sprinting else (&"walk" if not axis.is_zero_approx() else &"idle")))
+	var in_air := not is_on_floor() and (_jumped or _air_time >= MIN_AIR_TIME_S)
+	var gait: StringName = &"carry" if held_item() != null else (&"jump" if in_air else (&"sprint" if sprinting else (&"walk" if not axis.is_zero_approx() else &"idle")))
 	# The walk and sprint clips cover a known ground speed; play them at the real ground speed so feet do not slide.
 	var gait_speed := 1.0
 	if gait == &"walk":
@@ -207,9 +228,14 @@ func _answer(action: StringName, target: StringName, params: Dictionary) -> Acti
 	action_answered.emit(result)
 	return result
 
+## E is the one key for every interaction (owner's instruction, 2026-11-12): a station you look at is used;
+## otherwise an item you look at is picked up, or the item in your hands is put down (thrown while sprinting).
+## G and the left mouse button still pick up and put down.
 func _interact() -> void:
 	var target := aimed_target()
 	if target.kind != "station":
+		if target.kind == "item" or held_item() != null:
+			_grab()
 		return
 	var node: Node = target.node
 	if String(node.get_meta("kind", "")) == "suits":

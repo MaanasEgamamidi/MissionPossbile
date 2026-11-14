@@ -38,6 +38,25 @@ func to_dict() -> Dictionary:
 	}
 
 
+## Copies a replicated record into this object in place, so nodes holding this CharacterState stay valid.
+## `keep_pose` keeps position and yaw: a client keeps its own body's pose, which it is the authority for.
+func assign_from(d: Dictionary, keep_pose := false) -> void:
+	var c := CharacterState.from_dict(d)
+	specialty = c.specialty
+	display_name = c.display_name
+	owner_peer = c.owner_peer
+	if not keep_pose:
+		position = c.position
+		yaw = c.yaw
+	hub_spot = c.hub_spot
+	health = c.health
+	stamina = c.stamina
+	suit_on = c.suit_on
+	suit_charge = c.suit_charge
+	equipment = c.equipment
+	cargo = c.cargo
+
+
 static func from_dict(d: Dictionary) -> CharacterState:
 	var c := CharacterState.new()
 	c.id = StringName(String(d.get("id", "")))

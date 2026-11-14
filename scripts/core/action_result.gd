@@ -24,6 +24,8 @@ const MESSAGES := {
 	&"not_at_hub": "Go to the hub to change crew member.",
 	&"not_available_yet": "This station is not working yet.",
 	&"paused": "The game is paused.",
+	&"pending": "Asked the host. Waiting for the answer.",
+	&"offline": "Not connected to the host.",
 }
 
 var request_id := ""
@@ -34,6 +36,20 @@ var message := ""
 var changes := {}
 ## True if this is the stored answer to a request id the host had already handled. Nothing was done twice.
 var duplicate := false
+## True on a client while the request is on its way to the host. The real answer arrives later as
+## GameEvents.action_resolved with the same request_id; act on the replicated state, not on this placeholder.
+var pending := false
+
+
+## Placeholder answer a client gets at once for a request it has sent to the host.
+static func pending_answer(p_request_id: String) -> ActionResult:
+	var r := ActionResult.new()
+	r.request_id = p_request_id
+	r.ok = false
+	r.pending = true
+	r.reason = &"pending"
+	r.message = String(MESSAGES[&"pending"])
+	return r
 
 
 static func success(p_request_id: String, p_changes := {}, p_message := "") -> ActionResult:
@@ -66,7 +82,7 @@ func as_duplicate() -> ActionResult:
 
 
 func to_dict() -> Dictionary:
-	return {"request_id": request_id, "ok": ok, "reason": String(reason), "message": message, "changes": changes.duplicate(true), "duplicate": duplicate}
+	return {"request_id": request_id, "ok": ok, "reason": String(reason), "message": message, "changes": changes.duplicate(true), "duplicate": duplicate, "pending": pending}
 
 
 static func from_dict(d: Dictionary) -> ActionResult:
@@ -77,4 +93,5 @@ static func from_dict(d: Dictionary) -> ActionResult:
 	r.message = String(d.get("message", ""))
 	r.changes = (d.get("changes", {}) as Dictionary).duplicate(true)
 	r.duplicate = bool(d.get("duplicate", false))
+	r.pending = bool(d.get("pending", false))
 	return r

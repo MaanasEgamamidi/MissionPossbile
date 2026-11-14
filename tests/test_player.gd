@@ -13,6 +13,8 @@ var _refuse: bool = false
 var _reports: int = 0
 var _reported_position := Vector3.ZERO
 var _answers: Array[ActionResult] = []
+## Every state the player's visual changed to, in order.
+var _states: Array[StringName] = []
 
 func _initialize() -> void:
 	await process_frame
@@ -24,12 +26,14 @@ func _initialize() -> void:
 	_box(Vector3(20, 0.1, -3), Vector3(4, 0.2, 4))
 	_ramp(30.0, 20.0)
 	_ramp(40.0, 50.0)
+	_box(Vector3(-40, 0.5, -20), Vector3(4, 1, 4))   # 1 m ledge to walk off
 	_crew.owner_peer = 1
 	_crew.cargo = [&"existing"]
 	_player = PlayerController.new()
 	_player.setup(_config, _tuning, _crew, _submit, _report)
 	_world.add_child(_player)
 	_player.action_answered.connect(func(result: ActionResult) -> void: _answers.append(result))
+	_player.visual().state_changed.connect(func(state: StringName) -> void: _states.append(state))
 	await _frames(5)
 	_check("capsule and collision layers", _player.collision_layer == Layers.PLAYER and _player.collision_mask == (Layers.WORLD | Layers.DOOR | Layers.ITEM) and (_player.get_child(0) as CollisionShape3D).shape is CapsuleShape3D)
 	await _test_motion()
@@ -94,6 +98,7 @@ func _test_motion() -> void:
 	var base := _player.position.y
 	var apex := base
 	var air_frames := 0
+	_states.clear()
 	Input.action_press("jump")
 	await _frames(1)
 	Input.action_release("jump")
@@ -107,6 +112,17 @@ func _test_motion() -> void:
 			break
 	apex -= base
 	_check("jump apex %.4f m airtime %.4f s" % [apex, float(air_frames) / Engine.physics_ticks_per_second], absf(apex / _tuning.jump_height_m - 1.0) < 0.05 and air_frames < 90)
+	await _frames(45)   # let the landing hold finish
+	_check("jump plays jump_start, jump, land in order", _jump_phases() == [&"jump_start", &"jump", &"land"] and _states.back() == &"idle", str(_states))
+	# Walking off a 1 m ledge: no push-off, straight to the in-air pose, then the landing.
+	_player.teleport(Vector3(-40, 1.01, -20), 0)
+	await _frames(10)
+	_states.clear()
+	Input.action_press("move_forward")
+	await _frames(100)
+	Input.action_release("move_forward")
+	await _frames(45)
+	_check("walking off a ledge goes straight to jump then land", _jump_phases() == [&"jump", &"land"] and _player.position.y < 0.05 and _player.is_on_floor(), str(_states) + " " + str(_player.position))
 	var walk := await _speed(false, false)
 	_check("walk speed %.4f m/s" % walk, absf(walk / _tuning.walk_speed - 1.0) < 0.03)
 	var suited := await _speed(true, false)
@@ -128,10 +144,12 @@ func _test_motion() -> void:
 	_check("rejects 50 degree ramp", _player.position.z > -0.6 and _player.position.y < 0.4, str(_player.position))
 	_player.teleport(Vector3(20, 0.01, 0), 0)
 	await _frames(5)
+	_states.clear()
 	Input.action_press("move_forward")
 	await _frames(60)
 	Input.action_release("move_forward")
 	_check("climbs 0.2 m step", _player.position.z < -1.5 and absf(_player.position.y - 0.2) < 0.02, str(_player.position))
+	_check("a step-up plays neither jump nor land", _jump_phases().is_empty(), str(_states))
 	_player.teleport(Vector3(0, 0.01, 6), PI)
 	await _frames(5)
 	Input.action_press("move_forward")
@@ -141,6 +159,14 @@ func _test_motion() -> void:
 		through = through or _player.position.z > 7.9 - _tuning.body_radius_m + 0.01
 	Input.action_release("move_forward")
 	_check("wall blocks for two seconds", not through and _player.position.z > 7.4, str(_player.position))
+
+## The jump-related states among the recorded ones, in order.
+func _jump_phases() -> Array[StringName]:
+	var phases: Array[StringName] = []
+	for state: StringName in _states:
+		if state in [&"jump_start", &"jump", &"land"]:
+			phases.append(state)
+	return phases
 
 func _speed(suited: bool, sprint: bool) -> float:
 	_player.teleport(Vector3(-20, 0.01, 10), 0)
@@ -169,13 +195,18 @@ func _test_cameras() -> void:
 	for node: Node in _player.visual().find_children("*", "MeshInstance3D", true, false):
 		var mesh := node as MeshInstance3D
 		if mesh.name == &"Head" or mesh.name == &"Helmet":
-			masks_ok = masks_ok and mesh.layers == hidden
+			# not drawn for the player's own camera, but still casting a shadow
+			masks_ok = masks_ok and mesh.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY and (mesh.layers & hidden) == 0
 		elif mesh.name.begins_with("Arm") or mesh.name.begins_with("Hand") or mesh.name.begins_with("Leg") or mesh.name.begins_with("Boot") or mesh.name == &"Torso":
 			visible_count += 1
 			masks_ok = masks_ok and (mesh.layers & rig.camera().cull_mask) != 0
 	_check("first person head hidden limbs visible", masks_ok and visible_count == 9)
 	_player.visual().set_zone_layers(6)
-	_check("zone layers preserve hidden head", (_player.visual().find_child("Head", true, false) as MeshInstance3D).layers == hidden and (_player.visual().find_child("Torso", true, false) as MeshInstance3D).layers == 6)
+	var head := _player.visual().find_child("Head", true, false) as MeshInstance3D
+	_check("zone layers keep the head shadow-only and lit by the room", head.layers == 6 and head.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY and (_player.visual().find_child("Torso", true, false) as MeshInstance3D).layers == 6)
+	_player.set_first_person(false)
+	_check("third person draws the head normally", head.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON)
+	_player.set_first_person(true)
 	_player.teleport(Vector3(0, 0.01, 0), 0)
 	_player.set_first_person(false)
 	await _frames(6)
@@ -249,6 +280,17 @@ func _test_authority() -> void:
 	await _tap("grab")
 	Input.action_release("sprint")
 	_check("sprint drop throws forward", _player.held_item() == null and not item.freeze and absf(item.linear_velocity.z + _tuning.throw_speed) < 0.05, str(item.linear_velocity))
+	# E is the default for every interaction: it picks up what you look at and puts down what you hold.
+	item.freeze = true
+	item.linear_velocity = Vector3.ZERO
+	_player.teleport(Vector3.ZERO, 0)
+	item.global_position = Vector3(0, _tuning.eye_height_m, -1.5)
+	await _frames(4)
+	var before := _calls.size()
+	await _tap("interact")
+	var picked: bool = _calls.size() == before + 1 and _calls[before].action == &"pick_up" and _player.held_item() == item
+	await _tap("interact")
+	_check("E picks up and puts down", picked and _calls.size() == before + 2 and _calls[before + 1].action == &"drop" and _player.held_item() == null)
 	item.queue_free()
 	await _frames(2)
 	var station := Area3D.new()
@@ -288,7 +330,7 @@ func _test_visual() -> void:
 	visual.play(&"walk")
 	_check("a held one-shot clip is not replaced by a movement state", visual.get("_state") == &"use")
 	visual.clear_hold()
-	for state: StringName in [&"idle", &"walk", &"sprint", &"jump", &"land", &"carry", &"use", &"suit", &"seated"]:
+	for state: StringName in [&"idle", &"walk", &"sprint", &"jump_start", &"jump", &"land", &"carry", &"use", &"suit", &"seated"]:
 		visual.play(state)
 		visual._process(0.1)
 		var right := visual.find_child("ShoulderR", true, false) as Node3D
@@ -313,13 +355,28 @@ func _test_visual() -> void:
 		model.add_child(anchor)
 		anchor.owner = model
 	var animation := AnimationPlayer.new()
+	var library := AnimationLibrary.new()
+	for clip: Array in [[&"idle", 1.0], [&"walk", 1.0], [&"land", 0.42]]:
+		var anim := Animation.new()
+		anim.length = clip[1]
+		library.add_animation(clip[0], anim)
+	animation.add_animation_library(&"", library)
 	model.add_child(animation)
 	animation.owner = model
 	var packed := PackedScene.new()
 	var packed_ok := packed.pack(model) == OK
 	model.free()
 	visual.set_model(packed)
-	_check("replacement model anchors and head layers", packed_ok and visual.hand_anchor() != null and visual.hand_anchor(false) != null and (visual.find_child("Head", true, false) as MeshInstance3D).layers == Layers.render_bit(Layers.RENDER_FIRST_PERSON_HIDDEN))
+	_check("replacement model anchors and head layers", packed_ok and visual.hand_anchor() != null and visual.hand_anchor(false) != null and (visual.find_child("Head", true, false) as MeshInstance3D).cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY)
+	_check("clip_length reads the rig clip or falls back", is_equal_approx(visual.clip_length(&"land", 0.4), 0.42) and is_equal_approx(visual.clip_length(&"jump_start", 0.25), 0.25))
+	visual.play(&"walk")
+	visual.play_once(&"jump_start", 0.3)
+	visual.play(&"idle")
+	_check("a rig without jump_start skips it and does not hold", visual.get("_state") == &"idle" and not visual.has_clip(&"jump_start"))
+	visual.play_once(&"land", 5.0)
+	visual.play(&"walk")
+	_check("a rig clip that exists is held", visual.get("_state") == &"land")
+	visual.clear_hold()
 	_player.set_physics_process(true)
 	await _frames(2)
 

@@ -22,6 +22,10 @@ var saves: SaveService
 var zones: ColonyZones
 ## Result of the last continue_game(), for the menu to explain what happened.
 var last_load: SaveLoadResult
+## LAN session, or null while playing alone. See NetSession.
+var net: NetSession
+## &"offline" (solo), &"host" (owns the colony and the save) or &"client" (shows the host's colony).
+var mode: StringName = &"offline"
 
 var _autosave_left := 0.0
 var _pending_save: StringName = &""
@@ -62,6 +66,42 @@ func clock() -> SolClock:
 
 func has_game() -> bool:
 	return session.state != null
+
+
+## Network peer id of this machine: 1 when solo or hosting.
+func local_peer() -> int:
+	if mode == &"client" and net != null:
+		return net.local_peer()
+	return SessionService.HOST_PEER
+
+
+## True when this machine owns the colony: it ticks the simulation, validates actions and writes the save.
+func is_authority() -> bool:
+	return mode != &"client"
+
+
+## The character this machine's player controls, or null.
+func local_character() -> CharacterState:
+	return session.state.character_of_peer(local_peer()) if has_game() else null
+
+
+## Every request from this machine's player goes through here. On a client it is sent to the host and a
+## pending answer comes back at once; the host's real answer arrives as events.action_resolved.
+func request(action: StringName, target: StringName = &"", params := {}) -> ActionResult:
+	if mode == &"client":
+		if net == null:
+			return ActionResult.failure("", &"offline")
+		return net.send_request(action, target, params)
+	return session.request(action, target, params, local_peer())
+
+
+## Reports where this machine's player body is. The host checks ownership before storing it.
+func report_position(character_id: StringName, position: Vector3, yaw: float) -> void:
+	if mode == &"client":
+		if net != null:
+			net.send_position(character_id, position, yaw)
+		return
+	session.report_position(local_peer(), character_id, position, yaw)
 
 
 ## Starts a fresh colony. The host takes `host_character`. `seed_value` < 0 picks a seed from the system clock.
@@ -126,7 +166,7 @@ func restore(payload: Dictionary) -> void:
 
 
 func save_now(reason: StringName = &"manual") -> Error:
-	if not has_game():
+	if not has_game() or not is_authority():
 		return ERR_UNCONFIGURED
 	var err := saves.write(snapshot(), reason)
 	_pending_save = &""
@@ -145,7 +185,7 @@ func quit_game() -> void:
 
 
 func _process(delta: float) -> void:
-	if not has_game():
+	if not has_game() or not is_authority():
 		return
 	session.advance(delta)
 	if _pending_save != &"":
@@ -162,7 +202,7 @@ func _notification(what: int) -> void:
 
 
 func _on_state_changed(reason: StringName) -> void:
-	if reason == &"tick":
+	if reason == &"tick" or not is_authority():
 		return
 	var def := session.actions.definition(reason)
 	if def != null and def.important:

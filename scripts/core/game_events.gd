@@ -14,6 +14,9 @@ signal sol_settings_changed(sol_minutes: float)
 signal pause_changed(paused: bool)
 signal sol_started(sol_index: int)
 signal action_resolved(result: ActionResult)
+## A colony system changed in a way the players should hear about at once, with its cause in words
+## ("Water pump off: no power. The recycler has stopped."). level: &"info", &"warn" or &"urgent".
+signal system_alert(alert_id: StringName, level: StringName, text: String)
 ## A character reached zero condition and was brought back to the hub. `info` holds the cost and the cache location.
 signal character_recovered(character_id: StringName, info: Dictionary)
 ## The suit check began; it takes `seconds` real seconds and can still be cancelled.

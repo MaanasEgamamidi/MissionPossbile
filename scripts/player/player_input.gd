@@ -9,6 +9,15 @@ const ACTIONS: Dictionary = {
 	&"jump": [KEY_SPACE], &"interact": [KEY_E], &"grab": [KEY_G, -MOUSE_BUTTON_LEFT],
 	&"toggle_view": [KEY_TAB], &"map": [KEY_M], &"push_to_talk": [KEY_V],
 	&"back": [KEY_ESCAPE], &"source_register": [KEY_BACKSPACE | KEY_MASK_SHIFT],
+	# Added in Prompt 05 (not in the pack's list, remappable): cargo and crew screens.
+	&"inventory": [KEY_I], &"crew": [KEY_C],
+}
+## Plain names for the settings screen, in display order.
+const ACTION_NAMES: Dictionary = {
+	&"move_forward": "Move forward", &"move_back": "Move back", &"move_left": "Move left", &"move_right": "Move right",
+	&"sprint": "Sprint", &"jump": "Jump", &"interact": "Use (interact)", &"grab": "Grab, drop, throw",
+	&"toggle_view": "First / third person", &"map": "Blueprint map", &"inventory": "Cargo", &"crew": "Crew",
+	&"push_to_talk": "Push to talk", &"back": "Close / pause", &"source_register": "Source register",
 }
 static var _remapped: Dictionary = {}
 

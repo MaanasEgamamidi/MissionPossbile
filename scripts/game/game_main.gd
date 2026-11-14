@@ -63,6 +63,8 @@ func _ready() -> void:
 			door_visuals_attached += (door as DoorController).attach_visuals(world)
 		# The glass hall and its exit tunnel are environment scenery outside the manifest: give them collision and working doors.
 		airlock_doors = EnvironmentCollision.build(world, collision)
+		# The 996 outdoor rocks are scenery too: one convex hull each so nobody walks into them.
+		RockCollision.build(world, collision)
 		# Racks and stands show the crew's own suit, not the old white one modelled into the map.
 		SuitDisplays.build(world)
 	_add_ground()

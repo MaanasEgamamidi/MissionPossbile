@@ -161,6 +161,54 @@ func to_dict() -> Dictionary:
 	}
 
 
+## Replaces this state's contents with a replicated copy, in place. CharacterState objects are updated, not
+## replaced, so the player body and UI that hold them keep working. `keep_pose_of` names the character whose
+## position and yaw are left alone (the one this client controls). Display-only flow values are copied too.
+func assign_from(d: Dictionary, keep_pose_of: StringName = &"") -> void:
+	var fresh := ColonyState.from_dict(d)
+	stores = fresh.stores
+	capacities = fresh.capacities
+	parts = fresh.parts
+	zones = fresh.zones
+	stations = fresh.stations
+	items = fresh.items
+	caches = fresh.caches
+	knowledge = fresh.knowledge
+	evidence = fresh.evidence
+	upgrades = fresh.upgrades
+	tasks = fresh.tasks
+	discoveries = fresh.discoveries
+	rover = fresh.rover
+	data_snapshot_id = fresh.data_snapshot_id
+	weather_queue = fresh.weather_queue
+	event_queue = fresh.event_queue
+	rng_seed = fresh.rng_seed
+	rng_state = fresh.rng_state
+	ledger = fresh.ledger
+	counters = fresh.counters
+	for id: StringName in fresh.characters:
+		var incoming := fresh.characters[id] as CharacterState
+		var mine := characters.get(id) as CharacterState
+		if mine == null:
+			characters[id] = incoming
+		else:
+			mine.assign_from((d["characters"] as Dictionary)[String(id)], id == keep_pose_of)
+	for id: StringName in characters.keys():
+		if not fresh.characters.has(id):
+			characters.erase(id)
+	var flows: Dictionary = d.get("flows", {})
+	solar_kw = float(flows.get("solar_kw", solar_kw))
+	load_kw = float(flows.get("load_kw", load_kw))
+	power_deficit = bool(flows.get("power_deficit", power_deficit))
+	if flows.has("unmet"):
+		unmet = (flows["unmet"] as Dictionary).duplicate()
+
+
+## Display-only values recomputed every tick, for replication (never saved).
+func flows_dict() -> Dictionary:
+	return {"solar_kw": solar_kw, "load_kw": load_kw, "power_deficit": power_deficit, "unmet": unmet.duplicate()}
+
+
 static func from_dict(d: Dictionary) -> ColonyState:
 	var s := ColonyState.new()
 	for k in STORE_KEYS:

@@ -19,7 +19,10 @@ const RIG_PATHS: Array[String] = ["res://assets/characters/astronaut.glb", "res:
 ## (14 frames at the scene's 30 fps: 0.72 m stance travel in 0.38 of 0.467 s).
 const WALK_CLIP_SPEED: float = 1.545
 const SPRINT_CLIP_SPEED: float = 4.06
-const LOOPING: Array[StringName] = [&"idle", &"walk", &"sprint", &"carry", &"seated"]
+## "jump" is the in-air pose: it loops for as long as the player is airborne (about 1 s for a 0.5 m Mars jump).
+const LOOPING: Array[StringName] = [&"idle", &"walk", &"sprint", &"carry", &"seated", &"jump"]
+## Emitted whenever the shown state changes (play() or play_once()); tests use it to follow the jump phases.
+signal state_changed(state: StringName)
 var _limbs: Array[Node3D] = []
 var _patch_material := StandardMaterial3D.new()
 var _first_person: bool = true
@@ -152,10 +155,26 @@ func hand_anchor(right: bool = true) -> Node3D:
 
 ## Plays a clip now and holds it for `seconds`; movement states asked for meanwhile are ignored.
 ## Used for short actions that are not a way of moving: landing, using a panel, the suit check.
+## A rigged model without that clip skips it entirely (no hold), so the current pose is not frozen on a
+## clip that does not exist. The procedural stand-in has a pose for every state and always holds.
 func play_once(state: StringName, seconds: float) -> void:
+	if not has_clip(state):
+		return
 	_held_until_msec = 0
 	play(state)
 	_held_until_msec = Time.get_ticks_msec() + int(seconds * 1000.0)
+
+## True when this body can show `state`: the rig has that clip, or the procedural stand-in is in use.
+func has_clip(state: StringName) -> bool:
+	return _animation == null or _animation.has_animation(state)
+
+## Length in seconds of the rig's clip `state`, or `fallback` when there is no rig or no such clip.
+func clip_length(state: StringName, fallback: float) -> float:
+	if _animation != null and _animation.has_animation(state):
+		var length := _animation.get_animation(state).length
+		if length > 0.0:
+			return length
+	return fallback
 
 ## Ends a play_once() hold early, so the next play() takes effect at once.
 func clear_hold() -> void:
@@ -169,7 +188,10 @@ func play(state: StringName, speed: float = 1.0) -> void:
 		if state != _state or not _animation.is_playing():
 			_animation.play(state, 0.15)      # short blend so changes of gait do not snap
 		_animation.speed_scale = speed     # updated every call so the walk follows the ground speed
+	var changed := state != _state
 	_state = state
+	if changed:
+		state_changed.emit(state)
 	_speed = speed
 
 func _process(delta: float) -> void:
@@ -184,6 +206,12 @@ func _process(delta: float) -> void:
 			var amplitude := 0.65 if _state == &"sprint" else 0.35
 			for i: int in _limbs.size():
 				_limbs[i].rotation.x = swing * amplitude * (1.0 if i % 2 == 0 else -1.0)
+		&"jump_start":
+			# crouched push-off: arms swung back, knees bent
+			_limbs[0].rotation.x = 0.45
+			_limbs[1].rotation.x = 0.45
+			_limbs[2].rotation.x = -0.35
+			_limbs[3].rotation.x = -0.35
 		&"jump":
 			_limbs[0].rotation.x = -0.5
 			_limbs[1].rotation.x = -0.5
@@ -199,6 +227,9 @@ func _process(delta: float) -> void:
 		&"idle":
 			_limbs[0].rotation.x = sin(_time * 1.5) * 0.025
 
+## In first person the head and helmet are drawn "shadows only": the player's own camera does not see them,
+## but they still cast a shadow, so the body's shadow keeps its head. (Moving them to a layer the camera skips
+## also took them out of every light's shadow casters: the shadow was headless.)
 func _apply_layers() -> void:
 	for part: MeshInstance3D in _parts:
 		var hidden: bool = part == _head or part == _helmet
@@ -206,7 +237,11 @@ func _apply_layers() -> void:
 			hidden = true
 		if _helmet != null and _helmet.is_ancestor_of(part):
 			hidden = true
-		part.layers = Layers.render_bit(Layers.RENDER_FIRST_PERSON_HIDDEN) if hidden and _first_person else _zone_mask
+		part.layers = _zone_mask
+		if hidden and _first_person:
+			part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+		else:
+			part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON
 
 func _build_standin() -> void:
 	_model = Node3D.new()

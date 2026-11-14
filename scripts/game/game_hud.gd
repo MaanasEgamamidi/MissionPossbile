@@ -81,7 +81,7 @@ func set_target(target: Dictionary) -> void:
 		var rec: Dictionary = services.state().stations.get(String(target.get("id", "")), {})
 		_prompt.text = "[%s]  %s" % [PlayerInput.describe(&"interact"), _station_name(String(rec.get("kind", "")))]
 	elif kind == "item":
-		_prompt.text = "[%s]  Pick up" % PlayerInput.describe(&"grab")
+		_prompt.text = "[%s]  Pick up" % PlayerInput.describe(&"interact")
 	else:
 		_prompt.text = ""
 
