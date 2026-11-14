@@ -45,7 +45,7 @@ const PASSAGE_ASSETS: Array[String] = ["gd_airlock"]
 ## As a trimesh a player placed exactly on a seam (a save reloaded there) is caught inside it and cannot move, so these
 ## always get one convex hull: a clean walking surface at most 8 mm above the drawn floor.
 const FLOOR_HULL_ASSETS: Array[String] = ["gd_floor"]
-const SKIP_CLS: Array[String] = ["floor", "door"]
+const SKIP_CLS: Array[String] = ["floor", "door", "ladder"]
 const SKIP_PREFIXES: Array[String] = ["rock_", "Terrain_"]
 const SKIP_WORDS: Array[String] = ["curtain", "stair"]
 const SKIP_ANCESTORS: Array[String] = ["Terrain", "Exterior decals", "Exterior drifts"]
@@ -55,7 +55,7 @@ const DECAL_MATERIAL_PREFIXES: Array[String] = ["decal_", "sf_gouge", "sf_drift"
 ## Where the game keeps the baked shapes between runs (inside the project, next to the other map data).
 const CACHE_PATH := "res://data/prop_collision_cache.bin"
 ## Bump when the rules above change, so an old cache is rebuilt.
-const VERSION := 3   # 2: PASSAGE_ASSETS (garden dome airlock no longer sealed by a hull); 3: FLOOR_HULL_ASSETS
+const VERSION := 4   # 4: ladder rails are authored by WorldCollision; no convex hull sealing the rungs/exit
 ## Files whose change makes the cache stale (besides this script and the manifest and colliders passed in).
 const CACHE_INPUTS: Array[String] = ["res://assets/colony/colony.glb", "res://assets/colony/environment.glb",
 	"res://assets/colony/terrain.glb", "res://data/terrain_height.res", "res://scripts/world/prop_collision.gd",

@@ -73,6 +73,8 @@ static func _check(ctx: ActionService.Context) -> ActionResult:
 		&"begin_suit_check":
 			if ctx.actor.suit_on == bool(ctx.request.params.on) or ctx.session.suit_check_progress(ctx.actor.id) >= 0.0:
 				reason = &"missing_prerequisite"
+			elif bool(ctx.request.params.on) and ctx.session.available_suit_slot(ctx.request.target) < 0:
+				reason = &"missing_prerequisite"
 	return null if reason == &"" else ActionResult.failure(ctx.request.request_id, reason)
 
 static func _apply(ctx: ActionService.Context) -> Dictionary:

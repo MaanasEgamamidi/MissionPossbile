@@ -31,7 +31,7 @@ func setup(config: GameConfig, body: CollisionObject3D, eye_height: float) -> vo
 	_arm = SpringArm3D.new()
 	_arm.name = "SpringArm"
 	_arm.spring_length = config.third_person_distance_m
-	_arm.collision_mask = Layers.WORLD | Layers.DOOR
+	_arm.collision_mask = Layers.WORLD | Layers.DOOR | Layers.CREW_SOLID
 	var sphere := SphereShape3D.new()
 	sphere.radius = 0.2
 	_arm.shape = sphere

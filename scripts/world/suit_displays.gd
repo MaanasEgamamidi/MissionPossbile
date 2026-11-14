@@ -36,8 +36,25 @@ static func build(world: Node) -> int:
 		for suit: Dictionary in suits:
 			suit.facing = snapped.normalized()
 		mi.mesh = _cut(mi, suits)
+		if String(mi.get_meta("inter", "")) == "suits":
+			# Four crew need four separate rack positions; retain the rack's authored footprint.
+			var template: Dictionary = suits[0]
+			var centre := Vector3.ZERO
+			for suit: Dictionary in suits:
+				centre += (suit.box as AABB).get_center()
+			centre /= suits.size()
+			suits.clear()
+			for slot in SessionService.SUITS_PER_RACK:
+				var box: AABB = template.box
+				var wanted := centre + mi.global_basis.x.normalized() * ((float(slot) - 1.5) * 0.7)
+				box.position += wanted - box.get_center()
+				suits.append({"box": box, "facing": snapped.normalized()})
 		for i in suits.size():
-			_hang(mi, suits[i], i)
+			var display := _hang(mi, suits[i], i)
+			if String(mi.get_meta("inter", "")) == "suits":
+				display.set_meta("suit_rack", String(mi.name))
+				display.set_meta("suit_slot", i)
+				display.add_to_group(&"rack_suit_display")
 			count += 1
 	return count
 
@@ -138,7 +155,7 @@ static func _cut(mi: MeshInstance3D, suits: Array[Dictionary]) -> ArrayMesh:
 
 
 ## Hangs one empty crew suit where an old one was, the same height, feet at the old boots, facing the same way.
-static func _hang(mi: MeshInstance3D, suit: Dictionary, index: int) -> void:
+static func _hang(mi: MeshInstance3D, suit: Dictionary, index: int) -> PlayerVisual:
 	var box: AABB = suit.box
 	var visual := PlayerVisual.new()
 	visual.name = "DisplaySuit_%s_%d" % [mi.name, index]
@@ -160,3 +177,13 @@ static func _hang(mi: MeshInstance3D, suit: Dictionary, index: int) -> void:
 	var f: Vector3 = suit.facing
 	visual.global_transform = Transform3D(Basis(Vector3.UP, atan2(-f.x, -f.z)).scaled(Vector3.ONE * s),
 		Vector3(box.get_center().x, box.position.y + 0.04, box.get_center().z))
+	return visual
+
+## Derive display visibility from replicated/saved state, rather than a local interaction animation.
+static func sync(tree: SceneTree, state: ColonyState) -> void:
+	for display in tree.get_nodes_in_group(&"rack_suit_display"):
+		var taken := false
+		for c: CharacterState in state.characters.values():
+			if c.suit_on and String(c.suit_rack) == String(display.get_meta("suit_rack")) and c.suit_slot == int(display.get_meta("suit_slot")):
+				taken = true
+		display.visible = not taken

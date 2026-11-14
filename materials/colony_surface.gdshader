@@ -14,6 +14,7 @@ render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_sc
 
 uniform vec3 albedo : source_color = vec3(0.8);
 uniform float roughness : hint_range(0.0, 1.0) = 0.6;      // class baseline r0
+uniform float roughness_variation_gain : hint_range(0.0, 1.0) = 1.0;
 uniform float metallic : hint_range(0.0, 1.0) = 0.0;
 uniform float specular : hint_range(0.0, 1.0) = 0.5;
 uniform int class_id = 0;        // 0 other, 1 paint, 2 plastic/floor/rubber/leather/ceramic, 3 metal, 4 fabric, 5 wood, 6 leaf, 7 soil/rock/foam, 8 solar
@@ -80,7 +81,7 @@ void fragment() {
 	}
 
 	// roughness variation: smudges, fingerprints, polish
-	float rough = roughness + (fbm(p * 5.0, 4, 0.6) - 0.5) * (class_id == 3 ? 0.16 : 0.22);
+	float rough = roughness + (fbm(p * 5.0, 4, 0.6) - 0.5) * (class_id == 3 ? 0.16 : 0.22) * roughness_variation_gain;
 	float metal = metallic;
 
 	// edge wear: sparse chips on the rounded edges
