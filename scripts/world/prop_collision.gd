@@ -14,8 +14,9 @@ extends RefCounted
 ##  - anything smaller than MIN_SIZE_M or whose bottom is more than HEAD_CLEARANCE_M above the ground under it.
 ##
 ## How: a compact mesh (at most COMPACT_M across and COMPACT_HEIGHT_M tall) away from any doorway gets one convex hull
-## (computed once per shared mesh). Anything bigger, or anything near a doorway, gets a two-sided trimesh of its own
-## triangles, so openings, arches and the space inside a dome or hall stay exactly as modelled.
+## (computed once per shared mesh). Anything bigger, anything near a doorway, or a PASSAGE_ASSETS object, gets a
+## two-sided trimesh of its own triangles, so openings, arches and the space inside a dome or hall stay exactly as modelled.
+## FLOOR_HULL_ASSETS (finely detailed floors) always get one hull, whatever their size.
 ## Every shape carries the manifest object's name as "object_name" metadata, so looking at a station's hull still
 ## counts as looking at the station (PlayerController.aimed_target).
 ##
@@ -36,6 +37,14 @@ const BAND_LOW_M := 0.05
 const BAND_HIGH_M := 1.9
 ## How far around a closed door leaf a mesh counts as being in the doorway.
 const DOORWAY_MARGIN_M := 0.8
+## Manifest assets with a walk-through passage but no door leaf of their own, so no doorway is found for them: the
+## garden dome's airlock vestibule (open 1.6 x 2.35 m doorway, shallow steps). A convex hull would fill the passage
+## and seal the dome, so these always get a trimesh of their own triangles.
+const PASSAGE_ASSETS: Array[String] = ["gd_airlock"]
+## Floor assets drawn with millimetre detail (the garden dome floor: 1.2 mm tile seams, a 4 mm vinyl path, drain grates).
+## As a trimesh a player placed exactly on a seam (a save reloaded there) is caught inside it and cannot move, so these
+## always get one convex hull: a clean walking surface at most 8 mm above the drawn floor.
+const FLOOR_HULL_ASSETS: Array[String] = ["gd_floor"]
 const SKIP_CLS: Array[String] = ["floor", "door"]
 const SKIP_PREFIXES: Array[String] = ["rock_", "Terrain_"]
 const SKIP_WORDS: Array[String] = ["curtain", "stair"]
@@ -46,7 +55,7 @@ const DECAL_MATERIAL_PREFIXES: Array[String] = ["decal_", "sf_gouge", "sf_drift"
 ## Where the game keeps the baked shapes between runs (inside the project, next to the other map data).
 const CACHE_PATH := "res://data/prop_collision_cache.bin"
 ## Bump when the rules above change, so an old cache is rebuilt.
-const VERSION := 1
+const VERSION := 3   # 2: PASSAGE_ASSETS (garden dome airlock no longer sealed by a hull); 3: FLOOR_HULL_ASSETS
 ## Files whose change makes the cache stale (besides this script and the manifest and colliders passed in).
 const CACHE_INPUTS: Array[String] = ["res://assets/colony/colony.glb", "res://assets/colony/environment.glb",
 	"res://assets/colony/terrain.glb", "res://data/terrain_height.res", "res://scripts/world/prop_collision.gd",
@@ -187,7 +196,12 @@ static func _scan(world: Node3D, collision: Node3D, manifest_path: String, colli
 				stats.skipped_doorway += 1   # door frames and walls with an opening: their authored boxes shape the doorway
 				continue
 		var compact := maxf(aabb.size.x, aabb.size.z) <= COMPACT_M and aabb.size.y <= COMPACT_HEIGHT_M
-		if compact:
+		var asset := String(objects[owner_name].get("gc_asset", "")) if owner_name != "" else ""
+		if asset in PASSAGE_ASSETS:
+			compact = false
+		elif asset in FLOOR_HULL_ASSETS:
+			compact = true
+		if compact and not (asset in FLOOR_HULL_ASSETS):
 			for d: AABB in doorways:
 				if d.intersects(aabb):
 					compact = false
