@@ -1,6 +1,8 @@
 # Mars Colony — Godot 4.7.2 project
 
-State after Prompt 04 (2026-11-11): the **current** colony map imported from Blender (a rehearsal: the owner's improved map has not been supplied), a host-authoritative simulation and save foundation, and a playable first- and third-person character (a first-build rigged crew member and suit made from the workspace assets). Everything was checked by automated tests; no human playtest has been run.
+The `revisions` branch implements the prompt pack's F01-F06 foundation (pages 1-17): stable room/task contracts, authoritative role checks and operator leases, additive saves and LAN snapshots, a shared task-panel sample, 19 reserved interaction locations, and collision-checked Med Bay spawn/recovery spots. See [the foundation handoff](docs/revisions/HANDOFF.md) for APIs, verification and limitations.
+
+Cassette collection/playback, actual room puzzles, new hazard timing, restoration art and completion shots begin in later sections and are deferred. Existing colony gameplay remains available. No human playtest has been run for this foundation batch.
 
 Open `project.godot` with Godot 4.7.2. The main scene is `scenes/game.tscn` (the map alone is `scenes/world/colony_world.tscn`).
 
@@ -23,10 +25,10 @@ Doors open when you walk up to them. The top-left text shows the sol clock, the 
 ## Automated checks
 
 ```powershell
-& "G:\nasa app\mars_colony_godot\tools\run_tests.ps1" -Import
+& .\tools\run_tests.ps1 -Import
 ```
 
-Six headless suites, 301 checks: `test_saves`, `test_session`, `test_game_services` (Prompt 03), `test_collision`, `test_player`, `test_game_scene` (Prompt 04). Details: `docs\milestones\03_simulation\HANDOFF.md` and `docs\milestones\04_player\HANDOFF.md`.
+The runner includes the existing gameplay suites and the new repair-foundation, task-panel and anchor checks. Current results and visual evidence are recorded in [the foundation handoff](docs/revisions/HANDOFF.md). Historical Prompt 03/04 records remain in `docs/milestones/03_simulation/HANDOFF.md` and `docs/milestones/04_player/HANDOFF.md`.
 
 ## Collision data
 

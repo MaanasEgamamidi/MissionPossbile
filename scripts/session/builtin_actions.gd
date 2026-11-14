@@ -54,8 +54,15 @@ static func _check(ctx: ActionService.Context) -> ActionResult:
 			elif old != null:
 				if ctx.session.peers.size() >= 4:
 					reason = &"switch_disabled"
+				elif not ctx.session.safe_to_switch(old):
+					return ActionResult.failure(ctx.request.request_id, &"unsafe_switch", "Return safely indoors before changing crew member.")
 				elif not ctx.session.is_at_hub(old.position):
 					reason = &"not_at_hub"
+		&"release_character":
+			if not ctx.session.safe_to_switch(ctx.actor):
+				return ActionResult.failure(ctx.request.request_id, &"unsafe_switch", "Return safely indoors before leaving this crew member.")
+			elif not ctx.session.is_at_hub(ctx.actor.position):
+				reason = &"not_at_hub"
 		&"set_zone_power":
 			if not ctx.state.zones.has(ctx.request.params.zone):
 				reason = &"unknown_target"

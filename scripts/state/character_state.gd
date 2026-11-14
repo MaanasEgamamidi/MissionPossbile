@@ -24,6 +24,9 @@ var suit_slot := -1
 var suit_charge := 100.0
 ## True while the character is outside the pressurised habitat (set by the host from SessionService.outside_test).
 var outside := false
+## Durable real-second exposure accumulator reserved for the later survival slice. F04 adds persistence only.
+## A future hazard must advance this field, so saving/reloading cannot restart its lethal countdown.
+var lethal_exposure_seconds := 0.0
 var equipment: Array[StringName] = []
 ## Item ids carried by this character (see ColonyState.items).
 var cargo: Array[StringName] = []
@@ -38,6 +41,7 @@ func to_dict() -> Dictionary:
 		"id": String(id), "specialty": String(specialty), "display_name": display_name, "owner_peer": owner_peer,
 		"position": [position.x, position.y, position.z], "yaw": yaw, "hub_spot": [hub_spot.x, hub_spot.y, hub_spot.z],
 		"health": health, "stamina": stamina, "suit_on": suit_on, "suit_charge": suit_charge, "outside": outside,
+		"lethal_exposure_seconds": lethal_exposure_seconds,
 		"suit_rack": String(suit_rack), "suit_slot": suit_slot,
 		"equipment": equipment.map(func(e: StringName) -> String: return String(e)),
 		"cargo": cargo.map(func(e: StringName) -> String: return String(e)),
@@ -62,6 +66,7 @@ func assign_from(d: Dictionary, keep_pose := false) -> void:
 	suit_slot = c.suit_slot
 	suit_charge = c.suit_charge
 	outside = c.outside
+	lethal_exposure_seconds = c.lethal_exposure_seconds
 	equipment = c.equipment
 	cargo = c.cargo
 
@@ -82,6 +87,7 @@ static func from_dict(d: Dictionary) -> CharacterState:
 	c.suit_slot = int(d.get("suit_slot", -1))
 	c.suit_charge = float(d.get("suit_charge", 100.0))
 	c.outside = bool(d.get("outside", false))
+	c.lethal_exposure_seconds = maxf(0.0, float(d.get("lethal_exposure_seconds", 0.0)))
 	for e in d.get("equipment", []):
 		c.equipment.append(StringName(String(e)))
 	for e in d.get("cargo", []):

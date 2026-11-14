@@ -75,6 +75,8 @@ var knowledge := {}
 var evidence := {}
 var upgrades := {}
 var tasks := {}
+## F02/F04 foundation data, separate from established campaign tasks. Operator locks are session-only.
+var repair := {}
 var discoveries: Array = []
 var rover := {"built": false, "levels": {"speed": 1, "torque": 1, "range": 1, "cargo": 1, "traction": 1}, "battery_kwh": 0.0, "cargo": []}
 
@@ -152,6 +154,7 @@ static func new_game(balance: GameBalance, seed_value: int, zone_names: PackedSt
 	rng.seed = seed_value
 	s.rng_seed = seed_value
 	s.rng_state = rng.state
+	s.repair = RepairCatalog.fresh(seed_value)
 	return s
 
 
@@ -301,6 +304,7 @@ func to_dict() -> Dictionary:
 		"cabin_o2_kg": cabin_o2_kg, "cabin_n2_kg": cabin_n2_kg, "cabin_co2_kg": cabin_co2_kg,
 		"pending_airlock_cycles": pending_airlock_cycles, "alerts": alerts.duplicate(true), "sim_hours": sim_hours,
 		"knowledge": knowledge.duplicate(true), "evidence": evidence.duplicate(true), "upgrades": upgrades.duplicate(true), "tasks": tasks.duplicate(true),
+		"repair": repair.duplicate(true),
 		"discoveries": discoveries.duplicate(true), "rover": rover.duplicate(true),
 		"crops": crops.duplicate(true), "science": science.duplicate(true), "progress": progress.duplicate(true), "weather": weather.duplicate(true),
 		"campaign": campaign.duplicate(true), "scout": scout.duplicate(true),
@@ -338,6 +342,7 @@ func assign_from(d: Dictionary, keep_pose_of: StringName = &"") -> void:
 	evidence = fresh.evidence
 	upgrades = fresh.upgrades
 	tasks = fresh.tasks
+	repair = fresh.repair
 	discoveries = fresh.discoveries
 	rover = fresh.rover
 	data_snapshot_id = fresh.data_snapshot_id
@@ -463,4 +468,5 @@ static func from_dict(d: Dictionary) -> ColonyState:
 		s.counters[String(k)] = int(d.counters[k])
 	s.rng_seed = int(String(d.get("rng_seed", "0")))
 	s.rng_state = int(String(d.get("rng_state", "0")))
+	s.repair = RepairCatalog.restore(d.get("repair", {}), s.rng_seed)
 	return s

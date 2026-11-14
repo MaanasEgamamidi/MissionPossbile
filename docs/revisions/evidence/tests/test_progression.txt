@@ -1,0 +1,87 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS catalogue: the 16 contract upgrade ids and the 4 radio cards load into UpgradeDefinition with every field
+PASS catalogue: parts costs in upgrades.json equal ProgressionBalance.card_parts
+PASS catalogue: every sector has 2+ cards eligible from the same tier and tier rules 1..3; one card per sector fits the 10 starting parts
+PASS questions: each has 3 answers, the right one, an explanation and a different retry variant (37 questions)
+PASS model_sources_progression.json: all 21 ProgressionBalance fields have an evidence category
+PASS stations_progression.json: the gym spot is a station in the rec kitchen next to the mess hall
+PASS eligibility: with tier, questions, evidence and parts the card is eligible
+PASS eligibility: missing only the tier 'energy' keeps it locked with that reason
+PASS eligibility: missing only the question 'energy_q_battery_night' keeps it locked with that reason
+PASS eligibility: missing only the question 'energy_q_net_power' keeps it locked with that reason
+PASS eligibility: missing only the evidence 'energy_predict_net_power' keeps it locked with that reason
+PASS eligibility: missing only the parts 'parts' keeps it locked with that reason
+PASS install: wrong installer (medical specialist) is refused
+PASS install: wrong place (life-support console) is refused and says where
+PASS install: too far from the install station is refused
+PASS install: unknown card is refused
+PASS install: consumes exactly the card's parts and records the upgrade
+PASS install: battery capacity +25 % once (800 -> 1000 kWh)
+PASS install: idempotent — the same request is a duplicate and a new request changes nothing
+PASS answer: a wrong answer gives the explanation and a changed version next time, no knowledge
+PASS answer: a wrong answer costs no health
+PASS answer: a right answer records the knowledge once for the colony
+PASS answer: repeating a right (or a wrong) answer adds nothing
+PASS answer: refused at a station of another sector
+PASS answer: allowed at the sector's install station
+PASS answer: the readings question is refused away from the power panel
+PASS answer: right at the power panel records energy_predict_net_power once
+PASS answer: unknown question and a choice out of 0..2 are refused
+PASS tier 2: the diagnosis question waits for the guided question
+PASS tier 1: guided task + its explanation question give level 1
+PASS tier 2: the diagnosis is shown in a changed example ('storm_sky', guided was 'dusty_panels')
+PASS tier 2: a diagnosis in the same example as the guided one keeps level 1
+PASS tier 2: answering the changed example gives level 2
+PASS tier 2: retry versions of the diagnosis never repeat the guided example
+PASS tiers: stored colony tiers never go down
+PASS evidence: cleaning a panel while the panels give < 80 % records energy_diagnose_output_loss (by crew_1)
+PASS evidence: output back above 95 % within a sol records energy_verify_recovery
+PASS evidence: repairing the cleaner while output is low, then the sunrise wipe, records both energy ids
+PASS evidence: cleaning while output is above 80 % records nothing
+PASS evidence: electrolyser and CO2 unit one hour each record ls_distinguish_inputs (not before)
+PASS evidence: CO2 above the warning level, then back below records ls_co2_removal (18 h up, 0.75 h down)
+PASS effect solar tracking: tracking panels +10 % (x1.100), fixed panels unchanged, drives 0.60 -> 0.30 kW
+PASS effect solar tracking: over 3 h more solar energy and nothing else changes (water, oxygen, cabin, food)
+PASS effect battery reserve: at night lights may not use the last 200 kWh; life support keeps running
+PASS effect battery reserve: only the battery and the shed loads change (water, oxygen, cabin air the same)
+PASS effect cleaner automation: a broken cleaner repairs itself after a sol (without the upgrade it stays broken)
+PASS effect cleaner automation: the panels get wiped again (dust 0.00 vs 0.49), only energy numbers change
+PASS effect water reliability: recycler cleans 4 instead of 3 L/h (20.00 vs 15.00 L in 5 h), condition floor 0.8 keeps the water clean
+PASS effect water reliability: only water numbers change (battery, oxygen, cabin air the same); water ledger still balances
+PASS effect electrolysis: +50 % oxygen (1.200 vs 0.800 kg in 4 h) at the same 6.0 kWh per kg and 1.126 L water per kg
+PASS effect electrolysis: the CO2 unit, cabin CO2, recycler and food do not change; ledgers balance
+PASS effect CO2 processing: +50 % oxygen from Mars CO2 (0.900 vs 0.600 kg in 4 h)
+PASS effect CO2 processing: still no water at all (water and wastewater identical with and without)
+PASS effect oxygen monitoring: earlier warnings for the reserve (25 kg), cabin oxygen (19.5 kPa) and CO2 (0.46 kPa)
+PASS effect oxygen monitoring: clearer words (how long is left, harm levels) and a forecast line announced on the HUD
+PASS effect oxygen monitoring: the air, the stores and every ledger stay exactly the same
+PASS automation: over 10 sols the cleaner is never broken longer than a sol (longest 24.7 h) and the panels stay clean (worst dust 0.041)
+PASS automation: nothing breaks on a schedule in 10 sols (every machine stays at condition 1)
+PASS exercise: uses body energy now and raises conditioning; the battery does not change
+PASS exercise: body energy recovers faster with conditioning (66.20 vs 65.00 after 2 h), capped at 100
+PASS exercise: the battery is the same as without exercise after 2 h
+PASS exercise: refused when too tired (no health change) and away from the gym spot
+PASS exercise: conditioning is capped
+PASS solo run: one player switching crew only at the hub installs one card per sector (parts 10 -> 0)
+PASS solo run: every state invariant still holds
+PASS save/load: knowledge, evidence, tiers, quiz versions, conditioning and upgrades come back the same
+PASS save/load: after loading, a repeated answer and install change nothing
+PASS cards panel: 20 cards grouped in 5 sectors with the sector level
+PASS cards panel: each requirement is shown with ✖/✓ and words (level, questions, evidence, parts, installer, station)
+PASS cards panel: eligible cards are shown together so players can choose
+PASS cards panel: Install is enabled only at the install station (disabled at the computer, with the reason)
+PASS cards panel: wrong installer keeps Install disabled; pressing Install with the right one installs the card once
+PASS quiz panel: a wrong answer shows the explanation and a changed version; a right one marks it known; no health change
+PASS quiz panel: away from its station the answers are disabled and it says where to go
+PASS quiz panel: the tank-or-cabin question shows the live readings at the life-support console
+PASS panels: the colony computer opens the cards, a card's Questions button opens its quiz
+PASS gym panel: the Exercise button asks the host; fitness goes up, the battery does not move
+PASS layout UpgradeCards (Upgrades) at 1280x720, 1920x1080 and text 1.5
+PASS focus UpgradeCards (Upgrades)
+PASS layout Quiz (Questions) at 1280x720, 1920x1080 and text 1.5
+PASS focus Quiz (Questions)
+PASS layout Station_rk_treadmill (Exercise corner) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_rk_treadmill (Exercise corner)
+PASS no script or engine errors during the test
+RESULT 84/84

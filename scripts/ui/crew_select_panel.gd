@@ -119,6 +119,8 @@ func refusal_reason(id: StringName) -> String:
 	if mine != null:
 		if player_count() >= 4:
 			return "With four players everyone keeps their own crew member."
+		if not services.session.safe_to_switch(mine):
+			return "Return to a safe atmosphere before changing crew member."
 		if not services.session.is_at_hub(mine.position):
 			return "Walk to the hub to change crew member."
 	return ""

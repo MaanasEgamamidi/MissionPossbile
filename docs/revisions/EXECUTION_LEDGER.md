@@ -1,0 +1,32 @@
+# Revisions execution ledger
+
+This ledger tracks only PDF pages 1-17. C01 and all later sections are intentionally unassigned.
+
+| Unit | Dependencies | Owner | Implementation / evidence |
+| --- | --- | --- | --- |
+| F01 audit | None | Orchestrator, parent verification | Complete: `FOUNDATION_AUDIT.md` records code/asset/reference findings, exact node IDs and points. HUD/arrival and six rooms captured under `evidence/anchors/`; wider views under `evidence/rooms/`. Fresh import passed; final newest results 30 suites, 2042/2042 checks. |
+| F02 room/task/fault contract | F01 | Foundation specialist | Implemented: additive `RepairCatalog`, `RepairRuntime`, `RepairActions`. Reviewed fail-closed validator API; included in 119/119 foundation checks. |
+| F03 specialist/claim lifecycle | F02 | Foundation specialist | Implemented: same role rules solo/LAN; lease lifecycle and safe crew switching. Tests include all 12 tasks x 4 roles and same-room specialist/helper concurrency. |
+| F04 saves/replication | F02, F03 | Foundation specialist, orchestrator transport test | Implemented: nested repair v1, safe-resume save projection, durable exposure field, snapshot/session replication; no persisted leases. Old-save disk roundtrip included in foundation checks. Real ENet test 44/44 includes partial-puzzle late join, completed room/history propagation, disconnect lease release, rejoin and host LAN shutdown cleanup. |
+| F05 task shell | F02 | UI specialist | Implemented: themed dummy sample, pending/rejection, keyboard/focus and critical interruption; 29/29 task-panel checks. Normal/enlarged/high-contrast images visually reviewed. |
+| F06 anchors/spawn | F01, F02 | Parent integrator | Implemented: 12 repair stations, six future cassette anchors, one future playback station, collision-probed Med Bay arrival/recovery. Final rendered anchor walkthrough 102/102; all 19 local walk/aim/open approaches verified. |
+
+## Shared contracts
+
+- Stable tasks: `T01` through `T12`; station IDs `repair_t01` through `repair_t12`.
+- Stable rooms: `command_center`, `power_supply`, `greenhouse`, `green_dome`, `med_bay`, `hangar`.
+- Repair state is separate from pre-existing colony `tasks` and progression. `state.repair` owns room/task records, collected cassette IDs and seen beauty-shot IDs.
+- Host task actions: `task_claim`, `task_resume`, `task_move`, `task_release`, targeting the task's anchor station. Accepted params use `generation` plus scalar move data; no completion flag or client-selected role is authoritative.
+- Actual puzzle validators are future T-section work. The reusable foundation must reject attempted completion without an installed host validator. The F05 dummy sample is presentation-only.
+
+## Decisions
+
+- User-requested branch name is `revisions`, overriding the usual `codex/` prefix.
+- Git push must authenticate as `HarshilSharma1`; author metadata alone is insufficient evidence of the push identity.
+- Existing reference/output files are preserved. Test saves use isolated test directories.
+- No main HUD redesign, replacement action architecture, actual room puzzles or hazard-rate changes are part of this batch.
+- Runtime supports three child agents, all assigned for this batch: orchestrator/review lead, foundation engineer and UI engineer. Parent acts as integrator and world engineer. No additional child can be created while these slots are occupied.
+
+## Verification record
+
+F01-F06 are implemented and verified within this assignment. `FINAL_VERIFICATION.md` records the newest passing result for all 30 suites: 2042/2042 checks, with zero FAIL/SCRIPT ERROR/Parse Error lines in those selected logs. The fresh broad-run import passed. Two initial collision/title failures remain in raw logs for transparency and were corrected and rerun successfully; the final report selects the newer corrected results. `HANDOFF.md` records public APIs, decisions, visual evidence and remaining human/rendering verification limits. No prior milestone results are counted as current. C01 and later work remain unassigned.

@@ -1,0 +1,2 @@
+test_station_panels    exit=0 RESULT 196/196 (34.4 s)
+ALL TESTS PASSED

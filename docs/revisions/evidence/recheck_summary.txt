@@ -1,0 +1,3 @@
+test_collision         exit=0 RESULT 40/40 (20.2 s)
+test_game_services     exit=0 RESULT 25/25 (17.1 s)
+ALL TESTS PASSED

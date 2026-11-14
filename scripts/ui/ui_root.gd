@@ -46,6 +46,9 @@ var _refresh_left := 0.0
 var _mouse_mode: Input.MouseMode = Input.MOUSE_MODE_VISIBLE
 var _was_open := false
 var _fit_frames := 0
+var _critical_banner: PanelContainer
+var _critical_text: Label
+var _critical_left := 0.0
 
 
 func _init() -> void:
@@ -73,6 +76,22 @@ func _init() -> void:
 	_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_frame.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_screen.add_child(_frame)
+	# Added after the panel frame so urgent text remains above every modal surface.
+	_critical_banner = PanelContainer.new()
+	_critical_banner.name = "CriticalAlert"
+	_critical_banner.theme_type_variation = UiTheme.SUBTITLE
+	_critical_banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_critical_banner.anchor_left = 0.08
+	_critical_banner.anchor_right = 0.92
+	_critical_banner.offset_top = 12.0
+	_critical_banner.visible = false
+	_screen.add_child(_critical_banner)
+	_critical_text = Label.new()
+	_critical_text.name = "Message"
+	_critical_text.theme_type_variation = UiTheme.URGENT
+	_critical_text.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_critical_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_critical_banner.add_child(_critical_text)
 
 
 ## Connects the UI to the game and the player's settings. Call once before opening panels.
@@ -81,7 +100,29 @@ func setup(p_services: GameServices, p_settings: GameSettings) -> void:
 	settings = p_settings if p_settings != null else GameSettings.new()
 	_subtitle.settings = settings
 	PlayerInput.ensure_actions()
+	if services != null and not services.events.system_alert.is_connected(_on_system_alert):
+		services.events.system_alert.connect(_on_system_alert)
 	_update_mouse()
+
+
+## Development-only shared shell preview; it does not register or complete room puzzles.
+func open_task_sample() -> void:
+	open(TaskSamplePanel.new())
+
+
+## An urgent alert stays readable above a task and safely releases its operator.
+func show_critical_alert(message: String, seconds := 6.0) -> void:
+	_critical_text.text = "! " + message
+	_critical_banner.visible = true
+	_critical_left = maxf(seconds, 0.1)
+	var panel := top()
+	if panel is TaskPanel:
+		(panel as TaskPanel).interrupt(message)
+
+
+func _on_system_alert(_id: StringName, level: StringName, message: String) -> void:
+	if level == &"urgent":
+		show_critical_alert(message)
 
 
 ## Opens `panel` on top: sets it up if needed, hides the one below, shows it and gives keyboard focus to its first control.
@@ -236,6 +277,9 @@ func _handled() -> void:
 # ---------------------------------------------------------------- refresh, scroll and focus memory
 
 func _process(delta: float) -> void:
+	if _critical_left > 0.0:
+		_critical_left = maxf(0.0, _critical_left - delta)
+		_critical_banner.visible = _critical_left > 0.0
 	for i in range(_pending_scroll.size() - 1, -1, -1):
 		var job: Dictionary = _pending_scroll[i]
 		if not is_instance_valid(job.panel):

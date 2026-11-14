@@ -109,7 +109,7 @@ func setup(p_services: GameServices) -> void:
 
 
 func panel_title() -> String:
-	return StationPanels.name_of(kind)
+	return _title_text() if kind in ["repair_task", "cassette_anchor", "cassette_player_anchor"] else StationPanels.name_of(kind)
 
 
 func first_focus() -> Control:
@@ -371,6 +371,8 @@ func _build_frame() -> void:
 
 ## The words after the symbol in the header. Sun trackers add their number.
 func _title_text() -> String:
+	if kind in ["repair_task", "cassette_anchor", "cassette_player_anchor"] and services != null:
+		return String((services.state().stations.get(String(station_id), {}) as Dictionary).get("name", "Reserved interaction"))
 	return StationPanels.name_of(kind)
 
 
@@ -386,6 +388,15 @@ func _shows_later_note() -> bool:
 
 func _what_you_can_do() -> PackedStringArray:
 	match kind:
+		"repair_task":
+			var record: Dictionary = services.state().stations.get(String(station_id), {})
+			var role := String(record.get("specialty", ""))
+			var words := String(StationPanels.SPECIALTY_WORDS.get(StringName(role), "All crew members"))
+			return PackedStringArray(["Repair location reserved for %s." % words, "This room's puzzle will become available in a later task update."])
+		"cassette_anchor":
+			return PackedStringArray(["Room cassette location reserved. Collection arrives in the cassette update.", "Instructional tapes will be readable at the Command Room player."])
+		"cassette_player_anchor":
+			return PackedStringArray(["Command Room playback location reserved.", "Playback arrives in the cassette update and will not require room repairs."])
 		"computer":
 			return PackedStringArray(["See the colony summary: stores, power and how long they last.",
 				"Look at the upgrade cards for the facilities.", "Open the blueprint map of the base."])

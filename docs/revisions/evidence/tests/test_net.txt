@@ -1,0 +1,51 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS offline: status says alone
+PASS offline: send_request is refused
+PASS host: listening
+PASS host: status names a port  Hosting on 10.0.200.187:24791, 172.23.192.1:24791, 1 player
+ERROR: Couldn't create an ENet host.
+   at: _create (modules/enet/enet_connection.cpp:319)
+   GDScript backtrace (most recent call first):
+       [0] _run (res://tests/test_net.gd:82)
+PASS host: the port is really taken
+PASS repair fixture: host validates partial puzzle
+PASS repair save: partial retained without operator lock
+PASS join: started
+PASS join: colony received
+PASS join: client has its own peer id  293234460
+PASS join: host counts two players  [1, 293234460]
+PASS join: client got a free crew member
+PASS join: same colony seed and stations
+PASS join: client never ticks or saves
+PASS repair late join: current puzzle and seed arrive
+PASS repair late join: live operator lease arrives
+PASS repair updates: room milestone and shot history arrive
+PASS motion: host sees the client's body
+PASS motion: client keeps its own pose through updates
+PASS motion: client sees the host's body
+PASS motion: moving another player's crew is ignored
+PASS request: client gets a pending answer at once  c293234460-1
+PASS request: answer arrives
+PASS request: host said yes
+PASS request: host state changed
+PASS request: client state changed before the answer
+PASS request: client heard state_changed(pick_up)  ["own:crew_4:293234460", &"claim_character", &"task_move", &"task_claim", &"task_move", &"task_move", &"repair_fixture", &"pick_up"]
+PASS request: host-only action refused for a client
+PASS pause: one vote of two does not pause  1
+PASS pause: both votes pause, client sees it
+PASS pause: unpaused again
+PASS clock: client clock follows the host  0.302000 vs 0.302167
+PASS repair client: host grants an operator lease  [{ "request_id": "c293234460-5", "ok": true, "reason": "ok", "message": "", "changes": { "task_id": "T03", "claimed": true, "generation": 1 }, "duplicate": false, "pending": false, "peer": 293234460 }]
+PASS leave: host parks the client's crew
+PASS leave: client is offline
+PASS repair disconnect: operator lease released
+PASS rejoin: works on the same port
+PASS rejoin: gets a crew member again
+PASS repair rejoin: milestone retained without stuck lease
+PASS host leave fixture: rejoined client owns a lease
+PASS host leave: offline continuation clears remote ownership and leases
+PASS host quit: client is told  The connection to the host was lost, or the host closed the colony.
+PASS host quit: client back offline
+PASS join: nobody hosting gives a plain reason  The host did not answer. Check the address and port, that the host is still hosting, and that you are on the same network.
+RESULT 44/44

@@ -66,7 +66,9 @@ func _initialize() -> void:
 	for body: Node in _world.get_node("Static").get_children():
 		layers_ok = layers_ok and body.collision_layer == Layers.WORLD and body.collision_mask == 0
 	for station: Node in _world.get_node("Stations").get_children():
-		layers_ok = layers_ok and station.collision_layer == Layers.STATION and station.collision_mask == 0 and String(station.get_meta("station_id")).validate_node_name() == String(station.name) and station.has_meta("kind") and is_equal_approx(station.get_child(0).shape.radius, 1.2)
+		var reserved := String(station.get_meta("kind", "")) in ["repair_task", "cassette_anchor", "cassette_player_anchor"]
+		var expected_radius := 0.38 if reserved else 1.2
+		layers_ok = layers_ok and station.collision_layer == Layers.STATION and station.collision_mask == 0 and String(station.get_meta("station_id")).validate_node_name() == String(station.name) and station.has_meta("kind") and is_equal_approx(station.get_child(0).shape.radius, expected_radius)
 	_check(layers_ok, "static and station layers, metadata and radius")
 	await _frames(3)
 	for room: Dictionary in (manifest.rooms as Array).slice(0, 3):

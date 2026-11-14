@@ -46,6 +46,7 @@ func _init() -> void:
 	saves = SaveService.new(config.save_dir, config.save_name, config.backup_count)
 	if FileAccess.file_exists(MANIFEST_PATH):
 		zones = ColonyZones.from_manifest(MANIFEST_PATH)
+		session.zone_at_position = func(p: Vector3) -> String: return zones.zone_at_world(p)
 		# Outside = the Exterior zone. The dome plaza and the garden dome are inside pressurised glass.
 		session.outside_test = func(p: Vector3) -> bool: return zones.zone_at_world(p) == ColonyZones.EXTERIOR
 	# The LAN layer is always present and offline until host() or join(). Its node path (Services/Net) must be the same
@@ -149,6 +150,7 @@ func continue_game() -> SaveLoadResult:
 func snapshot() -> Dictionary:
 	session.sync_rng_to_state()
 	var colony := session.state.to_dict()
+	colony["repair"] = RepairCatalog.for_save(session.state.repair)
 	# Network peers belong to one play session, not to the colony: the save only remembers who the host was playing.
 	var host_character := ""
 	var chars: Dictionary = colony["characters"]
@@ -163,6 +165,13 @@ func snapshot() -> Dictionary:
 ## Puts a saved game back. No real time is added for the time the game was closed.
 func restore(payload: Dictionary) -> void:
 	var st := ColonyState.from_dict(payload.get("colony", {}))
+	# Add this pack's reserved interactions to older colonies without replacing their existing station state.
+	if zones != null:
+		var catalog := StationCatalog.from_manifest(MANIFEST_PATH, zones)
+		for entry: Dictionary in StationCatalog.extra_entries():
+			var station_id := String(entry.get("id", ""))
+			if entry.has("room_id") and catalog.has(station_id) and not st.stations.has(station_id):
+				st.stations[station_id] = catalog[station_id].duplicate(true)
 	var c := SolClock.from_dict(payload.get("clock", {}))
 	var host_character := StringName(String((payload.get("session", {}) as Dictionary).get("host_character", "")))
 	_place_crew_at_hub(st, false, host_character)
@@ -220,16 +229,24 @@ func _on_state_changed(reason: StringName) -> void:
 ## Parked crew wait at the hub. On a new game everyone starts there; on load only crew nobody will control are moved.
 func _place_crew_at_hub(st: ColonyState, everyone: bool, keep: StringName = &"") -> void:
 	var ids := st.characters.keys()
-	ids.sort()
+	ids.sort_custom(func(a: Variant, b: Variant) -> bool: return String(a) < String(b))
 	for i in ids.size():
 		var c := st.characters[ids[i]] as CharacterState
+		var angle := TAU * float(i) / float(maxi(1, ids.size()))
+		var offset := config.crew_hub_offsets[i] if i < config.crew_hub_offsets.size() else Vector3(cos(angle), 0.0, sin(angle)) * 1.2
+		# Upgrade recovery/parking spots on old saves too, without moving the continuing controlled astronaut.
+		c.hub_spot = config.hub_position + offset
 		if everyone:
-			var angle := TAU * float(i) / float(maxi(1, ids.size()))
-			c.hub_spot = config.hub_position + Vector3(cos(angle), 0.0, sin(angle)) * 1.2
 			c.position = c.hub_spot
 			c.yaw = angle
 		elif c.id != keep:
-			c.position = c.hub_spot
+			# A save may contain a remote astronaut in danger. Keep that encounter at its saved location
+			# until the astronaut is controlled again; loading must not supply a free rescue or reset.
+			var exterior := c.outside or (session.outside_test.is_valid() and bool(session.outside_test.call(c.position)))
+			if c.lethal_exposure_seconds <= 0.0 and c.health > 0.0 and not (exterior and not (c.suit_on and c.suit_charge > 0.0)):
+				c.position = c.hub_spot
+		if session.outside_test.is_valid():
+			c.outside = bool(session.outside_test.call(c.position))
 
 
 static func _load_resource(path: String, fallback: Resource) -> Resource:

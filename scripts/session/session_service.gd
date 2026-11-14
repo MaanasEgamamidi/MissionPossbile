@@ -25,6 +25,9 @@ var rng: RandomNumberGenerator
 var peers: Array[int] = []
 ## Host test for "is this point outside the pressurised habitat?" The game sets it; by default nowhere is outside.
 var outside_test: Callable = func(_point: Vector3) -> bool: return false
+## Optional host room lookup, wired by GameServices for room-specific repair validation.
+var zone_at_position := Callable()
+var repair_runtime := RepairRuntime.new()
 ## True when every connected peer votes to pause.
 var paused: bool = false
 var _votes: Dictionary = {}
@@ -41,6 +44,7 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	rng = RandomNumberGenerator.new()
 	actions = ActionService.new()
 	BuiltinActions.register(actions)
+	RepairActions.register(actions)
 	SystemActions.register(actions)
 	# Prompts 08 and 09: each part registers its actions and adds its simulation system.
 	FoodActions.register(actions)
@@ -69,6 +73,7 @@ func begin(p_state: ColonyState, p_clock: SolClock) -> void:
 	rng.state = state.rng_state
 	_votes.clear()
 	_suit_checks.clear()
+	repair_runtime.clear_session()
 	_accumulator = 0.0
 	_restore_suit_slots()
 	_recompute_pause()
@@ -80,6 +85,7 @@ func advance(real_delta: float) -> int:
 	_advance_suit_checks(0.0 if paused else real_delta)
 	if paused:
 		return 0
+	repair_runtime.advance(self, real_delta)
 	_accumulator += real_delta
 	var tick: float = 1.0 / config.sim_tick_hz
 	var count: int = 0
@@ -98,6 +104,8 @@ func advance(real_delta: float) -> int:
 
 ## Submits a request to the authoritative validator.
 func submit(action_request: ActionRequest) -> ActionResult:
+	if state != null:
+		repair_runtime.prune(self)
 	return actions.resolve(self, action_request)
 
 ## Builds a fresh request using the peer's current character.
@@ -116,6 +124,12 @@ func peer_joined(peer: int) -> void:
 func peer_left(peer: int) -> void:
 	var actor: CharacterState = state.character_of_peer(peer) if state != null else null
 	if actor != null:
+		# A dropped connection cannot replace an ongoing lethal encounter with a free teleport.
+		# Resolve through the same recovery/cache/resource-cost flow used by ordinary death.
+		var exterior := actor.outside or (outside_test.is_valid() and bool(outside_test.call(actor.position)))
+		var protected := actor.suit_on and actor.suit_charge > 0.0
+		if actor.lethal_exposure_seconds > 0.0 or actor.health <= 0.0 or (exterior and not protected):
+			recover_character(actor.id)
 		_release(actor)
 	peers.erase(peer)
 	_votes.erase(peer)
@@ -137,6 +151,7 @@ func report_position(peer: int, character_id: StringName, position: Vector3, yaw
 	actor.yaw = yaw
 	if outside_test.is_valid():
 		actor.outside = bool(outside_test.call(position))
+	repair_runtime.prune(self)
 	return true
 
 ## Queues one airlock cycle (host). The next tick takes its air loss from the cabin; the regulator then tops the
@@ -151,6 +166,7 @@ func recover_character(id: StringName) -> Dictionary:
 	var info: Dictionary = {"meals": 0.0, "water_l": 0.0, "cache_id": "", "cache_position": []}
 	if actor == null:
 		return info
+	repair_runtime.release_character(id)
 	if not actor.cargo.is_empty():
 		var cache_id: String = "cache_%d" % int(state.counters["cache"])
 		state.counters["cache"] = int(state.counters["cache"]) + 1
@@ -169,7 +185,10 @@ func recover_character(id: StringName) -> Dictionary:
 	state.ledger["recovery_meals"] += info.meals
 	state.ledger["recovery_water_l"] += info.water_l
 	actor.position = actor.hub_spot
+	if outside_test.is_valid():
+		actor.outside = bool(outside_test.call(actor.position))
 	actor.health = balance.recovery_health
+	actor.lethal_exposure_seconds = 0.0
 	_cancel_suit_check(id)
 	events.character_recovered.emit(id, info)
 	return info
@@ -177,6 +196,12 @@ func recover_character(id: StringName) -> Dictionary:
 ## Tests whether a point is within the hub boundary.
 func is_at_hub(position: Vector3) -> bool:
 	return position.distance_to(config.hub_position) <= config.hub_radius_m
+
+## Switching never cancels a dangerous atmosphere encounter. Read gas masses so this also works before a tick.
+func safe_to_switch(actor: CharacterState) -> bool:
+	if actor.health <= 0.0 or actor.lethal_exposure_seconds > 0.0 or actor.outside or (outside_test.is_valid() and bool(outside_test.call(actor.position))):
+		return false
+	return balance.gas_kpa(state.cabin_o2_kg, GameBalance.MOLAR_O2) >= balance.o2_low_kpa and balance.gas_kpa(state.cabin_co2_kg, GameBalance.MOLAR_CO2) <= balance.co2_danger_kpa
 
 ## Copies random state before saving.
 func sync_rng_to_state() -> void:
@@ -191,11 +216,12 @@ func replica_dict() -> Dictionary:
 	var votes := {}
 	for peer: int in _votes:
 		votes[peer] = bool(_votes[peer])
-	return {"peers": peers.duplicate(), "paused": paused, "votes": votes, "suit_checks": checks}
+	return {"peers": peers.duplicate(), "paused": paused, "votes": votes, "suit_checks": checks, "repair": repair_runtime.replica_dict()}
 
 
 ## Client: copies the host's session facts (see replica_dict). Emits nothing; the host's forwarded events do that.
 func apply_replica(d: Dictionary) -> void:
+	repair_runtime.apply_replica(d.get("repair", {}))
 	peers.clear()
 	for p in d.get("peers", [HOST_PEER]):
 		peers.append(int(p))
@@ -233,9 +259,12 @@ func _recompute_pause() -> void:
 		events.pause_changed.emit(paused)
 
 func _release(actor: CharacterState) -> void:
+	repair_runtime.release_character(actor.id)
 	_cancel_suit_check(actor.id)
 	actor.owner_peer = 0
 	actor.position = actor.hub_spot
+	if outside_test.is_valid():
+		actor.outside = bool(outside_test.call(actor.position))
 	events.crew_ownership_changed.emit(actor.id, 0)
 
 func _start_suit_check(actor: CharacterState, station: StringName, on: bool) -> void:

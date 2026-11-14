@@ -141,6 +141,12 @@ func join(p_address: String, p_port := DEFAULT_PORT) -> Error:
 
 ## Leaves the session (a host closes it for everyone).
 func leave() -> void:
+	# A host may stop LAN and keep playing this colony offline. Release remote operators while
+	# the session is still authoritative; closing ENet after detaching callbacks cannot do this for us.
+	if _role == &"host" and services != null and services.has_game():
+		for peer: int in services.session.peers.duplicate():
+			if peer != SessionService.HOST_PEER:
+				services.session.peer_left(peer)
 	_disconnect_forwarders()
 	_disconnect_api()
 	if _peer != null:

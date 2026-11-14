@@ -35,9 +35,11 @@ const MARS_GRAVITY := 3.73
 @export var remembered_requests := 256
 
 @export_group("Hub")
-## Where parked crew wait and where control changes hands. REHEARSAL VALUE: the owner has not named the hub room yet.
-@export var hub_position := Vector3(-7.3, 0.0, -14.5)
+## Med Bay safe switching/recovery area. Feet sit 4 cm above the measured room floor.
+@export var hub_position := Vector3(-7.3, 0.04, -14.5)
 @export var hub_radius_m := 6.0
+## Collision-probed parking positions relative to the Med Bay hub (fourth avoids bedside equipment).
+@export var crew_hub_offsets: Array[Vector3] = [Vector3(1.2, 0, 0), Vector3(0, 0, 1.2), Vector3(-1.2, 0, 0), Vector3(-0.3, 0, -1.2)]
 
 @export_group("Player (initial tuning, Prompt 04)")
 @export var fov_degrees := 72.0

@@ -68,7 +68,7 @@ static func extra_for_object(object_name: String) -> Dictionary:
 
 static func _record(entry: Dictionary, zone: String, p: Vector3) -> Dictionary:
 	var r := {"kind": String(entry.kind), "zone": zone, "position": [p.x, p.y, p.z], "specialty": String(entry.get("specialty", ""))}
-	for key in ["name", "symbol"]:
+	for key in ["name", "symbol", "room_id", "task_id", "cassette_id", "description"]:
 		if entry.has(key):
 			r[key] = String(entry[key])
 	return r

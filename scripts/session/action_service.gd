@@ -142,7 +142,7 @@ func _resolve_new(session: SessionService, request: ActionRequest) -> ActionResu
 	if specialty == &"" and d.target_kind == &"station":
 		specialty = StringName(ctx.target.get("specialty", ""))
 	if specialty != &"" and (ctx.actor == null or ctx.actor.specialty != specialty):
-		return ActionResult.failure(request.request_id, &"wrong_specialty")
+		return ActionResult.failure(request.request_id, &"wrong_specialty", "This job needs %s. Switch to that specialist at the hub." % String(specialty).replace("_", " "))
 	if d.check.is_valid():
 		var failure: ActionResult = d.check.call(ctx)
 		if failure != null:

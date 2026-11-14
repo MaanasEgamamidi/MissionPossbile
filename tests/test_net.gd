@@ -50,6 +50,14 @@ func _initialize() -> void:
 	_run.call_deferred()
 
 
+## Synthetic host-only repair validator. No production room puzzle is installed by this test.
+func _repair_rule(task: Dictionary, move: Dictionary) -> Dictionary:
+	var expected := int((task.puzzle_state as Dictionary).get("step", 0)) + 1
+	if String(move.move) != "step" or int(move.value) != expected or expected > 2:
+		return {"accepted": false}
+	return {"accepted": true, "puzzle_state": {"step": expected}, "progress": float(expected) / 2.0, "complete": expected == 2}
+
+
 func _run() -> void:
 	var dir := ProjectSettings.globalize_path("res://").path_join("_test_saves/net")
 	DirAccess.make_dir_recursive_absolute(dir)
@@ -73,6 +81,16 @@ func _run() -> void:
 	var second := ENetMultiplayerPeer.new()
 	_check("host: the port is really taken", second.create_server(PORT) != OK)
 	second.close()
+	# F04: join a real ENet colony while the host is midway through a resumable puzzle.
+	var repair_actor := host.local_character()
+	var comms_at := CharacterState._v3(host.state().stations["repair_t01"].position)
+	host.session.report_position(1, repair_actor.id, comms_at, 0.0)
+	host.session.repair_runtime.register_rule("T01", _repair_rule, true)
+	var claimed := host.request(&"task_claim", &"repair_t01", {"generation": 1})
+	var partial := host.request(&"task_move", &"repair_t01", {"generation": 1, "move": "step", "value": 1})
+	_check("repair fixture: host validates partial puzzle", claimed.ok and partial.ok and host.state().repair.tasks.T01.progress == 0.5)
+	var disk_snapshot := host.snapshot()
+	_check("repair save: partial retained without operator lock", disk_snapshot.colony.repair.tasks.T01.progress == 0.5 and not disk_snapshot.colony.repair.has("locks") and not disk_snapshot.session.has("repair") and host.session.repair_runtime.locks.has("T01"))
 
 	# ---- join
 	_check("join: started", client.net.join("127.0.0.1", PORT) == OK and client.net.is_joining() and client.mode == &"client")
@@ -85,6 +103,18 @@ func _run() -> void:
 	_check("join: client got a free crew member", mine != null and hosts != null and mine.id != hosts.id and host.state().character(mine.id).owner_peer == cpeer)
 	_check("join: same colony seed and stations", client.state().rng_seed == host.state().rng_seed and client.state().stations.size() == host.state().stations.size())
 	_check("join: client never ticks or saves", client.save_now() == ERR_UNCONFIGURED and not client.is_authority())
+	_check("repair late join: current puzzle and seed arrive", client.state().repair.tasks.T01.progress == 0.5 and client.state().repair.tasks.T01.puzzle_state == {"step": 1} and client.state().repair.tasks.T01.puzzle_seed == host.state().repair.tasks.T01.puzzle_seed)
+	_check("repair late join: live operator lease arrives", client.session.repair_runtime.locks.has("T01") and int(client.session.repair_runtime.locks.T01.peer) == 1)
+	# Both room milestones then travel as ordinary authoritative updates, including seen-shot history.
+	host.request(&"task_move", &"repair_t01", {"generation": 1, "move": "step", "value": 2})
+	host.session.report_position(1, hosts.id, CharacterState._v3(host.state().stations["repair_t02"].position), 0.0)
+	host.session.repair_runtime.register_rule("T02", _repair_rule, true)
+	host.request(&"task_claim", &"repair_t02", {"generation": 1})
+	host.request(&"task_move", &"repair_t02", {"generation": 1, "move": "step", "value": 1})
+	var completed := host.request(&"task_move", &"repair_t02", {"generation": 1, "move": "step", "value": 2})
+	host.state().repair.seen_beauty_shots.append("command_center")
+	host.events.state_changed.emit(&"repair_fixture")
+	_check("repair updates: room milestone and shot history arrive", completed.ok and await _until(func() -> bool: return client.state().repair.rooms.command_center.first_completed and client.state().repair.seen_beauty_shots == ["command_center"] and not client.session.repair_runtime.locks.has("T01") and not client.session.repair_runtime.locks.has("T02")))
 
 	# ---- client body -> host
 	var spot := host.state().items["crate_1"].position as Array
@@ -126,15 +156,32 @@ func _run() -> void:
 	_check("clock: client clock follows the host", absf(client.clock().phase - host.clock().phase) < 0.01 and client.clock().ticks > 0, "%f vs %f" % [client.clock().phase, host.clock().phase])
 
 	# ---- client leaves: its crew member is parked, cargo stays with the character
+	var rings_at := CharacterState._v3(host.state().stations["repair_t03"].position)
+	await _until(func() -> bool:
+		client.report_position(mine.id, rings_at, 0.0)
+		return host.state().character(mine.id).position.distance_to(rings_at) < 0.01)
+	var operator_claim := client.request(&"task_claim", &"repair_t03", {"generation": 1})
+	var lease_arrived := await _until(func() -> bool: return host.session.repair_runtime.locks.has("T03") and client.session.repair_runtime.locks.has("T03"))
+	var lease_answers := _client_results.filter(func(result: ActionResult) -> bool: return result.request_id == operator_claim.request_id)
+	_check("repair client: host grants an operator lease", operator_claim.pending and lease_arrived, str(lease_answers.map(func(result: ActionResult) -> Dictionary: return result.to_dict())))
 	client.net.leave()
 	_check("leave: host parks the client's crew", await _until(func() -> bool: return host.session.peers.size() == 1 and host.state().character(mine.id).owner_peer == 0))
 	_check("leave: client is offline", client.mode == &"offline" and not client.net.is_online())
+	_check("repair disconnect: operator lease released", not host.session.repair_runtime.locks.has("T03"))
 
 	# ---- rejoin, then the host quits
 	_client_events.clear()
 	_check("rejoin: works on the same port", client.net.join("127.0.0.1", PORT) == OK and await _until(func() -> bool: return client.net.is_client()))
 	_check("rejoin: gets a crew member again", client.local_character() != null)
+	_check("repair rejoin: milestone retained without stuck lease", client.state().repair.rooms.command_center.first_completed and client.state().repair.seen_beauty_shots == ["command_center"] and not client.session.repair_runtime.locks.has("T03"))
+	var rejoined_actor := client.local_character()
+	await _until(func() -> bool:
+		client.report_position(rejoined_actor.id, rings_at, 0.0)
+		return host.state().character(rejoined_actor.id).position.distance_to(rings_at) < 0.01)
+	client.request(&"task_claim", &"repair_t03", {"generation": 1})
+	_check("host leave fixture: rejoined client owns a lease", await _until(func() -> bool: return host.session.repair_runtime.locks.has("T03")))
 	host.net.leave()
+	_check("host leave: offline continuation clears remote ownership and leases", host.session.peers == [1] and host.state().character(rejoined_actor.id).owner_peer == 0 and not host.session.repair_runtime.locks.has("T03"))
 	_check("host quit: client is told", await _until(func() -> bool: return _lost != ""), _lost)
 	_check("host quit: client back offline", client.mode == &"offline")
 

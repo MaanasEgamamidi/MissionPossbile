@@ -272,7 +272,9 @@ func _hook_net() -> void:
 			_main_menu.show_notice(reason))
 	net.host_lost.connect(func(reason: String) -> void:
 		menu_notice = reason
-		get_tree().reload_current_scene())
+		# Embedded game instances (LAN tests/tools) do not own the tree's current scene.
+		if get_tree().current_scene == self:
+			get_tree().reload_current_scene())
 	net.peer_connected.connect(func(peer: int) -> void: _say_crew_change(peer, true))
 	net.peer_disconnected.connect(func(peer: int) -> void: _say_crew_change(peer, false))
 
