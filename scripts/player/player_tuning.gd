@@ -27,8 +27,9 @@ extends Resource
 @export var pitch_limit_degrees: float = 85.0
 ## Standing capsule height; matches the placeholder astronaut.
 @export var body_height_m: float = 1.8
-## Capsule radius; fits colony doorways.
-@export var body_radius_m: float = 0.32
+## Capsule radius. 0.22 (was 0.32): the 1.0 m door openings left only 0.18 m of slack each side at 0.32, so any
+## off-centre approach (the greenhouse doors included) caught the frame; now 0.28 m.
+@export var body_radius_m: float = 0.22
 ## Eye level below the top of the head.
 @export var eye_height_m: float = 1.65
 ## Interaction reach in metres; matches nearby station use.
