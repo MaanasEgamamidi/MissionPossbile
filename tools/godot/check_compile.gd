@@ -1,12 +1,12 @@
 extends SceneTree
-## Compile check: loads every GDScript file under res://scripts, res://tools and res://tests and reports any that
+## Compile check: loads every GDScript file under res://scripts, res://tools, res://tests and res://perf and reports any that
 ## fail to parse or cannot be instantiated. Prints "COMPILE OK <n> scripts" or one "COMPILE FAIL <path>" per problem.
 ## Run: godot --headless --path . --script res://tools/godot/check_compile.gd
 
 
 func _initialize() -> void:
 	var files: PackedStringArray = []
-	for root_dir in ["res://scripts", "res://tools", "res://tests"]:
+	for root_dir in ["res://scripts", "res://tools", "res://tests", "res://perf"]:
 		_collect(root_dir, files)
 	var failed := 0
 	for path in files:

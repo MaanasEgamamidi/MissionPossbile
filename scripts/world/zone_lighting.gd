@@ -15,6 +15,7 @@ var _lights := {}            # zone -> Array[Light3D]
 var _energy := {}            # Light3D -> authored energy
 var _emissive := {}          # zone -> Array[MeshInstance3D] with a glowing surface (lamp lenses, screens)
 var _powered := {}           # zone -> bool
+var _awake := {}             # zone -> bool: false while the perf ZoneManager has put the zone to sleep (nobody can see it)
 var _probes := {}            # zone -> ReflectionProbe carrying the room's ambient (bounce stand-in)
 var _sun: DirectionalLight3D
 var _sun_energy := 0.0
@@ -72,8 +73,7 @@ func set_zone_powered(zone: String, powered: bool) -> void:
 	if not _lights.has(zone):
 		return
 	_powered[zone] = powered
-	for l in _lights[zone]:
-		(l as Light3D).visible = powered
+	_apply_lights(zone)
 	for mi: MeshInstance3D in _emissive.get(zone, []):
 		mi.set_instance_shader_parameter("power", 1.0 if powered else 0.0)
 	if _probes.has(zone):
@@ -83,6 +83,26 @@ func set_zone_powered(zone: String, powered: bool) -> void:
 			probe.ambient_color_energy = float(probe.get_meta("ambient_full")) if powered else 0.0
 		_refresh_probe(probe)
 	zone_power_changed.emit(zone, powered)
+
+
+## Perf overhaul (res://perf/zone_manager.gd): a sleeping zone's fixtures are off whatever the power state, and waking
+## it gives back exactly what the power simulation says. Emission and probes stay with the power state: a sleeping
+## zone is not drawn, so its surfaces need no change.
+func set_zone_awake(zone: String, awake: bool) -> void:
+	if not _lights.has(zone) or bool(_awake.get(zone, true)) == awake:
+		return
+	_awake[zone] = awake
+	_apply_lights(zone)
+
+
+func is_zone_awake(zone: String) -> bool:
+	return bool(_awake.get(zone, true))
+
+
+func _apply_lights(zone: String) -> void:
+	var on := bool(_powered.get(zone, true)) and bool(_awake.get(zone, true))
+	for l in _lights[zone]:
+		(l as Light3D).visible = on
 
 
 ## 0.0 = midnight, 0.5 = local noon, 1.0 = next midnight. The authored reference sun is the noon state.

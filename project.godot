@@ -19,6 +19,11 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 
 driver/enable_input=true
 
+[autoload]
+
+PerfSettings="*res://perf/perf_settings.gd"
+PerfHud="*res://perf/perf_hud.gd"
+
 [display]
 
 window/size/viewport_width=1920
