@@ -675,7 +675,11 @@ func _panels() -> void:
 	services.sent.clear()
 	bed.water_switch.button_pressed = false
 	_check("bed panel: the water switch asks set_bed_water and shows the real state", services.sent_of(&"set_bed_water").size() == 1 and not bool(CropSystem.bed(st, String(BEDS[2])).valve) and not bed.water_switch.button_pressed)
-	_check("bed panel: Harvest is disabled until the crop is ready; the specialist symbol is on the panel", (bed.buttons["harvest"] as Button).disabled and _all_text(bed).contains("❀ Biology and food specialists"))
+	var bed_help := bed.find_child("StationHelp", true, false) as ExplainButton
+	bed_help.open_popup()
+	await _frames()
+	_check("bed panel: Harvest is disabled and specialist guidance is in help", (bed.buttons["harvest"] as Button).disabled and _all_text(bed_help.popup_window()).contains("Biology and food specialists"))
+	bed_help.close_popup()
 
 	# ---- console
 	me.position = CharacterState._v3(st.stations[String(CONSOLE)].position)
@@ -688,7 +692,12 @@ func _panels() -> void:
 	_check("console: lists all 7 beds, with the tomato's stage", beds_shown.size() == 7 and "\n".join(beds_shown).contains("Tomato, seed"), "\n".join(beds_shown))
 	_check("console: food store and meals per sol for the crew; stored meals cover the start",
 		con.reading_text(&"food").contains("meals") and con.reading_text(&"food_use") == "3 meals per sol" and con.start_note_text().contains("Stored meals cover the start"), con.reading_text(&"food_use"))
-	_check("console: a '?' explains why light, water and nutrients matter", _has_explain(con, "food") and _all_text(con).contains("Why light, water and nutrients matter") and _all_text(con).contains("weeks to months on Earth"))
+	var con_help := con.find_child("StationHelp", true, false) as ExplainButton
+	_check("console: long growing explanation is absent from the main panel", not _all_text(con).contains("weeks to months on Earth"))
+	con_help.open_popup()
+	await _frames()
+	_check("console: help explains growing and its time scale", _all_text(con_help.popup_window()).contains("Plants make food from light") and _all_text(con_help.popup_window()).contains("weeks to months on Earth"))
+	con_help.close_popup()
 	services.sent.clear()
 	con.lights_switch.button_pressed = false
 	_check("console: the grow-light switch asks set_grow_lights and the lights go off", services.sent_of(&"set_grow_lights").size() == 1 and not st.is_zone_powered("Greenhouse") and not con.lights_switch.button_pressed)

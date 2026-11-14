@@ -14,6 +14,8 @@ var _battery_l: Label
 var _verdict: Label
 var _verdict_box: PanelContainer
 var _sources: VBoxContainer
+var _problems: VBoxContainer
+var _expanded: Dictionary = {}
 var _loads: VBoxContainer
 var _life: VBoxContainer
 var _air: Label
@@ -82,6 +84,9 @@ func setup(p_services: GameServices) -> void:
 	_sources = VBoxContainer.new()
 	_sources.add_theme_constant_override(&"separation", 8)
 	content.add_child(_sources)
+	_problems = VBoxContainer.new()
+	_problems.name = "PowerProblems"
+	content.add_child(_problems)
 	content.add_child(_section("USING POWER"))
 	_loads = VBoxContainer.new()
 	_loads.add_theme_constant_override(&"separation", 6)
@@ -130,7 +135,7 @@ func _section(text: String) -> Label:
 	return l
 
 
-func _line(parent: Control, symbol: String, color: Color, title: String, sub: String, value: String, value_color: Color) -> void:
+func _line(parent: Control, symbol: String, color: Color, title: String, sub: String, value: String, value_color: Color, problem := false) -> void:
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 10)
 	parent.add_child(row)
@@ -142,9 +147,9 @@ func _line(parent: Control, symbol: String, color: Color, title: String, sub: St
 	col.add_theme_constant_override(&"separation", -2)
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(col)
-	col.add_child(AstraStyle.label(title, 14, AstraStyle.TEXT))
+	col.add_child(AstraStyle.label(title, 14, AstraStyle.DANGER if problem else AstraStyle.TEXT))
 	if sub != "":
-		var s := AstraStyle.label(sub, 11, AstraStyle.TEXT_3)
+		var s := AstraStyle.label(sub, 11, AstraStyle.DANGER if problem else AstraStyle.TEXT_3)
 		s.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		col.add_child(s)
 	var v := AstraStyle.label(value, 14, value_color)
@@ -186,11 +191,11 @@ func refresh() -> void:
 	AstraStyle.set_color(_verdict, vc)
 	_verdict_box.add_theme_stylebox_override(&"panel", AstraStyle.pill(Color(vc, 0.12), AstraStyle.RADIUS_SM, 12, 8))
 
-	var sig := "%s|%s|%s|%s" % [JSON.stringify(st.zones), JSON.stringify(st.equipment), snappedf(st.solar_kw, 0.1), JSON.stringify(st.rates)]
+	var sig := JSON.stringify([st.zones, st.equipment, snappedf(st.solar_kw, 0.1), st.rates, st.shed, st.panel_dust, day, snappedf(st.battery_kw, 0.1), _expanded])
 	if sig == _sig:
 		return
 	_sig = sig
-	for box: VBoxContainer in [_sources, _loads, _life]:
+	for box: VBoxContainer in [_sources, _loads, _life, _problems]:
 		for c in box.get_children():
 			box.remove_child(c)
 			c.queue_free()
@@ -203,31 +208,57 @@ func refresh() -> void:
 		"+%s kW" % ColonySummaryPanel.num(st.solar_kw), AstraStyle.C_POWER)
 	if st.battery_kw < -0.05:
 		_line(_sources, "▮", AstraStyle.GOOD, "Battery", "Covering the gap", "+%s kW" % ColonySummaryPanel.num(-st.battery_kw), AstraStyle.GOOD)
+	var categories := {"Room lighting": [], "Greenhouse": [], "Life support machines": [], "Solar equipment": [], "Control & heating": []}
+	var problems: Array[Dictionary] = []
 	var zones: Array = st.zones.keys()
 	zones.sort()
 	for zone: String in zones:
 		var on := st.is_zone_powered(zone)
-		var kw := b.load_of_zone(zone)
-		if kw <= 0.0:
+		var expected := b.load_of_zone(zone)
+		if expected <= 0.0:
 			continue
-		_line(_loads, "●" if on else "○", AstraStyle.ACCENT if on else AstraStyle.TEXT_3, zone, "Lights and room systems" if on else "Switched off",
-			("%s kW" % ColonySummaryPanel.num(kw)) if on else "off", AstraStyle.TEXT if on else AstraStyle.TEXT_3)
+		var group := "greenhouse" if zone == PowerModel.GREENHOUSE_ZONE else ("base" if b.critical_light_zones.has(zone) else "lights")
+		var missing := on and st.shed.has(group)
+		var row := {"title": zone, "kw": expected if on and not missing else 0.0,
+			"sub": "No power: supply shortage switched these lights off." if missing else ("Lights and room systems" if on else "Switched off"), "problem": missing}
+		categories["Greenhouse" if zone == PowerModel.GREENHOUSE_ZONE else "Room lighting"].append(row)
+		if missing:
+			problems.append(row)
 	for id: String in ColonyState.EQUIPMENT_IDS:
 		var e: Dictionary = st.equipment.get(id, {})
 		if e.is_empty():
 			continue
-		var on2 := bool(e.get("on", false))
-		var powered := bool(e.get("powered", false))
-		_line(_loads, "⚙", AstraStyle.C_O2 if on2 else AstraStyle.TEXT_3, StationPanel.equipment_name(id),
-			"Running" if on2 and powered else ("No power!" if on2 else "Switched off"),
-			("%s kW" % ColonySummaryPanel.num(float(e.get("kw", 0.0)))) if on2 else "off", AstraStyle.TEXT if on2 else AstraStyle.TEXT_3)
+		var problem := equipment_problem(st, b, id)
+		var running := st.is_on(id) and st.is_powered(id) and st.condition_of(id) >= b.equipment_min_condition
+		var row := {"title": StationPanel.equipment_name(id), "kw": float(e.get("kw", 0.0)) if running else 0.0,
+			"sub": problem if problem != "" else ("Running" if running else ("Idle: no production needed" if st.is_on(id) else "Switched off")), "problem": problem != ""}
+		categories["Solar equipment" if id in ["trackers", "cleaner"] else "Life support machines"].append(row)
+		if problem != "":
+			problems.append(row)
+	var base_missing := st.shed.has("base")
+	var base_row := {"title": "Control & heating", "kw": 0.0 if base_missing else b.base_load_kw,
+		"sub": "No power: control and heating stopped." if base_missing else "Essential colony systems", "problem": base_missing}
+	categories["Control & heating"].append(base_row)
+	if base_missing:
+		problems.append(base_row)
+	# Compare solar with a clean, working array at this time of day, never with noon output at night.
+	var solar_problem := solar_problem_text(st, b, day)
+	if solar_problem != "":
+		problems.append({"title": "Solar generation", "kw": st.solar_kw, "sub": solar_problem, "problem": true})
+	_problems.visible = not problems.is_empty()
+	if not problems.is_empty():
+		_problems.add_child(AstraStyle.label("POWER PROBLEMS", 11, AstraStyle.DANGER))
+		for row: Dictionary in problems:
+			_power_row(_problems, row)
+	for category: String in categories:
+		_category(category, categories[category])
 	for s: Dictionary in VitalsBar.STOCKS:
 		if s.key == &"battery_kwh":
 			continue
 		var per_sol := float(st.rates.get(String(s.key), 0.0)) * GameConfig.SOL_HOURS
 		var sign := "+" if per_sol >= 0.0 else ""
 		_line(_life, String(s.symbol), s.color, String(s.name), "%s %s in store" % [VitalsBar._amount(s.key, st.store(s.key)), s.unit],
-			"%s%s %s/sol" % [sign, ColonySummaryPanel.num(per_sol), s.unit], AstraStyle.GOOD if per_sol >= 0.0 else AstraStyle.DANGER)
+			"%s%s %s/sol" % [sign, ColonySummaryPanel.num(per_sol), s.unit], AstraStyle.GOOD if per_sol >= 0.0 else AstraStyle.TEXT_2)
 	var kpa := StationPanel.cabin_kpa(st, b)
 	_air.text = "Cabin air: oxygen %s kPa (%s) · carbon dioxide %s kPa (%s)" % [StationPanel.num(float(kpa.o2), 1),
 		StationPanel.o2_word(StationPanel.o2_level(float(kpa.o2), b)).to_lower(), StationPanel.num(float(kpa.co2), 2),
@@ -238,3 +269,60 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if visible and event.is_action_pressed(&"power_view"):
 		close_requested.emit()
 		get_viewport().set_input_as_handled()
+
+
+## Significant deviations are relative to this machine, not to unrelated rooms.
+static func equipment_problem(st: ColonyState, b: GameBalance, id: String) -> String:
+	if not st.is_on(id):
+		return ""
+	if st.condition_of(id) < b.equipment_min_condition:
+		return "Drawing no power: equipment is broken. Repair it."
+	if st.shed.has(id) or not st.is_powered(id):
+		return "Drawing no power: insufficient supply. Reduce other loads or restore generation."
+	# Oxygen makers vary with demand and available inputs; low production is not an electrical fault.
+	if id in ["electrolyser", "co2_unit"]:
+		return ""
+	var expected := PowerModel.equipment_kw(st, b, id, {})
+	var actual := float(st.unit(id).get("kw", 0.0))
+	if expected <= 0.05 or absf(actual - expected) <= maxf(0.1, expected * 0.3):
+		return ""
+	return "%s power draw: %s kW; expected %s kW. Check this machine." % ["Unusually high" if actual > expected else "Unusually low", ColonySummaryPanel.num(actual), ColonySummaryPanel.num(expected)]
+
+
+static func solar_problem_text(st: ColonyState, b: GameBalance, day: bool) -> String:
+	if not day:
+		return ""
+	if st.condition_of("trackers") < b.equipment_min_condition:
+		return "Low output: sun trackers are broken. Repair the tracker drives."
+	if PowerModel.average_dust(st) >= 0.3:
+		return "Low output: dust blocks %d %% of panel output. Clean the panels." % roundi(PowerModel.average_dust(st) * 100.0)
+	if st.is_on("trackers") and not st.is_powered("trackers"):
+		return "Low output: tracker drives have no power; panels cannot follow the Sun."
+	return ""
+
+
+func _power_row(parent: Control, row: Dictionary) -> void:
+	var issue := bool(row.problem)
+	var color := AstraStyle.DANGER if issue else AstraStyle.TEXT_2
+	_line(parent, "!" if issue else "•", color, String(row.title), String(row.sub),
+		"%s kW" % ColonySummaryPanel.num(float(row.kw)), color, issue)
+
+
+func _category(title: String, rows: Array) -> void:
+	if rows.is_empty():
+		return
+	var total := 0.0
+	for row: Dictionary in rows:
+		total += float(row.kw)
+	var open := bool(_expanded.get(title, false))
+	var button := AstraStyle.flat_button("%s %s · %s kW" % ["−" if open else "+", title, ColonySummaryPanel.num(total)], 14, AstraStyle.TEXT_2)
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	button.tooltip_text = "Show or hide individual readings"
+	button.pressed.connect(func() -> void:
+		_expanded[title] = not bool(_expanded.get(title, false))
+		refresh())
+	_loads.add_child(button)
+	if open:
+		for row: Dictionary in rows:
+			_power_row(_loads, row)

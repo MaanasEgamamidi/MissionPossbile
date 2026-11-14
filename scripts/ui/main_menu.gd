@@ -68,10 +68,22 @@ func setup(p_services: GameServices) -> void:
 	title.name = "Title"
 	title.autowrap_mode = TextServer.AUTOWRAP_OFF
 	title.add_theme_constant_override(&"line_spacing", -10)
-	outer.add_child(title)
-	var tagline := _label("Keep a base on Mars alive together: power, oxygen, water and food.", UiTheme.MUTED)
-	tagline.name = "Tagline"
-	outer.add_child(tagline)
+	var title_row := HBoxContainer.new()
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title_row.add_child(title)
+	var help := ExplainButton.make("", "Keep a base on Mars alive together: power, oxygen, water and food. Use the arrow keys or mouse to choose, and Enter to select.", "Main menu")
+	help.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	title_row.add_child(help)
+	outer.add_child(title_row)
+	var rule := HBoxContainer.new()
+	rule.add_theme_constant_override(&"separation", 3)
+	for segment: Array in [[UiTheme.palette().accent, 70.0], [UiTheme.palette().heading, 38.0], [UiTheme.palette().cool, 38.0]]:
+		var bar := ColorRect.new()
+		bar.color = segment[0]
+		bar.custom_minimum_size = Vector2(segment[1], 3.0)
+		bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		rule.add_child(bar)
+	outer.add_child(rule)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -131,9 +143,6 @@ func setup(p_services: GameServices) -> void:
 	_notice = _label("", UiTheme.WARN)
 	_notice.visible = false
 	column.add_child(_notice)
-	var keys := _label("Arrow keys or mouse to choose. Enter to select.", UiTheme.MUTED)
-	keys.name = "KeyHelp"
-	outer.add_child(keys)
 	refresh_save_info()
 
 

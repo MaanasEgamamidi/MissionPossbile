@@ -102,7 +102,7 @@ func _refresh_body(st: ColonyState) -> void:
 	var how := "Filling takes %s kg of oxygen from the colony reserve, which has %s kg." % [num(take, 3), num(reserve, 2)]
 	if reason != "":
 		how = reason
-	_fill_note.text = "%s This is the only way to fill a tank: putting the suit on again does not fill it." % how
+	_fill_note.text = how
 
 
 func _on_suit_pressed() -> void:

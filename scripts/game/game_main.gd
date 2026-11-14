@@ -357,7 +357,7 @@ func _rebuild_crew() -> void:
 		player.teleport(mine.position + Vector3(0.0, 0.05, 0.0), mine.yaw)
 		rigged_bodies = player.visual().use_rig_if_available()
 		player.visual().set_crew_identity(_identity_of(mine))
-		player.visual().set_suit(mine.suit_on)
+		player.visual().set_suit(mine.suit_on, mine.suit_slot)
 		player.action_answered.connect(_on_action_answered)
 		services.events.action_resolved.connect(player.resolve_answer)
 		_apply_player_settings()
@@ -384,7 +384,7 @@ func _rebuild_crew() -> void:
 				v.global_position = c.position
 				v.rotation.y = c.yaw
 				v.play(&"idle")
-			v.set_suit(c.suit_on)
+			v.set_suit(c.suit_on, c.suit_slot)
 			v.set_name_tag(CrewLooks.tag_text(c.display_name, _identity_of(c)))   # other crew only, never your own body
 			# Only crew someone is playing are "there" for doors: parked crew on the hub ring must not hold a door open.
 			(v.get_node("Presence") as CollisionObject3D).collision_layer = Layers.CREW_SOLID | (Layers.PLAYER if c.is_active() else 0)
@@ -634,10 +634,10 @@ func _on_suit_check_started(character_id: StringName, seconds: float) -> void:
 func _on_suit_check_finished(character_id: StringName, suit_on: bool, completed: bool) -> void:
 	var mine := _local_character()
 	if mine != null and mine.id == character_id:
-		player.visual().set_suit(suit_on)
+		player.visual().set_suit(suit_on, mine.suit_slot)
 		hud.show_message("Suit check complete. Suit %s." % ("on" if suit_on else "off") if completed else "Suit check cancelled.", 3.0)
 	elif _crew_visuals.has(character_id):
-		(_crew_visuals[character_id] as PlayerVisual).set_suit(suit_on)
+		(_crew_visuals[character_id] as PlayerVisual).set_suit(suit_on, services.state().character(character_id).suit_slot)
 
 
 func _on_character_recovered(character_id: StringName, info: Dictionary) -> void:

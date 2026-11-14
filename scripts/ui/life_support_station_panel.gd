@@ -94,7 +94,7 @@ func _build_body() -> void:
 	_water_forecast = _add_text(water, "", UiTheme.MUTED)
 	_add_equipment_switch(water, "recycler")
 
-	_add_heading_with_help(water, "Where spare water goes", "water_allocation")
+	_add_heading_with_help(water, "Where spare water goes", "water_allocation", "Drinking water comes first. Only water above the reserve goes to the greenhouse or electrolyser; if there is not enough for both, they share it.")
 	for key: String in ALLOCATIONS:
 		var row := HBoxContainer.new()
 		row.name = "Allocation_%s" % key
@@ -122,16 +122,15 @@ func _build_body() -> void:
 		row.add_child(value)
 		sliders[key] = s
 		_slider_values[key] = value
-	_reserve_note = _add_text(water, "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the electrolyser. If there is not enough for both, they get the same share." % num(bal.water_reserve_l, 0), UiTheme.MUTED)
+	_reserve_note = _add_text(water, "", UiTheme.MUTED)
 
 	# ---- oxygen
-	_add_heading_with_help(_body, "Oxygen", "oxygen")
+	_add_heading_with_help(_body, "Oxygen", "oxygen", "Two machines can fill the oxygen tanks. Either, both or neither may run. Only the electrolyser uses water.")
 	var oxygen := VBoxContainer.new()
 	oxygen.name = "Oxygen"
 	_body.add_child(oxygen)
 	_add_reading(&"oxygen", "O₂", "Oxygen reserve (in the tanks)", "oxygen", oxygen)
 	_oxygen_forecast = _add_text(oxygen, "", UiTheme.MUTED)
-	_add_text(oxygen, "Two machines can fill the oxygen tanks. Either, both or neither may run. Only the electrolyser uses water.")
 	var pair := HBoxContainer.new()
 	pair.name = "Processes"
 	oxygen.add_child(pair)
@@ -139,7 +138,7 @@ func _build_body() -> void:
 	_add_process_card(pair, "co2_unit", "co2_oxygen_unit", "Uses Mars air and power, no water.")
 
 	# ---- cabin air
-	_add_heading_with_help(_body, "Cabin air", "cabin_air")
+	_add_heading_with_help(_body, "Cabin air", "cabin_air", "Cabin air is separate from the oxygen reserve. A regulator tops up the rooms from the tanks when needed.")
 	var cabin := VBoxContainer.new()
 	cabin.name = "Cabin"
 	_body.add_child(cabin)
@@ -148,7 +147,6 @@ func _build_body() -> void:
 	_add_reading(&"pressure", "◎", "Air pressure in the cabin", "pressure", cabin)
 	_add_equipment_switch(cabin, "scrubber")
 	_add_equipment_switch(cabin, "cabin_fans")
-	_add_text(cabin, "Safe air in the rooms is not the same as the oxygen in the tanks. The tanks are the reserve; a regulator lets oxygen from them into the rooms when the cabin air needs it.", UiTheme.MUTED)
 
 
 func _add_process_card(parent: Control, id: String, explanation_id: String, uses: String) -> void:
@@ -226,7 +224,7 @@ func _refresh_body(st: ColonyState) -> void:
 			s.set_value_no_signal(float(st.water_allocation.get(key, 0.0)))
 		(_slider_values[key] as Label).text = "%s L per hour" % num(s.value)
 	var spare := maxf(0.0, water - bal.water_reserve_l)
-	_reserve_note.text = "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the electrolyser (%s L spare now). If there is not enough for both, they get the same share." % [num(bal.water_reserve_l, 0), num(spare, 0)]
+	_reserve_note.text = "Drinking reserve: %s L · spare: %s L" % [num(bal.water_reserve_l, 0), num(spare, 0)]
 
 	# oxygen
 	var oxygen := st.store(&"oxygen_kg")

@@ -76,11 +76,10 @@ func _build_body() -> void:
 	_feedback.visible = false
 	_body.add_child(_feedback)
 
-	_add_heading_with_help(_body, "Lab results", "food")
+	_add_heading_with_help(_body, "Lab results", "food", String(ScienceActions.samples_data().get("use_note", "")))
 	_results_box = VBoxContainer.new()
 	_results_box.name = "Results"
 	_body.add_child(_results_box)
-	_add_text(_body, String(ScienceActions.samples_data().get("use_note", "")), UiTheme.MUTED)
 
 
 func _refresh_body(st: ColonyState) -> void:

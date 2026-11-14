@@ -287,17 +287,12 @@ func _build() -> void:
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
-	header.add_child(ExplainButton.make("upgrades"))
+	header.add_child(ExplainButton.make("upgrades", "Upgrades improve equipment the colony already has. Costs and effect sizes are game balance, not NASA numbers."))
 	_close_button = Button.new()
 	_close_button.text = "Close"
 	_close_button.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(_close_button)
 
-	var intro := Label.new()
-	intro.text = "Upgrades improve equipment the colony already has. Costs and effect sizes are game balance, not NASA numbers."
-	intro.theme_type_variation = UiTheme.MUTED
-	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	column.add_child(intro)
 	_parts_label = Label.new()
 	_parts_label.theme_type_variation = UiTheme.HEADING
 	column.add_child(_parts_label)

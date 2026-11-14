@@ -54,6 +54,7 @@ func _build() -> void:
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
+	header.add_child(ExplainButton.make("", "The engine, tools, models and science pages this game was made with, and the licence of each one. A licence is a set of rules for using someone's work.", "Credits"))
 	var close := Button.new()
 	close.name = "CloseButton"
 	close.text = "Close"
@@ -61,11 +62,6 @@ func _build() -> void:
 	close.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(close)
 
-	var intro := Label.new()
-	intro.text = "The engine, tools, models and science pages this game was made with, and the licence of each one. A licence is a set of rules for using someone's work."
-	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	intro.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	box.add_child(intro)
 
 	_scroll = ScrollContainer.new()
 	_scroll.name = "Credits"
