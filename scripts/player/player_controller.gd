@@ -58,7 +58,7 @@ func setup(p_config: GameConfig, p_tuning: PlayerTuning, p_character: CharacterS
 	report_position = p_report_position
 	PlayerInput.ensure_actions()
 	collision_layer = Layers.PLAYER
-	collision_mask = Layers.WORLD | Layers.DOOR | Layers.ITEM
+	collision_mask = Layers.WORLD | Layers.DOOR | Layers.ITEM | Layers.CREW_SOLID
 	floor_snap_length = tuning.floor_snap_m
 	floor_max_angle = deg_to_rad(tuning.max_slope_degrees)
 	floor_constant_speed = true

@@ -367,8 +367,8 @@ func _rebuild_crew() -> void:
 				v.use_rig_if_available()
 				v.set_first_person(false)   # other crew are always seen from outside: keep their heads visible
 				v.set_crew_identity(_identity_of(c))
-				v.add_child(_presence_body())
 				v.global_position = c.position
+				v.add_child(_presence_body())
 			if not c.is_active():
 				# Parked crew stand still at the hub; crew other players control are moved smoothly by _move_crew.
 				v.global_position = c.position
@@ -377,19 +377,19 @@ func _rebuild_crew() -> void:
 			v.set_suit(c.suit_on)
 			v.set_name_tag(CrewLooks.tag_text(c.display_name, _identity_of(c)))   # other crew only, never your own body
 			# Only crew someone is playing are "there" for doors: parked crew on the hub ring must not hold a door open.
-			(v.get_node("Presence") as CollisionObject3D).collision_layer = Layers.PLAYER if c.is_active() else 0
+			(v.get_node("Presence") as CollisionObject3D).collision_layer = Layers.CREW_SOLID | (Layers.PLAYER if c.is_active() else 0)
 			if services.zones != null:
 				v.set_zone_layers(_layers_for(services.zones.zone_at_world(c.position)))
 
 
 ## Other crew are drawn, not simulated, but doors sense bodies on the PLAYER layer: give each one a capsule there so a
-## door opens for every player on every screen. Nothing collides with it (the local player does not mask PLAYER).
+## door opens for every player on every screen. CREW_SOLID also stops local players walking through active or parked crew.
 func _presence_body() -> AnimatableBody3D:
 	var tuning := PlayerTuning.new()
 	var body := AnimatableBody3D.new()
 	body.name = "Presence"
 	body.sync_to_physics = false
-	body.collision_layer = 0          # _rebuild_crew turns it on for crew another player controls
+	body.collision_layer = Layers.CREW_SOLID  # _rebuild_crew adds door sensing for active crew
 	body.collision_mask = 0
 	var shape := CollisionShape3D.new()
 	var capsule := CapsuleShape3D.new()

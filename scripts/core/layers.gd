@@ -8,6 +8,7 @@ const PLAYER := 2         # crew bodies
 const ITEM := 4           # things that can be carried
 const DOOR := 8           # sliding door leaves
 const STATION := 16       # interaction volumes (Area3D), never solid
+const CREW_SOLID := 32    # other crew, including parked crew; separate from door sensing
 
 # ---- render layers (1-based layer numbers, as in the editor)
 ## Layers 1..18 are lighting zones (see ColonyZones.layer_of); layer 20 is "can shadow the sun".

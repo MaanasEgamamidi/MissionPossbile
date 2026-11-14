@@ -35,7 +35,7 @@ func _initialize() -> void:
 	_player.action_answered.connect(func(result: ActionResult) -> void: _answers.append(result))
 	_player.visual().state_changed.connect(func(state: StringName) -> void: _states.append(state))
 	await _frames(5)
-	_check("capsule and collision layers", _player.collision_layer == Layers.PLAYER and _player.collision_mask == (Layers.WORLD | Layers.DOOR | Layers.ITEM) and (_player.get_child(0) as CollisionShape3D).shape is CapsuleShape3D)
+	_check("capsule and collision layers", _player.collision_layer == Layers.PLAYER and _player.collision_mask == (Layers.WORLD | Layers.DOOR | Layers.ITEM | Layers.CREW_SOLID) and (_player.get_child(0) as CollisionShape3D).shape is CapsuleShape3D)
 	await _test_motion()
 	await _test_cameras()
 	await _test_authority()
