@@ -44,6 +44,7 @@ func _initialize() -> void:
 		DirAccess.remove_absolute(save_dir.path_join(f))
 	main = (load("res://scenes/game.tscn") as PackedScene).instantiate() as GameMain
 	main.save_directory = save_dir
+	main.show_menu = false   # straight into the game, no main menu
 	root.add_child(main)
 	await _frames(30)
 	var doors := main.airlock_doors

@@ -1,0 +1,92 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS hud: nothing low shows only 'Colony OK ✓'  []
+PASS hud: low battery_kwh alone shows one reading with symbol, unit and word  ["⚡ Colony electricity 3 % ✖ Very low"]
+PASS hud: low oxygen_kg alone shows one reading with symbol, unit and word  ["O₂ Oxygen 1.0 kg ✖ Very low"]
+PASS hud: low water_l alone shows one reading with symbol, unit and word  ["≈ Water 2 L ✖ Very low"]
+PASS hud: low food_meals alone shows one reading with symbol, unit and word  ["✿ Food 1 meal ✖ Very low"]
+PASS hud: low suit tank (suit on) shows one reading  ["⛑ Suit tank 5 % ✖ Very low"]
+PASS hud: a low tank with the suit off is not urgent  []
+PASS hud: five low readings show at most three, most urgent first  ["≈ Water 2 L ✖ Very low", "✿ Food 1 meal ✖ Very low", "O₂ Oxygen 0.5 kg ✖ Very low"]
+PASS hud: battery is called colony electricity, an empty one comes first  ["⚡ Colony electricity 0 % ✖ Power short", "⛑ Suit tank 20 % ! Low"]
+PASS hud: stamina is labelled 'Body energy'  Electrical and communications | ⚡ Electrical and comms | Health 100 % | Body energy 100 % | Suit on · tank 20 % | Hands empty
+PASS hud: crew corner shows name, specialty symbol, health, suit and tank  Electrical and communications | ⚡ Electrical and comms | Health 100 % | Body energy 100 % | Suit on · tank 20 % | Hands empty
+PASS hud: cue for a station  [E] Use power panel
+PASS hud: cue for an item  [E] Pick up supply crate
+PASS hud: cue while holding something  [E] Put down
+PASS hud: holding and aiming at a station still uses the station  [E] Use life support console
+PASS hud: no cue when there is nothing to do
+PASS hud: messages queue (3 on screen, 2 waiting, no repeats)  ["Message number 1.", "Message number 2.", "Message number 3."] / ["Message number 4.", "Message number 5."]
+PASS hud: waiting messages come next, in order  ["Message number 4.", "Message number 5."]
+PASS hud: key hint strip  M map · I cargo · C crew · Esc pause · Shift+Backspace sources
+PASS hud: status line shows
+PASS hud: PAUSED banner while paused
+PASS hud: no banner when running
+PASS hud: suit check bar while the check runs  ok
+PASS layout: HUD at 1280x720 text x1.0
+PASS focus: HUD at 1280x720 text x1.0
+PASS layout: HUD at 1920x1080 text x1.0
+PASS focus: HUD at 1920x1080 text x1.0
+PASS layout: HUD at 1280x720 text x1.5
+PASS focus: HUD at 1280x720 text x1.5
+PASS hud: suit check bar hidden when done
+PASS hud: key hints start fading after 30 s of play
+PASS hud: set_visible_hud(false) hides it
+PASS hud: empty status hides the line
+PASS summary: one crew member is active  1
+PASS summary: oxygen time left = stock / net use per hour  4.866220 vs 4.866220
+PASS summary: battery time left at night = kWh / kW of everything switched on (23.1 kW)  0.315988 vs 0.315988 sols
+PASS summary: food time left = meals / meals per sol
+PASS summary: oxygen line reads 'about 4.9 sols'  Oxygen lasts about 4.9 sols at this rate
+PASS summary: battery line in hours when under a sol  Battery lasts about 7.8 hours at this rate / Battery lasts about 7.8 hours at this rate
+PASS summary: food line  Food lasts about 10 sols at this rate
+PASS summary: '—' when not going down (water rate 0)  —
+PASS summary: cause line for the battery  Battery draining: the colony uses 53 kW and the sun gives 19 kW.
+PASS summary: net flow shows the drain  −34 kW
+PASS summary: oxygen flow and each process from the model  −2.47 kg per sol
+PASS summary: cabin air line in kPa  O₂ 21 kPa · CO₂ 0.10 kPa · total 100 kPa
+PASS summary: battery charging (full battery, not empty within the forecast) shows '—'  —
+PASS summary: rooms list shows power with ✓/✖ and kW  ✓ On | Airlock | uses 0.2 kW | ✓ On | Blast-door passage | uses 0.2 kW | ✓ On | Command Room | uses 0.4 kW | ✓ On | Crew corridor | uses 0.2 kW | ✓ On | Dome plaza | uses 0.8 kW | ✓ On | East quarters | uses 0.2 kW | ✓ On | Exterior | uses 
+PASS summary: stock vs flow and body energy vs electricity boxes
+PASS summary: units on every number
+PASS layout: ColonySummaryPanel at 1280x720 text x1.0
+PASS focus: ColonySummaryPanel at 1280x720 text x1.0
+PASS layout: ColonySummaryPanel at 1920x1080 text x1.0
+PASS focus: ColonySummaryPanel at 1920x1080 text x1.0
+PASS layout: ColonySummaryPanel at 1280x720 text x1.5
+PASS focus: ColonySummaryPanel at 1280x720 text x1.5
+PASS cargo: setup carries two crates  [&"crate_1", &"crate_2"]
+PASS cargo: slots used of cargo_slots  Electrical and communications carries 2 of 6 slots.
+PASS cargo: items named from their kind
+PASS cargo: cache with zone and distance  Cargo | Electrical and communications carries 2 of 6 slots. | Supply crate | Supply crate | Caches you know of | A cache is the cargo left behind when a crew member was brought back to the hub. Walk there to pick it up again. | ! Cache with 1 thing in Crew corridor, 15 m from you.
+PASS layout: InventoryPanel at 1280x720 text x1.0
+PASS focus: InventoryPanel at 1280x720 text x1.0
+PASS layout: InventoryPanel at 1920x1080 text x1.0
+PASS focus: InventoryPanel at 1920x1080 text x1.0
+PASS layout: InventoryPanel at 1280x720 text x1.5
+PASS focus: InventoryPanel at 1280x720 text x1.5
+PASS cargo: 'Put down' sends exactly one drop for the right item  [{ "action": &"drop", "target": &"crate_2", "params": {  } }]
+PASS cargo: list updates after the state changes  Cargo | Electrical and communications carries 1 of 6 slots. | You put down the supply crate. | Supply crate | Caches you know of | A cache is the cargo left behind when a crew member was brought back to the hub. Walk there to pick it up again. | ! Cache with 1 thing in Crew corridor, 15 m from you.
+PASS cargo: the answer is shown
+PASS cargo: empty hands say so
+PASS crew: four cards sorted by id  [&"crew_1", &"crew_2", &"crew_3", &"crew_4"]
+PASS crew: status words
+PASS crew: card shows specialty with symbol, health, suit tank and place  Medical and life support | ✚ Medical and life support specialist | Free — waiting at the hub | Health 100 % | Suit off · tank 100 % | Where: Med Bay
+PASS crew: own card is disabled with a reason
+PASS crew: rule line with crew_switching explanation
+PASS crew: far from the hub is disabled with the reason  Walk to the hub to change crew member. / host not_at_hub
+PASS crew: four players is disabled with the reason  With four players everyone keeps their own crew member. / host switch_disabled
+PASS crew: taken is disabled with the reason  Another player is already this crew member. / host character_taken
+PASS crew: allowed at the hub
+PASS layout: CrewSelectPanel at 1280x720 text x1.0
+PASS focus: CrewSelectPanel at 1280x720 text x1.0
+PASS layout: CrewSelectPanel at 1920x1080 text x1.0
+PASS focus: CrewSelectPanel at 1920x1080 text x1.0
+PASS layout: CrewSelectPanel at 1280x720 text x1.5
+PASS focus: CrewSelectPanel at 1280x720 text x1.5
+PASS crew: 'Play as' sends exactly one claim_character  [{ "action": &"claim_character", "target": &"crew_2", "params": {  } }]
+PASS crew: the answer is shown and the cards update
+PASS portrait: 3D portrait built (SubViewport 160x200, own world, update once, body, camera, light)
+PASS portrait: badge fallback draws without a viewport
+PASS portrait: specialist symbols
+RESULT 89/89

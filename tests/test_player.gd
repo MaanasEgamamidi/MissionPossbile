@@ -98,6 +98,8 @@ func _test_motion() -> void:
 	var base := _player.position.y
 	var apex := base
 	var air_frames := 0
+	var visual := _player.visual()
+	var fractions: Array[float] = []
 	_states.clear()
 	Input.action_press("jump")
 	await _frames(1)
@@ -108,21 +110,78 @@ func _test_motion() -> void:
 		await _frames(1)
 		air_frames += 1
 		apex = maxf(apex, _player.position.y)
+		if visual.get("_state") == &"jump":
+			fractions.append(visual.get("_jump_fraction"))
 		if _player.is_on_floor():
 			break
 	apex -= base
 	_check("jump apex %.4f m airtime %.4f s" % [apex, float(air_frames) / Engine.physics_ticks_per_second], absf(apex / _tuning.jump_height_m - 1.0) < 0.05 and air_frames < 90)
 	await _frames(45)   # let the landing hold finish
-	_check("jump plays jump_start, jump, land in order", _jump_phases() == [&"jump_start", &"jump", &"land"] and _states.back() == &"idle", str(_states))
-	# Walking off a 1 m ledge: no push-off, straight to the in-air pose, then the landing.
+	_check("standing jump plays jump_start, jump, land in order", _jump_phases() == [&"jump_start", &"jump", &"land"] and _states.back() == &"idle", str(_states))
+	var rising := not fractions.is_empty()
+	for i: int in range(1, fractions.size()):
+		rising = rising and fractions[i] >= fractions[i - 1] - 0.0001
+	_check("jump arc time follows vertical velocity: rise, apex, fall", rising and fractions[0] < 0.35 and fractions.back() > 0.85, str(fractions))
+	# Running jump: the push-off and the air arc, then no standing land and no loss of speed.
+	_player.teleport(Vector3(-20, 0.01, 30), 0)
+	_crew.suit_on = false
+	await _frames(5)
+	Input.action_press("move_forward")
+	Input.action_press("sprint")
+	await _frames(40)
+	var before_speed := Vector2(_player.velocity.x, _player.velocity.z).length()
+	_states.clear()
+	await _tap("jump")
+	while not _player.is_on_floor():
+		await _frames(1)
+	await _frames(3)
+	var after_speed := Vector2(_player.velocity.x, _player.velocity.z).length()
+	Input.action_release("move_forward")
+	Input.action_release("sprint")
+	_check("running jump skips land, keeps speed %.2f -> %.2f m/s" % [before_speed, after_speed], _jump_phases() == [&"jump_start", &"jump"] and _states.back() == &"sprint" and after_speed > before_speed * 0.97, str(_states))
+	await _frames(30)
+	# Walking off a 1 m ledge: no push-off, the arc entered at the apex, and (still moving) no standing land.
 	_player.teleport(Vector3(-40, 1.01, -20), 0)
 	await _frames(10)
 	_states.clear()
+	var entry := -1.0
 	Input.action_press("move_forward")
-	await _frames(100)
+	for i: int in 140:
+		await _frames(1)
+		if entry < 0.0 and visual.get("_state") == &"jump":
+			entry = visual.get("_jump_fraction")
+	var landed_in: StringName = visual.get("_state")
 	Input.action_release("move_forward")
 	await _frames(45)
-	_check("walking off a ledge goes straight to jump then land", _jump_phases() == [&"jump", &"land"] and _player.position.y < 0.05 and _player.is_on_floor(), str(_states) + " " + str(_player.position))
+	_check("walking off a ledge enters the arc at the apex (%.3f), no jump_start, no standing land" % entry, _jump_phases() == [&"jump"] and absf(entry - 0.5) < 0.05 and landed_in == &"walk" and _player.position.y < 0.05 and _player.is_on_floor(), str(_states) + " " + str(_player.position))
+	# Locomotion follows ground speed, not the sprint key: from standing, sprint shows only once fast enough,
+	# the clip scale stays within 0.75-1.5, and stopping settles into idle instead of slow-motion steps.
+	_player.teleport(Vector3(-20, 0.01, 30), 0)
+	await _frames(10)
+	_states.clear()
+	var scale_ok := true
+	Input.action_press("move_forward")
+	Input.action_press("sprint")
+	for i: int in 40:
+		await _frames(1)
+		if visual.get("_state") in [&"walk", &"sprint"]:
+			var s: float = visual.get("_speed")
+			scale_ok = scale_ok and s >= PlayerVisual.MIN_CLIP_SCALE - 0.001 and s <= PlayerVisual.MAX_CLIP_SCALE + 0.001
+	Input.action_release("move_forward")
+	Input.action_release("sprint")
+	var idle_frame := -1
+	for i: int in 30:
+		await _frames(1)
+		if idle_frame < 0 and visual.get("_state") == &"idle":
+			idle_frame = i
+		if visual.get("_state") in [&"walk", &"sprint"]:
+			var s: float = visual.get("_speed")
+			scale_ok = scale_ok and s >= PlayerVisual.MIN_CLIP_SCALE - 0.001
+	var walk_at := _states.find(&"walk")
+	var sprint_at := _states.find(&"sprint")
+	_check("sprint key from standing: walk first, sprint by speed", walk_at >= 0 and sprint_at > walk_at, str(_states))
+	_check("locomotion clip scale stays within 0.75-1.5", scale_ok)
+	_check("stopping settles into idle within 0.25 s (frame %d)" % idle_frame, idle_frame >= 0 and idle_frame <= 15, str(_states))
 	var walk := await _speed(false, false)
 	_check("walk speed %.4f m/s" % walk, absf(walk / _tuning.walk_speed - 1.0) < 0.03)
 	var suited := await _speed(true, false)
@@ -212,6 +271,16 @@ func _test_cameras() -> void:
 	await _frames(6)
 	var distance := rig.camera().global_position.z - _player.global_position.z
 	_check("third person FOV and distance %.3f m" % distance, is_equal_approx(rig.camera().fov, 72.0) and absf(distance - _config.third_person_distance_m) < 0.1 and (rig.camera().cull_mask & hidden) != 0)
+	var cam3 := rig.camera()
+	var feet_local := cam3.global_transform.affine_inverse() * _player.global_position
+	var feet_ndc_y := (feet_local.y / -feet_local.z) / tan(deg_to_rad(cam3.fov) * 0.5)
+	var feet_margin := (feet_ndc_y + 1.0) * 0.5
+	_check("third person level look: boots %.3f of screen height above the bottom edge" % feet_margin, absf(feet_margin - 0.08) < 0.015)
+	_check("third-person fill light only in third person", rig.fill_light().visible and not rig.fill_light().shadow_enabled and rig.fill_light().light_energy < 0.5)
+	_player.set_first_person(true)
+	var fill_hidden := not rig.fill_light().visible
+	_player.set_first_person(false)
+	_check("first person hides the fill light", fill_hidden)
 	_player.teleport(Vector3(0, 0.01, 7.3), 0)
 	await _frames(6)
 	_check("camera stays before wall", rig.camera().global_position.z < 7.9 and rig.camera().global_position.z > _player.global_position.z, str(rig.camera().global_position))
@@ -307,7 +376,8 @@ func _test_authority() -> void:
 	station.position = Vector3(0, _tuning.eye_height_m, -1.5)
 	await _frames(3)
 	await _tap("interact")
-	_check("suit station dispatch", _calls.back().action == &"begin_suit_check" and _calls.back().params == {"on": not _crew.suit_on})
+	# Prompt 07: the suit rack has a surface (suit check and tank refill), so E asks to open it like any station.
+	_check("suit station dispatch", _calls.back().action == &"use_station" and _calls.back().target == &"suits_test")
 	station.set_meta("kind", "computer")
 	await _tap("interact")
 	_check("other station returns host failure", _calls.back().action == &"use_station" and _answers.back().reason == &"unknown_action")
@@ -356,7 +426,7 @@ func _test_visual() -> void:
 		anchor.owner = model
 	var animation := AnimationPlayer.new()
 	var library := AnimationLibrary.new()
-	for clip: Array in [[&"idle", 1.0], [&"walk", 1.0], [&"land", 0.42]]:
+	for clip: Array in [[&"idle", 1.0], [&"walk", 1.0], [&"sprint", 0.5], [&"land", 0.42], [&"jump", 1.0]]:
 		var anim := Animation.new()
 		anim.length = clip[1]
 		library.add_animation(clip[0], anim)
@@ -377,6 +447,43 @@ func _test_visual() -> void:
 	visual.play(&"walk")
 	_check("a rig clip that exists is held", visual.get("_state") == &"land")
 	visual.clear_hold()
+	var player_anim := visual.get("_animation") as AnimationPlayer
+	_check("jump clip is non-looping, walk loops", player_anim.get_animation(&"jump").loop_mode == Animation.LOOP_NONE and player_anim.get_animation(&"walk").loop_mode == Animation.LOOP_LINEAR)
+	_check("per-transition blend times", is_equal_approx(PlayerVisual.blend_time(&"idle", &"walk"), 0.2) and is_equal_approx(PlayerVisual.blend_time(&"walk", &"sprint"), 0.25)
+		and is_equal_approx(PlayerVisual.blend_time(&"walk", &"jump_start"), 0.07) and is_equal_approx(PlayerVisual.blend_time(&"jump_start", &"jump"), 0.1)
+		and is_equal_approx(PlayerVisual.blend_time(&"jump", &"land"), 0.06) and is_equal_approx(PlayerVisual.blend_time(&"walk", &"idle"), 0.2)
+		and is_equal_approx(PlayerVisual.blend_time(&"land", &"idle"), 0.2) and is_equal_approx(PlayerVisual.blend_time(&"walk", &"jump"), 0.15))
+	visual.play(&"walk")
+	player_anim.seek(0.3, true)
+	visual.play(&"sprint")
+	_check("walk to sprint keeps the step phase (0.3 of 1.0 s -> 0.15 of 0.5 s)", absf(player_anim.current_animation_position - 0.15) < 0.01, str(player_anim.current_animation_position))
+	visual.play(&"jump")
+	visual.set_jump_phase(0.5)
+	var at_apex := player_anim.current_animation_position
+	visual.set_jump_phase(3.0)
+	_check("set_jump_phase seeks the arc and holds the fall pose", absf(at_apex - 0.5) < 0.01 and player_anim.current_animation_position <= 0.96 and player_anim.current_animation_position > 0.9, "%.3f %.3f" % [at_apex, player_anim.current_animation_position])
+	visual.play(&"land")
+	player_anim.seek(0.4, true)
+	player_anim.advance(0.1)
+	var finished := not player_anim.is_playing()
+	visual.play(&"land")
+	_check("a finished non-looping clip is not restarted by play()", finished and player_anim.assigned_animation == "land" and player_anim.current_animation_position > 0.3,"%s %.3f" % [player_anim.is_playing(), player_anim.current_animation_position])
+	visual.play(&"idle")
+	visual.play_once(&"land", 0.42, 0.2)
+	visual.play(&"walk")
+	var held_early: bool = visual.get("_state") == &"land"
+	visual._process(0.25)
+	visual.play(&"idle")
+	var idle_waits: bool = visual.get("_state") == &"land"
+	visual.play(&"walk")
+	_check("landing hold: walk may cut it after 0.2 s, idle waits (process-time hold)", held_early and idle_waits and visual.get("_state") == &"walk")
+	visual.play(&"idle")
+	visual.dip(0.05, 0.2)
+	visual._process(0.1)
+	var model_node := visual.get("_model") as Node3D
+	var dipped := model_node.position.y < -0.04
+	visual._process(0.15)
+	_check("running-landing hip dip goes 5 cm down and back", dipped and is_zero_approx(model_node.position.y))
 	_player.set_physics_process(true)
 	await _frames(2)
 

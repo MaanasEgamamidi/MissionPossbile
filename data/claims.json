@@ -1,0 +1,138 @@
+{
+ "schema": 1,
+ "note": "Every factual statement the game shows. category: archive (from a NASA or PDS page in the source register), game_time (time made shorter for play), fiction (made up for the game), balance (game tuning, no source). lead_ids are search leads that were not opened; they are never shown as citations.",
+ "claims": [
+  {
+   "id": "gravity",
+   "title": "Gravity on Mars",
+   "text": "Gravity on Mars is 3.73 m/s². Things fall more slowly than on Earth, so you can jump higher.",
+   "source_ids": ["S01"],
+   "category": "archive",
+   "note": "Mean surface gravity from the NASA Mars Fact Sheet. The game uses this value for walking and jumping."
+  },
+  {
+   "id": "sol_length",
+   "title": "How long a Mars day is",
+   "text": "A day on Mars is called a sol. One sol lasts 24 h 39 min 35 s, a little longer than a day on Earth.",
+   "source_ids": ["S02"],
+   "category": "archive",
+   "note": "Mean solar day 24 h 39 min 35.244 s (Mars24 technical notes). Rounded to whole seconds here."
+  },
+  {
+   "id": "sol_compression",
+   "title": "Sols go faster in the game",
+   "text": "In the game, one sol lasts 20 real minutes, so you can see day and night pass while you play.",
+   "source_ids": [],
+   "category": "game_time",
+   "note": "20 minutes is the default. The host can choose 5 to 120 minutes. It is a game-time control, not the length of a real Mars day."
+  },
+  {
+   "id": "oxygen_from_water",
+   "title": "Oxygen from water",
+   "text": "On the International Space Station, a machine splits water into oxygen and hydrogen. This is called electrolysis.",
+   "source_ids": ["S08"],
+   "category": "archive",
+   "note": "ISS evidence, not Mars evidence. The colony's life support copies this idea."
+  },
+  {
+   "id": "oxygen_from_co2",
+   "title": "Oxygen from Mars air",
+   "text": "A small test machine called MOXIE made oxygen from the carbon dioxide in Mars air. It made 122 g of oxygen in 16 runs.",
+   "source_ids": ["S09"],
+   "category": "archive",
+   "note": "Best rate 12 g per hour, purity 98% or better. A small technology test on Mars."
+  },
+  {
+   "id": "oxygen_scale_up",
+   "title": "The colony's big oxygen machines",
+   "text": "The colony's oxygen machines are much bigger than MOXIE. That bigger machine is made up for the game.",
+   "source_ids": [],
+   "category": "fiction",
+   "note": "Fictional 2080 scale-up of the MOXIE idea."
+  },
+  {
+   "id": "water_recycling",
+   "title": "Water is recycled",
+   "text": "The space station cleans and reuses about 90 percent of its water.",
+   "source_ids": ["S08"],
+   "category": "archive",
+   "note": "Water recovery about 90 percent on the ISS. The game's own recycling share is game balance."
+  },
+  {
+   "id": "plants_in_space",
+   "title": "Plants grown in space",
+   "text": "Astronauts have grown lettuce, Chinese cabbage, mizuna mustard, red Russian kale and zinnia flowers on the space station.",
+   "source_ids": ["S11"],
+   "category": "archive",
+   "note": "Crops grown in the Veggie chamber on the ISS. Growing plants on the ISS does not prove farming on Mars."
+  },
+  {
+   "id": "mars_air",
+   "title": "What Mars air is made of",
+   "text": "Mars air is mostly carbon dioxide: 95.1% by volume. It has only 0.16% oxygen, far too little to breathe.",
+   "source_ids": ["S01"],
+   "category": "archive",
+   "note": "Atmosphere by volume from the NASA Mars Fact Sheet: CO2 95.1%, N2 2.59%, Ar 1.94%, O2 0.16%, CO 0.06%."
+  },
+  {
+   "id": "mars_cold",
+   "title": "How cold Mars is",
+   "text": "The average temperature on Mars is about −59 °C.",
+   "source_ids": ["S01"],
+   "category": "archive",
+   "note": "About 214 K (−59 °C), a global average from the NASA Mars Fact Sheet. Not local weather."
+  },
+  {
+   "id": "mars_sunlight",
+   "title": "Sunlight at Mars",
+   "text": "At Mars, sunlight brings 586.2 W of power to each square metre facing the Sun.",
+   "source_ids": ["S01"],
+   "category": "archive",
+   "note": "Solar irradiance 586.2 W/m² from the NASA Mars Fact Sheet. This is sunlight, not what a solar panel makes."
+  },
+  {
+   "id": "solar_dust",
+   "title": "Dust and solar power",
+   "text": "Dust on solar panels and in the air lowers how much electricity the panels make.",
+   "source_ids": [],
+   "lead_ids": ["S18"],
+   "category": "archive",
+   "unsourced": true,
+   "note": "Source not yet checked. S18 (InSight dust news) is a search lead only; the page was not opened."
+  },
+  {
+   "id": "earth_radio_delay",
+   "title": "Radio messages to Earth take time",
+   "text": "Radio messages between Mars and Earth take several minutes to arrive.",
+   "source_ids": [],
+   "lead_ids": ["S15"],
+   "category": "archive",
+   "unsourced": true,
+   "note": "Source not yet checked. S15 pages give different ranges and were not opened, so the game shows no number."
+  },
+  {
+   "id": "crew_rates",
+   "title": "How fast the crew uses supplies",
+   "text": "How much oxygen, water and food each crew member uses in the game is game balance. These numbers were chosen for play, not measured.",
+   "source_ids": [],
+   "category": "balance",
+   "note": "GameBalance rates per active crew member. No source."
+  },
+  {
+   "id": "battery_numbers",
+   "title": "Battery, solar and room power numbers",
+   "text": "The battery size, the solar power and the power each room uses are game balance numbers, not real ones.",
+   "source_ids": [],
+   "category": "balance",
+   "note": "GameBalance values in kWh and kW. No source."
+  },
+  {
+   "id": "colony_premise",
+   "title": "The colony is made up",
+   "text": "The colony, its crew and its 2080 machines are made up for the game. No colony like it exists on Mars today.",
+   "source_ids": [],
+   "category": "fiction",
+   "note": "The fictional colony and its equipment. Real places such as Gale crater and Jezero crater are not the colony's site."
+  }
+ ]
+}

@@ -22,6 +22,8 @@ var actions: ActionService
 var rng: RandomNumberGenerator
 ## Connected peers, host first.
 var peers: Array[int] = []
+## Host test for "is this point outside the pressurised habitat?" The game sets it; by default nowhere is outside.
+var outside_test: Callable = func(_point: Vector3) -> bool: return false
 ## True when every connected peer votes to pause.
 var paused: bool = false
 var _votes: Dictionary = {}
@@ -34,9 +36,11 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	balance = p_balance
 	events = p_events
 	sim = ColonySim.new()
+	sim.set_events(events)
 	rng = RandomNumberGenerator.new()
 	actions = ActionService.new()
 	BuiltinActions.register(actions)
+	SystemActions.register(actions)
 
 ## Attaches a new or restored game and resets transient session state.
 func begin(p_state: ColonyState, p_clock: SolClock) -> void:
@@ -114,7 +118,15 @@ func report_position(peer: int, character_id: StringName, position: Vector3, yaw
 		return false
 	actor.position = position
 	actor.yaw = yaw
+	if outside_test.is_valid():
+		actor.outside = bool(outside_test.call(position))
 	return true
+
+## Queues one airlock cycle (host). The next tick takes its air loss from the cabin; the regulator then tops the
+## cabin up from the oxygen and nitrogen reserves.
+func note_airlock_cycle() -> void:
+	if state != null:
+		state.pending_airlock_cycles += 1
 
 ## Recovers a downed character and leaves carried items at the incident.
 func recover_character(id: StringName) -> Dictionary:

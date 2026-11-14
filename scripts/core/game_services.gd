@@ -46,6 +46,8 @@ func _init() -> void:
 	saves = SaveService.new(config.save_dir, config.save_name, config.backup_count)
 	if FileAccess.file_exists(MANIFEST_PATH):
 		zones = ColonyZones.from_manifest(MANIFEST_PATH)
+		# Outside = the Exterior zone. The dome plaza and the garden dome are inside pressurised glass.
+		session.outside_test = func(p: Vector3) -> bool: return zones.zone_at_world(p) == ColonyZones.EXTERIOR
 	events.state_changed.connect(_on_state_changed)
 	events.character_recovered.connect(func(_id: StringName, _info: Dictionary) -> void: _pending_save = &"recovery")
 

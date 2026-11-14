@@ -38,7 +38,7 @@ func _initialize() -> void:
 	g.start_new_game(777)
 	var st := g.state()
 	_check("new game: four crew, host controls crew_1", st.characters.size() == 4 and st.character(&"crew_1").owner_peer == 1)
-	_check("new game: 9 stations from the map", st.stations.size() == 9, str(st.stations.size()))
+	_check("new game: 21 stations from the map (9 tagged + 12 sun trackers)", st.stations.size() == 21, str(st.stations.size()))
 	_check("new game: 18 zones, all powered", st.zones.size() == 18 and st.is_zone_powered("Power Room"), str(st.zones.size()))
 	_check("new game: saved at once", g.saves.has_save())
 	_check("new game: starts at the configured time of day", is_equal_approx(g.clock().phase, g.config.start_phase))

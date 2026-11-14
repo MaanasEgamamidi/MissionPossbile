@@ -1,0 +1,125 @@
+class_name GameSettings
+extends Resource
+## The player's own settings (not part of the colony save): screen, text, camera and controls.
+## Every value is clamped when set, and a new value emits Resource's own `changed` signal (emit_changed()).
+## Gameplay code reads fov_degrees, mouse_sensitivity, invert_y and toggle_sprint from here.
+
+const DEFAULT_PATH := "user://settings.json"
+## The text sizes offered: normal, large, extra large.
+const TEXT_SCALES: Array[float] = [1.0, 1.25, 1.5]
+## Names of the stored values, in file order.
+const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov_degrees", &"mouse_sensitivity",
+	&"invert_y", &"toggle_sprint", &"reduce_motion", &"high_contrast"]
+
+## Size of all menus and the HUD (0.75 to 2.0).
+@export var ui_scale := 1.0:
+	set(v):
+		v = clampf(v, 0.75, 2.0)
+		if v != ui_scale:
+			ui_scale = v
+			emit_changed()
+## Text size: 1.0, 1.25 or 1.5 (other values snap to the nearest).
+@export var text_scale := 1.0:
+	set(v):
+		v = nearest_text_scale(v)
+		if v != text_scale:
+			text_scale = v
+			emit_changed()
+## Show subtitles for spoken and authored messages (essential messages always show).
+@export var subtitles := true:
+	set(v):
+		if v != subtitles:
+			subtitles = v
+			emit_changed()
+## Camera field of view in degrees (60 to 100).
+@export var fov_degrees := 72.0:
+	set(v):
+		v = clampf(v, 60.0, 100.0)
+		if v != fov_degrees:
+			fov_degrees = v
+			emit_changed()
+## Radians of turn per pixel of mouse movement (0.0005 to 0.006).
+@export var mouse_sensitivity := 0.002:
+	set(v):
+		v = clampf(v, 0.0005, 0.006)
+		if v != mouse_sensitivity:
+			mouse_sensitivity = v
+			emit_changed()
+## Mouse up looks down.
+@export var invert_y := false:
+	set(v):
+		if v != invert_y:
+			invert_y = v
+			emit_changed()
+## True: tap Shift to switch sprint on and off. False: hold Shift.
+@export var toggle_sprint := false:
+	set(v):
+		if v != toggle_sprint:
+			toggle_sprint = v
+			emit_changed()
+## Fewer moving effects (no camera bob, no fades).
+@export var reduce_motion := false:
+	set(v):
+		if v != reduce_motion:
+			reduce_motion = v
+			emit_changed()
+## Stronger colours and borders.
+@export var high_contrast := false:
+	set(v):
+		if v != high_contrast:
+			high_contrast = v
+			emit_changed()
+
+
+## Reads the settings file; anything missing or broken keeps its default.
+static func load_or_default(path := DEFAULT_PATH) -> GameSettings:
+	var s := GameSettings.new()
+	if not FileAccess.file_exists(path):
+		return s
+	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not data is Dictionary:
+		return s
+	var d: Dictionary = data
+	for key: StringName in KEYS:
+		var v: Variant = d.get(String(key))
+		var current: Variant = s.get(key)
+		if current is bool and v is bool:
+			s.set(key, v)
+		elif current is float and (v is float or v is int):
+			s.set(key, float(v))
+	return s
+
+
+## Writes the settings as JSON.
+func save(path := DEFAULT_PATH) -> Error:
+	DirAccess.make_dir_recursive_absolute(path.get_base_dir())
+	var file := FileAccess.open(path, FileAccess.WRITE)
+	if file == null:
+		return FileAccess.get_open_error()
+	file.store_string(JSON.stringify(to_dict(), "\t"))
+	return file.get_error()
+
+
+## Puts the screen settings into effect: UI scale, text size and high contrast colours.
+func apply(tree: SceneTree) -> void:
+	if tree != null and tree.root != null:
+		tree.root.content_scale_factor = ui_scale
+	UiTheme.set_high_contrast(high_contrast)
+	UiTheme.apply_text_scale(text_scale)
+
+
+## All values by name.
+func to_dict() -> Dictionary:
+	var d := {}
+	for key: StringName in KEYS:
+		d[String(key)] = get(key)
+	return d
+
+
+## The offered text scale closest to `v`.
+static func nearest_text_scale(v: float) -> float:
+	var best := TEXT_SCALES[0]
+	for s: float in TEXT_SCALES:
+		if absf(s - v) < absf(best - v):
+			best = s
+	return best

@@ -44,6 +44,7 @@ func _initialize() -> void:
 
 	main = (load("res://scenes/game.tscn") as PackedScene).instantiate() as GameMain
 	main.load_world = false
+	main.show_menu = false
 	main.save_directory = dir
 	root.add_child(main)
 	await _frames(30)
@@ -175,14 +176,14 @@ func _initialize() -> void:
 	var panel_pos := Vector3(float(panel.position[0]), 0.0, float(panel.position[2]))
 	await _place(_free_spot_near(panel_pos, 1.5), 0.0)
 	main._submit(&"use_station", &"pw_panel", {})
-	_check("power panel opens and steering stops", main.hud.is_menu_open() and not player.input_enabled)
+	await _frames(2)
+	_check("power panel opens as a station surface and steering stops", main.ui.top() is PowerStationPanel and not player.input_enabled)
 	await _frames(15)
 	var load_before := st.load_kw
 	r = services.session.request(&"set_zone_power", &"pw_panel", {"zone": "Greenhouse", "on": false})
 	await _frames(15)
 	_check("switching the Greenhouse off lowers the load by its 9 kW", r.ok and absf((load_before - st.load_kw) - 9.0) < 0.01, "%.1f -> %.1f kW" % [load_before, st.load_kw])
-	main.hud.close_menu()
-	main._set_menu_mode(false)
+	main.ui.close_all()
 	await _place(services.config.hub_position, 0.0)
 	r = services.session.request(&"set_zone_power", &"pw_panel", {"zone": "Greenhouse", "on": true})
 	_check("the same switch from across the base is refused", not r.ok and r.reason == &"too_far", String(r.reason))
@@ -205,11 +206,11 @@ func _initialize() -> void:
 	var incident := me.position
 	var food := st.store(&"food_meals")
 	var seen := {"health": -1.0}
+	var tank_before_recovery := me.suit_charge
 	services.events.character_recovered.connect(func(_id: StringName, _info: Dictionary) -> void:
-		seen["health"] = me.health
-		st.stores[&"oxygen_kg"] = 60.0)                       # air is back, so health stops falling
-	st.stores[&"oxygen_kg"] = 0.0
-	st.zones["Life Support"]["powered"] = false
+		seen["health"] = me.health)
+	# Outside with an empty suit tank: no air, so health falls until the hub recovery (Prompt 07 rules).
+	me.suit_charge = 0.0
 	me.health = 0.01
 	await _frames(60)
 	_check("recovered to the hub with health 50, suit kept", me.position.distance_to(me.hub_spot) < 0.6 and float(seen["health"]) == services.balance.recovery_health and me.suit_on,
@@ -218,9 +219,10 @@ func _initialize() -> void:
 	_check("cargo left in one cache where it happened", st.caches.size() == 1 and Vector3(float(st.caches[0].position[0]), float(st.caches[0].position[1]),
 		float(st.caches[0].position[2])).distance_to(incident) < 0.5 and st.caches[0].items == ["probe_item"])
 	_check("cost charged once: 0.3 meals", absf((food - st.store(&"food_meals")) - 0.3) < 0.02, "%.3f meals" % (food - st.store(&"food_meals")))
-	_check("the player is told the cost and where the cache is", main.hud._message.text.contains("meals") and main.hud._message.text.contains("cache"), main.hud._message.text)
-	st.stores[&"oxygen_kg"] = 60.0
-	st.zones["Life Support"]["powered"] = true
+	var told := main.ui.subtitle_line().current_text()
+	_check("the player is told the cost and where the cache is", told.contains("meals") and told.contains("cache"), told)
+	_check("recovery does not refill the suit tank", me.suit_charge == 0.0)
+	me.suit_charge = tank_before_recovery
 	me.suit_on = false
 
 	# ---- every door: walk through from both sides (engine sped up; the checks are positions, not timings)

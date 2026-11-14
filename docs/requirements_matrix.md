@@ -1,6 +1,6 @@
 # Requirements matrix (cumulative)
 
-Started in Prompt 01 on 2026-11-11; states updated in Prompt 02, Prompt 03 and Prompt 04 the same day. One row per confirmed requirement. Each row names the input it depends on and the milestone that implements it.
+Started in Prompt 01 on 2026-11-11; states updated in Prompts 02 to 04 the same day and in Prompts 05 and 07 on 2026-11-12 (Prompt 06 skipped). One row per confirmed requirement. Each row names the input it depends on and the milestone that implements it.
 
 **Basis.** The three governing documents are missing (issue I-01), so every row comes from the Execution Prompt Pack, pages 1 to 12: the shared brief, the engineering contract and the common execution instruction. The pack says those sections record the owner's decisions. When the governing documents arrive, each row must be checked against them and the "Doc check" column filled.
 
@@ -14,7 +14,7 @@ Inputs: A1–A3 governing documents; A6 improved map; A7 browser game; A8 Godot 
 
 | ID | Requirement | Depends on | Milestone | State 2026-11-11 | Doc check |
 | --- | --- | --- | --- | --- | --- |
-| PW-01 | Five sectors: health and life support; food production; resources and manufacturing; energy; science and research. Communications supports them. | A1–A3 | P07, P08, P09–P12 | Browser demo has power, life support, food, comms, medical. No manufacturing or research loop. | Pending |
+| PW-01 | Five sectors: health and life support; food production; resources and manufacturing; energy; science and research. Communications supports them. | A1–A3 | P07, P08, P09–P12 | Energy and health/life-support sectors have a working model (P07). Food, manufacturing and research wait for P08. | Pending |
 | PW-02 | One continuous colony world with a small main hub; detailed work at specialist facilities. The owner supplies the improved map. No replacement map, no procedural terrain. | A6 | P01 (request), P02 (import) | Current map imported into Godot as a rehearsal (P02). Improved map not supplied. No hub designated. | Pending |
 | PW-03 | Reuse existing spaceship, rover, human, suit, equipment and environment assets. Preserve original Blender files. Derivative rigs, exports, bakes and functional adaptations only. | A9, A12 | P01, P02, P04, P10 | Originals hashed and unchanged after P02. A derivative GLB export of the map exists (P02). A derivative rigged crew member and suit exist (P04); source hashes unchanged after building them. | Pending |
 | PW-04 | Construction means upgrading equipment in existing facilities. No new buildings, free placement, terrain editing, extra sectors, autonomous inhabitants, or tasks needing simultaneous players. | — | P08 and all | None. | Pending |
@@ -52,7 +52,7 @@ Inputs: A1–A3 governing documents; A6 improved map; A7 browser game; A8 Godot 
 | ID | Requirement | Depends on | Milestone | State 2026-11-11 | Doc check |
 | --- | --- | --- | --- | --- | --- |
 | LP-01 | One progression framework. An upgrade needs the knowledge answers, practical tasks, demonstrated competence and current tier. Paying parts is necessary where parts are consumed but is not enough. Repeating an answer cannot farm progress. | — | P08 | None. | Pending |
-| LP-02 | Upgrades are branching cards naming function, tier, knowledge checks, practical evidence, materials, specialist, location and resulting change. The player sees why a card is locked. | — | P05, P08 | None. | Pending |
+| LP-02 | Upgrades are branching cards naming function, tier, knowledge checks, practical evidence, materials, specialist, location and resulting change. The player sees why a card is locked. | — | P05, P08 | Display only (P05): 8 placeholder cards with function, tier, cost, installer, location, effect and locked reason; install disabled until P08. | Pending |
 | LP-03 | Tiers 0 to 3 as implementation defaults (unfamiliar; guided task and check; independent diagnosis; controlled comparison or transfer). Knowledge and competence are shared colony progress. | — | P08 | None. | Pending |
 | LP-04 | Short contextual questions with explanations and retry variants. No health loss for a wrong answer; no mastery for answer count. Terminals show locked requirements, eligible choices, expected effects and the install action separately. | — | P05, P08 | None. | Pending |
 | LP-05 | Initial upgrade choices and practical evidence per sector as tabled in the brief (energy; health and life support; food; resources and manufacturing; science and research). Costs and tests are defined in the progression milestone. | — | P08 | None. | Pending |
@@ -62,8 +62,8 @@ Inputs: A1–A3 governing documents; A6 improved map; A7 browser game; A8 Godot 
 
 | ID | Requirement | Depends on | Milestone | State 2026-11-11 | Doc check |
 | --- | --- | --- | --- | --- | --- |
-| OX-01 | Water electrolysis and atmospheric CO2-to-oxygen processing are distinct equipment paths with their own inputs. CO2 removal from cabin air is separate. Oxygen production does not prove habitat pressure. | S08, S09 | P07 | Both equipment types are modelled in the map. Browser demo has one "MOXIE maintenance" action. | Pending |
-| OX-02 | Separate source labels for ISS life support, the Mars MOXIE experiment and the fictional 2080 installations. Simplifications are labelled; balance numbers are not attributed to NASA. | S08, S09 | P05, P07 | None. | Pending |
+| OX-01 | Water electrolysis and atmospheric CO2-to-oxygen processing are distinct equipment paths with their own inputs. CO2 removal from cabin air is separate. Oxygen production does not prove habitat pressure. | S08, S09 | P07 | Implemented (P07): electrolyser (water + power) and CO2-oxygen unit (Mars air + power, never water) as separate equipment; CO2 scrubber separate; cabin pressure and safe air tracked apart from the oxygen reserve. 88 model checks. | Pending |
+| OX-02 | Separate source labels for ISS life support, the Mars MOXIE experiment and the fictional 2080 installations. Simplifications are labelled; balance numbers are not attributed to NASA. | S08, S09 | P05, P07 | Implemented (P05/P07): ISS (S08), MOXIE (S09) and the fictional colony-scale unit are labelled separately in `model_sources.json`, claims and panels; balance numbers are never attributed to NASA. | Pending |
 
 ## Rover
 
@@ -106,7 +106,7 @@ Inputs: A1–A3 governing documents; A6 improved map; A7 browser game; A8 Godot 
 | EN-05 | Typed state and resources, signals, fixed simulation tick, versioned JSON snapshots under `user://`, atomic replacement, rolling backups. No database or server framework. | — | P03 | None. | n/a |
 | EN-06 | Godot high-level multiplayer with ENet. The host validates ownership, position, prerequisites, costs and transactions. Separate channels for reliable actions, motion and voice. | T08 | P03, P06 | LAN Walk shows ENet and a spawner working under 4.7.2. | n/a |
 | EN-07 | TwoVoip 6.1 adapter over the ENet session with a pinned, tested build verified on 4.7.2 Windows editor and release. No MQTT. | T09 | P11 | Unconfirmed (C-17). | n/a |
-| EN-08 | Native Control and CanvasLayer UI with one shared Theme, containers, focus navigation, icons with text. Reference UI is for study only. | — | P05 | None. | n/a |
+| EN-08 | Native Control and CanvasLayer UI with one shared Theme, containers, focus navigation, icons with text. Reference UI is for study only. | — | P05 | Implemented (P05): native Control/CanvasLayer UI built in code, one shared Theme (`UiTheme`), containers, keyboard focus everywhere, symbols with words. Checked by `UiLayoutCheck` at three sizes; 118 framework checks. | n/a |
 | EN-09 | Small NASA/PDS CSV or XML subsets, a validated runtime cache, HTTPRequest background checks and a local provenance register. Play must start without a cloud feed. | S03–S07 | P05, P09 | Register started. | n/a |
 | EN-10 | No web frameworks, cloud databases, analytics, AI runtime services or image generation in ordinary gameplay. Licence notices kept for every adopted dependency and asset. | L01–L04 | all, P17 | One licence ambiguity (C-19). | n/a |
 | EN-11 | Node responsibilities as listed in the contract; consult the pinned class reference before using a node or property. | T03–T10 | all | — | n/a |
@@ -124,9 +124,9 @@ Inputs: A1–A3 governing documents; A6 improved map; A7 browser game; A8 Godot 
 | ID | Requirement | Depends on | Milestone | State 2026-11-11 | Doc check |
 | --- | --- | --- | --- | --- | --- |
 | SD-01 | NASA/PDS first. Match target, site, season, instrument, units and processing level. Never use Earth land-surface temperature for Mars, Reddit for science, or DONKI events as a measured Mars surface dose. | S01–S07 | P01, P09 | Register started; several entries partial. | n/a |
-| SD-02 | Source-specific quality rules. Keep measured, modelled, ISS or Earth analog, technology study, fictional equipment and game tuning distinct. | — | P05, P09 | Evidence category recorded per register entry. | n/a |
+| SD-02 | Source-specific quality rules. Keep measured, modelled, ISS or Earth analog, technology study, fictional equipment and game tuning distinct. | — | P05, P09 | Evidence category per source and per claim, shown in words in the game (P05). | n/a |
 | SD-03 | Fetch without blocking play: conditional requests, timeouts, bounded products, backoff. Pin a data snapshot per run; adopt new data at the next session. The host distributes the snapshot id and weather events. | — | P09 | None. | n/a |
-| SD-04 | Shift + Backspace opens a searchable source screen: claim, child-readable explanation, institution or mission, data dates, evidence category, clickable primary source, plus a separate note on game-time conversion or fictional scaling. Credits and licences included. | `source_register.md` | P05 | None. | n/a |
+| SD-04 | Shift + Backspace opens a searchable source screen: claim, child-readable explanation, institution or mission, data dates, evidence category, clickable primary source, plus a separate note on game-time conversion or fictional scaling. Credits and licences included. | `source_register.md` | P05 | Implemented (P05): Shift + Backspace opens the searchable register from anywhere; claims with plain explanation, institution, dates, units, evidence category in words, status ("not yet checked" for leads), a link opened only on request; game-time and fiction marked; credits screen. Works offline (76 checks). | n/a |
 
 ## Lighting and performance
 

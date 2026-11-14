@@ -1,0 +1,261 @@
+{
+ "battery": {
+  "title": "Battery (colony electricity)",
+  "short": "The battery stores the colony's electricity, counted in kWh.",
+  "long": "The battery is like a big tank for electricity. Solar panels fill it during the day. The rooms use it all the time, and at night it is the only power. If it runs empty, rooms lose power. Its size in the game is game balance.",
+  "source_ids": [],
+  "claim_ids": ["battery_numbers"]
+ },
+ "solar_power": {
+  "title": "Solar power",
+  "short": "Solar panels turn sunlight into electricity, counted in kW.",
+  "long": "Solar panels make electricity only while the Sun is up. They make the most at midday and nothing at night. At Mars, sunlight brings 586.2 W to each square metre. Dust may lower what panels make, but that source is not yet checked. The colony's panel numbers are game balance.",
+  "source_ids": ["S01"],
+  "claim_ids": ["mars_sunlight", "solar_dust", "battery_numbers"]
+ },
+ "load": {
+  "title": "Load",
+  "short": "The load is how much electricity the colony uses right now, counted in kW.",
+  "long": "Every room with its power on adds to the load. Life support and pumps always use some. Switching a room off at the power panel lowers the load. The numbers for each room are game balance.",
+  "source_ids": [],
+  "claim_ids": ["battery_numbers"]
+ },
+ "power_deficit": {
+  "title": "Power deficit",
+  "short": "A power deficit means the colony uses more electricity than the solar panels make.",
+  "long": "When the load is bigger than the solar power, the battery makes up the difference. Then the battery goes down. If it runs empty, rooms lose power. Turn off rooms you do not need, or wait for the Sun.",
+  "source_ids": [],
+  "claim_ids": ["battery_numbers"]
+ },
+ "stamina_vs_electricity": {
+  "title": "Body energy and colony electricity",
+  "short": "Body energy is how fresh your crew member feels; colony electricity is the power in the battery.",
+  "long": "Body energy (stamina) goes down when you sprint and comes back when you rest. It belongs to one person. Colony electricity is stored in the battery and shared by every room. They are different things: resting does not charge the battery.",
+  "source_ids": [],
+  "claim_ids": ["battery_numbers"]
+ },
+ "stock_vs_flow": {
+  "title": "Amounts and rates",
+  "short": "An amount is how much is in store; a rate is how fast it changes.",
+  "long": "An amount is counted in kWh, litres (L), kilograms (kg) or meals. A rate is counted in kW, or per hour, or per sol. The battery holds an amount of electricity in kWh. The solar panels give a rate in kW. A rate that lasts 2 hours changes the amount twice as much as one that lasts 1 hour.",
+  "source_ids": [],
+  "claim_ids": []
+ },
+ "oxygen": {
+  "title": "Oxygen",
+  "short": "Oxygen is the gas the crew breathes, counted in kg.",
+  "long": "Mars air is mostly carbon dioxide and has far too little oxygen to breathe. The colony makes oxygen in life support, which needs power. On the space station, water is split to make oxygen. A small test machine called MOXIE made oxygen from Mars air. How much the crew uses is game balance.",
+  "source_ids": ["S01", "S08", "S09"],
+  "claim_ids": ["mars_air", "oxygen_from_water", "oxygen_from_co2", "oxygen_scale_up", "crew_rates"]
+ },
+ "water": {
+  "title": "Water",
+  "short": "Water for the crew is stored in litres (L).",
+  "long": "The crew drinks water every day. Life support cleans used water so it can be used again, but only while it has power. The space station reuses about 90 percent of its water. The game's own numbers are game balance.",
+  "source_ids": ["S08"],
+  "claim_ids": ["water_recycling", "crew_rates"]
+ },
+ "food": {
+  "title": "Food",
+  "short": "Food is counted in meals.",
+  "long": "Each crew member who is being played eats meals every sol. The greenhouse is where the colony grows food. Astronauts have grown lettuce and other plants on the space station. How many meals the crew eats is game balance.",
+  "source_ids": ["S11"],
+  "claim_ids": ["plants_in_space", "crew_rates"]
+ },
+ "parts": {
+  "title": "Parts",
+  "short": "Parts are spare pieces the colony uses to build upgrades.",
+  "long": "Upgrades cost parts. The colony starts with only a few parts. Parts are counted one by one, with no unit. How many parts things cost is game balance.",
+  "source_ids": [],
+  "claim_ids": []
+ },
+ "suit_tank": {
+  "title": "Suit tank",
+  "short": "Your spacesuit's tank keeps you going outside; it is shown in % (100% is full).",
+  "long": "Put on your suit at the suit rack before you go outside. The tank is not refilled just by putting the suit on again. When the tank gets low, go back inside.",
+  "source_ids": [],
+  "claim_ids": []
+ },
+ "health": {
+  "title": "Health",
+  "short": "Health shows how well your crew member is, from 0 to 100.",
+  "long": "Health goes down if the colony runs out of oxygen, water or food. If health reaches zero, your crew member is brought back to the hub. The med station is where the crew is looked after.",
+  "source_ids": [],
+  "claim_ids": ["crew_rates"]
+ },
+ "stamina": {
+  "title": "Body energy (stamina)",
+  "short": "Body energy is how much running your crew member has left.",
+  "long": "Sprinting uses body energy. Resting brings it back. It is your own energy, not the colony's electricity.",
+  "source_ids": [],
+  "claim_ids": []
+ },
+ "sol_clock": {
+  "title": "Sol clock",
+  "short": "The clock shows which sol it is and the time of day.",
+  "long": "A sol is a day on Mars. The clock counts sols from the start of the colony. In the game a sol passes in 20 real minutes, so day and night come quickly. The time of day decides when the solar panels work.",
+  "source_ids": ["S02"],
+  "claim_ids": ["sol_compression", "sol_length"]
+ },
+ "sol_length": {
+  "title": "How long a sol is",
+  "short": "A real day on Mars, called a sol, lasts 24 h 39 min 35 s.",
+  "long": "A sol is a little longer than a day on Earth. In the game a sol is much shorter, so you can play through many days. The host can change how many real minutes a sol lasts.",
+  "source_ids": ["S02"],
+  "claim_ids": ["sol_length", "sol_compression"]
+ },
+ "cargo": {
+  "title": "Cargo",
+  "short": "Cargo is what your crew member is carrying.",
+  "long": "Press E to pick something up or put it down. Your hands and pack have only a few slots. When they are full, put something down first. The number of slots is game balance.",
+  "source_ids": [],
+  "claim_ids": []
+ },
+ "pause_vote": {
+  "title": "Pausing together",
+  "short": "With friends, the game pauses only when every player agrees.",
+  "long": "Opening the pause menu is a vote to pause. When every player has voted, the colony stops. Closing the menu takes your vote back. When you play alone, the game pauses at once.",
+  "source_ids": [],
+  "claim_ids": []
+ },
+ "specialists": {
+  "title": "Specialists",
+  "short": "Each crew member is an expert in one kind of job.",
+  "long": "There are four specialists: electrical and comms, medical and life support, biology and food, and field engineering and geology. Some jobs need a certain specialist. Working together gets more done.",
+  "source_ids": [],
+  "claim_ids": ["colony_premise"]
+ },
+ "crew_switching": {
+  "title": "Changing crew member",
+  "short": "You can change which crew member you play when you are at the hub.",
+  "long": "Walk to the hub to change crew member. You cannot take a crew member another player is using. With four players, everyone keeps their own crew member. A crew member keeps their cargo, health and suit when someone else takes over.",
+  "source_ids": [],
+  "claim_ids": []
+ },
+ "upgrades": {
+  "title": "Upgrades",
+  "short": "Upgrades make the colony's rooms and machines better.",
+  "long": "Each upgrade costs parts and may need a certain specialist. Some upgrades need another one first. In this game, building means upgrading what is already there, not adding new buildings. Upgrades are installed in a later update.",
+  "source_ids": [],
+  "claim_ids": ["colony_premise"]
+ },
+ "recovery": {
+  "title": "Being brought back",
+  "short": "If a crew member's health reaches zero, they are brought back to the hub.",
+  "long": "Being brought back costs the colony some food and water. Anything you were carrying is left where it happened, as a cache. A cache is a pile of dropped things you can go back and collect. Your crew member starts again with some health.",
+  "source_ids": [],
+  "claim_ids": ["crew_rates"]
+ },
+ "zones_power": {
+  "title": "Room power",
+  "short": "Each room (zone) can have its power switched on or off.",
+  "long": "Rooms are switched on and off at the power panel. A room without power goes dark and its machines stop. Turning off rooms you do not need saves electricity. Life support needs power to make oxygen and clean water.",
+  "source_ids": [],
+  "claim_ids": ["battery_numbers"]
+ },
+ "blueprint": {
+  "title": "Blueprint map",
+  "short": "The blueprint is a map of the colony seen from above.",
+  "long": "Press M to open it. It shows the rooms, the stations, the crew and things lying on the ground. Rooms without power are drawn dim with a ✖.",
+  "source_ids": [],
+  "claim_ids": ["colony_premise"]
+ },
+ "sources": {
+  "title": "Where the facts come from",
+  "short": "The source register shows where the game's facts come from.",
+  "long": "Some facts come from NASA pages, and the register says how well each page was checked. Some facts are still waiting to be checked, and the register says so. Some numbers are game balance or made up for the game. Press Shift+Backspace to open the register.",
+  "source_ids": [],
+  "claim_ids": ["colony_premise", "earth_radio_delay"]
+ },
+ "wastewater": {
+  "title": "Wastewater",
+  "short": "Wastewater is used water that waits to be cleaned, counted in litres (L).",
+  "long": "When the crew drinks and washes, most of the water comes back as wastewater. The water recycler cleans it so it can be used again. The space station reuses about 90 percent of its water in the same way. If the recycler stops, the wastewater tank fills up.",
+  "source_ids": ["S08"],
+  "claim_ids": ["water_recycling", "crew_rates"]
+ },
+ "water_quality": {
+  "title": "Water quality",
+  "short": "Water quality says how clean the clean water is, in % (100 % is perfectly clean).",
+  "long": "A recycler in good condition makes very clean water. A worn recycler makes water that is less clean, and it mixes with the water in the tank. The electrolyser needs very clean water, so it stops when the quality is too low. In the game the crew can always drink the water. These numbers are game balance.",
+  "source_ids": ["S08"],
+  "claim_ids": ["water_recycling", "crew_rates"]
+ },
+ "water_allocation": {
+  "title": "Where spare water goes",
+  "short": "The water allocation says how many litres per hour go to the greenhouse and to the electrolyser.",
+  "long": "Drinking water always comes first. A drinking reserve always stays in the tank, and only water above it can be sent. If there is not enough for both, the greenhouse and the electrolyser get the same share. The amounts are game balance.",
+  "source_ids": [],
+  "claim_ids": ["crew_rates"]
+ },
+ "electrolysis": {
+  "title": "Electrolyser",
+  "short": "The electrolyser uses electricity to split water into oxygen and hydrogen.",
+  "long": "This is how the space station makes oxygen from water. Each kilogram of oxygen uses a little more than one litre of water. The hydrogen is let out of the colony. The machine needs power and very clean water. The colony's big machine is made up for the game.",
+  "source_ids": ["S08"],
+  "claim_ids": ["oxygen_from_water", "oxygen_scale_up"]
+ },
+ "co2_oxygen_unit": {
+  "title": "CO₂-oxygen unit",
+  "short": "The CO₂-oxygen unit makes oxygen from the carbon dioxide in Mars air, using electricity but no water.",
+  "long": "Mars air is mostly carbon dioxide. A small test machine called MOXIE made oxygen from it on Mars. The colony's unit works the same way but is much bigger, and that size is made up for the game. It needs more electricity than the electrolyser for each kilogram of oxygen, but it uses no water at all.",
+  "source_ids": ["S01", "S09"],
+  "claim_ids": ["mars_air", "oxygen_from_co2", "oxygen_scale_up"]
+ },
+ "cabin_air": {
+  "title": "Cabin air",
+  "short": "Cabin air is the air the crew breathes inside the rooms, measured in kPa.",
+  "long": "Each gas in the air has its own share of the air pressure, counted in kilopascals (kPa). The crew needs enough oxygen in the cabin air and not too much carbon dioxide. The oxygen tanks are a reserve, and a regulator lets oxygen from them into the rooms when needed. So the air in the rooms and the oxygen in the tanks are not the same thing. The game's air numbers are game balance.",
+  "source_ids": [],
+  "claim_ids": ["crew_rates"]
+ },
+ "co2_scrubber": {
+  "title": "CO₂ scrubber",
+  "short": "The CO₂ scrubber removes the carbon dioxide that the crew breathes out from the cabin air.",
+  "long": "Every breath out adds carbon dioxide to the air, and too much of it makes people ill. The space station removes it with special filters called molecular sieves, and the colony's scrubber copies that idea. The cabin fans push air through the scrubber. Without the fans it works much more slowly.",
+  "source_ids": ["S08"],
+  "claim_ids": ["crew_rates"]
+ },
+ "pressure": {
+  "title": "Air pressure",
+  "short": "Air pressure is how hard the air pushes, counted in kilopascals (kPa).",
+  "long": "The cabin is kept at about the same air pressure as on Earth. Each time the airlock opens, a little air is lost. The regulator tops it up from the oxygen and nitrogen tanks. If the tanks run out, the pressure falls. These numbers are game balance.",
+  "source_ids": [],
+  "claim_ids": ["crew_rates"]
+ },
+ "panel_dust": {
+  "title": "Dust on the panels",
+  "short": "Dust settles on the solar panels and makes them give less power.",
+  "long": "Each sol a little more dust lands on every panel. A dusty panel lets less sunlight through, so it makes less electricity. The automatic cleaner wipes all panels at sunrise when it works, and you can clean one panel by hand at its tracker. The real effect of dust has not been checked against a source yet, and the amounts are game balance.",
+  "source_ids": [],
+  "claim_ids": ["solar_dust", "battery_numbers"]
+ },
+ "sun_trackers": {
+  "title": "Sun trackers",
+  "short": "Sun trackers turn the solar panels so that they face the sun.",
+  "long": "A panel that faces the sun all day collects more light than a fixed one, most of all in the morning and evening. The trackers need a little power to turn. If they have no power, the panels stay still and make less. The colony's trackers and their numbers are made up for the game.",
+  "source_ids": [],
+  "claim_ids": ["colony_premise", "battery_numbers"]
+ },
+ "load_shedding": {
+  "title": "Load shedding",
+  "short": "Load shedding means the colony switches some loads off by itself when there is not enough power.",
+  "long": "When the loads want more than the sun and the battery can give, the least important loads lose power first. Room lights go first, and control and heating go last. A shed load stays switched on but has no power. It gets power again by itself when there is enough.",
+  "source_ids": [],
+  "claim_ids": ["battery_numbers"]
+ },
+ "battery_forecast": {
+  "title": "Battery forecast",
+  "short": "The battery forecast says how long the battery lasts if nothing is switched.",
+  "long": "The forecast keeps the switches as they are now and follows the sun through the day and the night. It says when the battery would run empty and how much will be left at the next sunrise. If you switch things on or off, the forecast changes. It is worked out from game numbers, so it is a guide, not a promise.",
+  "source_ids": [],
+  "claim_ids": ["battery_numbers"]
+ },
+ "suit_refill": {
+  "title": "Filling your suit tank",
+  "short": "Your suit tank is filled from the colony's oxygen reserve at the suit rack.",
+  "long": "Putting the suit on does not fill the tank. Filling it moves oxygen from the colony's tanks into your suit, so the reserve goes down by the same amount. A full tank lasts several hours outside. These numbers are game balance.",
+  "source_ids": [],
+  "claim_ids": ["crew_rates"]
+ }
+}

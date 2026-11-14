@@ -18,6 +18,11 @@ var submit: Callable = Callable()
 var report_position: Callable = Callable()
 ## Enables local controls; gravity and position reporting continue when disabled.
 var input_enabled: bool = true
+## Settings: mouse up looks down.
+var invert_y: bool = false
+## Settings: Shift switches sprint on and off instead of being held (an alternative to holding a key).
+var toggle_sprint: bool = false
+var _sprint_latched: bool = false
 var _rig: PlayerCameraRig
 var _visual: PlayerVisual
 var _held: CarryItem
@@ -30,6 +35,16 @@ var _jumped: bool = false
 ## Shorter flights than this (a stair step-up, a bump, a floor-contact flicker) neither show the in-air
 ## pose nor play the landing; a jump always does both.
 const MIN_AIR_TIME_S: float = 0.15
+## Locomotion is picked from the real horizontal ground speed, not from the sprint key (m/s).
+const IDLE_BELOW: float = 0.15
+const SPRINT_ABOVE: float = 3.1
+const SPRINT_HYSTERESIS: float = 0.15
+## Touching down faster than this skips the standing land clip: a short hip dip and straight back into the gait.
+const RUNNING_LANDING_SPEED: float = 1.0
+## Walk input may cut a standing landing short after this long.
+const LAND_INTERRUPT_AFTER_S: float = 0.2
+## Current locomotion choice: idle, walk or sprint.
+var _locomotion: StringName = &"idle"
 
 ## Builds the collider, cameras and visible body using the supplied crew record.
 func setup(p_config: GameConfig, p_tuning: PlayerTuning, p_character: CharacterState, p_submit: Callable, p_report_position: Callable) -> void:
@@ -131,13 +146,13 @@ func _station_node(object_name: String) -> Node:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if input_enabled and event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
-		_rig.add_look(-event.relative.x * tuning.mouse_sensitivity, -event.relative.y * tuning.mouse_sensitivity)
+		_rig.add_look(-event.relative.x * tuning.mouse_sensitivity, (1.0 if invert_y else -1.0) * event.relative.y * tuning.mouse_sensitivity)
 
 func _physics_process(delta: float) -> void:
 	if character == null:
 		return
 	# Edge tracking also supports Input.action_press in headless tests.
-	for action: StringName in [&"toggle_view", &"interact", &"grab", &"jump"]:
+	for action: StringName in [&"toggle_view", &"interact", &"grab", &"jump", &"sprint"]:
 		var pressed := input_enabled and Input.is_action_pressed(action)
 		if pressed and not bool(_buttons.get(action, false)):
 			match action:
@@ -148,13 +163,16 @@ func _physics_process(delta: float) -> void:
 					if is_on_floor():
 						velocity.y = sqrt(2.0 * GameConfig.MARS_GRAVITY * tuning.jump_height_m)
 						_jumped = true
-						# Push-off first; the looping in-air "jump" takes over when this hold ends.
+						# Push-off first; the velocity-driven in-air "jump" takes over when this hold ends.
 						# A rig without a jump_start clip skips it and goes straight to "jump".
 						_visual.play_once(&"jump_start", clampf(_visual.clip_length(&"jump_start", 0.25), 0.1, 0.5))
+				&"sprint":
+					_sprint_latched = not _sprint_latched
 		_buttons[action] = pressed
 	var axis := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if input_enabled else Vector2.ZERO
 	var direction := Basis(Vector3.UP, _rig.yaw()) * Vector3(axis.x, 0, axis.y)
-	var sprinting := input_enabled and Input.is_action_pressed("sprint") and character.stamina > 0.0 and not axis.is_zero_approx()
+	var sprint_wanted := _sprint_latched if toggle_sprint else Input.is_action_pressed("sprint")
+	var sprinting := input_enabled and sprint_wanted and character.stamina > 0.0 and not axis.is_zero_approx()
 	var speed := tuning.walk_speed * (config.suit_speed_factor if character.suit_on else 1.0) * (tuning.sprint_multiplier if sprinting else 1.0)
 	# Local feel only: the authoritative stamina model is a later milestone.
 	character.stamina = clampf(character.stamina + (-tuning.sprint_stamina_per_second if sprinting else tuning.stamina_recover_per_second) * delta, 0.0, 100.0)
@@ -173,11 +191,16 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 	if airborne and not is_on_floor():
 		velocity.y -= GameConfig.MARS_GRAVITY * delta * 0.5
+	var ground_speed := Vector2(velocity.x, velocity.z).length()
 	if is_on_floor():
 		if not _was_on_floor and (_jumped or _air_time >= MIN_AIR_TIME_S):
-			# The landing absorb holds for the clip's own length; movement asked for meanwhile waits,
-			# then walking or sprinting resumes on the next play() after the hold.
-			_visual.play_once(&"land", clampf(_visual.clip_length(&"land", 0.4), 0.25, 0.6))
+			if ground_speed > RUNNING_LANDING_SPEED:
+				# Moving landing: the standing absorb would slide; keep the gait (0.15 s blend) with a 5 cm hip dip.
+				# Horizontal speed is not touched.
+				_visual.dip(0.05, 0.2)
+			else:
+				# Standing landing: hold for the clip's own length; idle waits for all of it, walk input may cut it after 0.2 s.
+				_visual.play_once(&"land", clampf(_visual.clip_length(&"land", 0.4), 0.25, 0.6), LAND_INTERRUPT_AFTER_S)
 		_air_time = 0.0
 		_jumped = false
 	else:
@@ -185,17 +208,40 @@ func _physics_process(delta: float) -> void:
 	_was_on_floor = is_on_floor()
 	_visual.rotation.y = _rig.yaw()
 	_visual.set_suit(character.suit_on)
+	_rig.set_fill_layers(_visual.zone_layers())
 	var in_air := not is_on_floor() and (_jumped or _air_time >= MIN_AIR_TIME_S)
-	var gait: StringName = &"carry" if held_item() != null else (&"jump" if in_air else (&"sprint" if sprinting else (&"walk" if not axis.is_zero_approx() else &"idle")))
+	_locomotion = _pick_locomotion(ground_speed, axis.is_zero_approx())
+	var gait: StringName = &"carry" if held_item() != null else (&"jump" if in_air else _locomotion)
 	# The walk and sprint clips cover a known ground speed; play them at the real ground speed so feet do not slide.
 	var gait_speed := 1.0
 	if gait == &"walk":
-		gait_speed = clampf(horizontal.length() / PlayerVisual.WALK_CLIP_SPEED, 0.5, 2.5)
+		gait_speed = clampf(ground_speed / PlayerVisual.WALK_CLIP_SPEED, PlayerVisual.MIN_CLIP_SCALE, PlayerVisual.MAX_CLIP_SCALE)
 	elif gait == &"sprint":
-		gait_speed = clampf(horizontal.length() / PlayerVisual.SPRINT_CLIP_SPEED, 0.5, 2.5)
+		gait_speed = clampf(ground_speed / PlayerVisual.SPRINT_CLIP_SPEED, PlayerVisual.MIN_CLIP_SCALE, PlayerVisual.MAX_CLIP_SCALE)
 	_visual.play(gait, gait_speed)
+	if gait == &"jump":
+		# Rise, apex, fall from vertical velocity: take-off speed v0 -> 0, apex -> 0.5, -v0 or faster -> 1 (fall pose held).
+		# Walking off a ledge enters at the apex pose: the in-air pose only starts MIN_AIR_TIME_S after leaving the
+		# floor, so that much fall speed is discounted and the arc runs on from 0.5.
+		var v0 := sqrt(2.0 * GameConfig.MARS_GRAVITY * tuning.jump_height_m)
+		var vy := velocity.y if _jumped else minf(velocity.y + GameConfig.MARS_GRAVITY * MIN_AIR_TIME_S, 0.0)
+		_visual.set_jump_phase((v0 - vy) / (2.0 * v0))
 	if report_position.is_valid():
 		report_position.call(global_position, _rig.yaw())
+
+## Idle below 0.15 m/s, walk up to 3.1 m/s, sprint above, with +-0.15 m/s hysteresis at the walk/sprint split.
+## Coasting to a stop with no input below the walk clip's slowest scale settles into idle instead of slow-motion steps.
+func _pick_locomotion(ground_speed: float, no_input: bool) -> StringName:
+	if ground_speed < IDLE_BELOW:
+		return &"idle"
+	var next: StringName = &"walk"
+	if _locomotion == &"sprint":
+		next = &"walk" if ground_speed < SPRINT_ABOVE - SPRINT_HYSTERESIS else &"sprint"
+	elif ground_speed > SPRINT_ABOVE + SPRINT_HYSTERESIS:
+		next = &"sprint"
+	if next == &"walk" and no_input and ground_speed < PlayerVisual.WALK_CLIP_SPEED * PlayerVisual.MIN_CLIP_SCALE:
+		next = &"idle"
+	return next
 
 func _try_step(motion: Vector3) -> void:
 	if motion.is_zero_approx() or tuning.step_height_m <= 0.0:
@@ -237,12 +283,9 @@ func _interact() -> void:
 		if target.kind == "item" or held_item() != null:
 			_grab()
 		return
-	var node: Node = target.node
-	if String(node.get_meta("kind", "")) == "suits":
-		_answer(&"begin_suit_check", target.id, {"on": not character.suit_on})
-	else:
-		_visual.play_once(&"use", 1.0)
-		_answer(&"use_station", target.id, {})
+	# Every station opens its surface; the suit rack's has the suit check and the tank refill (Prompt 07).
+	_visual.play_once(&"use", 1.0)
+	_answer(&"use_station", target.id, {})
 
 func _grab() -> void:
 	if held_item() != null:

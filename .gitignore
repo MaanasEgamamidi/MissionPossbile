@@ -11,6 +11,9 @@ scenes/world/lighting/_exp_env.tres
 _test_saves/
 tests/tmp/
 
+# baked prop collision, rebuilt automatically at load when the map changes
+data/prop_collision_cache.bin
+
 # logs
 *.log
 # but keep the logs that are milestone evidence

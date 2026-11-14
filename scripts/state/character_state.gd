@@ -19,6 +19,8 @@ var stamina := 100.0
 var suit_on := false
 ## Portable tank charge, 0..100. Never refilled by equipping the suit or changing the camera.
 var suit_charge := 100.0
+## True while the character is outside the pressurised habitat (set by the host from SessionService.outside_test).
+var outside := false
 var equipment: Array[StringName] = []
 ## Item ids carried by this character (see ColonyState.items).
 var cargo: Array[StringName] = []
@@ -32,7 +34,7 @@ func to_dict() -> Dictionary:
 	return {
 		"id": String(id), "specialty": String(specialty), "display_name": display_name, "owner_peer": owner_peer,
 		"position": [position.x, position.y, position.z], "yaw": yaw, "hub_spot": [hub_spot.x, hub_spot.y, hub_spot.z],
-		"health": health, "stamina": stamina, "suit_on": suit_on, "suit_charge": suit_charge,
+		"health": health, "stamina": stamina, "suit_on": suit_on, "suit_charge": suit_charge, "outside": outside,
 		"equipment": equipment.map(func(e: StringName) -> String: return String(e)),
 		"cargo": cargo.map(func(e: StringName) -> String: return String(e)),
 	}
@@ -53,6 +55,7 @@ func assign_from(d: Dictionary, keep_pose := false) -> void:
 	stamina = c.stamina
 	suit_on = c.suit_on
 	suit_charge = c.suit_charge
+	outside = c.outside
 	equipment = c.equipment
 	cargo = c.cargo
 
@@ -70,6 +73,7 @@ static func from_dict(d: Dictionary) -> CharacterState:
 	c.stamina = float(d.get("stamina", 100.0))
 	c.suit_on = bool(d.get("suit_on", false))
 	c.suit_charge = float(d.get("suit_charge", 100.0))
+	c.outside = bool(d.get("outside", false))
 	for e in d.get("equipment", []):
 		c.equipment.append(StringName(String(e)))
 	for e in d.get("cargo", []):

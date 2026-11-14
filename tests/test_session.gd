@@ -12,7 +12,10 @@ func _initialize() -> void:
 	for station: Dictionary in _catalog.values():
 		kinds.append(station.kind)
 	kinds.sort()
-	_check("manifest stations", _catalog.size() == 9 and kinds == ["board", "comms", "computer", "food", "heal", "lifesupport", "power", "suits", "survivor"])
+	var expected_kinds: Array = ["board", "comms", "computer", "food", "heal", "lifesupport", "power"]
+	for tracker: int in 12: expected_kinds.append("solar")
+	expected_kinds.append_array(["suits", "survivor"])
+	_check("manifest stations", _catalog.size() == 21 and kinds == expected_kinds)
 	var s := _new_session()
 	var power: StringName = LegacyStations.stations_of_kind(s.state, "power")[0]
 	_check("power zone", s.state.stations[power].zone == "Power Room")
@@ -252,7 +255,7 @@ func _timing() -> void:
 		var battery: float = s.state.store(&"battery_kwh")
 		instant_ok = instant_ok and s.request(&"set_sol_minutes", &"", {"minutes": minutes}).ok and phase == s.clock.phase and index == s.clock.sol_index and battery == s.state.store(&"battery_kwh")
 	_check("sol settings preserve instant state", instant_ok)
-	_check("battery ledger identity", absf(s.state.store(&"battery_kwh") - battery_start - float(s.state.ledger.solar_used_kwh) + float(s.state.ledger.load_served_kwh)) < 1e-6)
+	_check("battery ledger identity", absf(s.state.store(&"battery_kwh") - battery_start - float(s.state.ledger.battery_in_kwh) + float(s.state.ledger.battery_loss_kwh) + float(s.state.ledger.battery_out_kwh)) < 1e-6)
 	var reference: Dictionary = {}
 	for minutes: float in [5.0, 20.0, 120.0]:
 		var sol := _new_session()
@@ -314,6 +317,7 @@ func _history_and_recovery_tick() -> void:
 	s.request(&"pick_up", &"logbox")
 	c.health = 0.001
 	s.state.stores[&"oxygen_kg"] = 0.0
+	s.state.cabin_o2_kg = 0.0
 	s.state.zones["Life Support"].powered = false
 	var recovered: Array = []
 	s.events.character_recovered.connect(func(id: StringName, info: Dictionary) -> void: recovered.append([id, info]))

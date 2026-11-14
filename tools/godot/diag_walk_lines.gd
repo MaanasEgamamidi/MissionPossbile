@@ -12,12 +12,13 @@ func _frames(n: int) -> void:
 
 
 func _initialize() -> void:
-	var save_dir := ProjectSettings.globalize_path("res://").path_join("_test_saves/diag_walk_saves")
+	var save_dir := ProjectSettings.globalize_path("res://").path_join("_test_saves/diag/walk_saves")
 	DirAccess.make_dir_recursive_absolute(save_dir)
 	for f in DirAccess.get_files_at(save_dir):
 		DirAccess.remove_absolute(save_dir.path_join(f))
 	main = (load("res://scenes/game.tscn") as PackedScene).instantiate() as GameMain
 	main.save_directory = save_dir
+	main.show_menu = false   # straight into the game, no main menu
 	root.add_child(main)
 	await _frames(30)
 	var player := main.player

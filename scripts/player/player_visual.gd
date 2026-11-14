@@ -19,8 +19,16 @@ const RIG_PATHS: Array[String] = ["res://assets/characters/astronaut.glb", "res:
 ## (14 frames at the scene's 30 fps: 0.72 m stance travel in 0.38 of 0.467 s).
 const WALK_CLIP_SPEED: float = 1.545
 const SPRINT_CLIP_SPEED: float = 4.06
-## "jump" is the in-air pose: it loops for as long as the player is airborne (about 1 s for a 0.5 m Mars jump).
-const LOOPING: Array[StringName] = [&"idle", &"walk", &"sprint", &"carry", &"seated", &"jump"]
+const LOOPING: Array[StringName] = [&"idle", &"walk", &"sprint", &"carry", &"seated"]
+## "jump" is a non-looping rise-apex-fall arc whose time the controller drives from vertical velocity (set_jump_phase).
+const NON_LOOPING: Array[StringName] = [&"jump", &"jump_start", &"land"]
+## Locomotion clips play between these speed scales; slower than the minimum reads as slow motion.
+const MIN_CLIP_SCALE: float = 0.75
+const MAX_CLIP_SCALE: float = 1.5
+## Switching between these starts the new clip at the same normalised phase, so the feet keep their rhythm.
+const PHASE_SYNC: Array[StringName] = [&"walk", &"sprint"]
+## States that may cut a play_once() hold short once its interruptible_after time has passed.
+const INTERRUPTERS: Array[StringName] = [&"walk", &"sprint", &"carry"]
 ## Emitted whenever the shown state changes (play() or play_once()); tests use it to follow the jump phases.
 signal state_changed(state: StringName)
 var _limbs: Array[Node3D] = []
@@ -32,7 +40,18 @@ var _identity: int = 0
 var _state: StringName = &"idle"
 var _speed: float = 1.0
 var _time: float = 0.0
-var _held_until_msec: int = 0
+## play_once() hold, counted in the same process time the AnimationPlayer advances by (not wall clock: under a
+## slow frame the old millisecond hold ran out before the clip had advanced, so jump_start never showed).
+var _hold_left: float = 0.0
+var _hold_elapsed: float = 0.0
+var _interrupt_after: float = -1.0
+## Last fraction (0 rise .. 0.5 apex .. 1 fall) handed to set_jump_phase().
+var _jump_fraction: float = 0.0
+## Procedural hip dip (running landings, which skip the standing land clip).
+var _dip_depth: float = 0.0
+var _dip_seconds: float = 0.0
+var _dip_time: float = 0.0
+var _model_base_y: float = 0.0
 
 func _init() -> void:
 	_build_standin()
@@ -95,10 +114,14 @@ func set_model(scene: PackedScene) -> void:
 		_parts.append(node as MeshInstance3D)
 		if node.name.begins_with("Suit") or node.name == &"Pack":
 			_suit_parts.append(node as Node3D)
+	_model_base_y = _model.position.y
 	if _animation != null:
 		for clip: StringName in LOOPING:
 			if _animation.has_animation(clip):
 				_animation.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+		for clip: StringName in NON_LOOPING:
+			if _animation.has_animation(clip):
+				_animation.get_animation(clip).loop_mode = Animation.LOOP_NONE
 	set_first_person(_first_person)
 	set_suit(_suited)
 	set_crew_identity(_identity)
@@ -122,6 +145,10 @@ func set_first_person(on: bool) -> void:
 func set_zone_layers(mask: int) -> void:
 	_zone_mask = mask
 	_apply_layers()
+
+## Render layers last set by set_zone_layers().
+func zone_layers() -> int:
+	return _zone_mask
 
 ## Shows helmet, pack and suit overlays without duplicating limbs.
 func set_suit(on: bool) -> void:
@@ -157,12 +184,54 @@ func hand_anchor(right: bool = true) -> Node3D:
 ## Used for short actions that are not a way of moving: landing, using a panel, the suit check.
 ## A rigged model without that clip skips it entirely (no hold), so the current pose is not frozen on a
 ## clip that does not exist. The procedural stand-in has a pose for every state and always holds.
-func play_once(state: StringName, seconds: float) -> void:
+## `interruptible_after` >= 0 lets walk, sprint or carry take over once that much of the hold has passed
+## (the landing: walk input may cut it after 0.2 s, but idle waits for the whole clip).
+func play_once(state: StringName, seconds: float, interruptible_after: float = -1.0) -> void:
 	if not has_clip(state):
 		return
-	_held_until_msec = 0
+	_hold_left = 0.0
 	play(state)
-	_held_until_msec = Time.get_ticks_msec() + int(seconds * 1000.0)
+	_hold_left = seconds
+	_hold_elapsed = 0.0
+	_interrupt_after = interruptible_after
+
+## True while a play_once() hold is running.
+func is_holding() -> bool:
+	return _hold_left > 0.0
+
+## Cross-fade length for a change of clip, per the animation review (fable_verdict_1, "Game side" 3).
+static func blend_time(from: StringName, to: StringName) -> float:
+	match to:
+		&"jump_start":
+			return 0.07
+		&"jump":
+			return 0.1 if from == &"jump_start" else 0.15   # 0.15: walking off a ledge into the apex pose
+		&"land":
+			return 0.06
+		&"idle":
+			return 0.2
+		&"walk":
+			return 0.25 if from == &"sprint" else (0.15 if from == &"jump" else 0.2)
+		&"sprint":
+			return 0.15 if from == &"jump" else 0.25         # 0.15: running landing, land skipped
+	return 0.2
+
+## Poses the non-looping "jump" arc: 0 = take-off, 0.5 = apex, 1 = fall (held). Only acts while "jump" is shown.
+func set_jump_phase(fraction: float) -> void:
+	_jump_fraction = clampf(fraction, 0.0, 1.0)
+	if _state != &"jump" or _animation == null or _animation.assigned_animation != "jump":
+		return
+	var length := _animation.get_animation(&"jump").length
+	# Stop a frame short of the end: the player then never reports "finished", and the next process step's
+	# small advance cannot run past the held fall pose.
+	_animation.seek(minf(_jump_fraction * length, maxf(length - 0.05, 0.0)))
+	_animation.speed_scale = 1.0
+
+## A quick procedural hip dip (metres, seconds), used for running landings instead of the standing land clip.
+func dip(depth: float, seconds: float) -> void:
+	_dip_depth = depth
+	_dip_seconds = maxf(seconds, 0.01)
+	_dip_time = 0.0
 
 ## True when this body can show `state`: the rig has that clip, or the procedural stand-in is in use.
 func has_clip(state: StringName) -> bool:
@@ -178,15 +247,26 @@ func clip_length(state: StringName, fallback: float) -> float:
 
 ## Ends a play_once() hold early, so the next play() takes effect at once.
 func clear_hold() -> void:
-	_held_until_msec = 0
+	_hold_left = 0.0
 
 ## Plays a named animation or its procedural placeholder equivalent.
 func play(state: StringName, speed: float = 1.0) -> void:
-	if Time.get_ticks_msec() < _held_until_msec:
-		return
+	if _hold_left > 0.0:
+		if not (state in INTERRUPTERS and _interrupt_after >= 0.0 and _hold_elapsed >= _interrupt_after):
+			return
+		_hold_left = 0.0
 	if _animation != null and _animation.has_animation(state):
-		if state != _state or not _animation.is_playing():
-			_animation.play(state, 0.15)      # short blend so changes of gait do not snap
+		if state != _state or _animation.assigned_animation != String(state):
+			var phase := -1.0
+			if state in PHASE_SYNC and _state in PHASE_SYNC and _animation.assigned_animation == String(_state) and _animation.current_animation_length > 0.0:
+				phase = fposmod(_animation.current_animation_position / _animation.current_animation_length, 1.0)
+			_animation.play(state, blend_time(_state, state))
+			if phase >= 0.0:
+				_animation.seek(phase * _animation.get_animation(state).length)
+		elif not _animation.is_playing() and _animation.get_animation(state).loop_mode != Animation.LOOP_NONE:
+			_animation.play(state)
+		# A finished non-looping clip (jump, land) is left on its last frame: re-calling play() used to restart it
+		# from 0 every frame, because a finished clip reports not playing.
 		_animation.speed_scale = speed     # updated every call so the walk follows the ground speed
 	var changed := state != _state
 	_state = state
@@ -196,6 +276,16 @@ func play(state: StringName, speed: float = 1.0) -> void:
 
 func _process(delta: float) -> void:
 	_time += delta * _speed
+	if _hold_left > 0.0:
+		_hold_left -= delta
+		_hold_elapsed += delta
+	if _dip_depth > 0.0:
+		_dip_time += delta
+		var k := _dip_time / _dip_seconds
+		_model.position.y = _model_base_y - _dip_depth * sin(PI * clampf(k, 0.0, 1.0))
+		if k >= 1.0:
+			_dip_depth = 0.0
+			_model.position.y = _model_base_y
 	if _limbs.is_empty():
 		return
 	for limb: Node3D in _limbs:

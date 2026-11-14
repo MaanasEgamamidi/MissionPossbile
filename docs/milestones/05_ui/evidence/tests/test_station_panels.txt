@@ -1,0 +1,73 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS for_station: right panel for each of the 21 stations (9 + 12 sun trackers), suit rack included
+PASS power panel has a switch for every zone
+PASS switch Greenhouse off sends exactly one set_zone_power with the right zone and value
+PASS load text updates after Greenhouse off
+PASS cause and effect sentence for Greenhouse
+PASS switch Hangar bay off sends exactly one set_zone_power with the right zone and value
+PASS load text updates after Hangar bay off
+PASS cause and effect sentence for Hangar bay
+PASS refused switch: one request, host answers too_far
+PASS refused switch flips back and shows the reason
+PASS switch reflects the state on refresh
+PASS computer buttons open Colony summary, Upgrades and Blueprint
+PASS station readings show values with units, a status mark and a ? button
+PASS upgrade cards load into UpgradeDefinition (6 to 8, all five sectors, placeholder)
+PASS cards show cost vs parts, the locked reason, and a disabled install button
+PASS locked reasons in words: not enough parts, needs another upgrade first
+PASS keyboard focus moves between the cards
+PASS blueprint draws without errors
+PASS blueprint converts coordinates (room centre within 1 px, west left, north up)
+PASS blueprint shows an unpowered room dimmed with ✖
+PASS clicking a room shows its name, power state and load
+PASS legend lists every symbol used
+PASS zoom doubles the plan and Centre on me puts you in the middle
+PASS layout Station_it_transceiver (Transceiver board) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_it_transceiver (Transceiver board)
+PASS layout Station_md_survivor (Patient) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_md_survivor (Patient)
+PASS layout Station_md_heal_station (Med station) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_md_heal_station (Med station)
+PASS layout Station_cm_colony_computer (Colony computer) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_cm_colony_computer (Colony computer)
+PASS layout Station_cm_comms_console (Comms console) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_cm_comms_console (Comms console)
+PASS layout Station_gh_console (Greenhouse console) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_gh_console (Greenhouse console)
+PASS layout Station_al_suit_rack (Suit rack) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_al_suit_rack (Suit rack)
+PASS layout Station_pw_panel (Power panel) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_pw_panel (Power panel)
+PASS layout Station_ls_console (Life support console) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ls_console (Life support console)
+PASS layout Station_sf_solar_tracker (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker (Sun tracker)
+PASS layout Station_sf_solar_tracker_001 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_001 (Sun tracker)
+PASS layout Station_sf_solar_tracker_002 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_002 (Sun tracker)
+PASS layout Station_sf_solar_tracker_003 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_003 (Sun tracker)
+PASS layout Station_sf_solar_tracker_004 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_004 (Sun tracker)
+PASS layout Station_sf_solar_tracker_005 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_005 (Sun tracker)
+PASS layout Station_sf_solar_tracker_006 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_006 (Sun tracker)
+PASS layout Station_sf_solar_tracker_007 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_007 (Sun tracker)
+PASS layout Station_sf_solar_tracker_008 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_008 (Sun tracker)
+PASS layout Station_sf_solar_tracker_009 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_009 (Sun tracker)
+PASS layout Station_sf_solar_tracker_010 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_010 (Sun tracker)
+PASS layout Station_sf_solar_tracker_011 (Sun tracker) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_sf_solar_tracker_011 (Sun tracker)
+PASS layout UpgradeCards (Upgrades) at 1280x720, 1920x1080 and text 1.5
+PASS focus UpgradeCards (Upgrades)
+PASS layout Blueprint (Blueprint) at 1280x720, 1920x1080 and text 1.5
+PASS focus Blueprint (Blueprint)
+PASS no errors during the test
+RESULT 70/70

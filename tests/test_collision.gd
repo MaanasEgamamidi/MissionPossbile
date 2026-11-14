@@ -14,7 +14,7 @@ func _initialize() -> void:
 	root.add_child(_world)
 	var stats := WorldCollision.stats(_world)
 	print("STATS ", JSON.stringify(stats))
-	_check(stats.doors == 24 and stats.leaves == 52 and stats.stations == 9, "24 doors, 52 leaves, 9 stations")
+	_check(stats.doors == 24 and stats.leaves == 52 and stats.stations == 21, "24 doors, 52 leaves, 21 stations (9 tagged + 12 sun trackers)")
 	var shapes: Dictionary = {}
 	var counts: Dictionary = {}
 	for node: Node in _world.find_children("*", "CollisionShape3D", true, false):
@@ -65,7 +65,7 @@ func _initialize() -> void:
 	for body: Node in _world.get_node("Static").get_children():
 		layers_ok = layers_ok and body.collision_layer == Layers.WORLD and body.collision_mask == 0
 	for station: Node in _world.get_node("Stations").get_children():
-		layers_ok = layers_ok and station.collision_layer == Layers.STATION and station.collision_mask == 0 and station.get_meta("station_id") == String(station.name) and station.has_meta("kind") and is_equal_approx(station.get_child(0).shape.radius, 1.2)
+		layers_ok = layers_ok and station.collision_layer == Layers.STATION and station.collision_mask == 0 and String(station.get_meta("station_id")).validate_node_name() == String(station.name) and station.has_meta("kind") and is_equal_approx(station.get_child(0).shape.radius, 1.2)
 	_check(layers_ok, "static and station layers, metadata and radius")
 	await _frames(3)
 	for room: Dictionary in (manifest.rooms as Array).slice(0, 3):
@@ -77,6 +77,7 @@ func _initialize() -> void:
 	_check(not wall.is_empty(), "ray across hangar wall blocked")
 	await _doors()
 	await _terrain()
+	await _props()
 	print("RESULT %d/%d" % [_passed, _total])
 	quit(0 if _passed == _total else 1)
 
@@ -188,6 +189,117 @@ func _terrain() -> void:
 	_check(exit_code == 0 and loaded != null and loaded.width == 9 and loaded.depth == 9 and loaded.heights == grid.heights, "tool writes loadable matching resource")
 	scene.queue_free()
 	body.queue_free()
+
+## PropCollision on a small synthetic map (far from the real one): a crate with no authored boxes gets a hull, a long
+## two-walled corridor gets a two-sided trimesh that keeps the corridor open, while a decal, an overhead lamp, a floor
+## and an object already filled by its authored box get nothing. A walking capsule is stopped at the crate and the
+## corridor walls, passes over the decal, and walks the corridor end to end.
+func _props() -> void:
+	var o := Vector3(300, 0, 300)
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://tests/tmp"))
+	var ident := [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+	var boxed_m := [[1.0, 0.0, 0.0, o.x + 6.0], [0.0, 1.0, 0.0, -o.z], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]]
+	var manifest := {"objects": [
+		{"name": "t_crate", "gc_asset": "t_none", "area": "T", "cls": "static", "matrix_world": ident},
+		{"name": "t_boxed", "gc_asset": "t_box", "area": "T", "cls": "static", "matrix_world": boxed_m},
+		{"name": "t_floor", "gc_asset": "t_none", "area": "T", "cls": "floor", "matrix_world": ident}]}
+	# one authored box filling t_boxed: centre 0.5 m up in the object's (Y-up) space, half size 0.5
+	var colliders := {"assets": {"t_box": {"cols": [{"c": [0, 0.5, 0], "h": [0.5, 0.5, 0.5], "q": [0, 0, 0, 1]}]}}}
+	for pair: Array in [["res://tests/tmp/props_manifest.json", manifest], ["res://tests/tmp/props_colliders.json", colliders]]:
+		var f := FileAccess.open(pair[0], FileAccess.WRITE)
+		f.store_string(JSON.stringify(pair[1]))
+		f.close()
+	var world := Node3D.new()
+	world.name = "PropWorld"
+	root.add_child(world)
+	var floor_body := StaticBody3D.new()
+	floor_body.collision_layer = Layers.WORLD
+	var floor_shape := CollisionShape3D.new()
+	var floor_box := BoxShape3D.new()
+	floor_box.size = Vector3(40, 0.2, 40)
+	floor_shape.shape = floor_box
+	floor_body.add_child(floor_shape)
+	floor_body.position = o + Vector3(0, -0.1, 0)
+	root.add_child(floor_body)
+	var crate := _box_mesh(world, "t_crate", Vector3(1, 1, 1), o + Vector3(3, 0.5, 0))
+	_box_mesh(world, "t_boxed", Vector3(1, 1, 1), o + Vector3(6, 0.5, 0))
+	_box_mesh(world, "t_floor", Vector3(4, 0.1, 4), o + Vector3(0, -0.05, 6))
+	_box_mesh(world, "overhead_lamp", Vector3(1, 0.3, 1), o + Vector3(-3, 2.6, 0))
+	var decal := _box_mesh(world, "scorch", Vector3(1.5, 0.2, 1.5), o + Vector3(0, 0.1, -4))
+	decal.material_override = load("res://materials/colony/decal_scorch.tres")
+	# corridor: two 8 m walls 2.2 m apart (inner faces at z = -1.1 and +1.1 around the corridor centre)
+	var corridor := MeshInstance3D.new()
+	corridor.name = "corridor_walls"
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for side: float in [-1.0, 1.0]:
+		var wall := BoxMesh.new()
+		wall.size = Vector3(8, 2.5, 0.2)
+		st.append_from(wall, 0, Transform3D(Basis(), Vector3(0, 1.25, side * 1.2)))
+	corridor.mesh = st.commit()
+	world.add_child(corridor)
+	corridor.global_position = o + Vector3(0, 0, 10)
+	var collision := Node3D.new()
+	collision.name = "PropTestCollision"
+	root.add_child(collision)
+	var stats := PropCollision.build(world, collision, "res://tests/tmp/props_manifest.json", "res://tests/tmp/props_colliders.json", null)
+	print("PROPS ", JSON.stringify(stats))
+	_check(stats.hulls == 1 and stats.trimeshes == 1 and stats.skipped_covered == 1, "props: crate hull, corridor trimesh, boxed object left to its box")
+	var props := collision.get_node("Props") as StaticBody3D
+	var names := {}
+	for cs: Node in props.get_children():
+		names[String(cs.name)] = cs
+	_check(names.has("t_crate") and names.has("corridor_walls") and not names.has("scorch") and not names.has("overhead_lamp") and not names.has("t_floor"), "props: decal, overhead lamp and floor get no collision")
+	_check(props.collision_layer == Layers.WORLD and (names["t_crate"] as Node).get_meta("object_name") == "t_crate" and ((names["corridor_walls"] as CollisionShape3D).shape as ConcavePolygonShape3D).backface_collision, "props: world layer, object name kept, trimesh two-sided")
+	await _frames(2)
+	var walker := CharacterBody3D.new()
+	walker.collision_layer = Layers.PLAYER
+	walker.collision_mask = Layers.WORLD | Layers.DOOR
+	var ws := CollisionShape3D.new()
+	var cap := CapsuleShape3D.new()
+	cap.radius = 0.32
+	cap.height = 1.8
+	ws.shape = cap
+	walker.add_child(ws)
+	root.add_child(walker)
+	var end := await _walk_capsule(walker, o + Vector3(0, 0, 0), Vector3.RIGHT, 2.0)
+	_check(end.x < crate.global_position.x - 0.5 - 0.25 and end.x > crate.global_position.x - 0.5 - 0.45, "props: walker stopped at the crate face (x=%.2f, face %.2f)" % [end.x, crate.global_position.x - 0.5])
+	end = await _walk_capsule(walker, o + Vector3(0, 0, -6.5), Vector3.BACK, 1.5)
+	_check(end.z > o.z - 2.5, "props: walker passes over the decal (z=%.2f)" % end.z)
+	end = await _walk_capsule(walker, o + Vector3(-5, 0, 10), Vector3.RIGHT, 3.5)
+	_check(end.x > o.x + 4.0 and absf(end.z - (o.z + 10)) < 0.2, "props: corridor stays open end to end (x=%.2f)" % end.x)
+	end = await _walk_capsule(walker, o + Vector3(0, 0, 10), Vector3.BACK, 1.5)
+	_check(end.z < o.z + 10 + 1.1 - 0.25 and end.z > o.z + 10, "props: corridor wall stops the walker from inside (z=%.2f)" % end.z)
+	end = await _walk_capsule(walker, o + Vector3(0, 0, 13.5), Vector3.FORWARD, 1.5)
+	_check(end.z > o.z + 10 + 1.3 + 0.25, "props: corridor wall stops the walker from outside (z=%.2f)" % end.z)
+	walker.queue_free()
+	world.queue_free()
+	collision.queue_free()
+	floor_body.queue_free()
+
+
+func _box_mesh(parent: Node3D, mesh_name: String, size: Vector3, at: Vector3) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	mi.name = mesh_name
+	var m := BoxMesh.new()
+	m.size = size
+	mi.mesh = m
+	parent.add_child(mi)
+	mi.global_position = at
+	return mi
+
+
+## Pushes the capsule from `from` (feet) along `dir` at 3 m/s for `seconds`; returns where it ended.
+func _walk_capsule(body: CharacterBody3D, from: Vector3, dir: Vector3, seconds: float) -> Vector3:
+	body.global_position = from + Vector3.UP * 0.95
+	body.velocity = Vector3.ZERO
+	await _frames(2)
+	for i in int(seconds * 60.0):
+		await physics_frame
+		body.velocity = Vector3(dir.x * 3.0, body.velocity.y - 3.73 / 60.0, dir.z * 3.0)
+		body.move_and_slide()
+	return body.global_position
+
 
 func _height(x: float, z: float) -> float:
 	return x * 0.15 + z * 0.08 + 0.12 * sin(x) * cos(z)

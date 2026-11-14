@@ -19,6 +19,12 @@ var services: GameServices
 var captures_mouse := true
 ## True: the 3D view stays visible around the panel (most in-game panels); false: full-screen menus.
 var keeps_world_visible := true
+## Widest and tallest the panel wants to be, in screen units; UiRoot centres it. 0 = UiRoot's size for this kind of
+## panel (UiRoot.PANEL_SIZES), and the whole frame when it has none.
+var max_width := 0.0
+var max_height := 0.0
+## True: an accent line is drawn along the panel's top edge, so every panel reads as part of one console.
+var accent_line := true
 
 
 ## Builds the panel. Subclasses call super.setup(p_services) first.
@@ -45,6 +51,13 @@ func first_focus() -> Control:
 ## A panel can veto closing (for example while capturing a key for remapping).
 func can_close() -> bool:
 	return true
+
+
+func _draw() -> void:
+	if not accent_line or size.x < 80.0:
+		return
+	# The panel style has round corners: the line starts and ends where the top edge is straight.
+	draw_rect(Rect2(18.0, 0.0, size.x - 36.0, 4.0), UiTheme.palette().accent)
 
 
 static func _first_focusable(node: Node) -> Control:

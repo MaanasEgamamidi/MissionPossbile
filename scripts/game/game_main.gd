@@ -11,6 +11,8 @@ const INPUT_PATH := "user://input.json"
 
 ## Tests switch this off to run without the 300 MB map.
 @export var load_world := true
+## Start at the main menu (true) or go straight into the newest save or a new colony (tests and capture tools).
+@export var show_menu := true
 ## Tests point saves at a folder inside the project instead of user://.
 @export var save_directory := ""
 
@@ -20,6 +22,10 @@ var collision: Node3D
 var lighting: ZoneLighting
 var player: PlayerController
 var hud: GameHud
+## Menus, panels, pause menu and subtitles (Prompt 05).
+var ui: UiRoot
+## The player's own settings: text size, FOV, mouse, subtitles... (user://settings.json).
+var settings: GameSettings
 var notice := ""
 ## Door leaves whose visible mesh was found in the map and now moves with its collider (52 when the map is loaded).
 var door_visuals_attached := 0
@@ -27,6 +33,8 @@ var door_visuals_attached := 0
 var airlock_doors: Array[DoorController] = []
 ## True if the rigged astronaut was found and is used instead of the capsule stand-in.
 var rigged_bodies := false
+## What PropCollision built at load (hulls, trimeshes, skipped, ms); empty when the map is not loaded.
+var prop_collision_stats := {}
 
 var _crew_visuals := {}          # character id -> PlayerVisual (crew the local player does not control)
 var _item_nodes := {}            # item id -> CarryItem
@@ -34,11 +42,17 @@ var _cache_nodes := {}           # cache id -> Node3D marker
 var _sun_timer := 0.0
 var _layer_timer := 0.0
 var _zone_now := ""
+var _playing := false
+var _main_menu: MainMenu
+var _confirm_new := false
 
 
 func _ready() -> void:
 	PlayerInput.ensure_actions()
 	PlayerInput.load(INPUT_PATH)
+	settings = GameSettings.load_or_default()
+	settings.apply(get_tree())
+	settings.changed.connect(_apply_player_settings)
 
 	services = GameServices.new()
 	services.name = "Services"
@@ -68,18 +82,46 @@ func _ready() -> void:
 		# Racks and stands show the crew's own suit, not the old white one modelled into the map.
 		SuitDisplays.build(world)
 	_add_ground()
+	if world != null:
+		# Everything else solid that is drawn (rovers, tanks, machines, hall frames and curb, dome shell...) gets its own
+		# collision, so no rigid object can be walked into.
+		var height := load(TERRAIN_HEIGHT_PATH) as TerrainHeight if ResourceLoader.exists(TERRAIN_HEIGHT_PATH) else null
+		prop_collision_stats = PropCollision.build(world, collision, MANIFEST_PATH, COLLIDERS_PATH, height, PropCollision.CACHE_PATH)
 
-	_start_or_continue()
 
+	ui = UiRoot.new()
+	ui.name = "Ui"
+	add_child(ui)
+	ui.setup(services, settings)
+	ui.quit_to_menu_requested.connect(_on_quit_to_menu)
+
+	if show_menu:
+		_open_main_menu()
+	else:
+		_start_or_continue()
+		_begin_play()
+
+
+## Everything that needs a running colony: HUD, crew bodies, items, lights. Called once, after the menu.
+func _begin_play() -> void:
+	_playing = true
 	hud = GameHud.new()
 	hud.name = "Hud"
 	add_child(hud)
 	hud.setup(services)
+	# One thing at a time on screen: the HUD steps aside while a panel or menu is open.
+	if not ui.menu_mode_changed.is_connected(_on_menu_mode_changed):
+		ui.menu_mode_changed.connect(_on_menu_mode_changed)
 	for door: DoorController in airlock_doors:
+		# Each time the outer door opens, the airlock has let some cabin air out (Prompt 07: pressure boundary).
+		if door.door_id == 902:
+			door.opened_changed.connect(func(_id: int, open: bool) -> void:
+				if open and services.is_authority():
+					services.session.note_airlock_cycle())
 		door.cycle_started.connect(func(_id: int, seconds: float) -> void:
-			hud.show_message("Airlock cycling: the other door must stay shut. Wait %.0f s." % ceilf(seconds), seconds + 0.5))
+			ui.show_subtitle("Airlock cycling: the other door must stay shut. Wait %.0f s." % ceilf(seconds), seconds + 0.5, "Airlock", true))
 	if notice != "":
-		hud.show_message(notice, 8.0)
+		ui.show_subtitle(notice, 8.0, "", true)
 
 	var ev := services.events
 	ev.state_changed.connect(_on_state_changed)
@@ -93,7 +135,54 @@ func _ready() -> void:
 	_sync_items()
 	_apply_all_zone_power()
 	_update_sun(true)
+	_apply_player_settings()
+	ui.close_all()        # leaves menu mode: the mouse is captured for play
 
+
+func _on_menu_mode_changed(open: bool) -> void:
+	if hud != null:
+		hud.set_visible_hud(not open)
+
+
+# ---------------------------------------------------------------- menu
+
+func _open_main_menu() -> void:
+	_main_menu = MainMenu.new()
+	_main_menu.continue_pressed.connect(_on_menu_continue)
+	_main_menu.new_game_pressed.connect(_on_menu_new)
+	_main_menu.host_pressed.connect(func(_port: int, _continue_save: bool) -> void: _main_menu.show_notice(NETWORK_LATER))
+	_main_menu.join_pressed.connect(func(_address: String, _port: int) -> void: _main_menu.show_notice(NETWORK_LATER))
+	_main_menu.quit_pressed.connect(func() -> void: get_tree().quit())
+	ui.open(_main_menu)
+
+
+## Playing together over a network is Prompt 06, skipped for now at the owner's request.
+const NETWORK_LATER := "Playing together on a network is not built yet. You can play the colony on your own for now: choose Continue or New colony."
+
+
+func _on_menu_continue() -> void:
+	var loaded := services.continue_game()
+	if not loaded.is_usable():
+		_main_menu.show_notice("The saved colony could not be opened (%s). Choose New colony to start again; the old files are kept." % loaded.status)
+		return
+	if loaded.status == &"recovered_from_backup":
+		notice = "The newest save was damaged. An earlier save was loaded instead."
+	_begin_play()
+
+
+func _on_menu_new() -> void:
+	if services.saves.has_save() and not _confirm_new:
+		_confirm_new = true
+		_main_menu.show_notice("A new colony replaces your saved one (the old save is kept as a backup). Press New colony again to start.")
+		return
+	services.start_new_game()
+	_begin_play()
+
+
+func _on_quit_to_menu() -> void:
+	if services.is_authority() and services.has_game():
+		services.save_now(&"quit")
+	get_tree().reload_current_scene()
 
 func _start_or_continue() -> void:
 	var loaded := services.continue_game()
@@ -129,7 +218,7 @@ func _add_ground() -> void:
 # ---------------------------------------------------------------- crew
 
 func _local_character() -> CharacterState:
-	return services.state().character_of_peer(SessionService.HOST_PEER)
+	return services.local_character()
 
 
 func _rebuild_crew() -> void:
@@ -143,12 +232,13 @@ func _rebuild_crew() -> void:
 		player.name = "Player"
 		add_child(player)
 		player.setup(services.config, PlayerTuning.new(), mine, _submit,
-			func(pos: Vector3, yaw: float) -> void: services.session.report_position(SessionService.HOST_PEER, mine.id, pos, yaw))
+			func(pos: Vector3, yaw: float) -> void: services.report_position(mine.id, pos, yaw))
 		player.teleport(mine.position + Vector3(0.0, 0.05, 0.0), mine.yaw)
 		rigged_bodies = player.visual().use_rig_if_available()
 		player.visual().set_crew_identity(_identity_of(mine))
 		player.visual().set_suit(mine.suit_on)
 		player.action_answered.connect(_on_action_answered)
+		_apply_player_settings()
 	for id: StringName in st.characters:
 		var c := st.characters[id] as CharacterState
 		var is_mine := mine != null and c.id == mine.id
@@ -176,21 +266,23 @@ func _rebuild_crew() -> void:
 ## Everything the local player asks for goes to the host through here.
 func _submit(action: StringName, target: StringName, params: Dictionary) -> ActionResult:
 	if action == &"use_station":
-		var rec: Dictionary = services.state().stations.get(String(target), {})
-		if String(rec.get("kind", "")) == "power":
-			# Opening the panel changes nothing; every switch on it is its own validated request.
-			hud.open_power_panel(target)
-			_set_menu_mode(true)
+		# Opening a station's surface changes nothing; every control on it is its own validated request.
+		var panel := StationPanels.for_station(target, services)
+		if panel != null:
+			ui.open(panel)
 			return ActionResult.success("", {})
-		return LegacyStations.interact(services.session, SessionService.HOST_PEER, target, params)
-	return services.session.request(action, target, params)
+		return LegacyStations.interact(services.session, services.local_peer(), target, params)
+	return services.request(action, target, params)
 
 
-## Menu open or game paused: free the mouse and stop steering the body.
-func _set_menu_mode(on: bool) -> void:
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE if on else Input.MOUSE_MODE_CAPTURED
-	if player != null:
-		player.input_enabled = not on
+## Settings that reach into the player body: field of view, mouse, sprint toggle.
+func _apply_player_settings() -> void:
+	if player == null or settings == null:
+		return
+	player.tuning.mouse_sensitivity = settings.mouse_sensitivity
+	player.invert_y = settings.invert_y
+	player.toggle_sprint = settings.toggle_sprint
+	player.camera_rig().set_fov(settings.fov_degrees)
 
 
 func _identity_of(c: CharacterState) -> int:
@@ -287,8 +379,11 @@ func _update_sun(force := false) -> void:
 
 
 func _process(_delta: float) -> void:
-	if not services.has_game():
+	if not _playing or not services.has_game():
 		return
+	if player != null:
+		player.input_enabled = ui.gameplay_has_focus()
+		hud.set_held(player.held_item().item_id if player.held_item() != null else &"")
 	_update_sun()
 	if player != null and services.zones != null:
 		var zone := services.zones.zone_at_world(player.global_position)
@@ -309,27 +404,15 @@ func _process(_delta: float) -> void:
 
 # ---------------------------------------------------------------- input that belongs to the whole game
 
+## Esc, panels, the pause menu and the M / I / C / Shift+Backspace screens belong to UiRoot.
+## Here only: a click takes the mouse back for play after the window lost it (alt-tab) while no panel is open.
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"back"):
-		# Esc closes what is open first; with nothing open it asks for a pause (solo: at once, co-op: everyone must agree).
-		if hud.is_menu_open():
-			hud.close_menu()
-			_set_menu_mode(false)
-		else:
-			var pause := not services.session.paused
-			services.session.request(&"vote_pause", &"", {"paused": pause})
-			_set_menu_mode(services.session.paused)
-		get_viewport().set_input_as_handled()
-	elif event is InputEventMouseButton and (event as InputEventMouseButton).pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
-		if not services.session.paused and not hud.is_menu_open():
-			_set_menu_mode(false)
+	if not _playing:
+		return
+	if event is InputEventMouseButton and (event as InputEventMouseButton).pressed and Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		if not ui.is_open():
+			Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 			get_viewport().set_input_as_handled()
-	elif event is InputEventKey and (event as InputEventKey).pressed and not (event as InputEventKey).echo:
-		# Interim way to change crew member at the hub until the crew screen exists: keys 1 to 4.
-		var key := (event as InputEventKey).physical_keycode
-		if key >= KEY_1 and key <= KEY_4:
-			var result := services.session.request(&"claim_character", StringName("crew_%d" % (key - KEY_1 + 1)))
-			_on_action_answered(result)
 
 
 # ---------------------------------------------------------------- events
@@ -374,11 +457,11 @@ func _on_character_recovered(character_id: StringName, info: Dictionary) -> void
 		var p := _v3(info.get("cache_position", []))
 		var where := services.zones.zone_at_world(p) if services.zones != null else ""
 		text += " Their cargo is waiting in a cache: %s (%.0f, %.0f)." % [where, p.x, p.z]
-	hud.show_message(text, 12.0)
+	ui.show_subtitle(text, 12.0, "Colony computer", true)
 	_rebuild_crew()
 	_sync_items()
 
 
 func _on_action_answered(result: ActionResult) -> void:
-	if result != null and not result.ok:
+	if result != null and not result.ok and not result.pending:
 		hud.show_message(result.message, 3.0)

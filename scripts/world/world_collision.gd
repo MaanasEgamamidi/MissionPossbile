@@ -37,14 +37,18 @@ static func build(manifest_path: String, colliders_path: String) -> Node3D:
 				doors[id] = door
 			var controller: DoorController = doors[id]
 			controller.add_leaf(object.name, pose, float(object.door_slide), boxes)
-		if object.has("inter"):
+		# Stations: map objects tagged with `inter`, plus the 12 sun trackers (kind "solar", Prompt 07), matching StationCatalog.
+		var station_kind := String(object.get("inter", ""))
+		if station_kind == "" and String(object.name).begins_with("sf_solar_tracker"):
+			station_kind = "solar"
+		if station_kind != "":
 			var station := Area3D.new()
 			station.name = object.name
 			station.position = pose.origin
 			station.collision_layer = Layers.STATION
 			station.collision_mask = 0
 			station.set_meta("station_id", object.name)
-			station.set_meta("kind", object.inter)
+			station.set_meta("kind", station_kind)
 			station.add_to_group(&"station_volume")
 			station.position.y += 1.0  # centred at hand height, not on the floor (origins sit at the object's base)
 			var shape := CollisionShape3D.new()

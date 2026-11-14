@@ -1,0 +1,111 @@
+{
+	"schema": 1,
+	"note": "PLACEHOLDER CARDS for the UI; the real catalogue comes with the upgrade milestone.",
+	"numbers": "Every cost and tier here is game balance, not a NASA figure.",
+	"cards": [
+		{
+			"id": "oxygen_maker_2",
+			"title": "Bigger oxygen maker",
+			"sector": "health_life_support",
+			"zone": "Life Support",
+			"tier": 1,
+			"cost_parts": 4,
+			"prerequisites": [],
+			"specialty": "medical_life_support",
+			"effect": "Makes more oxygen from water each sol, but uses more electricity.",
+			"question": "How can a colony make the air it breathes?",
+			"placeholder": true
+		},
+		{
+			"id": "health_scanner",
+			"title": "Health scanner",
+			"sector": "health_life_support",
+			"zone": "Med Bay",
+			"tier": 1,
+			"cost_parts": 3,
+			"prerequisites": [],
+			"specialty": "medical_life_support",
+			"effect": "Shows how each crew member is doing before they feel ill.",
+			"question": "What does living on Mars do to the body?",
+			"placeholder": true
+		},
+		{
+			"id": "grow_lights",
+			"title": "Brighter grow lights",
+			"sector": "food_production",
+			"zone": "Greenhouse",
+			"tier": 1,
+			"cost_parts": 4,
+			"prerequisites": [],
+			"specialty": "biology_food",
+			"effect": "Plants grow more food each sol, but the lights use more electricity.",
+			"question": "How much light do plants need to grow?",
+			"placeholder": true
+		},
+		{
+			"id": "plant_racks",
+			"title": "More plant racks",
+			"sector": "food_production",
+			"zone": "Greenhouse",
+			"tier": 2,
+			"cost_parts": 6,
+			"prerequisites": ["grow_lights"],
+			"specialty": "biology_food",
+			"effect": "Room for more plants, so the greenhouse makes more meals.",
+			"question": "Which plants give the most food for the space they take?",
+			"placeholder": true
+		},
+		{
+			"id": "parts_printer",
+			"title": "Parts printer",
+			"sector": "resources_manufacturing",
+			"zone": "Hangar bay",
+			"tier": 1,
+			"cost_parts": 5,
+			"prerequisites": [],
+			"specialty": "field_engineering_geology",
+			"effect": "Turns broken parts and scrap into new spare parts.",
+			"question": "What can we make from things we already have?",
+			"placeholder": true
+		},
+		{
+			"id": "battery_bank",
+			"title": "Extra battery bank",
+			"sector": "energy",
+			"zone": "Power Room",
+			"tier": 1,
+			"cost_parts": 6,
+			"prerequisites": [],
+			"specialty": "electrical_comms",
+			"effect": "Stores more electricity for the night.",
+			"question": "Why does a solar colony need batteries?",
+			"placeholder": true
+		},
+		{
+			"id": "panel_brushes",
+			"title": "Solar panel dust brushes",
+			"sector": "energy",
+			"zone": "Power Room",
+			"tier": 2,
+			"cost_parts": 12,
+			"prerequisites": ["battery_bank"],
+			"specialty": "electrical_comms",
+			"effect": "Keeps dust off the solar panels so they give more power.",
+			"question": "What does Mars dust do to solar panels?",
+			"placeholder": true
+		},
+		{
+			"id": "rock_lab",
+			"title": "Rock lab bench",
+			"sector": "science_research",
+			"zone": "Command Room",
+			"tier": 1,
+			"cost_parts": 3,
+			"prerequisites": [],
+			"specialty": "field_engineering_geology",
+			"effect": "Lets the crew study the rocks they bring back.",
+			"question": "What can rocks tell us about water on Mars long ago?",
+			"placeholder": true
+		}
+	]
+}

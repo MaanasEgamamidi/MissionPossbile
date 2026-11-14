@@ -1,0 +1,78 @@
+{
+ "schema": 1,
+ "note": "Credits shown in the game. kind: engine, tool, asset, science. A licence that was not found is written as unknown.",
+ "credits": [
+  {
+   "id": "godot",
+   "kind": "engine",
+   "name": "Godot Engine 4.7.2",
+   "by": "Godot Engine",
+   "licence": "MIT",
+   "licence_words": "MIT licence: free to use, change and share, as long as the licence notice stays with it.",
+   "url": "https://godotengine.org/",
+   "used_for": "The game engine that runs the whole game.",
+   "note": "The register (L04) says the engine's licence notice still has to be added when the game is packaged.",
+   "source_ids": ["T01", "L04"]
+  },
+  {
+   "id": "blender",
+   "kind": "tool",
+   "name": "Blender 5.3",
+   "by": "Blender",
+   "licence": "GPL",
+   "licence_words": "GPL licence: free software. It was used as a tool to make the 3D models; it is not part of the game.",
+   "url": "",
+   "used_for": "Building the colony models and the crew characters.",
+   "note": "",
+   "source_ids": []
+  },
+  {
+   "id": "human_base_meshes",
+   "kind": "asset",
+   "name": "Human Base Meshes 1.4.1",
+   "by": "Blender Studio and the Blender community",
+   "licence": "Unresolved: CC0 (README) and CC BY 4.0 (License text)",
+   "licence_words": "Not settled. The bundle's README says: \"All provided assets are public domain under the CC0 license.\" A separate License text in the same file says: \"The Rain Rig is released under the Creative Commons Attribution 4.0 license. The attribution is © Blender Foundation | cloud.blender.org\". Whether that second text covers the body mesh was not established.",
+   "url": "",
+   "used_for": "The body mesh of the first crew character (version 1). The current crew (version 2) is built from PlayerCharacter.fbx.",
+   "note": "Open issue C-19 / I-12 in the project docs.",
+   "source_ids": ["L01"]
+  },
+  {
+   "id": "player_character_fbx",
+   "kind": "asset",
+   "name": "PlayerCharacter.fbx (simple-low-poly-character.zip)",
+   "by": "Supplied by the game's owner; the original maker is not recorded",
+   "licence": "Unknown",
+   "licence_words": "Licence unknown: no licence text was recorded for this file.",
+   "url": "",
+   "used_for": "The low-poly body that all four crew members and their spacesuits are built from (crew version 2).",
+   "note": "One unrigged low-poly man, 2,828 triangles, copied to assets_src/characters/crew_v2/.",
+   "source_ids": []
+  },
+  {
+   "id": "walking_fbx",
+   "kind": "asset",
+   "name": "Walking.fbx (Mixamo)",
+   "by": "Mixamo; supplied by the game's owner",
+   "licence": "Unknown",
+   "licence_words": "Licence unknown: no licence text was recorded for this file.",
+   "url": "",
+   "used_for": "The walking animation of the crew, moved onto the crew's own skeleton.",
+   "note": "Skeleton only, 32 frames at 30 fps, copied to assets_src/characters/anims/Walking.fbx.",
+   "source_ids": []
+  },
+  {
+   "id": "nasa_sources",
+   "kind": "science",
+   "name": "NASA and PDS science pages",
+   "by": "NASA (NSSDCA, GISS, JPL) and the NASA Planetary Data System nodes",
+   "licence": "Public information",
+   "licence_words": "Public information from NASA. Each page is listed in the source register with what was read and how well it was checked.",
+   "url": "",
+   "used_for": "The real facts about Mars, the space station and plants in space that the game shows.",
+   "note": "Open the source register to see every page.",
+   "source_ids": ["S01", "S02", "S08", "S09", "S11"]
+  }
+ ]
+}
