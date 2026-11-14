@@ -1,0 +1,7 @@
+test_saves             exit=0 RESULT 56/56 (0.5 s)
+test_session           exit=0 RESULT 91/91 (53.8 s)
+test_tutorial          exit=0 RESULT 59/59 (34.7 s)
+test_rover             exit=0 RESULT 80/80 (8.3 s)
+test_net_game          exit=0 RESULT 20/20 (32.9 s)
+test_weather           exit=0 RESULT 66/66 (113.4 s)
+ALL TESTS PASSED

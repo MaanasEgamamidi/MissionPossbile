@@ -284,6 +284,11 @@ func _check_shipped_bundle() -> void:
 		bad.is_empty(), "%d products, %d rows, %d missing cells, %d episodes; %s" % [
 			(info.get("product_ids", []) as Array).size(), int(info.get("rows", 0)), int(info.get("missing_cells", 0)),
 			int(info.get("episodes", 0)), "; ".join(bad.slice(0, 8))])
+	# P15 regression (playtest issue PT-01): the GAME's own loader must accept the shipped bundle too, or a fresh
+	# offline game falls back to the built-in sky and never has a dust event.
+	var runtime := WeatherArchive.load_dir(BUNDLE_DIR, "shipped")
+	_check("the game's WeatherArchive loader accepts the shipped bundle (count columns such as 'samples' are not held to the ratio range), so an offline boot uses it",
+		runtime.ok and WeatherArchive.choose(runtime, null).source == "shipped", "; ".join(runtime.problems.slice(0, 3)))
 	var kinds: Array = info.get("kinds", [])
 	_check("shipped bundle has pressure, air temperature, wind and dust opacity products",
 		kinds.has("pressure") and kinds.has("air_temperature") and kinds.has("wind") and kinds.has("dust_opacity"), str(kinds))

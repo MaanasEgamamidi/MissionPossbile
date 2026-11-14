@@ -1,0 +1,39 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS game starts: new colony, host plays crew_1
+PASS starts in first person, FOV 72
+PASS standing on the hub floor  y=0.000
+PASS host position follows the body
+PASS three parked crew are shown, none of them is a second local body
+PASS walks from the hub spot (the rehearsal hub is a furnished room, so a short way)  0.84 m in 2 s; start=(-6.1, 0.000078, -14.5) end=(-6.1, 0.000078, -15.34) input=true yaw=0.00
+PASS host has the new position
+PASS jump apex matches tuning under Mars gravity  apex 0.501 m (tuned 0.50)
+PASS jump air time matches 3.73 m/s²  1.00 s (expected 1.04)
+PASS six Tab presses: back in first person, owner and cargo unchanged
+PASS third person: camera at most 2.5 m behind and nothing solid between it and the head  0.78 m
+PASS pick up: host agrees and the crate is in the hand
+PASS held crate follows the hand while walking
+PASS drop: host agrees, crate is a free body again and in nobody's cargo
+PASS no duplicate or lost item
+PASS suit check starts at the rack   (stood 1.60 m away)
+PASS after 0.5 s the suit is not on yet
+PASS after 1.25 s the suit is on and the tank is unchanged
+PASS leaving the rack cancels the check: suit still on  33.77 m from rack
+PASS outdoors on terrain: walks, and the suit is 20 % slower  suit 2.40 m/s, no suit 3.00 m/s, ratio 0.800; run from (-18.0, 0.0, 33.0) yaw 0.79 clear=true; ended at (-24.33202, -0.049156, 26.66798) on_floor=true
+PASS power panel opens as a station surface and steering stops
+PASS switching the Greenhouse off lowers the load by its 9 kW  23.1 -> 14.1 kW
+PASS the same switch from across the base is refused  too_far
+PASS paused: colony clock does not move
+PASS resumed: clock moves again
+PASS recovered to the hub with health 50, suit kept  health at recovery 50.0
+PASS body moved to the hub too
+PASS cargo left in one cache where it happened
+PASS cost charged once: 0.3 meals  0.303 meals
+PASS the player is told the cost and where the cache is  Electrical and communications was brought back to the hub. Cost: 0.3 meals and 0.6 L of water. Their cargo is waiting in a cache: Exterior (-18, 33).
+PASS recovery does not refill the suit tank
+PASS doors open for the player and can be walked through both ways  24 of 24; 
+RESULT 32/32
+WARNING: 100 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 20 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
