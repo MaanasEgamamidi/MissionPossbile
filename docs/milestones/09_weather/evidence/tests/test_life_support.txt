@@ -1,0 +1,91 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS catalog: 12 sun trackers as solar stations in the Exterior, indices 0..11
+PASS set_equipment: unknown equipment is unknown_target
+PASS set_equipment: only at life support or power
+PASS set_equipment: switches and says what it does
+PASS set_water_allocation: 0..20 L per hour
+PASS set_water_allocation: sets both
+PASS clean_panel: only at a tracker
+PASS model_sources.json: all 74 GameBalance fields have an evidence category
+PASS conservation over 5 sols with switching: every ledger identity within 1e-6 (worst 2.773958840407431e-11, worst on any tick 3.2741809263825417e-11)
+PASS conservation run: invariants (no negative or over-capacity store, no NaN) on every tick
+PASS conservation run: things really flowed (airlock, suits, electrolysis, recycling, greenhouse)
+PASS capacity: battery never above capacity, the rest of the sun is curtailed
+PASS capacity: full oxygen tanks stop both processes, no water used
+PASS capacity: water and wastewater stay within capacity; overflow ledgered
+PASS zero input: no sun at night, the battery alone carries the load
+PASS zero input: no water, the electrolyser makes nothing
+PASS overload: all ten load groups switched on, in priority order
+PASS overload: loads shed exactly in the listed order (lights, greenhouse, CO2 unit, electrolyser, recycler, trackers, cleaner, scrubber, fans, base)
+PASS overload: an alert names each shed load and says why; shed equipment is 'on but unpowered'
+PASS overload: unserved energy = shed kW x hours, in the ledger
+PASS overload: 'Water pump stopped: no power. Wastewater is building up.' announced once over three ticks
+PASS overload: shed trackers stop following the sun, output falls to the fixed-panel value
+PASS cleaning: anyone cleans a tracker; output rises by dust/sum(1-dust) = 0.0682
+PASS cleaner repair: needs the electrical specialist
+PASS cleaner failed: dust keeps settling through sunrise
+PASS cleaner repair: electrical specialist repairs it
+PASS cleaner repair: refused when not failed
+PASS cleaner: wipes every panel at each sunrise and keeps them clean (max dust 0.0200)
+PASS trackers: fixed / tracking output = sqrt(sun half-sine) = 0.8995
+PASS trackers: switching their power off lowers the output by the expected ratio
+PASS trackers: over a sol, tracking collects about 20 % more sunlight (1.198 x)
+PASS recycler on: wastewater does not build up
+PASS recycler off: wastewater builds up by exactly the returned water (5.10 L), alert once
+PASS recycler unpowered: wastewater builds up, 'Water pump stopped: no power' announced once
+PASS oxygen neither: electrolyser 0.00 kg, CO2 unit 0.00 kg in 10 h, reserve change -1.40 kg; both statuses reported
+PASS oxygen electrolyser alone: electrolyser 2.00 kg, CO2 unit 0.00 kg in 10 h, reserve change +0.60 kg; both statuses reported
+PASS electrolyser: exactly 1.126 L of water per kg of oxygen (1.126000000), hydrogen vented = water x 2/18
+PASS oxygen CO2-oxygen unit alone: electrolyser 0.00 kg, CO2 unit 1.50 kg in 10 h, reserve change +0.10 kg; both statuses reported
+PASS oxygen both: electrolyser 2.00 kg, CO2 unit 1.50 kg in 10 h, reserve change +2.10 kg; both statuses reported
+PASS electrolyser: half the feed water makes half the oxygen
+PASS electrolyser: never takes clean water below the drinking reserve
+PASS CO2-oxygen unit uses no water in any of 64 switch combinations (largest water difference 0)
+PASS electrolyser stops below water quality 0.9, with 'Electrolyser stopped: the water is not clean enough.'
+PASS electrolyser runs again at quality 0.9
+PASS water quality mixes by volume (poor recycler: 0.9934)
+PASS scrubber off: CO2 reaches the warning level at 17.1 h (expected 17.1 h), alert once
+PASS scrubber off: the warning comes 21.3 h before any harm (at least 12 h)
+PASS airlock: three cycles lower cabin pressure (100.10 -> 98.89 kPa)
+PASS airlock: the regulator restores pressure (100.100 kPa) from the reserves
+PASS airlock: with no nitrogen left, pressure stays low and an alert says so
+PASS suits: report_position marks a character outside
+PASS suits: used only outside (outside 82.5 %, inside 100 %), cabin feeds only the 3 inside
+PASS suits: outside without a suit, health falls gradually (75.0 after 1 h) with an urgent alert
+PASS suits: an empty tank outside harms the same way
+PASS refill: moves oxygen from the reserve to the tank
+PASS refill: a full tank is refused
+PASS refill: a short reserve fills what it can and says so
+PASS refill: an empty reserve is insufficient
+PASS suit check: no free refill, the tank is unchanged
+PASS active crew 0..4: use scales exactly with the active count; parked crew use nothing and stay frozen
+PASS recovery with empty shared stores still works (24 recoveries), stores stay >= 0
+PASS toggling equipment 1,000 times with no time passing changes no store, gas or ledger
+PASS toggling 1,000 times between ticks creates nothing (identities within 3.835376460870066e-12)
+PASS save -> load -> continue matches an uninterrupted run (70 values, largest difference 2.842170943040401e-14)
+PASS arrival, no action for 3 sols: nobody reaches zero health (lowest 100.0), every supply store stays above zero (lowest battery 265 kWh, oxygen 49.6 kg)
+PASS arrival, 3 sols: first warning of any kind at 0.05 h (the failed cleaner); battery or air warning none; harm none
+PASS arrival: energy-negative before the restoration (battery at sunrise [482, 385, 271] kWh)
+PASS no action for 10 sols: 'battery low' at 93.1 h, 28.6 h before the first load is shed
+PASS no action for 10 sols: first battery or air warning (93.1 h) comes 104.1 h before the first harm (197.3 h)
+PASS no action for 10 sols: the first harm is hunger (food 0.00 meals left), and 'food low' came 24.6 h before it
+PASS restored (electrolyser): energy-positive over a sol (sun 936 kWh > used 604 + battery loss 34; battery -0 kWh), oxygen-positive (+1.48 kg), nothing unserved
+PASS restored (electrolyser): from 300 kWh at sunrise the battery ends the sol higher (496 kWh)
+PASS restored (co2_unit): energy-positive over a sol (sun 936 kWh > used 649 + battery loss 37; battery -0 kWh), oxygen-positive (+0.25 kg), nothing unserved
+PASS restored (co2_unit): from 300 kWh at sunrise the battery ends the sol higher (473 kWh)
+PASS restored (both): energy-positive over a sol (sun 936 kWh > used 678 + battery loss 38; battery -0 kWh), oxygen-positive (+5.18 kg), nothing unserved
+PASS restored (both): from 300 kWh at sunrise the battery ends the sol higher (458 kWh)
+PASS forecast: battery lasts 6.44 h, simulation runs out (first load shed) at 6.45 h (within 2 %)
+PASS forecast: battery at next sunrise from phase 0.8: 243.7 kWh, simulation 243.7 kWh (within 2 %)
+PASS forecast: battery at next sunrise from phase 0.4: 184.7 kWh, simulation 182.7 kWh (within 2 %)
+PASS forecast: oxygen_kg lasts 35.21 h, simulation 35.22 h (within 2 %)
+PASS forecast: water_l lasts 127.16 h, simulation 128.34 h (within 2 %)
+PASS forecast: food_meals lasts 11.83 h, simulation 11.84 h (within 2 %)
+PASS forecast: suit lasts 5.21 h, simulation 5.22 h (within 2 %)
+PASS forecast: plain text lines ('Battery: 5000005 kWh, not running out in the next 3 sols at this rate')
+PASS forecast: -1 for a reserve that is not falling (oxygen with the electrolyser on)
+PASS full sol at 5 real minutes: stores within 1 % of the 5-minute sol (largest difference 0.0000 %)
+PASS full sol at 20 real minutes: stores within 1 % of the 5-minute sol (largest difference 0.0043 %)
+PASS full sol at 120 real minutes: stores within 1 % of the 5-minute sol (largest difference 0.0039 %)
+RESULT 88/88

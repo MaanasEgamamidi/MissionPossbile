@@ -20,6 +20,8 @@ Milestone records:
 | Prompt 05 — Native game UI, controls and sources | [milestones/05_ui/HANDOFF.md](milestones/05_ui/HANDOFF.md) | 2026-11-12 |
 | Prompt 06 — LAN multiplayer (host and up to three clients over ENet; no voice) | [milestones/06_lan/HANDOFF.md](milestones/06_lan/HANDOFF.md) | 2026-11-13 |
 | Prompt 07 — Power, water and two oxygen processes | [milestones/07_power_life_support/HANDOFF.md](milestones/07_power_life_support/HANDOFF.md) | 2026-11-12 |
+| Prompt 08 — Food, science, fabrication and earned upgrades | [milestones/08_food_science_upgrades/HANDOFF.md](milestones/08_food_science_upgrades/HANDOFF.md) | 2026-11-14 |
+| Prompt 09 — NASA weather archive, refresh and varied weather | [milestones/09_weather/HANDOFF.md](milestones/09_weather/HANDOFF.md) | 2026-11-14 |
 
 Prompt 01 deliverables, all in `milestones/01_audit/`: `inventory.md`, `authority_matrix.md`, `camera_manifest.json` and `.csv`, `coverage_sheet.md`, `asset_readiness.md`, `contradictions.md`, `evidence/`, `tools/`.
 

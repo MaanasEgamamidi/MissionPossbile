@@ -58,7 +58,7 @@ completed by another session, so the host distributes the weather to clients thr
 
 ## 3. Checks run (headless only, 2026-11-14)
 
-Compile: **COMPILE OK, 157 scripts**. Suites: RESULTS_PLACEHOLDER
+Compile: **COMPILE OK, 157 scripts**. Suites: All 19 headless suites pass on the merged project, **1,275 checks**: test_saves 56, test_session 91, test_game_services 25, test_collision 40, test_life_support 88, test_food 85, test_science 76, test_progression 84, test_weather_data 14, test_weather 66, test_ui_framework 125, test_sources 76, test_hud_panels 89, test_station_panels 108, test_p07_panels 54, test_player 112, test_net 34, test_net_game 20, test_game_scene 32 (all run headless; logs in `evidence\tests\`). Found and fixed in the combined run: the weather screen was 38 px too wide at 1280×720 (long values now wrap); a station-panel title check assumed every station of a kind shares one name (numbered beds do not).
 
 ## 4. Limits
 

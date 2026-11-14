@@ -1,0 +1,94 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS manifest stations
+PASS power zone
+PASS bad shape
+PASS unknown action
+PASS parameter validation
+PASS parameter validation
+PASS parameter validation
+PASS parameter validation
+PASS parameter validation
+PASS long string
+PASS host only
+PASS no actor
+PASS unknown actor
+PASS first claim
+PASS already yours
+PASS taken
+PASS not owner
+PASS missing target
+PASS wrong target category
+PASS wrong station
+PASS too far
+PASS unknown zone
+PASS power action
+PASS legacy unknown
+PASS legacy unavailable
+PASS specialty
+PASS prerequisite
+PASS quantity
+PASS station specialty
+PASS pick up
+PASS duplicate success
+PASS cannot hold twice
+PASS carrying invariant
+PASS drop
+PASS not held
+PASS cargo full
+PASS duplicate failure stays failed
+PASS switch with 1 peers
+PASS switch with 2 peers
+PASS switch with 3 peers
+PASS switch outside hub
+PASS four peer switch
+PASS peer loss preserves cargo and stores
+PASS position ownership
+PASS position accepted
+PASS release
+PASS parked sol frozen and no consumption
+PASS start suit
+PASS check already running
+PASS solo pause freezes ticks and suit
+PASS paused action
+PASS one of two votes
+PASS two votes pause
+PASS leaving dissenter pauses
+PASS unvote resumes
+PASS suit waits at 20 minutes
+PASS suit completes at 20 minutes
+PASS suit waits at 5 minutes
+PASS suit completes at 5 minutes
+PASS same suit state
+PASS walking cancels suit
+PASS ten on off cycles preserve charge
+PASS peer loss cancels suit
+PASS recovery cache exact
+PASS recovery cost once
+PASS recovery preserves personal gear
+PASS partial cache collect
+PASS cache cargo full
+PASS cache collect complete
+PASS empty stores recovery
+PASS unattached session
+PASS sol settings preserve instant state
+PASS battery ledger identity
+PASS full sol 5 minutes difference 0.00000000
+PASS full sol 20 minutes difference 0.00000397
+PASS full sol 120 minutes difference 0.00000447
+PASS frame rate 30 tick difference 0 store difference 0.000000000
+PASS frame rate 60 tick difference 0 store difference 0.000000000
+PASS frame rate 144 tick difference 0 store difference 0.000000000
+PASS frame rate 0 tick difference 0 store difference 0.000000000
+PASS tick cap
+PASS backlog retained
+PASS rng restored
+PASS rng synchronized
+PASS remember failure
+PASS request log evicts oldest
+PASS forget peer clears history
+PASS simulation triggers recovery once
+PASS later tick does not repeat recovery
+PASS begin resets transient state
+PASS invariants after every action
+RESULT 91/91
