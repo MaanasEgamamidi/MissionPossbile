@@ -32,7 +32,7 @@ Date: 2026-11-13. Branch `feat/astra-ui-scout`. The owner asked for this directl
 
 - `tools/run_tests.ps1`, 21 suites, 1,438 checks, all passing, including the new `test_scout` (60 checks).
 - `test_science`: one check changed on purpose. The donor list excludes `broken_rover`, which has no map object.
-- Screenshots: 11 shots of the windowed game at 2560×1369 and 1280×720 (local tool run; images not committed).
+- Screenshots: 11 shots of the windowed game at 2560×1369 and 1280×720 in `evidence/`, made with `tools/godot/capture_scout.gd` (`godot --path . --script res://tools/godot/capture_scout.gd -- <out folder>`).
 - No human playtest.
 
 ## Known limits and requests
