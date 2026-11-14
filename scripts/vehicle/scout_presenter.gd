@@ -89,6 +89,11 @@ func _build() -> void:
 	var bay_pos := _station_pos(st, "scout_bay", Vector3(17.0, 0.0, 21.5))
 	_place(_bay, bay_pos, 0.0)
 	_place(_kit, ScoutSystem.dock_position(), ScoutSystem.dock_yaw())
+	# Visibility is set before the models enter the tree, and later only when it really changes: the renderer
+	# asserts (softshadow_count) when a brand-new instance is hidden in the frame it was created.
+	var built := st != null and ScoutSystem.is_built(st)
+	_kit.visible = not built
+	_scout.visible = built
 	for n: Node3D in [_bay, _kit, _scout]:
 		_root.add_child(n)
 	_solid(_kit, Vector3(1.6, 1.4, 2.2), Vector3(0, 0.7, 0))
@@ -108,11 +113,12 @@ func _build() -> void:
 			var n := ScoutModels.ore_deposit(Color(float(c[0]), float(c[1]), float(c[2])), id.hash())
 			n.name = id.validate_node_name()
 			_place(n, _station_pos(st, id, Vector3.ZERO), 0.0)
+			_apply_ore(n, st, id)
 			_root.add_child(n)
 			_ores[id] = n
 	_set_layers(_root, mask)
 	_build_mast_camera()
-	refresh(true)
+	_placed = false
 
 
 func _build_mast_camera() -> void:
@@ -189,8 +195,8 @@ func _process(delta: float) -> void:
 func refresh(snap := false, delta := 0.0) -> void:
 	var st := services.state()
 	var built := ScoutSystem.is_built(st)
-	_kit.visible = not built
-	_scout.visible = built
+	_show(_kit, not built)
+	_show(_scout, built)
 	var target := ScoutSystem.position(st)
 	var yaw := float(st.scout.get("yaw", ScoutSystem.dock_yaw()))
 	if snap or not _placed:
@@ -212,13 +218,22 @@ func refresh(snap := false, delta := 0.0) -> void:
 	if head != null:
 		head.rotation.y = sin(Time.get_ticks_msec() / 1000.0 * 0.6) * 0.9 if surveying else lerp_angle(head.rotation.y, 0.0, clampf(delta * 2.0, 0.0, 1.0))
 	for id: String in _ores:
-		var n := _ores[id] as Node3D
-		(n.get_node("Flag") as Node3D).visible = ScoutSystem.is_revealed(st, id)
-		var left := ScoutSystem.ore_left(st, id)
-		for c in n.get_children():
-			if c is MeshInstance3D and String(c.name).begins_with("Ore_"):
-				(c as Node3D).visible = int(String(c.name).trim_prefix("Ore_")) < left * 2
+		_apply_ore(_ores[id] as Node3D, st, id)
 	_update_camera(st, surveying, delta)
+
+
+## Flag once found; one ore-coloured rock fewer for each piece collected.
+func _apply_ore(n: Node3D, st: ColonyState, id: String) -> void:
+	_show(n.get_node("Flag") as Node3D, ScoutSystem.is_revealed(st, id))
+	var left := ScoutSystem.ore_left(st, id)
+	for c in n.get_children():
+		if c is MeshInstance3D and String(c.name).begins_with("Ore_"):
+			_show(c as Node3D, int(String(c.name).trim_prefix("Ore_")) < left * 2)
+
+
+static func _show(n: Node3D, on: bool) -> void:
+	if n.visible != on:
+		n.visible = on
 
 
 func _update_camera(st: ColonyState, surveying: bool, delta: float) -> void:

@@ -3,6 +3,18 @@
  "note": "Credits shown in the game. kind: engine, tool, asset, science. A licence that was not found is written as unknown.",
  "credits": [
   {
+   "id": "astra_ui",
+   "kind": "tool",
+   "name": "ASTRA, Junior Astronaut Mission Trainer (UI design reference)",
+   "by": "Hamza Ali",
+   "licence": "MIT",
+   "licence_words": "MIT licence: free to use, change and share, as long as the licence notice stays with it.",
+   "url": "https://github.com/HamzaAli0911/astra-mission-trainer",
+   "used_for": "Design study for the mission-control HUD: the supplies bar, goals card, map, pop-ups, Mission Control messages, key dock and the power and build drawers. Rebuilt with Godot controls; no code or images were copied.",
+   "note": "Independent NASA Space Apps 2026 project, not a NASA product.",
+   "source_ids": []
+  },
+  {
    "id": "godot",
    "kind": "engine",
    "name": "Godot Engine 4.7.2",

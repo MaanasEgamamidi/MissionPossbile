@@ -26,7 +26,7 @@ const STATION_NAMES := {
 	"suits": "suit rack", "power": "power panel", "computer": "colony computer", "comms": "comms console",
 	"food": "greenhouse console", "board": "transceiver board", "lifesupport": "life support console",
 	"heal": "med station", "survivor": "patient", "solar": "sun tracker",
-	"scout_bay": "scout bay", "ore_deposit": "ore deposit", "salvage": "damaged machine",
+	"scout_bay": "scout bay", "ore_deposit": "ore deposit", "salvage": "damaged machine", "sample_site": "sample site",
 }
 ## Seconds a colony system alert stays in the message line.
 const ALERT_SECONDS := 6.0

@@ -84,7 +84,7 @@ func _make_item(s: Dictionary) -> Dictionary:
 	line.add_theme_constant_override(&"separation", 6)
 	line.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(line)
-	var sym := AstraStyle.label(String(s.symbol), 18, s.color, "Symbol", true)
+	var sym := AstraStyle.label(String(s.symbol), 20, s.color, "Symbol", true)
 	line.add_child(sym)
 	var nums := VBoxContainer.new()
 	nums.add_theme_constant_override(&"separation", -3)
@@ -92,12 +92,12 @@ func _make_item(s: Dictionary) -> Dictionary:
 	var top := HBoxContainer.new()
 	top.add_theme_constant_override(&"separation", 3)
 	nums.add_child(top)
-	var value := AstraStyle.label("0", 17, AstraStyle.TEXT, "Value")
+	var value := AstraStyle.label("0", 19, AstraStyle.TEXT, "Value")
 	top.add_child(value)
-	var unit := AstraStyle.label(String(s.unit), 11, AstraStyle.TEXT_3, "Unit")
+	var unit := AstraStyle.label(String(s.unit), 12, AstraStyle.TEXT_3, "Unit")
 	unit.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	top.add_child(unit)
-	var trend := AstraStyle.label("steady", 11, AstraStyle.TEXT_3, "Trend", true)
+	var trend := AstraStyle.label("steady", 12, AstraStyle.TEXT_3, "Trend", true)
 	nums.add_child(trend)
 	var meter := AstraStyle.Meter.new(s.color, 3.0)
 	meter.name = "Fill"
