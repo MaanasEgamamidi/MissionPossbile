@@ -6,7 +6,9 @@ extends Node
 ## Channels (EN-06):
 ##   0  reliable, ordered: requests, answers, colony snapshots and forwarded GameEvents. One channel, so a client always
 ##      has the new state before the event that tells the UI to read it.
-##   1  unreliable, ordered: body positions, about 20 per second each way.
+##   1  unreliable, ordered: body positions, about 20 per second each way, and "motion extras" (the rover's pose).
+##   2  voice (Prompt 11): encoded audio packets, unreliable ordered (headers reliable). The host relays a client's
+##      packets to the other clients; every machine decides itself how to play them (VoiceRouter).
 ##
 ## What travels:
 ##   client -> host   _rpc_request(request dict)  _rpc_position(character, position, yaw)
@@ -17,9 +19,14 @@ extends Node
 const DEFAULT_PORT := 24680
 const MAX_PLAYERS := 4
 ## Bumped when the messages change shape. A client of another version is turned away with a plain reason.
-const PROTOCOL := 1
+const PROTOCOL := 2
 const CHANNEL_STATE := 0
 const CHANNEL_MOTION := 1
+const CHANNEL_VOICE := 2
+## Channels opened on the ENet connection (state, motion, voice).
+const CHANNEL_COUNT := 3
+## Largest voice packet accepted, in bytes (an Opus frame of 20 ms is far smaller).
+const VOICE_PACKET_MAX := 4000
 ## Colony snapshots per second while nothing else happens (the simulation itself ticks at 5 Hz).
 const STATE_HZ := 5.0
 ## Body positions per second, each way.
@@ -37,6 +44,13 @@ signal peer_connected(peer_id: int)
 signal peer_disconnected(peer_id: int)
 ## The host went away; `reason` is plain language for the menu.
 signal host_lost(reason: String)
+## Prompt 11: a voice packet from another machine's player (`from_peer`), on every machine that receives it.
+signal voice_packet_received(from_peer: int, packet: PackedByteArray)
+## Prompt 10: host only. A client sent a motion extra (for example the rover pose from its driver). The receiver
+## must check that `sender` may set it (the rover code checks the sender is the driver).
+signal motion_extra_received(sender: int, key: String, value: Variant)
+## Prompt 10: client only. The host's motion extras, about 20 times a second.
+signal motion_extras_received(extras: Dictionary)
 
 ## GameEvents signals the host forwards to clients. action_resolved goes only to the peer that asked (as _rpc_result);
 ## game_saved and game_loaded describe the host's own files and stay there.
@@ -60,6 +74,8 @@ var _join_left := 0.0
 var _counter := 0
 var _forwarders := {}                  # signal name -> Callable, so leave() can disconnect them
 var _last_sent_pose := {}              # client: character id -> [position, yaw] last sent
+## Host: returns {key: value} sent to every client with the body positions (for example {"rover": pose}).
+var motion_extras_provider: Callable = Callable()
 
 
 func setup(p_services: GameServices) -> void:
@@ -82,7 +98,7 @@ func host(p_port := DEFAULT_PORT) -> Error:
 	if services == null:
 		return ERR_UNCONFIGURED
 	var peer := ENetMultiplayerPeer.new()
-	var err := peer.create_server(p_port, MAX_PLAYERS - 1, 2)
+	var err := peer.create_server(p_port, MAX_PLAYERS - 1, CHANNEL_COUNT)
 	if err != OK:
 		return err
 	_peer = peer
@@ -104,7 +120,7 @@ func join(p_address: String, p_port := DEFAULT_PORT) -> Error:
 	if services == null:
 		return ERR_UNCONFIGURED
 	var peer := ENetMultiplayerPeer.new()
-	var err := peer.create_client(p_address, p_port, 2)
+	var err := peer.create_client(p_address, p_port, CHANNEL_COUNT)
 	if err != OK:
 		return err
 	_peer = peer
@@ -200,6 +216,33 @@ func send_position(character_id: StringName, position: Vector3, yaw: float) -> v
 	_rpc_position.rpc_id(1, String(character_id), position, yaw)
 
 
+## Sends this machine's voice packet to the other players. A client sends it to the host, which relays it; the host
+## sends it to every client. `reliable` is for stream headers and footers. Offline it does nothing.
+func send_voice(packet: PackedByteArray, reliable := false) -> void:
+	if packet.is_empty() or packet.size() > VOICE_PACKET_MAX:
+		return
+	match _role:
+		&"client":
+			if reliable:
+				_rpc_voice_up_reliable.rpc_id(1, packet)
+			else:
+				_rpc_voice_up.rpc_id(1, packet)
+		&"host":
+			if multiplayer.get_peers().is_empty():
+				return
+			if reliable:
+				_rpc_voice_down_reliable.rpc(1, packet)
+			else:
+				_rpc_voice_down.rpc(1, packet)
+
+
+## Client only: sends a motion extra (for example the rover pose while this player drives) to the host.
+func send_motion_extra(key: String, value: Variant) -> void:
+	if _role != &"client" or key.length() > 32:
+		return
+	_rpc_motion_extra.rpc_id(1, key, value)
+
+
 ## One line for the HUD or menu: "Hosting on 192.168.1.20:24680, 2 players" and the like.
 func status_text() -> String:
 	match _role:
@@ -292,6 +335,10 @@ func _full_record() -> Dictionary:
 func _broadcast_positions() -> void:
 	if multiplayer.get_peers().is_empty():
 		return
+	if motion_extras_provider.is_valid():
+		var extras: Dictionary = motion_extras_provider.call()
+		if not extras.is_empty():
+			_rpc_extras.rpc(extras)
 	var poses := {}
 	for c: CharacterState in services.state().active_characters():
 		poses[String(c.id)] = [c.position, c.yaw]
@@ -351,6 +398,54 @@ func _rpc_position(character_id: String, position: Vector3, yaw: float) -> void:
 		return
 	# SessionService checks that the sender owns this character.
 	services.session.report_position(multiplayer.get_remote_sender_id(), StringName(character_id), position, yaw)
+
+
+@rpc("any_peer", "call_remote", "unreliable_ordered", 1)
+func _rpc_motion_extra(key: String, value: Variant) -> void:
+	if _role != &"host" or not services.has_game():
+		return
+	var sender := multiplayer.get_remote_sender_id()
+	if services.session.peers.has(sender):
+		motion_extra_received.emit(sender, key, value)
+
+
+@rpc("any_peer", "call_remote", "unreliable_ordered", 2)
+func _rpc_voice_up(packet: PackedByteArray) -> void:
+	_voice_from_client(packet, false)
+
+
+@rpc("any_peer", "call_remote", "reliable", 2)
+func _rpc_voice_up_reliable(packet: PackedByteArray) -> void:
+	_voice_from_client(packet, true)
+
+
+## Host: plays a client's packet here and relays it to the other clients, unchanged and in arrival order.
+func _voice_from_client(packet: PackedByteArray, reliable: bool) -> void:
+	if _role != &"host" or packet.is_empty() or packet.size() > VOICE_PACKET_MAX:
+		return
+	var sender := multiplayer.get_remote_sender_id()
+	if not services.has_game() or not services.session.peers.has(sender):
+		return
+	voice_packet_received.emit(sender, packet)
+	for p: int in multiplayer.get_peers():
+		if p == sender:
+			continue
+		if reliable:
+			_rpc_voice_down_reliable.rpc_id(p, sender, packet)
+		else:
+			_rpc_voice_down.rpc_id(p, sender, packet)
+
+
+@rpc("authority", "call_remote", "unreliable_ordered", 2)
+func _rpc_voice_down(from_peer: int, packet: PackedByteArray) -> void:
+	if _role == &"client" and packet.size() <= VOICE_PACKET_MAX and from_peer != local_peer():
+		voice_packet_received.emit(from_peer, packet)
+
+
+@rpc("authority", "call_remote", "reliable", 2)
+func _rpc_voice_down_reliable(from_peer: int, packet: PackedByteArray) -> void:
+	if _role == &"client" and packet.size() <= VOICE_PACKET_MAX and from_peer != local_peer():
+		voice_packet_received.emit(from_peer, packet)
 
 
 func _connect_forwarders() -> void:
@@ -454,6 +549,12 @@ func _rpc_positions(poses: Dictionary) -> void:
 		if c != null and pose.size() == 2 and pose[0] is Vector3:
 			c.position = pose[0]
 			c.yaw = float(pose[1])
+
+
+@rpc("authority", "call_remote", "unreliable_ordered", 1)
+func _rpc_extras(extras: Dictionary) -> void:
+	if _role == &"client" and services.has_game():
+		motion_extras_received.emit(extras)
 
 
 @rpc("authority", "call_remote", "reliable", 0)

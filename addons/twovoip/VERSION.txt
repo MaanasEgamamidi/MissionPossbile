@@ -1,0 +1,6 @@
+﻿TwoVoIP 6.1 (GDExtension), from https://github.com/goatchurchprime/two-voip-godot-4/releases/tag/v6.1
+Release asset TwoVoIP.zip, SHA-256 01825E1FB99B483FE6EF3B43A4578F6E5CF029AE6F39C292D99EB8AF3DD0D098, downloaded 2026-11-13.
+Kept here: twovoip.gdextension and the Windows x86_64 debug and release libraries only. The helper scripts
+are not copied; the game has its own adapter in scripts/voice/ (the originals stay in G:\nasa app\_tools\twovoip_6.1).
+License: MIT (LICENSE.txt). The libraries bundle libopus, speexdsp and rnnoise (BSD-style licenses, see the project
+repository's thirdparty notices).
