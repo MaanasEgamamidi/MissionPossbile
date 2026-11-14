@@ -1,0 +1,2 @@
+# Small menu images are ordinary Git blobs so web uploads and clones contain usable textures.
+*.png -filter -diff -merge -text
