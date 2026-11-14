@@ -79,6 +79,17 @@ var discoveries: Array = []
 var rover := {"built": false, "levels": {"speed": 1, "torque": 1, "range": 1, "cargo": 1, "traction": 1}, "battery_kwh": 0.0, "cargo": []}
 
 # ---- data and randomness
+# ---- Prompts 08 and 09: one dictionary per part, plain JSON data, owned by that part's code
+## Greenhouse beds and plants (CropSystem, FoodActions).
+var crops := {}
+## Field samples, lab records, salvage donors and components (ScienceActions).
+var science := {}
+## Sector tiers, quiz attempts, automation flags (ProgressionSystem, ProgressionActions). Knowledge answers go in
+## `knowledge`, practical evidence in `evidence` (ProgressEvidence.record), installed upgrades in `upgrades`.
+var progress := {}
+## Current weather: dust episode, opacity, warnings (WeatherSystem). Future events stay in `weather_queue`.
+var weather := {}
+
 var data_snapshot_id := ""
 var weather_queue: Array = []
 ## Timed events waiting to happen: [{"at_hours": float, "type": String, ...}], oldest first.
@@ -196,6 +207,11 @@ func character_of_peer(peer_id: int) -> CharacterState:
 	return null
 
 
+## True if the upgrade `id` is installed (Prompt 08). Systems check this to apply an upgrade's effect.
+func has_upgrade(id: String) -> bool:
+	return bool((upgrades.get(id, {}) as Dictionary).get("installed", false))
+
+
 func is_zone_powered(zone: String) -> bool:
 	return bool((zones.get(zone, {}) as Dictionary).get("powered", true))
 
@@ -280,6 +296,7 @@ func to_dict() -> Dictionary:
 		"pending_airlock_cycles": pending_airlock_cycles, "alerts": alerts.duplicate(true), "sim_hours": sim_hours,
 		"knowledge": knowledge.duplicate(true), "evidence": evidence.duplicate(true), "upgrades": upgrades.duplicate(true), "tasks": tasks.duplicate(true),
 		"discoveries": discoveries.duplicate(true), "rover": rover.duplicate(true),
+		"crops": crops.duplicate(true), "science": science.duplicate(true), "progress": progress.duplicate(true), "weather": weather.duplicate(true),
 		"data_snapshot_id": data_snapshot_id, "weather_queue": weather_queue.duplicate(true), "event_queue": event_queue.duplicate(true),
 		"ledger": ledger.duplicate(true), "counters": counters.duplicate(true),
 		# 64-bit values go out as strings: JSON numbers are doubles and would lose the low bits
@@ -318,6 +335,10 @@ func assign_from(d: Dictionary, keep_pose_of: StringName = &"") -> void:
 	rover = fresh.rover
 	data_snapshot_id = fresh.data_snapshot_id
 	weather_queue = fresh.weather_queue
+	crops = fresh.crops
+	science = fresh.science
+	progress = fresh.progress
+	weather = fresh.weather
 	event_queue = fresh.event_queue
 	rng_seed = fresh.rng_seed
 	rng_state = fresh.rng_state
@@ -420,6 +441,10 @@ static func from_dict(d: Dictionary) -> ColonyState:
 			levels[k] = int(levels[k])
 	s.data_snapshot_id = String(d.get("data_snapshot_id", ""))
 	s.weather_queue = (d.get("weather_queue", []) as Array).duplicate(true)
+	s.crops = (d.get("crops", {}) as Dictionary).duplicate(true)
+	s.science = (d.get("science", {}) as Dictionary).duplicate(true)
+	s.progress = (d.get("progress", {}) as Dictionary).duplicate(true)
+	s.weather = (d.get("weather", {}) as Dictionary).duplicate(true)
 	s.event_queue = (d.get("event_queue", []) as Array).duplicate(true)
 	for k in (d.get("ledger", {}) as Dictionary):
 		s.ledger[String(k)] = float(d.ledger[k])

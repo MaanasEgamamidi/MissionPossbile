@@ -73,7 +73,12 @@ static func for_station(station_id: StringName, services: GameServices) -> UiPan
 		return null
 	var kind := String(record.get("kind", ""))
 	var panel: StationPanel
-	match kind:
+	# A later milestone adds a panel for a kind by creating res://scripts/ui/stations/<kind>_station_panel.gd
+	# (a script extending StationPanel). It takes precedence over the built-in panels below.
+	var custom_path := "res://scripts/ui/stations/%s_station_panel.gd" % kind
+	if ResourceLoader.exists(custom_path):
+		panel = (load(custom_path) as Script).new() as StationPanel
+	match kind if panel == null else "":
 		"power":
 			panel = PowerStationPanel.new()
 		"lifesupport":
@@ -94,7 +99,15 @@ static func for_station(station_id: StringName, services: GameServices) -> UiPan
 
 ## The station's name in words ("Life support console").
 static func name_of(kind: String) -> String:
-	return String(NAMES.get(kind, "Station"))
+	return String(NAMES.get(kind, String(_extra_field(kind, "name", "Station"))))
+
+
+## A field of the first data/stations_*.json entry of this kind (later milestones name their own stations).
+static func _extra_field(kind: String, field: String, fallback: String) -> String:
+	for entry: Dictionary in StationCatalog.extra_entries():
+		if String(entry.get("kind", "")) == kind and entry.has(field):
+			return String(entry[field])
+	return fallback
 
 
 ## The station's short name for the map ("Life support").

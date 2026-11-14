@@ -17,6 +17,12 @@ extends RefCounted
 
 ## Optional: where new alerts are announced. Set by SessionService.
 var events: GameEvents
+## Systems added by later milestones, run every tick. Each is an object with
+##   func step(state: ColonyState, balance: GameBalance, phase: float, dt_hours: float, events: GameEvents) -> void
+## pre_systems run first (weather sets dust_tau before solar power is worked out);
+## post_systems run after water, oxygen and cabin air and before food and health (crops, automation).
+var pre_systems: Array = []
+var post_systems: Array = []
 
 
 func set_events(p_events: GameEvents) -> void:
@@ -41,12 +47,16 @@ func step(state: ColonyState, balance: GameBalance, phase: float, dt_hours: floa
 	state.unmet = {"oxygen_kg": 0.0, "water_l": 0.0, "food_meals": 0.0}
 	var mid_phase := fposmod(phase + 0.5 * dt / GameConfig.SOL_HOURS, 1.0)
 
+	for system in pre_systems:
+		system.step(state, balance, phase, dt, events)
 	var water_share := _share(LifeSupportModel.use_water(state, balance, crew.size(), dt))
 	var plan := LifeSupportModel.plan_processes(state, balance, dt)
 	PowerModel.allocate(state, balance, mid_phase, dt, plan.kw)
 	PowerModel.settle_dust(state, balance, phase, dt)
 	LifeSupportModel.run_processes(state, balance, plan, dt)
 	var o2_short := LifeSupportModel.run_cabin(state, balance, inside, dt)
+	for system in post_systems:
+		system.step(state, balance, phase, dt, events)
 
 	var no_air := {}
 	for c in crew:

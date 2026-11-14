@@ -41,6 +41,9 @@ static func build(manifest_path: String, colliders_path: String) -> Node3D:
 		var station_kind := String(object.get("inter", ""))
 		if station_kind == "" and String(object.name).begins_with("sf_solar_tracker"):
 			station_kind = "solar"
+		var extra := StationCatalog.extra_for_object(String(object.name))
+		if not extra.is_empty():
+			station_kind = String(extra.kind)
 		if station_kind != "":
 			var station := Area3D.new()
 			station.name = object.name
@@ -57,7 +60,29 @@ static func build(manifest_path: String, colliders_path: String) -> Node3D:
 			shape.shape = sphere
 			station.add_child(shape)
 			result.get_node("Stations").add_child(station)
+	# stations with no map object (data/stations_*.json entries with an id and a position)
+	for entry: Dictionary in StationCatalog.extra_entries():
+		if entry.has("id") and entry.has("position"):
+			var q: Array = entry.position
+			result.get_node("Stations").add_child(_station_volume(String(entry.id), String(entry.kind), Vector3(float(q[0]), float(q[1]), float(q[2]))))
 	return result
+
+
+static func _station_volume(id: String, kind: String, at: Vector3) -> Area3D:
+	var station := Area3D.new()
+	station.name = id.validate_node_name()
+	station.position = at + Vector3(0, 1.0, 0)
+	station.collision_layer = Layers.STATION
+	station.collision_mask = 0
+	station.set_meta("station_id", id)
+	station.set_meta("kind", kind)
+	station.add_to_group(&"station_volume")
+	var shape := CollisionShape3D.new()
+	var sphere := SphereShape3D.new()
+	sphere.radius = 1.2
+	shape.shape = sphere
+	station.add_child(shape)
+	return station
 
 ## Convert a Blender row matrix to Godot's Y-up coordinates.
 static func object_transform(m: Array) -> Transform3D:

@@ -41,6 +41,14 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	actions = ActionService.new()
 	BuiltinActions.register(actions)
 	SystemActions.register(actions)
+	# Prompts 08 and 09: each part registers its actions and adds its simulation system.
+	FoodActions.register(actions)
+	ScienceActions.register(actions)
+	ProgressionActions.register(actions)
+	WeatherActions.register(actions)
+	sim.pre_systems.append(WeatherSystem.new())
+	sim.post_systems.append(CropSystem.new())
+	sim.post_systems.append(ProgressionSystem.new())
 
 ## Attaches a new or restored game and resets transient session state.
 func begin(p_state: ColonyState, p_clock: SolClock) -> void:
