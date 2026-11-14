@@ -14,6 +14,9 @@ var locked: bool = false
 var open_seconds: float = 0.6
 ## Player sensing distance from the average leaf origin.
 var sense_radius: float = 2.2
+## Shift of the sensing sphere from the average leaf origin (controller space), set before entering the tree. A short
+## airlock moves each door's sphere away from the chamber so the two doors do not both sense one player.
+var sense_offset: Vector3 = Vector3.ZERO
 
 ## Emitted when this door starts waiting for an airlock pressure cycle before it may open.
 signal cycle_started(door_id: int, seconds: float)
@@ -50,7 +53,7 @@ func _ready() -> void:
 	var centre := Vector3.ZERO
 	for leaf: Dictionary in _leaves:
 		centre += (leaf.closed as Transform3D).origin
-	_sense.position = centre / maxi(_leaves.size(), 1)
+	_sense.position = centre / maxi(_leaves.size(), 1) + sense_offset
 	var shape := CollisionShape3D.new()
 	var sphere := SphereShape3D.new()
 	sphere.radius = sense_radius

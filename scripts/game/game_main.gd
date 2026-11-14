@@ -35,6 +35,8 @@ var notice := ""
 var door_visuals_attached := 0
 ## The exit tunnel's inner and outer doors, paired as an airlock (empty when the map is not loaded).
 var airlock_doors: Array[DoorController] = []
+## The garden dome (greenhouse) airlock's inner and outer sliding doors, paired the same way (empty without the map).
+var garden_airlock_doors: Array[DoorController] = []
 ## True if the rigged astronaut was found and is used instead of the capsule stand-in.
 var rigged_bodies := false
 ## What PropCollision built at load (hulls, trimeshes, skipped, ms); empty when the map is not loaded.
@@ -92,6 +94,9 @@ func _ready() -> void:
 		# collision, so no rigid object can be walked into.
 		var height := load(TERRAIN_HEIGHT_PATH) as TerrainHeight if ResourceLoader.exists(TERRAIN_HEIGHT_PATH) else null
 		prop_collision_stats = PropCollision.build(world, collision, MANIFEST_PATH, COLLIDERS_PATH, height, PropCollision.CACHE_PATH)
+		# The garden dome's airlock vestibule is modelled open: give it sliding doors that cycle like the exit tunnel.
+		# Built after PropCollision so the vestibule's own collision (and the baked cache) is unchanged.
+		garden_airlock_doors = GardenDomeDoors.build(world, collision)
 
 
 	ui = UiRoot.new()
@@ -131,7 +136,7 @@ func _begin_play() -> void:
 	# One thing at a time on screen: the HUD steps aside while a panel or menu is open.
 	if not ui.menu_mode_changed.is_connected(_on_menu_mode_changed):
 		ui.menu_mode_changed.connect(_on_menu_mode_changed)
-	for door: DoorController in airlock_doors:
+	for door: DoorController in airlock_doors + garden_airlock_doors:
 		# Each time the outer door opens, the airlock has let some cabin air out (Prompt 07: pressure boundary).
 		if door.door_id == 902:
 			door.opened_changed.connect(func(_id: int, open: bool) -> void:
