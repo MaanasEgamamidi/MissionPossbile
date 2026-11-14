@@ -81,6 +81,7 @@ const NAME_TAG_FONT_SIZE := 64
 ## Emission energy of the skin while suited (a faint "helmet light" on the face).
 const SUITED_FACE_GLOW := 0.18
 var _first_person: bool = true
+var _camera_obstructed := false
 var _suited: bool = false
 var _zone_mask: int = 1
 var _identity: int = 0
@@ -170,6 +171,7 @@ func set_model(scene: PackedScene) -> void:
 		elif node.name.begins_with("Ident_Symbol_") or node.name.begins_with("Ident_Band_"):
 			_ident_parts.append(node as MeshInstance3D)
 	_model_base_y = _model.position.y
+	_finish_suit_materials()
 	if _animation != null:
 		for clip: StringName in LOOPING:
 			if _animation.has_animation(clip):
@@ -195,6 +197,27 @@ func _bone_anchor(skeleton: Skeleton3D, bone: String) -> Node3D:
 func set_first_person(on: bool) -> void:
 	_first_person = on
 	_apply_layers()
+
+## The third-person arm can retract into the body against a wall: preserve shadows without drawing its inside.
+func set_camera_obstructed(on: bool) -> void:
+	if _camera_obstructed != on:
+		_camera_obstructed = on
+		_apply_layers()
+
+func _finish_suit_materials() -> void:
+	for part: MeshInstance3D in _parts:
+		if part.mesh == null:
+			continue
+		for surface in part.mesh.get_surface_count():
+			var original := part.mesh.surface_get_material(surface) as BaseMaterial3D
+			if original == null or not (original.resource_name.begins_with("Mat_Suit") or original.resource_name == "Mat_Visor"):
+				continue
+			var copy := original.duplicate() as BaseMaterial3D
+			copy.metallic = 0.0
+			copy.metallic_specular = 0.0 if original.resource_name == "Mat_Visor" else 0.1
+			copy.clearcoat_enabled = false
+			copy.roughness = maxf(copy.roughness, 0.65 if original.resource_name == "Mat_Visor" else 0.85)
+			part.set_surface_override_material(surface, copy)
 
 ## Applies room-light layers while preserving first-person head exclusion.
 func set_zone_layers(mask: int) -> void:
@@ -587,13 +610,15 @@ func _process(delta: float) -> void:
 ## also took them out of every light's shadow casters: the shadow was headless.)
 func _apply_layers() -> void:
 	for part: MeshInstance3D in _parts:
-		var hidden: bool = part == _head or part == _helmet or _hair_parts.has(part)
+		# Identity meshes include the helmet/collar band as well as sleeve badges. In a jump the helmet band
+		# crosses the eye even though Suit_Helmet itself is hidden, producing the reported yellow arc.
+		var hidden: bool = part == _head or part == _helmet or _hair_parts.has(part) or _ident_parts.has(part)
 		if _head != null and _head.is_ancestor_of(part):
 			hidden = true
 		if _helmet != null and _helmet.is_ancestor_of(part):
 			hidden = true
 		part.layers = _zone_mask
-		if hidden and _first_person:
+		if (hidden and _first_person) or _camera_obstructed:
 			part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
 		else:
 			part.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_ON

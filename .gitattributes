@@ -8,3 +8,8 @@
 *.gd text eol=lf
 *.tscn text eol=lf
 *.tres text eol=lf
+# Weather manifests verify byte sizes and SHA-256: checkout must preserve the authored LF bytes.
+data/weather/**/*.csv text eol=lf
+data/weather/**/*.json text eol=lf
+tests/fixtures/**/*.csv text eol=lf
+tests/fixtures/**/*.json text eol=lf

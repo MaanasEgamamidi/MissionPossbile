@@ -34,6 +34,7 @@ var _was_on_floor: bool = true
 var _air_time: float = 0.0
 ## True from a jump press until the next touchdown.
 var _jumped: bool = false
+var _ladder: ClimbableLadder
 ## Shorter flights than this (a stair step-up, a bump, a floor-contact flicker) neither show the in-air
 ## pose nor play the landing; a jump always does both.
 const MIN_AIR_TIME_S: float = 0.15
@@ -102,6 +103,7 @@ func visual() -> PlayerVisual:
 func teleport(world_position: Vector3, yaw: float) -> void:
 	global_position = world_position
 	velocity = Vector3.ZERO
+	_ladder = null
 	_jumped = false
 	_air_time = 0.0
 	_rig.add_look(yaw - _rig.yaw(), -_rig.pitch())
@@ -122,9 +124,18 @@ func aimed_target() -> Dictionary:
 	query.exclude = [get_rid()]
 	query.collide_with_areas = true
 	var hit := get_world_3d().direct_space_state.intersect_ray(query)
+	var ladder_query := PhysicsRayQueryParameters3D.create(start, query.to, Layers.LADDER)
+	ladder_query.collide_with_areas = true
+	ladder_query.collide_with_bodies = false
+	ladder_query.hit_from_inside = true
+	var ladder_hit := get_world_3d().direct_space_state.intersect_ray(ladder_query)
+	if not ladder_hit.is_empty() and (hit.is_empty() or start.distance_squared_to(ladder_hit.position) <= start.distance_squared_to(hit.position)):
+		hit = ladder_hit
 	if hit.is_empty() or (hit.position as Vector3).distance_to(global_position + Vector3.UP * tuning.eye_height_m) > tuning.reach_m:
 		return empty
 	var node: Node = hit.collider
+	if node is ClimbableLadder:
+		return {"kind": "ladder", "id": StringName(node.name), "node": node}
 	if node is CarryItem:
 		return {"kind": "item", "id": node.item_id, "node": node}
 	if node.has_meta("station_id"):
@@ -154,6 +165,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _physics_process(delta: float) -> void:
 	if character == null:
 		return
+	_visual.set_camera_obstructed(not is_first_person() and _rig.camera().global_position.distance_to(_rig.global_position) < 0.6)
 	# Edge tracking also supports Input.action_press in headless tests.
 	for action: StringName in [&"toggle_view", &"interact", &"grab", &"jump", &"sprint"]:
 		var pressed := input_enabled and Input.is_action_pressed(action)
@@ -172,6 +184,10 @@ func _physics_process(delta: float) -> void:
 				&"sprint":
 					_sprint_latched = not _sprint_latched
 		_buttons[action] = pressed
+	if _climb_motion(delta):
+		if report_position.is_valid():
+			report_position.call(global_position, _rig.yaw())
+		return
 	var axis := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if input_enabled else Vector2.ZERO
 	var direction := Basis(Vector3.UP, _rig.yaw()) * Vector3(axis.x, 0, axis.y)
 	var sprint_wanted := _sprint_latched if toggle_sprint else Input.is_action_pressed("sprint")
@@ -281,7 +297,14 @@ func _answer(action: StringName, target: StringName, params: Dictionary) -> Acti
 ## otherwise an item you look at is picked up, or the item in your hands is put down (thrown while sprinting).
 ## G and the left mouse button still pick up and put down.
 func _interact() -> void:
+	if is_instance_valid(_ladder):
+		_ladder = null
+		return
 	var target := aimed_target()
+	if target.kind == "ladder":
+		_ladder = target.node as ClimbableLadder
+		velocity = Vector3.ZERO
+		return
 	if target.kind != "station":
 		if target.kind == "item" or held_item() != null:
 			_grab()
@@ -289,6 +312,34 @@ func _interact() -> void:
 	# Every station opens its surface; the suit rack's has the suit check and the tank refill (Prompt 07).
 	_visual.play_once(&"use", 1.0)
 	_answer(&"use_station", target.id, {})
+
+## E holds/releases the ladder; W/S climb, A/D or Space release it. All motion still uses real collision.
+func _climb_motion(delta: float) -> bool:
+	if not is_instance_valid(_ladder):
+		return false
+	if not input_enabled:
+		velocity = Vector3.ZERO
+		return true
+	if Input.is_action_pressed("jump") or Input.is_action_pressed("move_left") or Input.is_action_pressed("move_right"):
+		_ladder = null
+		return false
+	var axis := Input.get_axis("move_forward", "move_back")
+	var anchor := _ladder.global_position + _ladder.front() * 0.36
+	var correction := Vector3(anchor.x - global_position.x, 0, anchor.z - global_position.z)
+	velocity = correction.limit_length(2.5 * delta) / maxf(delta, 0.001)
+	velocity.y = -axis * 1.6
+	move_and_slide()
+	_visual.play(&"use")
+	if axis < 0.0 and global_position.y >= _ladder.top_y() + 0.02:
+		var across := -_ladder.front() * 0.95
+		if not test_move(global_transform, across):
+			move_and_collide(across)
+			_ladder = null
+			velocity = Vector3.ZERO
+	elif axis > 0.0 and global_position.y <= _ladder.bottom_y() + 0.02:
+		_ladder = null
+		velocity = Vector3.ZERO
+	return true
 
 func _grab() -> void:
 	if held_item() != null:

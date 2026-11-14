@@ -4,6 +4,7 @@ extends RefCounted
 
 ## Host network id.
 const HOST_PEER: int = 1
+const SUITS_PER_RACK := 4
 ## Engineering settings.
 var config: GameConfig
 ## Designer tuning.
@@ -62,6 +63,7 @@ func begin(p_state: ColonyState, p_clock: SolClock) -> void:
 	_votes.clear()
 	_suit_checks.clear()
 	_accumulator = 0.0
+	_restore_suit_slots()
 	_recompute_pause()
 
 ## Advances real-time checks and fixed simulation ticks without dropping time.
@@ -231,7 +233,44 @@ func _release(actor: CharacterState) -> void:
 
 func _start_suit_check(actor: CharacterState, station: StringName, on: bool) -> void:
 	_suit_checks[actor.id] = {"peer": actor.owner_peer, "station": station, "on": on, "elapsed": 0.0}
+	_suit_checks[actor.id].slot = available_suit_slot(station) if on else actor.suit_slot
 	events.suit_check_started.emit(actor.id, config.suit_check_seconds)
+
+## Includes in-progress checks so simultaneous requests cannot take the same suit.
+func available_suit_slot(rack: StringName) -> int:
+	for slot in SUITS_PER_RACK:
+		var taken := false
+		for c: CharacterState in state.characters.values():
+			if c.suit_on and c.suit_rack == rack and c.suit_slot == slot:
+				taken = true
+		for check: Dictionary in _suit_checks.values():
+			if bool(check.get("on", false)) and StringName(check.get("station", "")) == rack and int(check.get("slot", -1)) == slot:
+				taken = true
+		if not taken:
+			return slot
+	return -1
+
+func _restore_suit_slots() -> void:
+	var rack: StringName = &""
+	for id in state.stations:
+		if String(state.stations[id].get("kind", "")) == "suits":
+			rack = StringName(id)
+			break
+	var occupied := {}
+	for c: CharacterState in state.characters.values():
+		if not c.suit_on:
+			c.suit_rack = &""
+			c.suit_slot = -1
+			continue
+		var key := "%s:%d" % [c.suit_rack, c.suit_slot]
+		if c.suit_rack == &"" or c.suit_slot < 0 or c.suit_slot >= SUITS_PER_RACK or occupied.has(key):
+			c.suit_rack = rack
+			c.suit_slot = -1
+		else:
+			occupied[key] = true
+	for c: CharacterState in state.characters.values():
+		if c.suit_on and c.suit_slot < 0 and rack != &"":
+			c.suit_slot = available_suit_slot(rack)
 
 func _cancel_suit_check(id: StringName) -> void:
 	if _suit_checks.has(id):
@@ -249,5 +288,7 @@ func _advance_suit_checks(delta: float) -> void:
 		check.elapsed += delta
 		if not paused and float(check.elapsed) >= config.suit_check_seconds - 1e-9:
 			actor.suit_on = bool(check.on)
+			actor.suit_rack = StringName(check.station) if actor.suit_on else &""
+			actor.suit_slot = int(check.slot) if actor.suit_on else -1
 			_suit_checks.erase(id)
 			events.suit_check_finished.emit(id, actor.suit_on, true)

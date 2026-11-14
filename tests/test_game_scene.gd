@@ -67,7 +67,7 @@ func _initialize() -> void:
 	Input.action_release(&"move_forward")
 	await _frames(20)
 	var walked := Vector2(player.global_position.x - start.x, player.global_position.z - start.z).length()
-	_check("walks from the hub spot (the rehearsal hub is a furnished room, so a short way)", walked > 0.5, "%.2f m in 2 s" % walked)
+	_check("walks from the hub spot (the rehearsal hub is a furnished room, so a short way)", walked > 0.5, "%.2f m in 2 s; start=%s end=%s input=%s yaw=%.2f" % [walked, start, player.global_position, player.input_enabled, player.camera_rig().yaw()])
 	_check("host has the new position", me.position.distance_to(player.global_position) < 0.05)
 
 	# ---- jump: apex and air time under 3.73 m/s²

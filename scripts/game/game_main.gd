@@ -88,6 +88,7 @@ func _ready() -> void:
 		RockCollision.build(world, collision)
 		# Racks and stands show the crew's own suit, not the old white one modelled into the map.
 		SuitDisplays.build(world)
+		HabitatFinish.new().apply(world)
 	_add_ground()
 	if world != null:
 		# Everything else solid that is drawn (rovers, tanks, machines, hall frames and curb, dome shell...) gets its own
@@ -564,6 +565,7 @@ func _process(_delta: float) -> void:
 		hud.set_held(player.held_item().item_id if player.held_item() != null else &"")
 	_update_sun()
 	_move_crew(_delta)
+	SuitDisplays.sync(get_tree(), services.state())
 	if player != null and services.zones != null:
 		var zone := services.zones.zone_at_world(player.global_position)
 		if zone != _zone_now:

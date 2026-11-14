@@ -24,6 +24,14 @@ static func build(manifest_path: String, colliders_path: String) -> Node3D:
 			result.get_node("Static").add_child(body)
 			areas[area] = body
 		var pose := object_transform(object.matrix_world)
+		if object.cls == "ladder" and object.gc_asset == "hgw_ladder":
+			var ladder := ClimbableLadder.new()
+			ladder.name = object.name
+			ladder.transform = pose
+			result.add_child(ladder)
+			# Solid side rails, open rungs: a convex hull around the whole ladder seals its climb/exit path.
+			for side in [-1.0, 1.0]:
+				add_boxes(areas[area], [{"c": [side * 0.26, 1.6, 0.0], "h": [0.02, 1.6, 0.035], "q": [0, 0, 0, 1]}], pose, object.name + "_rail")
 		var boxes: Array = assets.get(object.gc_asset, {}).get("cols", [])
 		if object.cls in ["floor", "static", "deco", "dynamic", "ladder"]:
 			add_boxes(areas[area], boxes, pose, object.name)

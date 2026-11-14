@@ -301,7 +301,7 @@ func _test_cameras() -> void:
 	await _frames(6)
 	_check("camera stays before wall", rig.camera().global_position.z < 7.9 and rig.camera().global_position.z > _player.global_position.z, str(rig.camera().global_position))
 	var arm := rig.get_node("SpringArm") as SpringArm3D
-	_check("spring arm sphere and mask", arm.shape is SphereShape3D and is_equal_approx((arm.shape as SphereShape3D).radius, 0.2) and arm.collision_mask == (Layers.WORLD | Layers.DOOR))
+	_check("spring arm sphere and mask", arm.shape is SphereShape3D and is_equal_approx((arm.shape as SphereShape3D).radius, 0.2) and arm.collision_mask == (Layers.WORLD | Layers.DOOR | Layers.CREW_SOLID))
 	for first: bool in [true, false]:
 		_player.set_first_person(first)
 		var current_count := 0

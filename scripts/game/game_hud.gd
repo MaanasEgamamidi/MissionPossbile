@@ -747,6 +747,8 @@ func _update_cue() -> void:
 			body = "Check on the patient"
 		else:
 			body = "Use %s" % String(STATION_NAMES.get(station_kind, "station"))
+	elif kind == "ladder":
+		body = "Hold ladder; W/S climb, E or Space release"
 	elif _held != &"":
 		body = "Put down"
 	elif kind == "item":
@@ -758,7 +760,7 @@ func _update_cue() -> void:
 	_cue.text = body
 	_cue_panel.visible = text != ""
 	# the crosshair grows a ring when E would do something with what you are looking at
-	_crosshair.active = kind == "station" or kind == "item"
+	_crosshair.active = kind in ["station", "item", "ladder"]
 
 
 func _hint_line() -> String:
