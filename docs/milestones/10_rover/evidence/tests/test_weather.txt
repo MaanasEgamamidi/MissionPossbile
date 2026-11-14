@@ -87,7 +87,7 @@ PASS presenter: a bounded cloud of dust particles (160 at most) only around an o
 PASS presenter: setup gives the session's WeatherSystem the session (warnings use the real sol length)
 PASS no script or engine errors during the test
 RESULT 66/66
-WARNING: 528 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+WARNING: 571 ObjectDB instances were leaked at exit (run with `--verbose` for details).
    at: cleanup (core/object/object.cpp:2536)
-ERROR: 20 resources still in use at exit (run with --verbose for details).
+ERROR: 21 resources still in use at exit (run with --verbose for details).
    at: clear (core/io/resource.cpp:822)

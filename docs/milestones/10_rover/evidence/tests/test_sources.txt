@@ -49,7 +49,7 @@ PASS pressing ? opens the popup
 PASS popup shows title, long text and each claim's kind in words  Oxygen | Mars air is mostly carbon dioxide and has far too little oxygen to breathe. The colony makes oxygen in life support, which needs power. On the space station, water is split to make oxygen. A small test machine called MOXIE made oxygen from Mars air. How much the crew uses is game balance. | What kind of facts these are: | • What Mars air is made of: measured on Mars | • Oxygen from water: ISS or Earth test | • Oxygen from Mars air: technology test | • The colony's big oxygen machines: made up for the game | • How fast the crew uses supplies: game balance | Sources | Close
 PASS popup is inside the same window
 PASS no HTTPRequest nodes anywhere in the tree (register works offline)
-PASS keyboard focus moves to the popup's Sources button  SourcesButton:<Button#540578678589>
+PASS keyboard focus moves to the popup's Sources button  SourcesButton:<Button#606395696970>
 PASS popup layout at 1280x720, text 1.0  popup (468, 584) at (294, 68); fits without scrolling: true;  
 PASS popup focus at 1280x720, text 1.0
 PASS popup layout at 1920x1080, text 1.0  popup (468, 584) at (614, 248); fits without scrolling: true;  

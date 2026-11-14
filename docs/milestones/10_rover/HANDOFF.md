@@ -11,7 +11,7 @@ Date: 2026-11-14. Project: `G:\nasa app\mars_colony_godot`. Built by two paralle
   - The Hangar rover (`hb_rover`, 2.2 m wide) cannot leave the pressurised hangar, whose widest door is 1.36 m.
   - The static map copy is hidden; a RigidBody3D shows the same mesh.
   - Under the parked rover the garage has a cable or hose (up to 0.91 m high) whose collision trapped the rover. The 212 garage collision triangles inside the parked rover's space are dropped at load; the floor stays.
-- **Salvage.** Nine new donors were added from damaged map objects (crash shield and debris, fault-alarm battery racks, a high-voltage alarm, a fault rack), for 14 donors in all. Each has compatible and incompatible parts with clues. They use the existing Prompt 08 flow: inspect, recover once, refurbish, bench test, one spare part.
+- **Salvage.** Nine new donors were added from damaged map objects (crash shield and debris, fault-alarm battery racks, a high-voltage alarm, a fault rack), for 14 donors in all (15 with the scout update's broken-down rover). Each has compatible and incompatible parts with clues. They use the existing Prompt 08 flow: inspect, recover once, refurbish, bench test, one spare part.
 - **Garage configurator** (`scripts\ui\stations\garage_station_panel.gd`):
   - Five level 1–5 sliders (speed, torque, battery range, cargo, traction) with step costs 1/2/3/4.
   - Shows invested, available and change in parts, current and projected stats, and the honest range with the cargo and crew aboard.
@@ -73,7 +73,7 @@ Every number is in `scripts\core\rover_balance.gd` and `data\rover.json` (`tunin
 1. **Seats** (I-55): the model has no seats; four invisible anchors use the rig's seated pose.
 2. **Wheels** (I-55): they are part of one mesh and do not turn on screen.
 3. **Windows** (I-55): opaque from outside, so seated crew are not seen.
-4. **Salvage shortfall** (I-56): at most 38 parts against a demand of 102, so a maximised rover is out of reach. This is an owner decision.
+4. **Salvage shortfall** (I-56): at most 40 parts against a demand of 102, so a maximised rover is out of reach. This is an owner decision.
 5. **Not seen on screen:** cameras, the seat view, the HUD layout and the rover lamps while driving were not checked visually.
 6. **Network:** tested in one process over 127.0.0.1, not a real LAN.
 7. **Weaker or heavier builds** may stall on the steepest dunes (17–20°).

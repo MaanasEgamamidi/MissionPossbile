@@ -69,13 +69,13 @@ INFO unreliable relay: 30 of 30 frames-like packets arrived at B (in-process ENe
 PASS net: unreliable voice packets that arrive through the relay are unchanged, from A, and in order
 INFO transport: A sent 30 frames (reliable on the voice channel), the host received 30; ENet's PEER_PACKET_THROTTLE statistic on A's link to the host reads 1 of 32 (when frames were sent unreliable, this throttle dropped about half of them)
 PASS net: every voice frame A sent reached the host (voice packets go reliable and ordered on the voice channel)
-INFO in-process end-to-end at the nearby route (speaker send -> released to the listener's player, one process, 127.0.0.1): mean 68 ms, max 69 ms over 30 frames; plus the 40 ms player buffer target and the audio output latency, not measured here
+INFO in-process end-to-end at the nearby route (speaker send -> released to the listener's player, one process, 127.0.0.1): mean 66 ms, max 69 ms over 30 frames; plus the 40 ms player buffer target and the audio output latency, not measured here
 PASS net: inside the mess hall, A's synthetic speech is sent by push-to-talk and B (no microphone) hears it nearby, decoded into the player (30 frames)
-PASS net: the near-immediate route is measured in-process and stays under the 200 ms target on average (mean 68 ms + 40 ms buffer target; in-process only)
+PASS net: the near-immediate route is measured in-process and stays under the 200 ms target on average (mean 66 ms + 40 ms buffer target; in-process only)
 PASS net: no catch-up: every voice player keeps pitch_scale 1.0
 PASS net: stage 0 and A outside: B hears nothing, B's HUD says there is no radio link, A's HUD says nobody can hear
 PASS net: going outside shows what changed for the voice
-INFO radio stage 3: requested delay 5.000 s; measured in-process from push-to-talk to the first decoded frame 5.096 s
+INFO radio stage 3: requested delay 5.000 s; measured in-process from push-to-talk to the first decoded frame 5.098 s
 PASS net: radio stage 3: A outside, B inside hears A after the 5 s equipment delay (measured 5.10 s), not before; the HUD shows the message waiting
 PASS net: two speakers at once (host nearby, A by radio at stage 4) are both heard by B on their own players
 PASS net: B mutes A: nothing of A is decoded or left waiting

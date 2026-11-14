@@ -24,7 +24,7 @@ Date: 2026-11-14. Project: `G:\nasa app\mars_colony_godot`. Built by one Claude 
   10. Back to the hub and on to exploration: the field engineer inspects a salvage donor or takes a sample.
 - **How objectives are checked:** only from real state or real actions. `TutorialActions` wraps the watched actions' `apply` without changing what they do or answer. Inside a stage, objectives complete in order; a real action done early is credited when its step opens.
 - **Hints and cues:**
-  - A hint appears after 75 s without progress, then every 60 s; H gives one on request. J opens the colony journal.
+  - A hint appears after 75 s without progress, then every 60 s; N gives one on request. L opens the colony journal (H and J belong to the mission HUD, E-46).
   - Explanations already mastered are skipped. Stages can be replayed as reminders without double-counting.
   - With four players nobody is ever asked to switch crew; the cue names who should act. With one to three players a switch cue appears only when nobody plays the specialist needed.
 - **Certification** (first campaign milestone):
@@ -56,7 +56,7 @@ Date: 2026-11-14. Project: `G:\nasa app\mars_colony_godot`. Built by one Claude 
 ## 3. Merge changes (executor)
 
 - The test's stand-in for radio card 1 was removed: the solo and four-player runs now install the real card.
-- H (hint) and J (journal) are now remappable input actions.
+- N (hint) and L (journal) are remappable input actions (H and J were taken by the mission HUD, E-46).
 - `TutorialActions` stays registered after every other part's actions, and `RoverActions` before it.
 
 ## 4. Limits

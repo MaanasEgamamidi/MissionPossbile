@@ -61,7 +61,7 @@ PASS focus styles SettingsPanel Graphics at 1280x720 text 1.5
 PASS Tab cycles through every control of MainMenu (13 controls)  missed: 
 PASS Tab cycles through every control of PauseMenu (10 controls)  missed: 
 PASS Tab cycles through every control of SettingsPanel Display (6 controls)  missed: 
-PASS Tab cycles through every control of SettingsPanel Controls (41 controls)  missed: 
+PASS Tab cycles through every control of SettingsPanel Controls (53 controls)  missed: 
 PASS Tab cycles through every control of SettingsPanel Graphics (2 controls)  missed: 
 PASS UiRoot is a CanvasLayer on layer 20
 PASS nothing open: gameplay has focus, mouse captured
@@ -84,16 +84,16 @@ PASS gameplay_has_focus() true again once the field lets go
 PASS M from gameplay opens the blueprint
 PASS M again closes the blueprint  []
 PASS typing 'tab m' into the join address: the text is typed  'tab m'
-PASS typing 'tab m': view and map actions do not fire, no blueprint opens  seen [], top MainMenu:<PanelContainer#671457741270>
+PASS typing 'tab m': view and map actions do not fire, no blueprint opens  seen [], top MainMenu:<PanelContainer#763967310329>
 PASS Tab and M while a menu is open: no view switch, no blueprint  []
 PASS I and C do nothing while another panel is on top
 PASS E does not close a station surface in the frame it opened
 PASS E closes the station surface in a later frame, without reaching gameplay  []
 PASS E leaves other panels open
 PASS after quick switching, the list keeps its scroll position  812 vs 812
-PASS after quick switching, focus is back on the control it was on  @Button@2763:<Button#684409751732>
+PASS after quick switching, focus is back on the control it was on  @Button@3119:<Button#777556854902>
 PASS reopened panel: same tab and scroll position restored  tab 1, 812 vs 812
-PASS reopened panel: focus on a control that is in view  @Button@2948:<Button#703217010831>
+PASS reopened panel: focus on a control that is in view  @Button@3335:<Button#797739845793>
 PASS key list shows every action in order  M / Shift+Backspace
 PASS Change waits for a key and the panel cannot close meanwhile
 PASS close while waiting is refused
@@ -120,7 +120,7 @@ PASS refreshing does not send again  2
 PASS closing the pause menu takes the pause vote back
 PASS non-host: no sol length slider and no Save now
 PASS non-host: shows the vote count and 'Waiting for everyone to agree'  1 of 2 players want to pause. Waiting for everyone to agree.
-PASS main menu Continue shows the save's sol and date  Sol 1, saved 14 Nov 2026 at 09:03
+PASS main menu Continue shows the save's sol and date  Sol 1, saved 14 Nov 2026 at 09:34
 PASS Host emits host_pressed with the default port  [[24680, true]]
 PASS subtitle shows the first line with its speaker; the second waits
 PASS subtitle moves on to the queued line  Check the batteries.

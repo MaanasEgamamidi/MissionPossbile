@@ -66,6 +66,11 @@ func _run() -> void:
 	client._on_menu_join("127.0.0.1", PORT)
 	_check("client: menu says it is connecting", client._main_menu.notice_text().begins_with("Connecting"), client._main_menu.notice_text())
 	_check("client: playing after the colony arrives", await _until(func() -> bool: return client._playing and client.player != null))
+	# Both machines run in this one process and share one physics world, so each player's body would also hit the
+	# other machine's drawing of that same character (its CREW_SOLID capsule, which trails the body and pushes it
+	# along without end). Two real computers never have both. Crew-to-crew collision is checked in test_crew_collision.
+	for g: GameMain in [host, client]:
+		g.player.collision_mask &= ~Layers.CREW_SOLID
 	var mine := client.services.local_character()
 	var hosts := host.services.local_character()
 	_check("client: controls a different crew member", mine != null and hosts != null and mine.id != hosts.id)

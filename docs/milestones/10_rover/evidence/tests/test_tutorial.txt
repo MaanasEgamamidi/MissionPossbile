@@ -54,7 +54,7 @@ PASS story: discoveries survive save/load
 PASS story: finding records changes nothing in the tutorial or the colony stores
 PASS hud: the tracker is under the GameHud and shows stage 1 with its first step
 PASS hud: at 1280x720 the tracker is on screen and covers neither the colony corner, the crew box nor the crosshair
-PASS hud: a hint after 80 s without progress, a second on request (H), none again once the step is done
+PASS hud: a hint after 80 s without progress, a second on request (N), none again once the step is done
 PASS journal: fits 1280x720, 1920x1080 and text 1.5; every button takes focus
 PASS journal: 'Answer the question here' opens only where the step's question can be answered (the colony computer)
 PASS hud: with four players the screens are in team mode, the crew-selection step names who leads, and nothing asks to switch

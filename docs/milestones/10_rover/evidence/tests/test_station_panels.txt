@@ -139,9 +139,23 @@ PASS layout Station_site_crash_crust (Sample site) at 1280x720, 1920x1080 and te
 PASS focus Station_site_crash_crust (Sample site)
 PASS layout Station_sf_crash_stage (Salvage donor) at 1280x720, 1920x1080 and text 1.5
 PASS focus Station_sf_crash_stage (Salvage donor)
+PASS layout Station_scout_bay (Scout rover bay) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_scout_bay (Scout rover bay)
+PASS layout Station_broken_rover (Salvage donor) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_broken_rover (Salvage donor)
+PASS layout Station_ore_hematite_a (Ore deposit) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ore_hematite_a (Ore deposit)
+PASS layout Station_ore_hematite_b (Ore deposit) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ore_hematite_b (Ore deposit)
+PASS layout Station_ore_olivine_a (Ore deposit) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ore_olivine_a (Ore deposit)
+PASS layout Station_ore_gypsum_a (Ore deposit) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ore_gypsum_a (Ore deposit)
+PASS layout Station_ore_carbonate_a (Ore deposit) at 1280x720, 1920x1080 and text 1.5
+PASS focus Station_ore_carbonate_a (Ore deposit)
 PASS layout UpgradeCards (Upgrades) at 1280x720, 1920x1080 and text 1.5
 PASS focus UpgradeCards (Upgrades)
 PASS layout Blueprint (Blueprint) at 1280x720, 1920x1080 and text 1.5
 PASS focus Blueprint (Blueprint)
 PASS no errors during the test
-RESULT 144/144
+RESULT 158/158

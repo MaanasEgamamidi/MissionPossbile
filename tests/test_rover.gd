@@ -361,7 +361,7 @@ func _test_donors() -> void:
 	for id: String in st().stations:
 		if String(st().stations[id].kind) == "salvage":
 			salvage_stations += 1
-	_check("donors: 14 salvage stations, one per donor in salvage.json", salvage_stations == 14 and donors.size() == 14, "%d %d" % [salvage_stations, donors.size()])
+	_check("donors: 15 salvage stations (5 from Prompt 08, 9 from Prompt 10, the scout update's broken-down rover), one per donor in salvage.json", salvage_stations == 15 and donors.size() == 15, "%d %d" % [salvage_stations, donors.size()])
 	# a new donor works in the real P08 flow: inspect, recover once, refurbish, bench test -> exactly one spare part
 	_become(FIELD)
 	_empty_pack(me())

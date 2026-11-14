@@ -19,12 +19,12 @@ PASS reach: the garage, the charger and the 9 new donors each have a clear stand
   gr_rack_fault: clear spot 1.0 m away
 PASS donors: the five P08 donors are still first and unchanged in salvage.json
 PASS donors: 9 new donors are existing map objects with a salvage station, 2+ compatible and 2+ unusable parts with clues
-PASS donors: 14 salvage stations, one per donor in salvage.json
+PASS donors: 15 salvage stations (5 from Prompt 08, 9 from Prompt 10, the scout update's broken-down rover), one per donor in salvage.json
 PASS donors: a new donor gives a part through the P08 flow (inspect, recover, refurbish, bench test: +1 spare part); an unusable part is refused
 PASS supply/demand: every number of the table in model_sources_rover.json matches the data files
 PASS supply/demand: the shortfall is flagged (a fully upgraded rover is not reachable from approved map salvage), the campaign needs 1 part
-  supply: start 10 + recovered 14 (base) / 28 (with the refurbishing jig) = 24 / 38; listed compatible 29
-  demand: facility cards 42 + comms 10 + rover 50 = 102; shortfall 64
+  supply: start 10 + recovered 15 (base) / 30 (with the refurbishing jig) = 25 / 40; listed compatible 32
+  demand: facility cards 42 + comms 10 + rover 50 = 102; shortfall 62
 PASS sources: every RoverBalance field has a category in model_sources_rover.json; every cited id is in the register
 PASS sources: Mars gravity is the register's S01 value (3.73 m/s²) and the curves are labelled fictional, not NASA data
 PASS costs: the steps cost 1, 2, 3, 4 parts; one stat to 5 costs 10, all five 50

@@ -106,7 +106,10 @@ func refresh() -> void:
 		c.queue_free()
 	build_buttons.clear()
 	for c: UpgradeDefinition in ProgressionSystem.cards_of("energy"):
-		_list.add_child(_card(st, c, me))
+		# Only the cards that can be built at a sun tracker (the radio cards are energy-sector too, but are installed
+		# at the comms console: Prompt 11).
+		if c.also_install_kinds.has("solar"):
+			_list.add_child(_card(st, c, me))
 
 
 func _card(st: ColonyState, c: UpgradeDefinition, me: CharacterState) -> Control:

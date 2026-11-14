@@ -11,8 +11,8 @@ ERROR: Couldn't create an ENet host.
 PASS host: the port is really taken
 PASS join: started
 PASS join: colony received
-PASS join: client has its own peer id  1699375097
-PASS join: host counts two players  [1, 1699375097]
+PASS join: client has its own peer id  1322266731
+PASS join: host counts two players  [1, 1322266731]
 PASS join: client got a free crew member
 PASS join: same colony seed and stations
 PASS join: client never ticks or saves
@@ -20,17 +20,17 @@ PASS motion: host sees the client's body
 PASS motion: client keeps its own pose through updates
 PASS motion: client sees the host's body
 PASS motion: moving another player's crew is ignored
-PASS request: client gets a pending answer at once  c1699375097-1
+PASS request: client gets a pending answer at once  c1322266731-1
 PASS request: answer arrives
 PASS request: host said yes
 PASS request: host state changed
 PASS request: client state changed before the answer
-PASS request: client heard state_changed(pick_up)  ["own:crew_4:1699375097", &"claim_character", &"pick_up"]
+PASS request: client heard state_changed(pick_up)  ["own:crew_4:1322266731", &"claim_character", &"pick_up"]
 PASS request: host-only action refused for a client
 PASS pause: one vote of two does not pause  1
 PASS pause: both votes pause, client sees it
 PASS pause: unpaused again
-PASS clock: client clock follows the host  0.301833 vs 0.302000
+PASS clock: client clock follows the host  0.302000 vs 0.302167
 PASS leave: host parks the client's crew
 PASS leave: client is offline
 PASS rejoin: works on the same port

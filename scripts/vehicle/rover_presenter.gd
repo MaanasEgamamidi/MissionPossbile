@@ -620,7 +620,7 @@ func _sync_seated_visuals(st: ColonyState, seats: Array, me: CharacterState) -> 
 			var c := st.character(StringName(id))
 			var presence := walking.get_node_or_null("Presence") as CollisionObject3D
 			if presence != null and c != null:
-				presence.collision_layer = Layers.PLAYER if c.is_active() else 0
+				presence.collision_layer = Layers.CREW_SOLID | (Layers.PLAYER if c.is_active() else 0)
 
 
 ## Seated bodies of other players' crew, by character id (tests).

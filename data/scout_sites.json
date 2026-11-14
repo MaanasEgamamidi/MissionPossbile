@@ -1,6 +1,6 @@
 {
  "_about": "Where the scout rover can be sent, what it reports, and the special ores (scout update). Positions are Godot metres (x east, z south). Site reports are game story written for ages 9-12; mineral facts cite the entries in data/model_sources_scout.json. A survey reveals every ore deposit within reveal_radius_m of the site on the map; deposits can also be found by walking.",
- "dock": {"position": [17.0, 0.0, 24.5], "yaw_deg": 180.0},
+ "dock": {"position": [18.0, 0.0, 14.5], "yaw_deg": 180.0},
  "sites": [
   {
    "id": "east_plain",

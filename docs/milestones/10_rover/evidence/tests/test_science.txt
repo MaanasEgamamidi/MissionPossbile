@@ -80,3 +80,7 @@ PASS layout Workbench (hg_control_board) at 1280x720, 1920x1080 and 1280x720 tex
 PASS focus Workbench (hg_control_board)
 PASS no script or engine errors during the test
 RESULT 76/76
+WARNING: 45 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 36 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

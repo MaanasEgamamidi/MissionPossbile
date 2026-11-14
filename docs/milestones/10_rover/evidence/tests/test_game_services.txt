@@ -2,7 +2,7 @@
 
 PASS fresh start: no save is a defined result  no_save
 PASS new game: four crew, host controls crew_1
-PASS new game: 21 base stations from the map (9 tagged + 12 sun trackers) plus those added by data files  21 base, 58 in all
+PASS new game: 21 base stations from the map (9 tagged + 12 sun trackers) plus those added by data files  21 base, 65 in all
 PASS new game: 18 zones, all powered  18
 PASS new game: saved at once
 PASS new game: starts at the configured time of day
