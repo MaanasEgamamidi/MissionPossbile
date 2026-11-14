@@ -1,0 +1,2 @@
+FAIL the game's WeatherArchive loader accepts the shipped bundle (count columns such as 'samples' are not held to the ratio range), so an offline boot uses it: product meda_ps_sol0289: 88 bad cells (f
+RESULT 14/15

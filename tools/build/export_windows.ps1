@@ -40,6 +40,7 @@ foreach ($f in "PLAYER_GUIDE.md", "THIRD_PARTY_NOTICES.md") {
 New-Item -ItemType Directory -Force (Join-Path $Out "licenses") | Out-Null
 Copy-Item (Join-Path $project "addons\twovoip\LICENSE.txt") (Join-Path $Out "licenses\TwoVoIP_LICENSE.txt")
 Copy-Item (Join-Path $project "addons\twovoip\VERSION.txt") (Join-Path $Out "licenses\TwoVoIP_VERSION.txt")
+Copy-Item (Join-Path $docs "GODOT_COPYRIGHT.txt") (Join-Path $Out "licenses\Godot_COPYRIGHT.txt")
 
 # What went into the pack
 $list = Join-Path $Out "pck_contents.json"

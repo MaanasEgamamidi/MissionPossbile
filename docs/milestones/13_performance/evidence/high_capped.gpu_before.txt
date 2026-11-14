@@ -1,0 +1,2 @@
+timestamp, utilization.gpu [%], memory.used [MiB], memory.total [MiB]
+2026/11/14 10:45:07.976, 98 %, 6196 MiB, 8188 MiB

@@ -1,0 +1,63 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS stations: scout bay, broken-down rover and five ore deposits come from data/stations_scout.json
+PASS stations: every new station is outside on walkable ground near its data height
+PASS new game: the scout starts half built at its bay
+PASS data: five survey sites, four ore kinds with a use and a source id
+PASS assemble: only the field engineering and geology specialist may finish the scout
+PASS assemble: refused without enough parts, with the reason in words
+PASS assemble: refused from far away
+PASS send: refused while the scout is a kit
+PASS assemble: the field engineer finishes it for 2 parts (ledger parts_used_scout)
+PASS assemble: once only
+PASS colony invariants hold after assembling
+PASS send: an unknown place is refused
+PASS send: anyone can send it; it drives off with an arrival time in words
+PASS send: refused while it is already on a trip
+PASS trip: it moves at about 150 m per game hour
+PASS trip: it arrives and looks around the site
+PASS report: after looking around it radios a report home (alert and discovery) and heads back
+PASS report: the ore deposits near the site are marked on the map, the others are not
+PASS trip: it comes home and parks at its bay
+PASS recall: it turns round on the way
+PASS recall: and parks again without a report
+PASS send: the colony computer can send it too
+PASS ore: anyone collects a piece; it goes into the colony store
+PASS ore: a deposit gives 3 pieces, then says it is empty
+PASS ore: walking to a deposit the scout never saw finds it and marks it
+PASS workbench: 2 hematite become one spare part (ledger parts_from_ore)
+PASS workbench: one hematite left is not enough for a part
+PASS workbench: a science ore studied raises the science score by one
+PASS workbench: an unknown ore is refused
+PASS colony invariants hold after ore work
+PASS broken-down rover: it is a salvage donor; the tool kit fits
+PASS broken-down rover: the field engineer takes the tool kit out
+PASS build: the energy cards can be installed at a sun tracker as well as at the power panel
+PASS build: the card says where it can be built
+PASS goals: checked from the colony (scout finished, 2 places surveyed, ore collected)
+PASS goals: at most 6 shown, unfinished first
+PASS goals: objectives published by the campaign come first
+PASS save: the scout, its surveys and the ores survive a JSON round trip
+PASS save: an older save without the scout gets a half-built scout
+PASS vitals: ⋯ folds the bar down to the numbers and opens it again
+PASS vitals: four supplies with amounts and a trend in words
+PASS goals card: lists goals and folds to its header
+PASS pop-ups: at most 4 at once, no repeats
+PASS pop-ups: they go away by themselves
+PASS mission control: a storm warning says when, what it does and what to do
+PASS mission control: messages wait their turn
+PASS storm chip: words for a warned storm
+PASS scout bay panel: a Send button for every place, the status in words
+PASS scout bay panel: Send asks the host and the scout drives off
+PASS layout scout bay at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS ore panel: Collect puts a piece in the store
+PASS layout ore deposit at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS workbench panel: a button for the ore in store
+PASS power drawer: making, using, battery and a verdict in words
+PASS layout power and life support at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS science panel: one card per idea with its sources button
+PASS layout science behind the numbers at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS build drawer: one card per energy upgrade with a Build button
+PASS layout build at the solar field at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS no script or engine errors during the test
+RESULT 60/60

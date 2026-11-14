@@ -41,8 +41,7 @@ func _initialize() -> void:
 	var cap := int(_args.get("cap", "0"))
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if cap > 0 else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = cap
-	root.size = WINDOW
-	DisplayServer.window_set_size(WINDOW)
+	_force_window()
 	var save_dir := OS.get_user_data_dir().path_join("perf_bench_saves")
 	DirAccess.make_dir_recursive_absolute(save_dir)
 	var game_script := load("res://scripts/game/game_main.gd") as Script
@@ -95,7 +94,18 @@ func _process(delta: float) -> bool:
 	return false
 
 
+## project.godot starts the window maximized (window/size/mode=2), which on this desktop gave a 2560x1369 render.
+## The benchmark needs 1920x1080: leave the maximized state first, then size and centre the window.
+func _force_window() -> void:
+	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+	DisplayServer.window_set_size(WINDOW)
+	var screen := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
+	DisplayServer.window_set_position(screen.position + (screen.size - WINDOW) / 2)
+	root.size = WINDOW
+
+
 func _setup() -> void:
+	_force_window()
 	var quality := int(_args.get("quality", "2"))
 	GraphicsQuality.apply(self, quality)
 	_vp_rid = root.get_viewport_rid()
@@ -267,7 +277,8 @@ func _sample(frame_ms: float) -> Dictionary:
 
 
 func _summarise(v: Dictionary, frames: Array) -> Dictionary:
-	var out := {"view": v.name, "kind": v.kind, "frames": frames.size()}
+	var out := {"view": v.name, "kind": v.kind, "frames": frames.size(), "render_size": [root.size.x, root.size.y],
+		"window_size": [DisplayServer.window_get_size().x, DisplayServer.window_get_size().y]}
 	var summary := {}
 	for key: String in ["frame_ms", "cpu_ms", "gpu_ms", "process_ms", "physics_ms", "draw_calls", "objects", "primitives", "video_mem_mb", "static_mem_mb"]:
 		var values: Array = frames.map(func(f: Dictionary) -> float: return float(f[key]))

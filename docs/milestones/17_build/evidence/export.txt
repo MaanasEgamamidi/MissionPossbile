@@ -1,0 +1,16 @@
+﻿staging copy -> G:\nasa app\_work\export_stage
+pck version 4 engine 4.7.2 files 1187 bytes 368395239
+package -> G:\nasa app\_build\MarsColony_windows
+
+Name                                           Length   
+----                                           ------   
+licenses                                                
+libtwovoip.windows.template_release.x86_64.dll 6465024  
+MANIFEST.txt                                   964      
+MarsColony.exe                                 109268480
+MarsColony.pck                                 368510428
+PLAYER_GUIDE.md                                8692     
+THIRD_PARTY_NOTICES.md                         11814    
+
+
+
