@@ -18,6 +18,11 @@ var sense_radius: float = 2.2
 ## airlock moves each door's sphere away from the chamber so the two doors do not both sense one player.
 var sense_offset: Vector3 = Vector3.ZERO
 
+## Perf overhaul (res://perf/zone_door.gd): the frame this door starts to open, before its leaves have moved, and the
+## frame it is fully shut again. The zone and exterior systems wake what is behind the door before anyone can see it.
+signal opening_started(door_id: int)
+signal closed_fully(door_id: int)
+
 ## Emitted when this door starts waiting for an airlock pressure cycle before it may open.
 signal cycle_started(door_id: int, seconds: float)
 ## Airlock pairing: when set, this door opens only after the partner has been fully shut for cycle_seconds
@@ -95,7 +100,12 @@ func _physics_process(delta: float) -> void:
 		else:
 			_cycling = false
 	var was_open := is_open()
+	var was_progress := _progress
 	_progress = move_toward(_progress, 1.0 if wants_open else 0.0, delta / maxf(open_seconds, 0.0001))
+	if was_progress <= 0.0 and _progress > 0.0:
+		opening_started.emit(door_id)
+	elif was_progress > 0.0 and _progress <= 0.0:
+		closed_fully.emit(door_id)
 	open_amount = smoothstep(0.0, 1.0, _progress)
 	_move_leaves()
 	if was_open != is_open():

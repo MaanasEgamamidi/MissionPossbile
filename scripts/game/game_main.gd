@@ -201,6 +201,9 @@ func _begin_play() -> void:
 		refresh.name = "WeatherRefresh"
 		add_child(refresh)
 	_apply_player_settings()
+	# Perf overhaul (res://perf, docs/perf): room sleep/wake, Mars culling, view gating, LOD. Every system is switchable
+	# through PerfSettings; with all switches off the game is unchanged. Does nothing without the map.
+	PerfRig.attach(self)
 	ui.close_all()        # leaves menu mode: the mouse is captured for play
 
 

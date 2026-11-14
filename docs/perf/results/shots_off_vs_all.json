@@ -1,0 +1,52 @@
+{
+  "exterior_garage": {
+    "mean_abs": 0.016,
+    "changed": 0.00034,
+    "ssim": 0.99979
+  },
+  "exterior_storm": {
+    "mean_abs": 0.054,
+    "changed": 0.00031,
+    "ssim": 0.99964
+  },
+  "four_suited_crew": {
+    "mean_abs": 0.582,
+    "changed": 0.00857,
+    "ssim": 0.99142
+  },
+  "plaza_through_glass": {
+    "mean_abs": 0.008,
+    "changed": 6e-05,
+    "ssim": 0.99995
+  },
+  "room_command_room": {
+    "mean_abs": 0.117,
+    "changed": 0.00037,
+    "ssim": 0.9997
+  },
+  "room_greenhouse": {
+    "mean_abs": 0.005,
+    "changed": 1e-05,
+    "ssim": 0.99999
+  },
+  "room_life_support": {
+    "mean_abs": 0.117,
+    "changed": 0.00065,
+    "ssim": 0.99961
+  },
+  "room_med_bay": {
+    "mean_abs": 3.857,
+    "changed": 0.12537,
+    "ssim": 0.93649
+  },
+  "room_power_room": {
+    "mean_abs": 0.013,
+    "changed": 0.00015,
+    "ssim": 0.99981
+  },
+  "rover_route": {
+    "mean_abs": 0.0,
+    "changed": 2e-05,
+    "ssim": 1.0
+  }
+}

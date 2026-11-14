@@ -7,6 +7,8 @@ extends SceneTree
 ##
 ## --quality  GraphicsQuality level (1 = Medium, 2 = High)       --cap  0 = uncapped (vsync off), 60 = vsync + 60 FPS cap
 ## --seconds  sampled seconds per view (after 2 s warm-up)      --host host a LAN session (clients join separately)
+## --shots=DIR  save one still per view (before the look sweep) for image comparison between runs (perf overhaul)
+## --perf-off / --perf-on  every perf-overhaul switch off (baseline) / on; neither = the shipped defaults
 ## --switches=N  after the views, switch Medium <-> High N times and record process memory after each (growth check)
 ## The "rover_route" view boards the rover (built, charged, suited driver) and drives it out of the garage by holding
 ## the throttle with a slow steering sweep: real physics, no teleport.
@@ -31,6 +33,7 @@ var _last_us := 0
 var _vp_rid: RID
 var _boot_frames := 0
 var _proc_mem_before := {}
+var _shot_frames := 0
 
 
 func _initialize() -> void:
@@ -76,7 +79,17 @@ func _process(delta: float) -> bool:
 			_enter_view(_views[_view_i])
 			_t = 0.0
 			_frames = []
-			_phase = "warm"
+			_shot_frames = 0
+			_phase = "shot" if _args.has("shots") else "warm"
+		"shot":
+			# Perf overhaul: --shots=DIR saves one still per view, 45 frames after arriving and before the slow look
+			# starts, so runs with different perf switches can be compared image to image.
+			_shot_frames += 1
+			if _shot_frames >= 45:
+				var dir: String = _args.shots
+				DirAccess.make_dir_recursive_absolute(dir)
+				root.get_texture().get_image().save_png(dir.path_join("%s.png" % _views[_view_i].name))
+				_phase = "warm"
 		"warm":
 			_t += delta
 			_update_view(_views[_view_i], delta)
@@ -322,6 +335,7 @@ func _finish() -> void:
 		"cap_fps": int(_args.get("cap", "0")), "vsync": int(_args.get("cap", "0")) > 0,
 		"host_session": _args.has("host"), "debug_build": OS.is_debug_build(),
 		"date": Time.get_datetime_string_from_system(),
+		"perf_switches": root.get_node("PerfSettings").call("snapshot") if root.has_node("PerfSettings") else {},
 	}
 	var report := {"info": info, "views": _results, "quality_switch_memory": _switch_memory}
 	var path: String = _args.get("out", OS.get_user_data_dir().path_join("perf_bench.json"))
