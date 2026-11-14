@@ -1,7 +1,7 @@
 class_name UiTheme
 extends RefCounted
-## The one shared Theme, built in code: a "mission console" look. Cool slate panels over the warm Mars view, a Mars
-## orange accent for headings and the main button, and a bright teal for keyboard focus. Panels refer to the type
+## The one shared Theme, built in code: a restrained mission-console look. Charcoal surfaces, warm-white text,
+## thin borders and a small rust accent keep the controls readable over the Mars landscape. Panels refer to the type
 ## variation names below (Control.theme_type_variation) instead of styling themselves. Colours, fonts, font sizes and
 ## the small drawn icons (switches, tick boxes, slider handles) are set here and nowhere else.
 
@@ -117,18 +117,18 @@ static func palette() -> Dictionary:
 			"cool": Color(0.5, 0.9, 1.0),
 		}
 	return {
-		"text": Color(0.95, 0.96, 0.98), "muted": Color(0.74, 0.79, 0.85), "heading": Color(1.0, 0.68, 0.38),
-		"good": Color(0.5, 0.93, 0.6), "warn": Color(1.0, 0.84, 0.38), "urgent": Color(1.0, 0.62, 0.56),
-		"focus": Color(0.35, 0.92, 0.95), "accent": Color(0.96, 0.52, 0.2),
-		"panel": Color(0.055, 0.07, 0.095, 0.97), "hud": Color(0.04, 0.055, 0.08, 0.86), "card": Color(0.095, 0.12, 0.16, 0.98),
-		"subtitle": Color(0.02, 0.025, 0.035, 0.92), "backdrop": Color(0.015, 0.02, 0.035, 0.8),
-		"backdrop_light": Color(0.015, 0.02, 0.035, 0.55),
-		"button": Color(0.15, 0.19, 0.25, 1), "button_hover": Color(0.21, 0.27, 0.35, 1),
-		"button_pressed": Color(0.42, 0.25, 0.12, 1), "button_disabled": Color(0.1, 0.12, 0.15, 1),
-		"text_disabled": Color(0.6, 0.64, 0.7), "primary": Color(0.96, 0.52, 0.2, 1), "primary_text": Color(0.07, 0.04, 0.02),
-		"danger": Color(0.6, 0.14, 0.14, 1), "border": Color(0.3, 0.37, 0.46), "border_soft": Color(0.2, 0.25, 0.32),
-		"field": Color(0.025, 0.035, 0.05, 0.95), "track": Color(0.025, 0.035, 0.05, 0.95), "keycap": Color(0.17, 0.21, 0.28, 1),
-		"cool": Color(0.45, 0.8, 1.0),
+		"text": Color(0.95, 0.95, 0.92), "muted": Color(0.76, 0.79, 0.79), "heading": Color(0.91, 0.89, 0.82),
+		"good": Color(0.62, 0.90, 0.72), "warn": Color(1.0, 0.84, 0.48), "urgent": Color(1.0, 0.66, 0.60),
+		"focus": Color(0.69, 0.91, 0.96), "accent": Color(0.86, 0.42, 0.28),
+		"panel": Color(0.045, 0.055, 0.065, 0.97), "hud": Color(0.035, 0.045, 0.055, 0.92), "card": Color(0.075, 0.09, 0.10, 0.98),
+		"subtitle": Color(0.02, 0.025, 0.03, 0.95), "backdrop": Color(0.015, 0.02, 0.025, 0.80),
+		"backdrop_light": Color(0.015, 0.02, 0.025, 0.55),
+		"button": Color(0.12, 0.14, 0.15, 1), "button_hover": Color(0.22, 0.25, 0.26, 1),
+		"button_pressed": Color(0.32, 0.21, 0.18, 1), "button_disabled": Color(0.09, 0.10, 0.11, 1),
+		"text_disabled": Color(0.60, 0.63, 0.63), "primary": Color(0.82, 0.80, 0.73, 1), "primary_text": Color(0.06, 0.07, 0.07),
+		"danger": Color(0.48, 0.12, 0.11, 1), "border": Color(0.40, 0.44, 0.44), "border_soft": Color(0.25, 0.29, 0.30),
+		"field": Color(0.025, 0.035, 0.04, 0.97), "track": Color(0.025, 0.035, 0.04, 0.97), "keycap": Color(0.14, 0.16, 0.17, 1),
+		"cool": Color(0.60, 0.84, 0.88),
 	}
 
 
@@ -197,7 +197,7 @@ static func _build() -> void:
 	var base_font := ThemeDB.fallback_font
 	if base_font != null:
 		t.set_font(&"font", TITLE, _weighted(base_font, 0.8, 1))
-		t.set_font(&"font", DISPLAY, _weighted(base_font, 1.0, 6))
+		t.set_font(&"font", DISPLAY, _weighted(base_font, 0.6, 4))
 		t.set_font(&"font", HEADING, _weighted(base_font, 0.6, 0))
 		t.set_font(&"font", READING, _weighted(base_font, 0.6, 0))
 		var button_font := _weighted(base_font, 0.4, 0)
@@ -205,8 +205,8 @@ static func _build() -> void:
 			t.set_font(&"font", type, button_font)
 
 	# Panels
-	var panel := _box(p.panel, 24, 14, p.border, 2 if _high_contrast else 1)
-	_shadow(panel, 18)
+	var panel := _box(p.panel, 24, 2, p.border, 2 if _high_contrast else 1)
+	_shadow(panel, 8)
 	t.set_stylebox(&"panel", &"PanelContainer", panel)
 	t.set_stylebox(&"panel", PANEL, panel)
 	t.set_stylebox(&"panel", HUD_PANEL, _box(p.hud, 12, 10, Color(p.border, 1.0 if _high_contrast else 0.55), 1, 14, 10))
@@ -403,7 +403,7 @@ static func _apply_sizes(t: Theme) -> void:
 static func _box(bg: Color, margin: int, radius: int, border := Color(0, 0, 0, 0), border_w := 0, h_margin := -1, v_margin := -1) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = bg
-	s.set_corner_radius_all(radius)
+	s.set_corner_radius_all(mini(radius, 2))
 	s.corner_detail = 6
 	s.border_color = border
 	s.set_border_width_all(border_w)
@@ -439,7 +439,7 @@ static func _focus_box(color: Color) -> StyleBoxFlat:
 	s.draw_center = false
 	s.border_color = color
 	s.set_border_width_all(4 if _high_contrast else 3)
-	s.set_corner_radius_all(8)
+	s.set_corner_radius_all(2)
 	return s
 
 

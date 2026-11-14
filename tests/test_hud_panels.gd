@@ -362,7 +362,7 @@ func _test_summary() -> void:
 		rooms_text.substr(0, 200).replace("\n", " | "))
 	st.zones["Greenhouse"]["powered"] = true
 	var all_text := _all_text(panel)
-	_check("summary: stock vs flow and body energy vs electricity boxes", all_text.contains("Stock or flow?") and all_text.contains("Body energy or electricity?")
+	_check("summary: explanations are available in help without long text boxes", not all_text.contains("Stock or flow?") and not all_text.contains("Body energy or electricity?")
 		and _has_explain(panel, "stock_vs_flow") and _has_explain(panel, "stamina_vs_electricity"))
 	var no_units := _numbers_without_units(panel)
 	_check("summary: units on every number", no_units.is_empty(), "; ".join(no_units))
@@ -453,7 +453,15 @@ func _test_crew() -> void:
 	_check("crew: card shows specialty with symbol, health, suit tank and place", card_text.contains("✚ Medical and life support specialist") and card_text.contains("Health 100 %")
 		and card_text.contains("tank 100 %") and card_text.contains("Where: %s" % services.zones.zone_at_world(st.character(&"crew_2").position)), card_text.replace("\n", " | "))
 	_check("crew: own card is disabled with a reason", panel.play_button(&"crew_1").disabled and panel.reason_text(&"crew_1") == "You are already this crew member.")
-	_check("crew: rule line with crew_switching explanation", _all_text(panel).contains("change crew member at the hub") and _has_explain(panel, "crew_switching"))
+	var crew_help: ExplainButton
+	for candidate in panel.find_children("*", "ExplainButton", true, false):
+		if (candidate as ExplainButton).explanation_id == "crew_switching":
+			crew_help = candidate as ExplainButton
+	var rule_on_screen := _all_text(panel).contains("You can change crew member at the hub")
+	crew_help.open_popup()
+	await _frames()
+	_check("crew: switching guidance is in help", not rule_on_screen and _all_text(crew_help.popup_window()).contains("change crew member at the hub"))
+	crew_help.close_popup()
 
 	# far from the hub
 	me.position = Vector3(30.0, 0.0, 9.0)

@@ -73,6 +73,8 @@ var _title: Label
 var _zone_label: Label
 var _power_label: Label
 var _power_explain: ExplainButton
+var _station_help: ExplainButton
+var _station_help_base := ""
 var _scroll: ScrollContainer
 var _body: VBoxContainer
 var _readings_box: VBoxContainer
@@ -98,6 +100,7 @@ func setup(p_services: GameServices) -> void:
 	theme_type_variation = UiTheme.PANEL
 	_build_frame()
 	_build_body()
+	_station_help_base = _station_help.extra_text
 	if _shows_later_note():
 		var later := Label.new()
 		later.text = LATER_NOTE
@@ -320,6 +323,9 @@ func _build_frame() -> void:
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	header.add_child(_title)
+	_station_help = ExplainButton.make("", "\n".join(_what_you_can_do()), _title_text())
+	_station_help.name = "StationHelp"
+	header.add_child(_station_help)
 	_close_button = Button.new()
 	_close_button.text = "Close"
 	_close_button.pressed.connect(func() -> void: close_requested.emit())
@@ -344,10 +350,6 @@ func _build_frame() -> void:
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_scroll.add_child(_body)
 
-	_add_heading(_body, "What you can do here")
-	for line in _what_you_can_do():
-		_add_text(_body, "•  " + line)
-
 	var readings_section := VBoxContainer.new()
 	_body.add_child(readings_section)
 	_add_heading(readings_section, "Readings")
@@ -362,11 +364,7 @@ func _build_frame() -> void:
 	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message.visible = false
 	column.add_child(_message)
-	var hint := Label.new()
-	hint.theme_type_variation = UiTheme.MUTED
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "Press %s or %s to close." % [_key_name(&"interact", "E"), _key_name(&"back", "Esc")]
-	column.add_child(hint)
+	_station_help.extra_text += "\n\nPress %s or %s to close." % [_key_name(&"interact", "E"), _key_name(&"back", "Esc")]
 
 
 ## The words after the symbol in the header. Sun trackers add their number.
@@ -545,12 +543,12 @@ func _add_heading(parent: Control, text: String) -> Label:
 
 
 ## A heading with a "?" button at its end.
-func _add_heading_with_help(parent: Control, text: String, explanation_id: String) -> Label:
+func _add_heading_with_help(parent: Control, text: String, explanation_id: String, extra: String = "") -> Label:
 	var row := HBoxContainer.new()
 	parent.add_child(row)
 	var l := _add_heading(row, text)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(ExplainButton.make(explanation_id))
+	row.add_child(ExplainButton.make(explanation_id, extra))
 	return l
 
 
