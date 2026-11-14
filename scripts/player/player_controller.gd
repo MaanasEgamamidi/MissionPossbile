@@ -26,6 +26,8 @@ var _sprint_latched: bool = false
 var _rig: PlayerCameraRig
 var _visual: PlayerVisual
 var _held: CarryItem
+## Client only: pick_up / drop requests sent to the host, by request id, until the answer arrives.
+var _waiting := {}
 var _buttons: Dictionary = {}
 var _was_on_floor: bool = true
 ## Seconds since the body last stood on the floor; 0 while grounded.
@@ -290,13 +292,46 @@ func _interact() -> void:
 
 func _grab() -> void:
 	if held_item() != null:
-		if _answer(&"drop", _held.item_id, {}).ok:
-			var forward := -Basis(Vector3.UP, _rig.yaw()).z
-			var toss := forward * tuning.throw_speed if Input.is_action_pressed("sprint") else Vector3.ZERO
-			_held.release(global_position + Vector3.UP * tuning.eye_height_m + forward * (tuning.body_radius_m + 0.5), toss)
-			_held = null
+		var throwing := Input.is_action_pressed("sprint")
+		var answer := _answer(&"drop", _held.item_id, {})
+		if answer.ok:
+			_finish_drop(throwing)
+		elif answer.pending:
+			_waiting[answer.request_id] = {"action": &"drop", "throw": throwing}
 		return
 	var target := aimed_target()
-	if target.kind == "item" and _answer(&"pick_up", target.id, {}).ok:
-		_held = target.node as CarryItem
+	if target.kind != "item":
+		return
+	var answer := _answer(&"pick_up", target.id, {})
+	if answer.ok:
+		_finish_pick_up(target.node as CarryItem)
+	elif answer.pending:
+		_waiting[answer.request_id] = {"action": &"pick_up", "node": target.node}
+
+
+## On a networked client the host answers pick_up and drop later (GameEvents.action_resolved): finish them here.
+func resolve_answer(result: ActionResult) -> void:
+	if not _waiting.has(result.request_id):
+		return
+	var w: Dictionary = _waiting[result.request_id]
+	_waiting.erase(result.request_id)
+	action_answered.emit(result)
+	if not result.ok:
+		return
+	if w.action == &"drop" and held_item() != null:
+		_finish_drop(bool(w.throw))
+	elif w.action == &"pick_up" and is_instance_valid(w.node):
+		_finish_pick_up(w.node as CarryItem)
+
+
+func _finish_pick_up(item: CarryItem) -> void:
+	_held = item
+	if not _held.is_held():
 		_held.attach_to(_visual.hand_anchor())
+
+
+func _finish_drop(throwing: bool) -> void:
+	var forward := -Basis(Vector3.UP, _rig.yaw()).z
+	var toss := forward * tuning.throw_speed if throwing else Vector3.ZERO
+	_held.release(global_position + Vector3.UP * tuning.eye_height_m + forward * (tuning.body_radius_m + 0.5), toss)
+	_held = null

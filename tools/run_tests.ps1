@@ -1,5 +1,5 @@
 param(
-	[string[]]$Tests = @("test_saves", "test_session", "test_game_services", "test_collision", "test_player"),
+	[string[]]$Tests = @("test_saves", "test_session", "test_game_services", "test_collision", "test_player", "test_net", "test_net_game"),
 	[string]$LogDir = "",
 	[switch]$Import
 )
@@ -8,8 +8,9 @@ param(
 # -LogDir keeps each test's full output as <name>.txt.
 $ErrorActionPreference = "Continue"
 $project = Split-Path -Parent $PSScriptRoot
-$godot = Join-Path $env:USERPROFILE "Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe"
-if (-not (Test-Path $godot)) { throw "Godot 4.7.2 console executable not found at $godot" }
+$godot = @("Downloads\Godot_v4.7.2-stable_win64.exe", "Downloads\Godot Installs\Godot_v4.7.2-stable_win64.exe") |
+	ForEach-Object { Join-Path $env:USERPROFILE "$_\Godot_v4.7.2-stable_win64_console.exe" } | Where-Object { Test-Path $_ } | Select-Object -First 1
+if (-not $godot) { throw "Godot 4.7.2 console executable not found under Downloads" }
 if ($Import) {
 	$out = & $godot --headless --path $project --import 2>&1 | ForEach-Object { "$_" }
 	$bad = $out | Where-Object { $_ -match "SCRIPT ERROR|Parse Error" }

@@ -166,6 +166,41 @@ func sync_rng_to_state() -> void:
 	if state != null:
 		state.rng_state = rng.state
 
+## Session facts a networked client shows but never decides: peers, pause votes, running suit checks.
+func replica_dict() -> Dictionary:
+	var checks := {}
+	for id: StringName in _suit_checks:
+		checks[String(id)] = float(_suit_checks[id].elapsed)
+	var votes := {}
+	for peer: int in _votes:
+		votes[peer] = bool(_votes[peer])
+	return {"peers": peers.duplicate(), "paused": paused, "votes": votes, "suit_checks": checks}
+
+
+## Client: copies the host's session facts (see replica_dict). Emits nothing; the host's forwarded events do that.
+func apply_replica(d: Dictionary) -> void:
+	peers.clear()
+	for p in d.get("peers", [HOST_PEER]):
+		peers.append(int(p))
+	paused = bool(d.get("paused", false))
+	_votes.clear()
+	var votes: Dictionary = d.get("votes", {})
+	for p in votes:
+		_votes[int(p)] = bool(votes[p])
+	_suit_checks.clear()
+	var checks: Dictionary = d.get("suit_checks", {})
+	for id in checks:
+		_suit_checks[StringName(String(id))] = {"elapsed": float(checks[id])}
+
+
+## How many connected peers currently vote to pause.
+func pause_votes() -> int:
+	var yes := 0
+	for peer: int in peers:
+		if bool(_votes.get(peer, false)):
+			yes += 1
+	return yes
+
 ## Returns check progress, or -1 when no check is running.
 func suit_check_progress(character_id: StringName) -> float:
 	if not _suit_checks.has(character_id):

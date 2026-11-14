@@ -9,6 +9,8 @@ signal quit_to_menu_pressed
 
 var _vote_label: Label
 var _status: Label
+## "Hosting on 192.168.1.20:24680, 2 players": the address others type to join. Hidden when playing alone.
+var _net_label: Label
 var _save_button: Button
 var _sol_slider: HSlider
 var _sol_label: Label
@@ -32,6 +34,10 @@ func setup(p_services: GameServices) -> void:
 	_vote_label = _wrap_label("", UiTheme.MUTED)
 	_vote_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	outer.add_child(_vote_label)
+	_net_label = _wrap_label("", UiTheme.MUTED)
+	_net_label.name = "Network"
+	_net_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	outer.add_child(_net_label)
 	var scroll := ScrollContainer.new()
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -69,20 +75,13 @@ func panel_title() -> String:
 func vote_text() -> String:
 	if services == null or not services.has_game():
 		return ""
-	if services.mode == &"client":
-		return "Waiting for everyone to agree to pause."
 	var session := services.session
 	var players := session.peers.size()
 	if players <= 1:
 		return "The colony is paused. Take your time." if session.paused else "Pausing…"
 	if session.paused:
 		return "Paused: all %d players agreed." % players
-	# The host's own vote record (SessionService keeps it; there is no public reader yet).
-	var votes: Dictionary = session._votes
-	var yes := 0
-	for peer: int in session.peers:
-		if bool(votes.get(peer, false)):
-			yes += 1
+	var yes := session.pause_votes()
 	return "%d of %d players want to pause. Waiting for everyone to agree." % [yes, players]
 
 
@@ -95,6 +94,10 @@ func refresh() -> void:
 	if _vote_label == null:
 		return
 	_vote_label.text = vote_text()
+	var online := services != null and services.net != null and services.net.is_online()
+	_net_label.visible = online
+	if online:
+		_net_label.text = services.net.status_text()
 	if _sol_slider != null and not _dragging and not _sol_dirty and services.has_game():
 		_sol_slider.set_value_no_signal(services.clock().sol_minutes)
 		_update_sol_label(_sol_slider.value)

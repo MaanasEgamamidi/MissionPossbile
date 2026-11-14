@@ -18,7 +18,7 @@ Milestone records:
 | Prompt 03 — Simulation, configuration and save foundation | [milestones/03_simulation/HANDOFF.md](milestones/03_simulation/HANDOFF.md) | 2026-11-11 |
 | Prompt 04 — Player rig, spacesuit, movement and cameras (movement, cameras, suit check and carrying done; body is a stand-in) | [milestones/04_player/HANDOFF.md](milestones/04_player/HANDOFF.md) | 2026-11-11 |
 | Prompt 05 — Native game UI, controls and sources | [milestones/05_ui/HANDOFF.md](milestones/05_ui/HANDOFF.md) | 2026-11-12 |
-| Prompt 06 — LAN multiplayer | skipped for now at the owner's request (D-10, I-48) | — |
+| Prompt 06 — LAN multiplayer (host and up to three clients over ENet; no voice) | [milestones/06_lan/HANDOFF.md](milestones/06_lan/HANDOFF.md) | 2026-11-13 |
 | Prompt 07 — Power, water and two oxygen processes | [milestones/07_power_life_support/HANDOFF.md](milestones/07_power_life_support/HANDOFF.md) | 2026-11-12 |
 
 Prompt 01 deliverables, all in `milestones/01_audit/`: `inventory.md`, `authority_matrix.md`, `camera_manifest.json` and `.csv`, `coverage_sheet.md`, `asset_readiness.md`, `contradictions.md`, `evidence/`, `tools/`.

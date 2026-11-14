@@ -22,7 +22,7 @@ var saves: SaveService
 var zones: ColonyZones
 ## Result of the last continue_game(), for the menu to explain what happened.
 var last_load: SaveLoadResult
-## LAN session, or null while playing alone. See NetSession.
+## LAN session (child node "Net"); offline until hosting or joining. See NetSession.
 var net: NetSession
 ## &"offline" (solo), &"host" (owns the colony and the save) or &"client" (shows the host's colony).
 var mode: StringName = &"offline"
@@ -48,6 +48,12 @@ func _init() -> void:
 		zones = ColonyZones.from_manifest(MANIFEST_PATH)
 		# Outside = the Exterior zone. The dome plaza and the garden dome are inside pressurised glass.
 		session.outside_test = func(p: Vector3) -> bool: return zones.zone_at_world(p) == ColonyZones.EXTERIOR
+	# The LAN layer is always present and offline until host() or join(). Its node path (Services/Net) must be the same
+	# on every machine, because remote calls are addressed by path.
+	net = NetSession.new()
+	net.name = "Net"
+	net.setup(self)
+	add_child(net)
 	events.state_changed.connect(_on_state_changed)
 	events.character_recovered.connect(func(_id: StringName, _info: Dictionary) -> void: _pending_save = &"recovery")
 

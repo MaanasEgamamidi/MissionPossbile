@@ -605,7 +605,11 @@ func _test_sol_slider() -> void:
 	var client_menu := PauseMenu.new()
 	client_menu.setup(services)
 	_check("non-host: no sol length slider and no Save now", client_menu.sol_slider() == null and client_menu.find_children("*", "HSlider", true, false).is_empty() and not _has_button(client_menu, "Save now"))
-	_check("non-host: shows 'Waiting for everyone to agree'", client_menu.vote_text().begins_with("Waiting for everyone to agree"), client_menu.vote_text())
+	# A client shows the host's replicated vote count (Prompt 06): two players, one wants to pause.
+	var saved_replica := services.session.replica_dict()
+	services.session.apply_replica({"peers": [1, 5], "paused": false, "votes": {5: true}})
+	_check("non-host: shows the vote count and 'Waiting for everyone to agree'", client_menu.vote_text() == "1 of 2 players want to pause. Waiting for everyone to agree.", client_menu.vote_text())
+	services.session.apply_replica(saved_replica)
 	client_menu.free()
 	services.mode = &"offline"
 	ui.queue_free()

@@ -39,6 +39,8 @@ var duplicate := false
 ## True on a client while the request is on its way to the host. The real answer arrives later as
 ## GameEvents.action_resolved with the same request_id; act on the replicated state, not on this placeholder.
 var pending := false
+## Network peer that sent the request (set by the host; 0 when unknown). Lets each screen show only its own answers.
+var peer := 0
 
 
 ## Placeholder answer a client gets at once for a request it has sent to the host.
@@ -78,11 +80,12 @@ func as_duplicate() -> ActionResult:
 	r.message = message
 	r.changes = changes.duplicate(true)
 	r.duplicate = true
+	r.peer = peer
 	return r
 
 
 func to_dict() -> Dictionary:
-	return {"request_id": request_id, "ok": ok, "reason": String(reason), "message": message, "changes": changes.duplicate(true), "duplicate": duplicate, "pending": pending}
+	return {"request_id": request_id, "ok": ok, "reason": String(reason), "message": message, "changes": changes.duplicate(true), "duplicate": duplicate, "pending": pending, "peer": peer}
 
 
 static func from_dict(d: Dictionary) -> ActionResult:
@@ -94,4 +97,5 @@ static func from_dict(d: Dictionary) -> ActionResult:
 	r.changes = (d.get("changes", {}) as Dictionary).duplicate(true)
 	r.duplicate = bool(d.get("duplicate", false))
 	r.pending = bool(d.get("pending", false))
+	r.peer = int(d.get("peer", 0))
 	return r

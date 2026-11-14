@@ -80,7 +80,7 @@ func _refresh_body(st: ColonyState) -> void:
 		tank_level = &"warn"
 	_show_reading(&"tank", "%s %% · %s kg of oxygen" % [num(me.suit_charge, 0), num(tank_kg, 3)], tank_level)
 
-	var progress := services.session.suit_check_progress(me.id) if services.is_authority() and services.session != null else -1.0
+	var progress := services.session.suit_check_progress(me.id) if services.session != null else -1.0
 	suit_button.text = "Take the suit off" if me.suit_on else "Put the suit on"
 	suit_button.disabled = progress >= 0.0
 	if progress >= 0.0:

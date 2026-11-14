@@ -86,6 +86,7 @@ func resolve(session: SessionService, request: ActionRequest) -> ActionResult:
 			while log.size() > maxi(0, session.config.remembered_requests):
 				log.erase(log.keys()[0])
 			_logs[request.peer_id] = log
+	result.peer = request.peer_id
 	session.events.action_resolved.emit(result)
 	if result.ok:
 		session.events.state_changed.emit(request.action)

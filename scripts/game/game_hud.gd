@@ -668,9 +668,9 @@ func refresh() -> void:
 			(l as Label).theme_type_variation = variation
 	_ok_line.visible = low.is_empty()
 	_refresh_crew()
-	_banner_panel.visible = services.session.paused if services.is_authority() else false
+	_banner_panel.visible = services.session.paused
 	var me := services.local_character()
-	var p := services.session.suit_check_progress(me.id) if me != null and services.is_authority() else -1.0
+	var p := services.session.suit_check_progress(me.id) if me != null else -1.0
 	_progress_box.visible = p >= 0.0
 	if p >= 0.0:
 		_progress.value = p * 100.0
@@ -756,6 +756,9 @@ func _item_name(item_id: StringName) -> String:
 
 
 func _on_action_resolved(result: ActionResult) -> void:
+	# On the host every player's answers pass through here; show only this player's own.
+	if result.peer != 0 and result.peer != services.local_peer():
+		return
 	if not result.ok and not result.duplicate and not result.pending and result.reason != &"paused":
 		show_message(result.message, 3.0)
 

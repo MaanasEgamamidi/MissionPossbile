@@ -95,6 +95,20 @@ func _ready() -> void:
 	ui.setup(services, settings)
 	ui.quit_to_menu_requested.connect(_on_quit_to_menu)
 
+	# Development shortcuts for trying co-op on one computer, after "--" on the command line:
+	#   --host[=PORT]          continue the save (or start one) and host at once
+	#   --join=ADDRESS[:PORT]  join at once
+	for arg: String in OS.get_cmdline_user_args():
+		if arg == "--host" or arg.begins_with("--host="):
+			_open_main_menu()
+			_on_menu_host(int(arg.get_slice("=", 1)) if arg.contains("=") else NetSession.DEFAULT_PORT, services.saves.has_save())
+			return
+		if arg.begins_with("--join="):
+			var target := arg.get_slice("=", 1)
+			_open_main_menu()
+			_on_menu_join(target.get_slice(":", 0), int(target.get_slice(":", 1)) if target.contains(":") else NetSession.DEFAULT_PORT)
+			return
+
 	if show_menu:
 		_open_main_menu()
 	else:
@@ -150,14 +164,89 @@ func _open_main_menu() -> void:
 	_main_menu = MainMenu.new()
 	_main_menu.continue_pressed.connect(_on_menu_continue)
 	_main_menu.new_game_pressed.connect(_on_menu_new)
-	_main_menu.host_pressed.connect(func(_port: int, _continue_save: bool) -> void: _main_menu.show_notice(NETWORK_LATER))
-	_main_menu.join_pressed.connect(func(_address: String, _port: int) -> void: _main_menu.show_notice(NETWORK_LATER))
+	_main_menu.host_pressed.connect(_on_menu_host)
+	_main_menu.join_pressed.connect(_on_menu_join)
 	_main_menu.quit_pressed.connect(func() -> void: get_tree().quit())
 	ui.open(_main_menu)
+	if menu_notice != "":
+		_main_menu.show_notice(menu_notice)
+		menu_notice = ""
 
 
-## Playing together over a network is Prompt 06, skipped for now at the owner's request.
-const NETWORK_LATER := "Playing together on a network is not built yet. You can play the colony on your own for now: choose Continue or New colony."
+## A message for the next main menu, kept across the scene reload (for example "the host closed the colony").
+static var menu_notice := ""
+
+
+## Host: open the colony (saved or new), then listen on `port` for up to three other players.
+func _on_menu_host(port: int, continue_save: bool) -> void:
+	if continue_save:
+		var loaded := services.continue_game()
+		if not loaded.is_usable():
+			_main_menu.show_notice("The saved colony could not be opened (%s). Untick \"Continue my saved colony\" to host a new one." % loaded.status)
+			return
+	else:
+		if services.saves.has_save() and not _confirm_new:
+			_confirm_new = true
+			_main_menu.show_notice("Hosting a new colony replaces your saved one (the old save is kept as a backup). Press Start hosting again to go ahead, or tick \"Continue my saved colony\".")
+			return
+		services.start_new_game()
+	var err := services.net.host(port)
+	if err != OK:
+		_main_menu.show_notice("Could not host on port %d (%s). Another program may be using it: try another port." % [port, error_string(err)])
+		return
+	_hook_net()
+	_begin_play()
+	_announce_hosting()
+
+
+## Join: connect, wait for the host's colony, then play. The menu stays up until the colony arrives.
+func _on_menu_join(address: String, port: int) -> void:
+	if services.net.is_joining():
+		return
+	_hook_net()
+	var err := services.net.join(address, port)
+	if err != OK:
+		_main_menu.show_notice("Could not start connecting (%s). Check the address." % error_string(err))
+		return
+	_main_menu.show_notice("Connecting to %s:%d…" % [address, port])
+
+
+func _hook_net() -> void:
+	var net := services.net
+	if net.joined.is_connected(_on_net_joined):
+		return
+	net.joined.connect(_on_net_joined)
+	net.join_failed.connect(func(reason: String) -> void:
+		if _main_menu != null and is_instance_valid(_main_menu):
+			_main_menu.show_notice(reason))
+	net.host_lost.connect(func(reason: String) -> void:
+		menu_notice = reason
+		get_tree().reload_current_scene())
+	net.peer_connected.connect(func(peer: int) -> void: _say_crew_change(peer, true))
+	net.peer_disconnected.connect(func(peer: int) -> void: _say_crew_change(peer, false))
+
+
+func _on_net_joined(_peer: int) -> void:
+	if not _playing:
+		_begin_play()
+		var me := _local_character()
+		ui.show_subtitle("Joined the colony%s." % (" as %s" % me.display_name if me != null else ""), 6.0, "", true)
+
+
+func _announce_hosting() -> void:
+	var addrs := NetSession.lan_addresses()
+	var where := " or ".join(Array(addrs.slice(0, 3))) if not addrs.is_empty() else "this computer's address"
+	ui.show_subtitle("Hosting. Other players choose Join a colony and type %s, port %d. The pause menu shows this again." % [where, services.net.port], 14.0, "Network", true)
+
+
+func _say_crew_change(peer: int, joined_now: bool) -> void:
+	if hud == null:
+		return
+	var c := services.state().character_of_peer(peer) if joined_now and services.has_game() else null
+	if c != null:
+		hud.show_message("A new player joined the colony as %s." % c.display_name, 4.0)
+	else:
+		hud.show_message("A player %s the colony." % ("joined" if joined_now else "left"), 4.0)
 
 
 func _on_menu_continue() -> void:
@@ -182,6 +271,8 @@ func _on_menu_new() -> void:
 func _on_quit_to_menu() -> void:
 	if services.is_authority() and services.has_game():
 		services.save_now(&"quit")
+	# The network peer lives on the SceneTree, not in this scene: close it, or the next Host finds the port taken.
+	services.net.leave()
 	get_tree().reload_current_scene()
 
 func _start_or_continue() -> void:
@@ -238,6 +329,7 @@ func _rebuild_crew() -> void:
 		player.visual().set_crew_identity(_identity_of(mine))
 		player.visual().set_suit(mine.suit_on)
 		player.action_answered.connect(_on_action_answered)
+		services.events.action_resolved.connect(player.resolve_answer)
 		_apply_player_settings()
 	for id: StringName in st.characters:
 		var c := st.characters[id] as CharacterState
@@ -255,12 +347,70 @@ func _rebuild_crew() -> void:
 				v.use_rig_if_available()
 				v.set_first_person(false)   # other crew are always seen from outside: keep their heads visible
 				v.set_crew_identity(_identity_of(c))
-			v.global_position = c.position
-			v.rotation.y = c.yaw
+				v.add_child(_presence_body())
+				v.global_position = c.position
+			if not c.is_active():
+				# Parked crew stand still at the hub; crew other players control are moved smoothly by _move_crew.
+				v.global_position = c.position
+				v.rotation.y = c.yaw
+				v.play(&"idle")
 			v.set_suit(c.suit_on)
-			v.play(&"idle")
+			# Only crew someone is playing are "there" for doors: parked crew on the hub ring must not hold a door open.
+			(v.get_node("Presence") as CollisionObject3D).collision_layer = Layers.PLAYER if c.is_active() else 0
 			if services.zones != null:
 				v.set_zone_layers(_layers_for(services.zones.zone_at_world(c.position)))
+
+
+## Other crew are drawn, not simulated, but doors sense bodies on the PLAYER layer: give each one a capsule there so a
+## door opens for every player on every screen. Nothing collides with it (the local player does not mask PLAYER).
+func _presence_body() -> AnimatableBody3D:
+	var tuning := PlayerTuning.new()
+	var body := AnimatableBody3D.new()
+	body.name = "Presence"
+	body.sync_to_physics = false
+	body.collision_layer = 0          # _rebuild_crew turns it on for crew another player controls
+	body.collision_mask = 0
+	var shape := CollisionShape3D.new()
+	var capsule := CapsuleShape3D.new()
+	capsule.radius = tuning.body_radius_m
+	capsule.height = tuning.body_height_m
+	shape.shape = capsule
+	shape.position.y = tuning.body_height_m / 2.0
+	body.add_child(shape)
+	return body
+
+
+## Moves the bodies of crew other players control toward their last reported pose (positions arrive about 20 times a
+## second) and picks idle, walk or sprint from how fast they actually move.
+func _move_crew(delta: float) -> void:
+	var st := services.state()
+	var follow := 1.0 - exp(-delta * 14.0)
+	for id: StringName in _crew_visuals:
+		var c := st.character(id)
+		var v := _crew_visuals[id] as PlayerVisual
+		if c == null or v == null or not c.is_active():
+			continue
+		var before := v.global_position
+		var gap := c.position - before
+		v.global_position = c.position if gap.length() > 6.0 else before + gap * follow      # snap after a teleport
+		v.rotation.y = lerp_angle(v.rotation.y, c.yaw, follow)
+		var moved := v.global_position - before
+		var speed := Vector2(moved.x, moved.z).length() / maxf(delta, 1e-4)
+		var smoothed := lerpf(float(v.get_meta(&"speed", 0.0)), speed, 1.0 - exp(-delta * 8.0))
+		v.set_meta(&"speed", smoothed)
+		var holding := false
+		for item_id: String in st.items:
+			if String((st.items[item_id] as Dictionary).get("holder", "")) == String(id):
+				holding = true
+				break
+		if holding:
+			v.play(&"carry")
+		elif smoothed < 0.15:
+			v.play(&"idle")
+		elif smoothed < 2.6:
+			v.play(&"walk", clampf(smoothed / PlayerVisual.WALK_CLIP_SPEED, PlayerVisual.MIN_CLIP_SCALE, PlayerVisual.MAX_CLIP_SCALE))
+		else:
+			v.play(&"sprint", clampf(smoothed / PlayerVisual.SPRINT_CLIP_SPEED, PlayerVisual.MIN_CLIP_SCALE, PlayerVisual.MAX_CLIP_SCALE))
 
 
 ## Everything the local player asks for goes to the host through here.
@@ -271,6 +421,13 @@ func _submit(action: StringName, target: StringName, params: Dictionary) -> Acti
 		if panel != null:
 			ui.open(panel)
 			return ActionResult.success("", {})
+		if not services.is_authority():
+			# A client never runs the session itself: ask the host for the station's action instead.
+			var st := services.state()
+			var kind := String((st.stations.get(target, {}) as Dictionary).get("kind", "")) if st.stations.has(target) else ""
+			if not LegacyStations.KIND_ACTION.has(kind):
+				return ActionResult.failure("", &"not_available_yet" if kind != "" else &"unknown_target")
+			return services.request(LegacyStations.KIND_ACTION[kind], target, params)
 		return LegacyStations.interact(services.session, services.local_peer(), target, params)
 	return services.request(action, target, params)
 
@@ -385,6 +542,7 @@ func _process(_delta: float) -> void:
 		player.input_enabled = ui.gameplay_has_focus()
 		hud.set_held(player.held_item().item_id if player.held_item() != null else &"")
 	_update_sun()
+	_move_crew(_delta)
 	if player != null and services.zones != null:
 		var zone := services.zones.zone_at_world(player.global_position)
 		if zone != _zone_now:
@@ -400,6 +558,9 @@ func _process(_delta: float) -> void:
 			var mask := _layers_for(services.zones.zone_at_world(node.global_position))
 			for mesh in node.find_children("*", "MeshInstance3D", true, false):
 				(mesh as MeshInstance3D).layers = mask
+		for id: StringName in _crew_visuals:
+			var v := _crew_visuals[id] as PlayerVisual
+			v.set_zone_layers(_layers_for(services.zones.zone_at_world(v.global_position)))
 
 
 # ---------------------------------------------------------------- input that belongs to the whole game
