@@ -17,8 +17,8 @@ const RIG_PATHS: Array[String] = ["res://assets/characters/astronaut.glb", "res:
 ## Ground speed (m/s) the clips cover at speed 1. Walk: the owner's Mixamo walk, retargeted with narrow-feet leg IK by
 ## tools/blender/character/retarget_mixamo_walk.py (source_speed_m_s). Sprint: tools/blender/character/make_gait.py
 ## (14 frames at the scene's 30 fps: 0.72 m stance travel in 0.38 of 0.467 s).
-const WALK_CLIP_SPEED: float = 1.545
-const SPRINT_CLIP_SPEED: float = 4.06
+const WALK_CLIP_SPEED: float = 2.0
+const SPRINT_CLIP_SPEED: float = 4.2
 const LOOPING: Array[StringName] = [&"idle", &"walk", &"sprint", &"carry", &"seated"]
 ## "jump" is a non-looping rise-apex-fall arc whose time the controller drives from vertical velocity (set_jump_phase).
 const NON_LOOPING: Array[StringName] = [&"jump", &"jump_start", &"land"]
@@ -27,6 +27,10 @@ const MIN_CLIP_SCALE: float = 0.75
 const MAX_CLIP_SCALE: float = 1.5
 ## Switching between these starts the new clip at the same normalised phase, so the feet keep their rhythm.
 const PHASE_SYNC: Array[StringName] = [&"walk", &"sprint"]
+## Normalised time of a heel strike in each locomotion clip; a running landing enters the gait here instead of at 0.
+## Measured on the current astronaut.glb with tools/godot/measure_contacts.gd (foot furthest forward):
+## walk 0.25 / 0.75, sprint 0.20 / 0.70. Re-measure after re-exporting either clip.
+const CONTACT_PHASE: Dictionary = {&"walk": 0.25, &"sprint": 0.20}
 ## States that may cut a play_once() hold short once its interruptible_after time has passed.
 const INTERRUPTERS: Array[StringName] = [&"walk", &"sprint", &"carry"]
 ## Emitted whenever the shown state changes (play() or play_once()); tests use it to follow the jump phases.
@@ -201,6 +205,8 @@ func is_holding() -> bool:
 
 ## Cross-fade length for a change of clip, per the animation review (fable_verdict_1, "Game side" 3).
 static func blend_time(from: StringName, to: StringName) -> float:
+	if from == &"":
+		return 0.0                                      # first clip on a fresh model: nothing to blend from
 	match to:
 		&"jump_start":
 			return 0.07
@@ -222,9 +228,12 @@ func set_jump_phase(fraction: float) -> void:
 	if _state != &"jump" or _animation == null or _animation.assigned_animation != "jump":
 		return
 	var length := _animation.get_animation(&"jump").length
-	# Stop a frame short of the end: the player then never reports "finished", and the next process step's
-	# small advance cannot run past the held fall pose.
-	_animation.seek(minf(_jump_fraction * length, maxf(length - 0.05, 0.0)))
+	if not _animation.is_playing():
+		# A long frame ran the clip past its end and the player stopped (current_animation went blank). Resume it
+		# so the fall pose stays on until the locomotion blend starts at touchdown.
+		_animation.play(&"jump", 0.0)
+	# Stop a frame short of the end: the next process step's small advance should not run past the held fall pose.
+	_animation.seek(minf(_jump_fraction * length, maxf(length - 0.05, 0.0)), true)
 	_animation.speed_scale = 1.0
 
 ## A quick procedural hip dip (metres, seconds), used for running landings instead of the standing land clip.
@@ -260,11 +269,17 @@ func play(state: StringName, speed: float = 1.0) -> void:
 			var phase := -1.0
 			if state in PHASE_SYNC and _state in PHASE_SYNC and _animation.assigned_animation == String(_state) and _animation.current_animation_length > 0.0:
 				phase = fposmod(_animation.current_animation_position / _animation.current_animation_length, 1.0)
+			elif state in PHASE_SYNC and _state == &"jump":
+				phase = float(CONTACT_PHASE.get(state, 0.0))   # running landing: come down on a heel strike
 			_animation.play(state, blend_time(_state, state))
 			if phase >= 0.0:
 				_animation.seek(phase * _animation.get_animation(state).length)
+			# Consume Godot's start step now: otherwise the first drawn frame after play() does not advance the clip
+			# (measured: one frame at t=0 per transition; 0.13 s of a slow capture).
+			_animation.advance(0.0)
 		elif not _animation.is_playing() and _animation.get_animation(state).loop_mode != Animation.LOOP_NONE:
 			_animation.play(state)
+			_animation.advance(0.0)
 		# A finished non-looping clip (jump, land) is left on its last frame: re-calling play() used to restart it
 		# from 0 every frame, because a finished clip reports not playing.
 		_animation.speed_scale = speed     # updated every call so the walk follows the ground speed

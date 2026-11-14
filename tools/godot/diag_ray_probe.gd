@@ -2,6 +2,7 @@ extends SceneTree
 ## Casts horizontal rays at body height through given points and prints what each hits (body / shape name), to check
 ## what collision lies in front of a visible object.
 ## Run: godot --headless --path . --script res://tools/godot/diag_ray_probe.gd -- name,x0,y,z0,x1,z1 ...   (y above the ground)
+## A name starting with "props:" makes the ray see only the PropCollision shapes.
 
 var main: GameMain
 
@@ -25,6 +26,12 @@ func _initialize() -> void:
 		b.y = a.y
 		var q := PhysicsRayQueryParameters3D.create(a, b, Layers.WORLD | Layers.DOOR)
 		q.hit_back_faces = true
+		if s[0].begins_with("props:"):   # only the PropCollision shapes
+			var ex: Array[RID] = []
+			for n: Node in main.collision.find_children("*", "CollisionObject3D", true, false):
+				if n.name != "Props":
+					ex.append((n as CollisionObject3D).get_rid())
+			q.exclude = ex
 		var hit := space.intersect_ray(q)
 		var what := "nothing"
 		if not hit.is_empty():

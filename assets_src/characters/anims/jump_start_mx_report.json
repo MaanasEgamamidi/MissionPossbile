@@ -1,0 +1,160 @@
+{
+ "start": 15,
+ "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Jump.fbx",
+ "mode": "once",
+ "old_names": {
+  "sprint": "sprint_handmade",
+  "jump": "jump_old",
+  "land": "land_old"
+ },
+ "target": "jump_start_mx",
+ "end": 23,
+ "x_scale": 0.65,
+ "yaw_ref_deg": 0,
+ "deyaw": "upper",
+ "live": [
+  "jump_start"
+ ],
+ "glb": "G:\\nasa app\\mars_colony_godot\\assets\\characters\\astronaut.glb",
+ "source_action": "Armature.004|mixamo.com|Layer0",
+ "source_action_frames": [
+  1.0,
+  66.0
+ ],
+ "scene_fps": 30,
+ "scale": 1.0764,
+ "source_times": [
+  15,
+  16.0,
+  17.0,
+  18.0,
+  19.0,
+  20.0,
+  21.0,
+  22.0,
+  23.0
+ ],
+ "pelvis_yaw_deg_vs_ref": [
+  -21.3,
+  -20.3,
+  -20.1,
+  -21.0,
+  -23.3,
+  -26.3,
+  -28.6,
+  -28.2,
+  -24.1
+ ],
+ "frames_keyed": 9,
+ "seconds": 0.2667,
+ "ankle_gap_m": [
+  0.192,
+  0.224
+ ],
+ "hips_z_m": [
+  0.829,
+  1.02
+ ],
+ "lowest_leg_above_floor_mm": [
+  -0.0,
+  0.0
+ ],
+ "planted_ball_sideways_mm_per_frame_max": 3.1,
+ "planted_ball_forward_mm_per_frame_max": 5.5,
+ "glb_animations": [
+  {
+   "name": "idle",
+   "seconds": 4
+  },
+  {
+   "name": "walk",
+   "seconds": 1.0667
+  },
+  {
+   "name": "sprint",
+   "seconds": 0.5667
+  },
+  {
+   "name": "jump",
+   "seconds": 1.2
+  },
+  {
+   "name": "land",
+   "seconds": 0.5
+  },
+  {
+   "name": "carry",
+   "seconds": 2
+  },
+  {
+   "name": "use",
+   "seconds": 1
+  },
+  {
+   "name": "suit",
+   "seconds": 1
+  },
+  {
+   "name": "seated",
+   "seconds": 0.0333
+  },
+  {
+   "name": "walk_mixamo",
+   "seconds": 1.0667
+  },
+  {
+   "name": "walk_q",
+   "seconds": 1.3333
+  },
+  {
+   "name": "walk_q_formal",
+   "seconds": 1.3333
+  },
+  {
+   "name": "sprint_mx_medium",
+   "seconds": 0.5667
+  },
+  {
+   "name": "sprint_mx_standard",
+   "seconds": 0.7333
+  },
+  {
+   "name": "sprint_q_jog",
+   "seconds": 0.9333
+  },
+  {
+   "name": "sprint_q",
+   "seconds": 0.6667
+  },
+  {
+   "name": "jump_start_mx",
+   "seconds": 0.2667
+  },
+  {
+   "name": "jump_start",
+   "seconds": 0.2667
+  },
+  {
+   "name": "jump_mx",
+   "seconds": 1.2
+  },
+  {
+   "name": "land_mx",
+   "seconds": 0.5
+  },
+  {
+   "name": "jump_start_q",
+   "seconds": 0.2333
+  },
+  {
+   "name": "jump_q",
+   "seconds": 2.5
+  },
+  {
+   "name": "land_q",
+   "seconds": 0.5333
+  }
+ ],
+ "glb_bytes": 941788,
+ "saved_blend": true
+}

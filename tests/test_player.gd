@@ -153,7 +153,7 @@ func _test_motion() -> void:
 	var landed_in: StringName = visual.get("_state")
 	Input.action_release("move_forward")
 	await _frames(45)
-	_check("walking off a ledge enters the arc at the apex (%.3f), no jump_start, no standing land" % entry, _jump_phases() == [&"jump"] and absf(entry - 0.5) < 0.05 and landed_in == &"walk" and _player.position.y < 0.05 and _player.is_on_floor(), str(_states) + " " + str(_player.position))
+	_check("walking off a ledge enters the arc at the apex (%.3f), no jump_start, no standing land" % entry, _jump_phases() == [&"jump"] and absf(entry - 0.5) < 0.05 and landed_in in [&"walk", &"sprint"] and _player.position.y < 0.05 and _player.is_on_floor(), str(_states) + " " + str(_player.position))
 	# Locomotion follows ground speed, not the sprint key: from standing, sprint shows only once fast enough,
 	# the clip scale stays within 0.75-1.5, and stopping settles into idle instead of slow-motion steps.
 	_player.teleport(Vector3(-20, 0.01, 30), 0)
@@ -182,6 +182,21 @@ func _test_motion() -> void:
 	_check("sprint key from standing: walk first, sprint by speed", walk_at >= 0 and sprint_at > walk_at, str(_states))
 	_check("locomotion clip scale stays within 0.75-1.5", scale_ok)
 	_check("stopping settles into idle within 0.25 s (frame %d)" % idle_frame, idle_frame >= 0 and idle_frame <= 15, str(_states))
+	# Gait by speed at steady pace: suited 2.4 m/s walks at 1.2x; the unsuited 3.0 m/s walk borrows the sprint lope
+	# (above 2.75 m/s) instead of overdriving the walk clip to its 1.5x limit.
+	for suited: bool in [true, false]:
+		_crew.suit_on = suited
+		_player.teleport(Vector3(-20, 0.01, 30), 0)
+		await _frames(5)
+		Input.action_press("move_forward")
+		await _frames(40)
+		var gait_state: StringName = visual.get("_state")
+		var gait_scale: float = visual.get("_speed")
+		Input.action_release("move_forward")
+		await _frames(20)
+		var wanted: StringName = &"walk" if suited else &"sprint"
+		_check("steady %s walk shows %s at %.2fx" % ["suited" if suited else "unsuited", wanted, gait_scale], gait_state == wanted and gait_scale >= PlayerVisual.MIN_CLIP_SCALE and gait_scale < PlayerVisual.MAX_CLIP_SCALE)
+	_crew.suit_on = false
 	var walk := await _speed(false, false)
 	_check("walk speed %.4f m/s" % walk, absf(walk / _tuning.walk_speed - 1.0) < 0.03)
 	var suited := await _speed(true, false)
@@ -276,7 +291,7 @@ func _test_cameras() -> void:
 	var feet_ndc_y := (feet_local.y / -feet_local.z) / tan(deg_to_rad(cam3.fov) * 0.5)
 	var feet_margin := (feet_ndc_y + 1.0) * 0.5
 	_check("third person level look: boots %.3f of screen height above the bottom edge" % feet_margin, absf(feet_margin - 0.08) < 0.015)
-	_check("third-person fill light only in third person", rig.fill_light().visible and not rig.fill_light().shadow_enabled and rig.fill_light().light_energy < 0.5)
+	_check("third-person fill light only in third person", rig.fill_light().visible and not rig.fill_light().shadow_enabled and rig.fill_light().light_energy <= 1.0)
 	_player.set_first_person(true)
 	var fill_hidden := not rig.fill_light().visible
 	_player.set_first_person(false)
@@ -484,6 +499,21 @@ func _test_visual() -> void:
 	var dipped := model_node.position.y < -0.04
 	visual._process(0.15)
 	_check("running-landing hip dip goes 5 cm down and back", dipped and is_zero_approx(model_node.position.y))
+	# The first drawn frame after play() already advances (no lost start step).
+	visual.play(&"walk")
+	visual.play(&"idle")
+	player_anim.advance(0.05)
+	_check("first frame after a clip change advances the clip", absf(player_anim.current_animation_position - 0.05) < 0.005, "%.4f" % player_anim.current_animation_position)
+	# A long frame that runs the jump arc past its end must not leave nothing playing.
+	visual.play(&"jump")
+	visual.set_jump_phase(0.9)
+	player_anim.advance(0.5)
+	var ran_out := not player_anim.is_playing()
+	visual.set_jump_phase(1.0)
+	_check("jump arc run past its end resumes on the held fall pose", ran_out and player_anim.is_playing() and player_anim.current_animation == "jump" and absf(player_anim.current_animation_position - 0.95) < 0.01, "%s %.3f" % [player_anim.current_animation, player_anim.current_animation_position])
+	# A running landing enters the gait on a heel strike, not at 0.
+	visual.play(&"sprint")
+	_check("running landing starts sprint at the contact phase", absf(player_anim.current_animation_position - PlayerVisual.CONTACT_PHASE[&"sprint"] * 0.5) < 0.01, "%.3f" % player_anim.current_animation_position)
 	_player.set_physics_process(true)
 	await _frames(2)
 

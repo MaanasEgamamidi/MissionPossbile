@@ -1,11 +1,14 @@
 extends SceneTree
 ## Audit: loads the full game (game.tscn) and, for every visible mesh of the world, samples points on its near-vertical
 ## faces inside the body band (0.1 to 1.9 m above the ground under them) and asks the physics space whether collision
-## lies within 0.25 m of each point. Lists the meshes whose sampled surface is mostly not covered.
+## lies between 0.6 m in front of and 0.25 m behind each point (from either side). Lists the meshes whose sampled surface is mostly not covered.
 ## Run: godot --headless --path . --script res://tools/godot/diag_uncovered.gd -- [--out <file.json>] [--min 0.6]
 ## Writes _test_saves/diag/diag_uncovered.json by default.
 
 const SAMPLES := 48
+## A surface point counts as covered when collision lies between REACH in front of it and 0.25 m behind it (from either
+## side): the player is then stopped before reaching the visible surface.
+const REACH := 0.6
 var main: GameMain
 
 
@@ -78,11 +81,11 @@ func _initialize() -> void:
 			if p.y < ground + 0.1 or p.y > ground + 1.9:
 				continue
 			valid += 1
-			var q := PhysicsRayQueryParameters3D.create(p + nrm * 0.25, p - nrm * 0.25, Layers.WORLD | Layers.DOOR)
+			var q := PhysicsRayQueryParameters3D.create(p + nrm * REACH, p - nrm * 0.25, Layers.WORLD | Layers.DOOR)
 			q.hit_back_faces = true
 			var hit := space.intersect_ray(q)
 			if hit.is_empty():
-				q = PhysicsRayQueryParameters3D.create(p - nrm * 0.25, p + nrm * 0.25, Layers.WORLD | Layers.DOOR)
+				q = PhysicsRayQueryParameters3D.create(p - nrm * REACH, p + nrm * 0.25, Layers.WORLD | Layers.DOOR)
 				q.hit_back_faces = true
 				hit = space.intersect_ray(q)
 			if not hit.is_empty():

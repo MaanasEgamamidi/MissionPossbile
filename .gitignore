@@ -18,3 +18,10 @@ data/prop_collision_cache.bin
 *.log
 # but keep the logs that are milestone evidence
 !docs/**/*.log
+
+# loose capture output written to the project root by capture tools
+/play_*.png
+/play_*.png.import
+/idle_*.png
+/idle_*.png.import
+/capture_log.txt

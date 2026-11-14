@@ -37,7 +37,8 @@ var _jumped: bool = false
 const MIN_AIR_TIME_S: float = 0.15
 ## Locomotion is picked from the real horizontal ground speed, not from the sprint key (m/s).
 const IDLE_BELOW: float = 0.15
-const SPRINT_ABOVE: float = 3.1
+## 2.6 (was 3.1): the unsuited 3.0 m/s walk would need the walk clip at 1.5x; above 2.75 it borrows the sprint lope.
+const SPRINT_ABOVE: float = 2.6
 const SPRINT_HYSTERESIS: float = 0.15
 ## Touching down faster than this skips the standing land clip: a short hip dip and straight back into the gait.
 const RUNNING_LANDING_SPEED: float = 1.0
@@ -229,7 +230,7 @@ func _physics_process(delta: float) -> void:
 	if report_position.is_valid():
 		report_position.call(global_position, _rig.yaw())
 
-## Idle below 0.15 m/s, walk up to 3.1 m/s, sprint above, with +-0.15 m/s hysteresis at the walk/sprint split.
+## Idle below 0.15 m/s, walk up to SPRINT_ABOVE (2.6 m/s), sprint above, with +-0.15 m/s hysteresis at the walk/sprint split.
 ## Coasting to a stop with no input below the walk clip's slowest scale settles into idle instead of slow-motion steps.
 func _pick_locomotion(ground_speed: float, no_input: bool) -> StringName:
 	if ground_speed < IDLE_BELOW:

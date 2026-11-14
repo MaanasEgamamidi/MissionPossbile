@@ -280,11 +280,13 @@ def build_idle():
             p.ank[s] = Vector((SGN[s] * GAP_IDLE / 2, base0.ank[s].y, base0.ank[s].z))
             p.knee[s] = Vector((SGN[s] * GAP_IDLE / 2, base0.ank[s].y - 0.15, (base0.ank[s].z + hipz) / 2))
         shift = 0.015 * math.sin(2 * math.pi * t)
-        p.hip = Vector((base0.hip.x + shift, base0.hip.y, hipz))
-        set_roll(p, "Hips", 1.5 * math.sin(2 * math.pi * t), only=True)
         b = 0.5 - 0.5 * math.cos(4 * math.pi * t)          # two breaths per 4 s loop
+        p.hip = Vector((base0.hip.x + shift, base0.hip.y, hipz + 0.01 * b))   # 1 cm breathing bob (knees take it)
+        set_roll(p, "Hips", 1.5 * math.sin(2 * math.pi * t), only=True)
         rotate_subtree(p, "Chest", Rx(-1.2 * b))
         rotate_subtree(p, "ShoulderL", Ry(-4.0 * b)); rotate_subtree(p, "ShoulderR", Ry(4.0 * b))
+        for s in SIDES:
+            set_abduction(p, s, 13.0)                       # matches the walk's 11-15 deg so walk/idle do not pop
         # helmet look-arounds: left at ~1.1 s, right at ~2.7 s (sin^2 windows, zero at the loop ends)
         def bump(c, w):
             x = (t * 4.0 - c) / w
@@ -407,6 +409,223 @@ def build_walk():
     return key_frames("walk_v5", snaps), True
 
 # ================================================================== sprint
+# ================================================================== walk, round 2 (procedural legs)
+# Judge round 2: stride x1.12 (else x1.08, x1.05) of the Mixamo walk, retimed to 28 frames; hard limits below. The legs
+# are generated: each stance is 14 frames with the ball of the foot moving back at one speed (flat foot, heel rising
+# about the ball when the trailing leg would over-reach); each swing is an eased arc. Upper body and arms come from the
+# Mixamo walk sampled at the same gait phase (left foot contact = phase 0).
+W2_N, W2_STANCE = 28, 14
+W2_HIP_MID, W2_BOB = 0.936, 0.04         # hips 0.916..0.956 before reach limits
+W2_TOE_OUT, W2_GAP = 3.0, 0.185
+W2_SWING_H = 0.04
+W2_CONTACT_KNEE = 2.0                     # knee bend the leading leg lands with (deg)
+W2_KNEE_POLE_OUT = 0.12                   # outward pole bias so bent knees track over the toes
+W2_THIGH_BACK = 28.0                      # trailing leg: raise the heel further rather than exceed this
+LIMITS = {"hips": (0.90, 0.96), "bob": 0.05, "stance_knee_contact": 15.0, "stance_knee": 25.0, "swing_knee": 65.0,
+          "thigh": 30.0, "knee_out": 8.0, "gap": (0.15, 0.19), "drift_mm": 3.0}
+
+def leg_angles(s):
+    """(knee flex deg, thigh angle from vertical deg, + = knee ahead of the hip) from the solved pose bones."""
+    pbs = ARM.pose.bones
+    hj, kn, an = pbs["UpperLeg" + s].head, pbs["LowerLeg" + s].head, pbs["Foot" + s].head
+    flex = math.degrees((kn - hj).angle(an - kn))
+    th = math.degrees((kn - hj).angle(Vector((0, 0, -1))))
+    return flex, (th if kn.y < hj.y else -th)
+
+def flat_rot(s, out_deg):
+    R = Rz(out_deg * SGN[s])
+    return R @ rot3(REST["Foot" + s]), R @ rot3(REST["Toes" + s])
+
+def walk_round2(factor):
+    src = bpy.data.actions["walk"]
+    n_src = 32
+    base_src = [eval_action(src, i) for i in range(n_src)]
+    s = [(p.ank["R"].y - p.hip.y) - (p.ank["L"].y - p.hip.y) for p in base_src]
+    c = sum(s[i] * math.cos(2 * math.pi * i / n_src) for i in range(n_src))
+    d = sum(s[i] * math.sin(2 * math.pi * i / n_src) for i in range(n_src))
+    phi0 = math.atan2(d, c)                       # source frame i has phase 2*pi*i/n - phi0
+    speed = 1.545 * factor * n_src / W2_N         # planted-foot speed after the stride scale and the retime
+    travel = speed * W2_STANCE / FPS              # ball travel per stance (= per swing)
+    flexmax = max(max(arm_angles(p, sd)[1] for sd in SIDES) for p in base_src)
+    hip_y = sum(p.hip.y for p in base_src) / n_src
+    N = W2_N
+    poses, info = [], {"factor": factor, "speed": round(speed, 3), "travel_m": round(travel, 3)}
+    # front contact: as far ahead as the leading leg reaches with the knee at ~12 deg at the lowest hip height
+    hj_off = {sd: HEAD["UpperLeg" + sd] - HEAD["Hips"] for sd in SIDES}
+    d12 = math.sqrt(L1["L"] ** 2 + L2["L"] ** 2 + 2 * L1["L"] * L2["L"] * math.cos(math.radians(W2_CONTACT_KNEE)))
+    low_hip = W2_HIP_MID - W2_BOB / 2
+    vert = low_hip + hj_off["L"].z - HZ["L"][0]
+    lat = abs(hj_off["L"].x) - W2_GAP / 2
+    ahead = math.sqrt(max(0.0, d12 ** 2 - vert ** 2 - lat ** 2))
+    ball_fwd = (rot3(REST["FootL"]) @ TOE_LOCAL["L"]).y          # ball relative to ankle along y (negative: ahead)
+    a_ball = ahead - ball_fwd                                       # contact ball distance ahead of the hip (+)
+    info["contact_ankle_ahead_m"] = round(ahead, 3)
+    def stance_ball_y(k):
+        return hip_y - a_ball + speed / FPS * k
+    for i in range(N):
+        phi = 2 * math.pi * i / N
+        t_src = ((phi + phi0) / (2 * math.pi) * n_src) % n_src
+        p = eval_action(src, t_src)
+        p.hip = Vector((0.02 * math.sin(phi), hip_y, W2_HIP_MID - W2_BOB / 2 * math.cos(2 * phi)))
+        poses.append((p, phi))
+    # stance frames for each foot: L contact at i=0, R at i=N/2
+    st_k = {"L": {}, "R": {}}
+    for sd, off in (("L", 0), ("R", N // 2)):
+        for k in range(W2_STANCE):
+            st_k[sd][(off + k) % N] = k
+    heel_max, hip_drop = 0.0, 0.0
+    for i, (p, phi) in enumerate(poses):
+        for sd in SIDES:
+            if i in st_k[sd]:
+                k = st_k[sd][i]
+                fF, fT = flat_rot(sd, W2_TOE_OUT)
+                p.W["Foot" + sd] = fF.copy(); p.W["Toes" + sd] = fT.copy()
+                ball = Vector((SGN[sd] * W2_GAP / 2 + (fF @ TOE_LOCAL[sd]).x, stance_ball_y(k), HZ[sd][1]))
+                p.ank[sd] = ball - fF @ TOE_LOCAL[sd]
+                p.knee[sd] = p.ank[sd] + Vector((0, -0.25, 0.4))
+    # reach: trailing stance foot raises its heel about the ball; a leading foot that cannot reach lowers the hips
+    for i, (p, phi) in enumerate(poses):
+        pos = fk_positions(p)
+        for sd in SIDES:
+            if i not in st_k[sd]:
+                continue
+            hj = pos["UpperLeg" + sd]
+            reach = (L1[sd] + L2[sd]) * 0.99
+            def too_far(a):
+                v = a - hj
+                back = math.degrees(math.atan2(v.y, -v.z)) if v.y > 0 else 0.0
+                return v.length > reach or back > W2_THIGH_BACK - 3.0
+            if p.ank[sd].y > hj.y and too_far(p.ank[sd]):
+                b = ball_pos(p, sd)
+                lo, hi = 0.0, 65.0
+                for _ in range(24):
+                    mid = (lo + hi) / 2
+                    if too_far(b + Rx(mid) @ (p.ank[sd] - b)):
+                        lo = mid
+                    else:
+                        hi = mid
+                R = Rx(hi)
+                p.ank[sd] = b + R @ (p.ank[sd] - b)
+                p.W["Foot" + sd] = R @ p.W["Foot" + sd]
+                heel_max = max(heel_max, hi)
+            if (p.ank[sd] - hj).length > reach:
+                dxy = (Vector((p.ank[sd].x, p.ank[sd].y)) - Vector((hj.x, hj.y))).length
+                cap = p.ank[sd].z + math.sqrt(max(0.0, reach ** 2 - dxy ** 2)) - (hj.z - p.hip.z)
+                hip_drop = max(hip_drop, p.hip.z - cap)
+                p.hip.z = min(p.hip.z, cap)
+                pos = fk_positions(p)
+    info["heel_lift_max_deg"] = round(heel_max, 1); info["hip_drop_for_reach_m"] = round(hip_drop, 3)
+    # swing: eased arc from toe-off to the next contact (ankle path, foot rotation slerped, toes follow the foot)
+    for sd, off in (("L", 0), ("R", N // 2)):
+        last = (off + W2_STANCE - 1) % N
+        first = off % N
+        A0, F0 = poses[last][0].ank[sd].copy(), poses[last][0].W["Foot" + sd].copy()
+        A1, F1 = poses[first][0].ank[sd].copy(), poses[first][0].W["Foot" + sd].copy()
+        # the swing ends where the next stance starts: same point relative to the (fixed-y) hips
+        nsw = N - W2_STANCE
+        for j in range(nsw):
+            i = (off + W2_STANCE + j) % N
+            p = poses[i][0]
+            u = (j + 1) / (nsw + 1)
+            e = smooth(u)
+            a = A0.lerp(A1, e)
+            a.z += W2_SWING_H * math.sin(math.pi * u) + (HZ[sd][0] - A1.z) * 0
+            p.ank[sd] = a
+            q = F0.to_quaternion().slerp(F1.to_quaternion(), smooth(min(1.0, u * 1.3)))
+            p.W["Foot" + sd] = q.to_matrix()
+            p.W["Toes" + sd] = p.W["Foot" + sd] @ rot3(REST["Foot" + sd]).inverted() @ rot3(REST["Toes" + sd])
+            p.knee[sd] = a + Vector((0, -0.3, 0.35))
+    # upper body (on top of the Mixamo upper body at the matching phase)
+    for i, (p, phi) in enumerate(poses):
+        set_roll(p, "Hips", 3.0 * math.sin(phi), only=True)
+        rotate_subtree(p, "Spine", Rx(3.5 - trunk_pitch_deg(p)))
+        set_yaw(p, "Chest", 6.0 * math.cos(phi))
+        rotate_subtree(p, "Chest", Rx(1.5 * math.sin(2 * phi)), only=True)
+        rotate_subtree(p, "ShoulderL", Ry(3.0 * math.cos(phi))); rotate_subtree(p, "ShoulderR", Ry(3.0 * math.cos(phi)))
+        arm_secondary(p, phi, 11.0, lambda sd, flex: 15.0 + 10.0 * max(0.0, flex / flexmax), 8.0)
+        set_head_pitch(p, 1.5)
+        rotate_subtree(p, "Head", Rz(-0.7 * head_yaw_deg(p)))
+    # solve; real boot mesh on the floor for stance feet, clear of it for swing feet; collect the limit checks
+    snaps = []
+    chk = {"knee_contact": 0.0, "knee_stance": 0.0, "knee_preswing": 0.0, "knee_swing": 0.0, "thigh_fwd": 0.0, "thigh_back": 0.0}
+    flat_up = {sd: (rot3(REST["Foot" + sd]) @ TOE_LOCAL[sd]).normalized() for sd in SIDES}
+    def aim_knees(p):
+        pos = fk_positions(p)
+        for sd in SIDES:
+            mid = (pos["UpperLeg" + sd] + p.ank[sd]) * 0.5
+            p.knee[sd] = mid + Vector((SGN[sd] * W2_KNEE_POLE_OUT, -1.0, 0.0)) * 0.3
+    for i, (p, phi) in enumerate(poses):
+        for _ in range(2):
+            aim_knees(p)
+            solve(p, 0.0)
+            low = lowest_by_side()
+            for sd in SIDES:
+                dz = low[sd] - REST_MIN
+                if i in st_k[sd]:
+                    p.ank[sd].z -= dz; p.knee[sd].z -= dz
+                elif dz < 0.012:
+                    p.ank[sd].z += 0.012 - dz; p.knee[sd].z += 0.012 - dz
+            # never stretch a planted leg past its reach (the IK would drag the foot): lower the hips instead
+            pos = fk_positions(p)
+            for sd in SIDES:
+                if i in st_k[sd]:
+                    hj = pos["UpperLeg" + sd]
+                    reach = (L1[sd] + L2[sd]) * 0.997
+                    v = p.ank[sd] - hj
+                    if v.length > reach:
+                        dxy = Vector((v.x, v.y)).length
+                        need = -v.z - math.sqrt(max(0.0, reach ** 2 - dxy ** 2))
+                        p.hip.z -= need
+                        pos = fk_positions(p)
+        aim_knees(p)
+        solve(p, 0.0)
+        bpy.context.view_layer.update()
+        for sd in SIDES:
+            flex, th = leg_angles(sd)
+            if i in st_k[sd]:
+                # pre-swing: the heel has left the floor (foot pitched > 5 deg from flat); the knee flexes there
+                pitch = math.degrees((p.W["Foot" + sd] @ TOE_LOCAL[sd]).normalized().angle(
+                    Rz(W2_TOE_OUT * SGN[sd]) @ flat_up[sd]))
+                key = "knee_preswing" if pitch > 5.0 else "knee_stance"
+                chk[key] = max(chk[key], flex)
+                if st_k[sd][i] == 0:
+                    chk["knee_contact"] = max(chk["knee_contact"], flex)
+            else:
+                chk["knee_swing"] = max(chk["knee_swing"], flex)
+            chk["thigh_fwd"] = max(chk["thigh_fwd"], th); chk["thigh_back"] = max(chk["thigh_back"], -th)
+        snaps.append(snapshot())
+    snaps.append(snaps[0])
+    info["checks_deg"] = {k: round(v, 1) for k, v in chk.items()}
+    return snaps, info
+
+def build_walk_round2():
+    tried = []
+    for factor in (1.12, 1.08, 1.05):
+        snaps, info = walk_round2(factor)
+        act = key_frames("walk_v6", snaps)
+        R, rows = measure(act, len(snaps), True)
+        c = info["checks_deg"]
+        fails = []
+        hz = R["hips_z_m"]
+        if hz[0] < LIMITS["hips"][0] - 1e-3 or hz[1] > LIMITS["hips"][1] + 1e-3: fails.append("hips")
+        if hz[1] - hz[0] > LIMITS["bob"] + 1e-3: fails.append("bob")
+        if c["knee_contact"] > LIMITS["stance_knee_contact"]: fails.append("stance_knee_contact")
+        if c["knee_stance"] > LIMITS["stance_knee"]: fails.append("stance_knee")
+        if c["knee_swing"] > LIMITS["swing_knee"]: fails.append("swing_knee")
+        if max(c["thigh_fwd"], c["thigh_back"]) > LIMITS["thigh"]: fails.append("thigh")
+        ko = R.get("knee_out_deg_when_bent") or [0, 0]
+        if max(abs(ko[0]), abs(ko[1])) > LIMITS["knee_out"]: fails.append("knee_out")
+        g = R["ankle_gap_m"]
+        if g[0] < LIMITS["gap"][0] - 1e-3 or g[1] > LIMITS["gap"][1] + 1e-3: fails.append("gap")
+        if (R.get("stance_drift_mm_per_frame_max") or 0) > LIMITS["drift_mm"]: fails.append("drift")
+        info["failed_limits"] = fails
+        tried.append(info)
+        if not fails:
+            break
+    REPORTS.setdefault("walk_v6", {})["stride_attempts"] = tried
+    return act, True
+
+SPRINT_TOE_OUT = 2.0        # planted toe-out (deg); judge range -5..+8
 SPRINT_SPEED = 4.2          # planted-foot speed (m/s at speed 1): the mean of the two fitted stance speeds (4.03, 4.34)
 SPRINT_FLIGHT = {3, 4, 5, 11, 12, 13}   # sprint_mx_medium frames i..i+1 with both feet off the ground in the source
 
@@ -430,6 +649,15 @@ def build_sprint():
     lean = sum(trunk_pitch_deg(p) for p in base) / n_out
     REPORTS.setdefault("sprint_v5", {}).update({"source_times": [round(t, 2) for t in times], "flight_stretch": round(k, 3),
                                                  "source_trunk_pitch_mean_deg": round(lean, 1)})
+    flexes = [arm_angles(p, s)[1] for p in base for s in SIDES]
+    fmax, fmin = max(flexes), min(flexes)
+    stance_mask = gait_stance(base)
+    low_mask = {s: [ball_pos(base[j], s).z < HEAD["Toes" + s].z + 0.04 for j in range(n_out)] for s in SIDES}
+    toe_turn = {}
+    for s in SIDES:
+        outs = [foot_out_deg(base[j], s) for j in range(n_out) if stance_mask[s][j]] or [0.0]
+        toe_turn[s] = SPRINT_TOE_OUT - sum(outs) / len(outs)
+    REPORTS["sprint_v5"]["source_planted_toe_out_deg"] = {s: round(-toe_turn[s] + SPRINT_TOE_OUT, 1) for s in SIDES}
     poses = []
     for j, p0 in enumerate(base):
         p = p0.copy(); phi = phis[j]
@@ -440,14 +668,49 @@ def build_sprint():
         set_yaw(p, "Chest", 10.0 * math.cos(phi))
         rotate_subtree(p, "Chest", Rx(3.0 * math.sin(2 * phi)), only=True)
         rotate_subtree(p, "ShoulderL", Ry(5.0 * math.cos(phi))); rotate_subtree(p, "ShoulderR", Ry(5.0 * math.cos(phi)))
+        C = p.W["Chest"] @ rot3(REST["Chest"]).inverted()
         for s in SIDES:
+            # shoulder flexion remapped to -45 (back swing, hand reaches the hip line) .. +30 (forward)
+            f = arm_angles(p, s)[1]
+            ft = f * 30.0 / fmax if f >= 0 else -f * 54.0 / fmin     # 54: lands at ~-45 after abduction/yaw
+            rotate_subtree(p, "UpperArm" + s, Matrix.Rotation(math.radians(-(ft - f)), 3, C @ Vector((1, 0, 0))))
             set_abduction(p, s, 13.5)
-            set_forearm(p, s, 90.0, inward=0.12, up=0.35)
+            # elbow 75 deg at the front of the swing, 105 at the back; forearm ~15 deg below horizontal
+            elbow = 90.0 - 15.0 * (ft / 30.0) if ft >= 0 else 90.0 + 15.0 * min(1.0, -ft / 54.0)
+            set_forearm(p, s, elbow, inward=0.12, up=-0.27)
+            if low_mask[s][j]:
+                turn_foot(p, s, SPRINT_TOE_OUT - foot_out_deg(p, s))
+            else:
+                turn_foot(p, s, toe_turn[s])
         rotate_subtree(p, "HandL", Rx(6.0 * math.sin(phi))); rotate_subtree(p, "HandR", Rx(-6.0 * math.sin(phi)))
         set_head_pitch(p, 3.0)
         rotate_subtree(p, "Head", Rz(-0.6 * head_yaw_deg(p)))
         poses.append(p)
     lock_feet(poses, base, "sprint_v5", speed=SPRINT_SPEED)
+    # toe-off: a trailing planted foot the leg cannot reach rises onto the ball instead of being dragged
+    lifts = []
+    for j, p in enumerate(poses):
+        pos = fk_positions(p)
+        for s in SIDES:
+            if not stance_mask[s][j]:
+                continue
+            hj = pos["UpperLeg" + s]
+            reach = (L1[s] + L2[s]) * 0.99
+            if (p.ank[s] - hj).length > reach and p.ank[s].y > hj.y:
+                b = ball_pos(p, s)
+                lo, hi = 0.0, 70.0
+                for _ in range(24):
+                    mid = (lo + hi) / 2
+                    if (b + Rx(mid) @ (p.ank[s] - b) - hj).length > reach:
+                        lo = mid
+                    else:
+                        hi = mid
+                R = Rx(hi)
+                na = b + R @ (p.ank[s] - b)
+                p.knee[s] = p.knee[s] + (na - p.ank[s]); p.ank[s] = na
+                p.W["Foot" + s] = R @ p.W["Foot" + s]
+                lifts.append(round(hi, 1))
+    REPORTS["sprint_v5"]["toe_off_heel_lift_deg"] = lifts
     # stance frames pinned; flight frames ride between the neighbouring stance heights plus a 4 cm arc
     dz = []
     for j, p in enumerate(poses):
@@ -468,15 +731,41 @@ def build_sprint():
         for jj in range(a, b + 1):
             u = (jj - a + 1) / m
             flight_dz[jj] = max(dz[jj], before + (after - before) * u + 0.04 * math.sin(math.pi * u))
-    snaps = []
+    snaps, dbg = [], []
     for j, p in enumerate(poses):
         shift_z(p, flight_dz.get(j, dz[j]))
+        # a planted foot still out of reach (toe-off): the hips dip instead of the IK dragging the foot
+        pos = fk_positions(p)
+        for s in SIDES:
+            if stance_mask[s][j]:
+                v = p.ank[s] - pos["UpperLeg" + s]
+                reach = (L1[s] + L2[s]) * 0.997
+                if v.length > reach:
+                    need = -v.z - math.sqrt(max(0.0, reach ** 2 - Vector((v.x, v.y)).length ** 2))
+                    p.hip.z -= need
+                    pos = fk_positions(p)
         solve(p, 0.5)
+        g = floor_gap()
+        if g > 0:                                    # never through the floor
+            shift_z(p, g); solve(p, 0.5)
+        bpy.context.view_layer.update()
+        dbg.append({"j": j, "flight": flight_u[j], "st": [stance_mask[s][j] for s in SIDES],
+                    **{s: [round(v, 3) for v in list(ARM.pose.bones["Foot" + s].head) + list(ARM.pose.bones["Toes" + s].head)]
+                       for s in SIDES}})
         snaps.append(snapshot())
+    REPORTS["sprint_v5"]["debug_feet"] = dbg
     snaps.append(snaps[0])
     return key_frames("sprint_v5", snaps), True
 
 # ================================================================== jump start
+def cap_arms(p, abd_max, elbow_max):
+    for s in SIDES:
+        abd, _, elbow = arm_angles(p, s)
+        if abd > abd_max:
+            set_abduction(p, s, abd_max)
+        if elbow > elbow_max:
+            set_elbow(p, s, elbow_max)
+
 def rest_ankle_rel(s, gap):
     r = HEAD["Foot" + s] - HEAD["Hips"]
     return Vector((SGN[s] * gap / 2, r.y, r.z))
@@ -504,6 +793,8 @@ def build_jump_start(tuck=0.38):
                 e = arm_angles(p, s)[2]
                 set_forearm(p, s, e + (25.0 - e) * wts[j], inward=0.1, up=0.0)
         set_head_pitch(p, 5.0 + (-6.0 - 5.0) * (j / (len(keys) - 1)))   # up at push-off, level into the float
+        if j >= 3:
+            cap_arms(p, 45.0, 45.0)            # the last frames flow into jump f8, where the judge caps both at 45
         solve(p, 0.6)
         g = floor_gap()
         if g > 0:
@@ -535,7 +826,7 @@ def build_jump():
         set_head_pitch(p, -6.0)                           # jump_q looks at its feet; bring the helmet up
         return p
     A1 = apex(0, 44, 8, -2.0, -0.56, -0.62)
-    A2 = apex(25, 48, 4, 0.0, -0.54, -0.60)
+    A2 = apex(25, 45, 4, 0.0, -0.54, -0.60)
     A3 = apex(50, 42, 10, 2.0, -0.58, -0.64)
     def fall(abd, flex, bend):
         p = A3.copy()
@@ -582,6 +873,8 @@ def build_jump():
         else:
             lag = 0.0
         rotate_subtree(p, "Chest", Rx(lag), only=True)
+        if 8 < f <= 18:
+            cap_arms(p, 45.0, 45.0)            # f8 is jump_start's last frame, already capped
         solve(p, 0.6)
         snaps.append(snapshot())
     return key_frames("jump_v5", snaps), False
@@ -594,7 +887,8 @@ def build_land():
     J = eval_action(bpy.data.actions["jump_v5"], 30)
     idle_hip = I0.hip.copy()
     zkeys = [(0, None), (4, 0.86), (8, idle_hip.z - 0.02), (10, idle_hip.z), (12, idle_hip.z)]
-    pkeys = [(0, 3.0), (4, 15.0), (8, 4.0), (10, -1.5), (12, 0.0)]
+    # absolute trunk pitch (hips->neck from vertical): <= 12 deg through the absorb (the knees take the rest)
+    pkeys = [(0, 6.0), (4, 11.0), (8, 4.0), (10, -1.5), (12, trunk_pitch_deg(I0))]
     idle_head = math.degrees(math.asin(max(-1, min(1, forward(I0, "Head").z))))
     def interp(keys, f):
         for (a, va), (b, vb) in zip(keys, keys[1:]):
@@ -622,14 +916,14 @@ def build_land():
             p.knee[s] = Vector((I0.ank[s].x, I0.ank[s].y - 0.2, (p.hip.z + I0.ank[s].z) / 2))
             p.W["Foot" + s] = I0.W["Foot" + s].copy(); p.W["Toes" + s] = I0.W["Toes" + s].copy()
         pitch = interp(pkeys, f)
-        rotate_subtree(p, "Spine", Rx(pitch))
-        set_head_pitch(p, -6.0 + (idle_head + 6.0) * e)
+        rotate_subtree(p, "Spine", Rx(pitch - trunk_pitch_deg(p)))
+        set_head_pitch(p, idle_head * e)                   # helmet level through the landing
         solve(p, 0.9)
         snaps.append(snapshot())
     return key_frames("land_v5", snaps), False
 
 # ================================================================== run
-BUILD = [("idle", build_idle), ("walk", build_walk), ("sprint", build_sprint), ("jump_start", build_jump_start),
+BUILD = [("idle", build_idle), ("walk", build_walk_round2), ("sprint", build_sprint), ("jump_start", build_jump_start),
          ("jump", build_jump), ("land", build_land)]
 built = {}
 for live, fn in BUILD:

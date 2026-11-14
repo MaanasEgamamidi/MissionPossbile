@@ -1,7 +1,8 @@
 extends SceneTree
 ## Captures animation clips on the real crew model inside the real game, for judging.
 ## Needs a window (no --headless).
-## Run: godot --path . --resolution 960x720 --script res://tools/godot/capture_anim.gd -- --out <folder> [--clips walk,sprint,...] [--play] [--suit]
+## Run: godot --path . --resolution 960x720 --fixed-fps 60 --script res://tools/godot/capture_anim.gd -- --out <folder> [--clips walk,sprint,...] [--play] [--suit]
+##   --fixed-fps 60 is needed for an honest --play log (see the timing note in the play section).
 ##   --clips  each clip is posed on a stand-alone crew model at 8 evenly spaced times, seen from the side and from the
 ##            front three-quarter (files <clip>_side_<i>.png, <clip>_front_<i>.png)
 ##   --play   real gameplay in third person: walk, sprint, standing jump, running jump (files play_<n>.png + play_log.txt)
@@ -54,6 +55,7 @@ func _initialize() -> void:
 		DirAccess.remove_absolute(save_dir.path_join(f))
 	main = (load("res://scenes/game.tscn") as PackedScene).instantiate() as GameMain
 	main.save_directory = save_dir
+	main.show_menu = false   # straight into the game, no main menu
 	root.add_child(main)
 	await _frames(90)
 	var player := main.player
@@ -117,20 +119,40 @@ func _initialize() -> void:
 			["standing_jump", [], 80, 0],
 			["running_jump", [&"move_forward", &"sprint"], 90, 20],
 		]
+		# Honest timing. Rendering a 960x720 shot takes far longer than 1/60 s, so normally Godot runs several physics
+		# steps per drawn frame while process (and so the AnimationPlayer) advances by the real frame time: physics,
+		# animation and the log drift apart (round 2: idle advanced 0.13 s per 5-step sample, the run went 1.6x
+		# further than the input script says, and a fresh clip read t=0.00 for two samples). With --fixed-fps 60 every
+		# frame is exactly one 1/60 s physics step and one 1/60 s process step.
+		var fixed := "--fixed-fps" in OS.get_cmdline_args()
+		Engine.max_physics_steps_per_frame = 1
+		log.store_line("timing: %s" % ("fixed 60 fps, one physics step per drawn frame" if fixed else
+			"WARNING not run with --fixed-fps 60: animation time and physics time drift apart in this log"))
 		for step: Array in steps:
 			for act: StringName in step[1]:
 				Input.action_press(act)
-			for f in int(step[2]):
-				if f == int(step[3]):
+			# Step frames, jump timing and samples count physics steps (Engine.get_physics_frames), not loop turns:
+			# a screenshot can let physics steps pass while this loop waits.
+			var start := Engine.get_physics_frames()
+			var jump_down := false
+			var next_sample := 0
+			while Engine.get_physics_frames() - start < int(step[2]):
+				var f := Engine.get_physics_frames() - start
+				if int(step[3]) >= 0 and f >= int(step[3]) and not jump_down:
 					Input.action_press(&"jump")
-				if f == int(step[3]) + 3:
+					jump_down = true
+				if jump_down and f >= int(step[3]) + 3:
 					Input.action_release(&"jump")
-				await physics_frame
-				if f % 5 == 0:
-					var v := Vector3(player.velocity.x, 0, player.velocity.z).length()
-					log.store_line("play_%03d %s anim=%s t=%.2f scale=%.2f ground=%.2f y=%.2f floor=%s" % [n, step[0], vis_anim.current_animation, vis_anim.current_animation_position, vis_anim.speed_scale, v, player.global_position.y, player.is_on_floor()])
+				if f >= next_sample:
+					next_sample = f + 5
 					await _shot("play_%03d" % n)
+					# Logged after the frame was drawn: the clip time is that of the pose in the picture.
+					var v := Vector3(player.velocity.x, 0, player.velocity.z).length()
+					log.store_line("play_%03d %s step_frame=%d anim=%s t=%.3f scale=%.2f ground=%.2f y=%.2f floor=%s" % [n, step[0], f, vis_anim.current_animation, vis_anim.current_animation_position, vis_anim.speed_scale, v, player.global_position.y, player.is_on_floor()])
 					n += 1
+				else:
+					await physics_frame
+			Input.action_release(&"jump")
 			for act: StringName in step[1]:
 				Input.action_release(act)
 	log.close()

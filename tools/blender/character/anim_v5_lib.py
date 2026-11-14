@@ -323,6 +323,8 @@ def measure(action, frames, loop, speed_dir=-1):
         hands = {s: pbs["Hand" + s].head.copy() for s in SIDES}
         rows.append(dict(f=f, gap=heels["L"].x - heels["R"].x, hipz=pbs["Hips"].head.z, hip=pbs["Hips"].head.copy(),
                          balls=balls, heels=heels, knee_out=knee_out, toe_out={s: foot_out_deg(p, s) for s in SIDES},
+                         pitch={s: math.degrees((p.W["Foot" + s] @ TOE_LOCAL[s]).angle(rot3(REST["Foot" + s]) @ TOE_LOCAL[s]))
+                                for s in SIDES},
                          arms=arms, hands=hands, trunk=trunk_pitch_deg(p), chest_yaw=yaw_deg(p, "Chest"),
                          pelvis_roll=roll_deg(p, "Hips"), head_pitch=math.degrees(math.asin(max(-1, min(1, forward(p, "Head").z)))),
                          navel_z=pbs["Spine"].head.z, low=lowest_leg_z() - REST_MIN, thigh=thigh, kflex=kflex,
@@ -341,7 +343,8 @@ def measure(action, frames, loop, speed_dir=-1):
     R["knee_out_deg_when_bent"] = [round(min(ko), 1), round(max(ko), 1)] if ko else None
     # toe-out only where the foot is near flat on the floor (ankle within 15 mm of its lowest)
     amin = {s: min(r["heels"][s].z for r in rows) for s in SIDES}
-    to = [r["toe_out"][s] for r in rows for s in SIDES if r["heels"][s].z < amin[s] + 0.015]
+    # (skipping feet pitched over 50 deg, whose heading is undefined)
+    to = [r["toe_out"][s] for r in rows for s in SIDES if r["heels"][s].z < amin[s] + 0.015 and r["pitch"][s] < 50]
     R["toe_out_deg_planted"] = [round(min(to), 1), round(max(to), 1)] if to else None
     for i, k in enumerate(("abduction", "arm_flex", "elbow_flex")):
         R[k + "_deg"] = [round(min(min(r["arms"][s][i] for s in SIDES) for r in rows), 1),
@@ -362,10 +365,11 @@ def measure(action, frames, loop, speed_dir=-1):
             # the planted foot is the lower one (a low swing foot passing a planted one is not "planted")
             if any(contact(r, s) > contact(r, o) + 0.002 for r in (ra, rb)):
                 continue
-            if all(r["heels"][s].z < hz[s][0] + 0.008 for r in (ra, rb)):
-                a, b = ra["heels"][s], rb["heels"][s]
-            elif all(r["balls"][s].z < hz[s][1] + 0.008 for r in (ra, rb)):
+            # the ball of the foot when it is down (flat foot or heel rising), else the heel (heel strike)
+            if all(r["balls"][s].z < hz[s][1] + 0.008 for r in (ra, rb)):
                 a, b = ra["balls"][s], rb["balls"][s]
+            elif all(r["heels"][s].z < hz[s][0] + 0.008 for r in (ra, rb)):
+                a, b = ra["heels"][s], rb["heels"][s]
             else:
                 continue
             vy.append((b.y - a.y) * FPS); drift_side.append(abs(b.x - a.x))

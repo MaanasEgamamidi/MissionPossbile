@@ -13,7 +13,8 @@ var _first_person: bool = true
 var _fill: OmniLight3D
 ## Third person, looking level: the boots sit this fraction of the screen height above the bottom edge.
 const THIRD_PERSON_FEET_MARGIN: float = 0.08
-const FILL_ENERGY: float = 0.35
+## 0.7 (was 0.35): legs still read near-black outdoors in round-2 captures.
+const FILL_ENERGY: float = 0.7
 const FILL_RANGE_M: float = 3.5
 
 ## Builds the eye cameras and excludes the owning body from the spring arm.

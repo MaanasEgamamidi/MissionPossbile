@@ -1,0 +1,498 @@
+{
+ "glb": "G:\\nasa app\\mars_colony_godot\\assets\\characters\\astronaut.glb",
+ "glb_animations": [
+  {
+   "name": "idle",
+   "seconds": 4
+  },
+  {
+   "name": "walk",
+   "seconds": 1.0667
+  },
+  {
+   "name": "sprint",
+   "seconds": 0.5667
+  },
+  {
+   "name": "jump",
+   "seconds": 1.2
+  },
+  {
+   "name": "land",
+   "seconds": 0.5
+  },
+  {
+   "name": "carry",
+   "seconds": 2
+  },
+  {
+   "name": "use",
+   "seconds": 1
+  },
+  {
+   "name": "suit",
+   "seconds": 1
+  },
+  {
+   "name": "seated",
+   "seconds": 0.0333
+  },
+  {
+   "name": "walk_mixamo",
+   "seconds": 1.0667
+  },
+  {
+   "name": "walk_q",
+   "seconds": 1.3333
+  },
+  {
+   "name": "walk_q_formal",
+   "seconds": 1.3333
+  },
+  {
+   "name": "sprint_mx_medium",
+   "seconds": 0.5667
+  },
+  {
+   "name": "sprint_mx_standard",
+   "seconds": 0.7333
+  },
+  {
+   "name": "sprint_q_jog",
+   "seconds": 0.9333
+  },
+  {
+   "name": "sprint_q",
+   "seconds": 0.6667
+  },
+  {
+   "name": "jump_start_mx",
+   "seconds": 0.2667
+  },
+  {
+   "name": "jump_start",
+   "seconds": 0.2667
+  },
+  {
+   "name": "jump_mx",
+   "seconds": 1.2
+  },
+  {
+   "name": "land_mx",
+   "seconds": 0.5
+  },
+  {
+   "name": "jump_start_q",
+   "seconds": 0.2333
+  },
+  {
+   "name": "jump_q",
+   "seconds": 2.5
+  },
+  {
+   "name": "land_q",
+   "seconds": 0.5333
+  }
+ ],
+ "live": {
+  "sprint": "sprint_mx_medium",
+  "jump": "jump_mx",
+  "land": "land_mx",
+  "walk_mixamo": "walk",
+  "jump_start": "jump_start_mx"
+ },
+ "candidates": {
+  "walk_q": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+   "source_action": "Walk_Loop",
+   "mode": "loop",
+   "source_times": [
+    0.0,
+    39.0
+   ],
+   "frames_keyed": 41,
+   "seconds": 1.3333,
+   "source_speed_m_s": 0.975,
+   "scale": 1.0123,
+   "clip_ground_speed_m_s": 0.987,
+   "measured_ball_speed_m_s": 0.993,
+   "ankle_gap_m": [
+    0.18,
+    0.188
+   ],
+   "hips_z_m": [
+    0.922,
+    0.985
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": null,
+   "notes": null
+  },
+  "walk_q_formal": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+   "source_action": "Walk_Formal_Loop",
+   "mode": "loop",
+   "source_times": [
+    0.0,
+    39.0
+   ],
+   "frames_keyed": 41,
+   "seconds": 1.3333,
+   "source_speed_m_s": 0.975,
+   "scale": 1.0123,
+   "clip_ground_speed_m_s": 0.987,
+   "measured_ball_speed_m_s": 0.986,
+   "ankle_gap_m": [
+    0.18,
+    0.189
+   ],
+   "hips_z_m": [
+    0.937,
+    0.975
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": null,
+   "notes": null
+  },
+  "sprint_mx_medium": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\MediumRun.fbx",
+   "source_action": "Armature.002|mixamo.com|Layer0",
+   "mode": "loop",
+   "source_times": [
+    1.0,
+    17.0
+   ],
+   "frames_keyed": 18,
+   "seconds": 0.5667,
+   "source_speed_m_s": 4.332,
+   "scale": 1.0764,
+   "clip_ground_speed_m_s": 4.663,
+   "measured_ball_speed_m_s": 4.767,
+   "ankle_gap_m": [
+    0.099,
+    0.196
+   ],
+   "hips_z_m": [
+    0.884,
+    0.978
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": [
+    "sprint"
+   ],
+   "notes": null
+  },
+  "sprint_mx_standard": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\StandardRun.fbx",
+   "source_action": "Armature.003|mixamo.com|Layer0",
+   "mode": "loop",
+   "source_times": [
+    1.0,
+    22.0
+   ],
+   "frames_keyed": 23,
+   "seconds": 0.7333,
+   "source_speed_m_s": 4.07,
+   "scale": 1.0764,
+   "clip_ground_speed_m_s": 4.381,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.221,
+    0.281
+   ],
+   "hips_z_m": [
+    0.802,
+    0.943
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": null,
+   "notes": null
+  },
+  "sprint_q_jog": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+   "source_action": "Jog_Fwd_Loop",
+   "mode": "loop",
+   "source_times": [
+    0.0,
+    27.0
+   ],
+   "frames_keyed": 29,
+   "seconds": 0.9333,
+   "source_speed_m_s": 5.357,
+   "scale": 1.0123,
+   "clip_ground_speed_m_s": 5.423,
+   "measured_ball_speed_m_s": 0.845,
+   "ankle_gap_m": [
+    0.179,
+    0.19
+   ],
+   "hips_z_m": [
+    0.707,
+    0.842
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": null,
+   "notes": null
+  },
+  "sprint_q": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+   "source_action": "Sprint_Loop",
+   "mode": "loop",
+   "source_times": [
+    0.0,
+    19.0
+   ],
+   "frames_keyed": 21,
+   "seconds": 0.6667,
+   "source_speed_m_s": 8.25,
+   "scale": 1.0123,
+   "clip_ground_speed_m_s": 8.352,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.18,
+    0.191
+   ],
+   "hips_z_m": [
+    0.755,
+    0.91
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": null,
+   "notes": null
+  },
+  "jump_start_mx": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Jump.fbx",
+   "source_action": "Armature.004|mixamo.com|Layer0",
+   "mode": "once",
+   "source_times": [
+    15,
+    23.0
+   ],
+   "frames_keyed": 9,
+   "seconds": 0.2667,
+   "source_speed_m_s": null,
+   "scale": 1.0764,
+   "clip_ground_speed_m_s": null,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.192,
+    0.224
+   ],
+   "hips_z_m": [
+    0.829,
+    1.02
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": [
+    "jump_start"
+   ],
+   "notes": null
+  },
+  "jump_mx": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Jump.fbx",
+   "source_action": "Armature.004|mixamo.com|Layer0",
+   "mode": "air",
+   "source_times": [
+    30.0,
+    30.03
+   ],
+   "frames_keyed": 37,
+   "seconds": 1.2,
+   "source_speed_m_s": null,
+   "scale": 1.0764,
+   "clip_ground_speed_m_s": null,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.189,
+    0.207
+   ],
+   "hips_z_m": [
+    0.967,
+    0.967
+   ],
+   "lowest_leg_above_floor_mm": [
+    20.0,
+    245.6
+   ],
+   "live": [
+    "jump"
+   ],
+   "notes": null
+  },
+  "land_mx": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Jump.fbx",
+   "source_action": "Armature.004|mixamo.com|Layer0",
+   "mode": "once",
+   "source_times": [
+    41,
+    56.0
+   ],
+   "frames_keyed": 16,
+   "seconds": 0.5,
+   "source_speed_m_s": null,
+   "scale": 1.0764,
+   "clip_ground_speed_m_s": null,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.193,
+    0.288
+   ],
+   "hips_z_m": [
+    0.92,
+    1.024
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": [
+    "land"
+   ],
+   "notes": null
+  },
+  "jump_start_q": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+   "source_action": "Jump_Start",
+   "mode": "once",
+   "source_times": [
+    1,
+    8.0
+   ],
+   "frames_keyed": 8,
+   "seconds": 0.2333,
+   "source_speed_m_s": null,
+   "scale": 1.0123,
+   "clip_ground_speed_m_s": null,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.192,
+    0.22
+   ],
+   "hips_z_m": [
+    0.765,
+    1.017
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    309.6
+   ],
+   "live": null,
+   "notes": null
+  },
+  "jump_q": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+   "source_action": "Jump_Loop",
+   "mode": "air",
+   "source_times": [
+    0.0,
+    74.0
+   ],
+   "frames_keyed": 76,
+   "seconds": 2.5,
+   "source_speed_m_s": null,
+   "scale": 1.0123,
+   "clip_ground_speed_m_s": null,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.195,
+    0.213
+   ],
+   "hips_z_m": [
+    1.04,
+    1.04
+   ],
+   "lowest_leg_above_floor_mm": [
+    20.0,
+    72.5
+   ],
+   "live": null,
+   "notes": null
+  },
+  "land_q": {
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+   "source_action": "Jump_Land",
+   "mode": "once",
+   "source_times": [
+    0,
+    24.0
+   ],
+   "frames_keyed": 17,
+   "seconds": 0.5333,
+   "source_speed_m_s": null,
+   "scale": 1.0123,
+   "clip_ground_speed_m_s": null,
+   "measured_ball_speed_m_s": null,
+   "ankle_gap_m": [
+    0.217,
+    0.288
+   ],
+   "hips_z_m": [
+    0.74,
+    0.998
+   ],
+   "lowest_leg_above_floor_mm": [
+    -0.0,
+    0.0
+   ],
+   "live": null,
+   "notes": null
+  },
+  "walk_mixamo": {
+   "copy_of": "walk",
+   "note": "current live walk (walk_retarget_report.json)",
+   "seconds": 1.0667,
+   "source": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Walking.fbx",
+   "clip_ground_speed_m_s": 1.545,
+   "ankle_gap_m": [
+    0.15,
+    0.231
+   ]
+  }
+ },
+ "live_tracks": {
+  "idle": "idle",
+  "walk": "walk",
+  "sprint": "sprint_mx_medium",
+  "jump": "jump_mx",
+  "land": "land_mx",
+  "carry": "carry",
+  "use": "use",
+  "suit": "suit",
+  "seated": "seated",
+  "walk_mixamo": "walk",
+  "walk_q": "walk_q",
+  "walk_q_formal": "walk_q_formal",
+  "sprint_mx_medium": "sprint_mx_medium",
+  "sprint_mx_standard": "sprint_mx_standard",
+  "sprint_q_jog": "sprint_q_jog",
+  "sprint_q": "sprint_q",
+  "jump_start_mx": "jump_start_mx",
+  "jump_start": "jump_start_mx",
+  "jump_mx": "jump_mx",
+  "land_mx": "land_mx",
+  "jump_start_q": "jump_start_q",
+  "jump_q": "jump_q",
+  "land_q": "land_q"
+ }
+}

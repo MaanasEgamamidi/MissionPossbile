@@ -1,0 +1,184 @@
+﻿{
+    "clips":  [
+                  {
+                      "rm_speed_m_s":  0.975,
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+                      "action":  "Walk_Loop",
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\walk_q_report.json",
+                      "target":  "walk_q",
+                      "mode":  "loop"
+                  },
+                  {
+                      "rm_speed_m_s":  0.975,
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+                      "action":  "Walk_Formal_Loop",
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\walk_q_formal_report.json",
+                      "target":  "walk_q_formal",
+                      "mode":  "loop"
+                  },
+                  {
+                      "mode":  "loop",
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\MediumRun.fbx",
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\sprint_mx_medium_report.json",
+                      "x_offset":  0.04,
+                      "target":  "sprint_mx_medium",
+                      "old_names":  {
+                                        "sprint":  "sprint_handmade",
+                                        "jump":  "jump_old",
+                                        "land":  "land_old"
+                                    },
+                      "live":  [
+                                   "sprint"
+                               ]
+                  },
+                  {
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\StandardRun.fbx",
+                      "target":  "sprint_mx_standard",
+                      "mode":  "loop",
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\sprint_mx_standard_report.json"
+                  },
+                  {
+                      "rm_speed_m_s":  5.357,
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+                      "action":  "Jog_Fwd_Loop",
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\sprint_q_jog_report.json",
+                      "target":  "sprint_q_jog",
+                      "mode":  "loop"
+                  },
+                  {
+                      "rm_speed_m_s":  8.25,
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+                      "action":  "Sprint_Loop",
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\sprint_q_report.json",
+                      "target":  "sprint_q",
+                      "mode":  "loop"
+                  },
+                  {
+                      "start":  15,
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Jump.fbx",
+                      "mode":  "once",
+                      "old_names":  {
+                                        "sprint":  "sprint_handmade",
+                                        "jump":  "jump_old",
+                                        "land":  "land_old"
+                                    },
+                      "target":  "jump_start_mx",
+                      "end":  23,
+                      "x_scale":  0.65,
+                      "yaw_ref_deg":  0,
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\jump_start_mx_report.json",
+                      "deyaw":  "upper",
+                      "live":  [
+                                   "jump_start"
+                               ]
+                  },
+                  {
+                      "period":  36,
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\jump_mx_report.json",
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Jump.fbx",
+                      "x_scale":  0.65,
+                      "legs":  0.85,
+                      "live":  [
+                                   "jump"
+                               ],
+                      "clearance":  0.02,
+                      "yaw_ref_deg":  0,
+                      "old_names":  {
+                                        "sprint":  "sprint_handmade",
+                                        "jump":  "jump_old",
+                                        "land":  "land_old"
+                                    },
+                      "pingpong":  [
+                                       30,
+                                       34
+                                   ],
+                      "deyaw":  "all",
+                      "target":  "jump_mx",
+                      "mode":  "air",
+                      "upper":  0.5
+                  },
+                  {
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Jump.fbx",
+                      "yaw_ref_deg":  0,
+                      "deyaw":  "upper",
+                      "live":  [
+                                   "land"
+                               ],
+                      "start":  41,
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\land_mx_report.json",
+                      "x_scale":  0.65,
+                      "blend_to_idle":  5,
+                      "target":  "land_mx",
+                      "mode":  "once",
+                      "old_names":  {
+                                        "sprint":  "sprint_handmade",
+                                        "jump":  "jump_old",
+                                        "land":  "land_old"
+                                    },
+                      "end":  56
+                  },
+                  {
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+                      "yaw_ref_deg":  0,
+                      "action":  "Jump_Start",
+                      "vertical":  "pin_up",
+                      "deyaw":  "upper",
+                      "start":  1,
+                      "stand_frame":  1,
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\jump_start_q_report.json",
+                      "x_scale":  0.6,
+                      "target":  "jump_start_q",
+                      "mode":  "once",
+                      "end":  8
+                  },
+                  {
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+                      "upper":  0.55,
+                      "action":  "Jump_Loop",
+                      "clearance":  0.02,
+                      "deyaw":  "all",
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\jump_q_report.json",
+                      "yaw_ref_deg":  0,
+                      "x_scale":  0.8,
+                      "target":  "jump_q",
+                      "mode":  "air",
+                      "stand_action":  "Idle_Loop",
+                      "stand_frame":  0
+                  },
+                  {
+                      "start":  0,
+                      "blend_to_idle":  5,
+                      "action":  "Jump_Land",
+                      "stand_frame":  37,
+                      "end":  25,
+                      "speed":  1.5,
+                      "upper":  0.55,
+                      "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\quaternius_ual1\\Universal Animation Library[Standard]\\Unreal-Godot\\UAL1_Standard.glb",
+                      "target":  "land_q",
+                      "mode":  "once",
+                      "legs":  0.45,
+                      "x_scale":  0.6,
+                      "yaw_ref_deg":  0,
+                      "report":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\land_q_report.json",
+                      "deyaw":  "upper"
+                  }
+              ],
+    "summary":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\candidates_report.json",
+    "copies":  [
+                   {
+                       "sheet":  true,
+                       "from":  "walk",
+                       "info":  {
+                                    "note":  "current live walk (walk_retarget_report.json)",
+                                    "seconds":  1.0667,
+                                    "source":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\anims\\Walking.fbx",
+                                    "clip_ground_speed_m_s":  1.545,
+                                    "ankle_gap_m":  [
+                                                        0.15,
+                                                        0.231
+                                                    ]
+                                },
+                       "target":  "walk_mixamo"
+                   }
+               ]
+}
