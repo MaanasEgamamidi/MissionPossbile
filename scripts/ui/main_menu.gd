@@ -1,6 +1,6 @@
 class_name MainMenu
 extends UiPanel
-## The title screen: a drawn Mars horizon with the game's name and the menu in a column on the left:
+## The title screen: animated colony beauty shots with the game's name and the menu in a column on the left:
 ## continue, start a new colony, host or join on the local network, settings, sources, quit.
 ## It only emits signals; the game decides what each one does. show_notice() puts a plain message on the menu.
 
@@ -9,6 +9,9 @@ signal new_game_pressed
 signal host_pressed(port: int, continue_save: bool)
 signal join_pressed(address: String, port: int)
 signal quit_pressed
+
+const BACKDROP_SCRIPT = preload("res://scripts/ui/menu_backdrop.gd")
+var _backdrop: Control
 
 const JOIN_HELP := "Ask the host for the address shown on their screen. You must be on the same network."
 ## Width of the menu column on the left, in screen units.
@@ -38,7 +41,10 @@ func setup(p_services: GameServices) -> void:
 	name = "MainMenu"
 	keeps_world_visible = false
 	accent_line = false
-	# No box of its own: the title screen is a drawn Mars horizon (see _draw) with the menu in a column on the left.
+	_backdrop = BACKDROP_SCRIPT.new()
+	_backdrop.name = "BeautyBackdrop"
+	add_child(_backdrop)
+	# No box of its own: the cinematic backdrop fills the screen behind the menu.
 	var bare := StyleBoxEmpty.new()
 	bare.content_margin_left = 56.0
 	bare.content_margin_right = 56.0
@@ -266,88 +272,17 @@ static func _field(parent: Control, text: String, placeholder: String) -> LineEd
 	return e
 
 
-## The title picture, drawn with plain shapes (no image file to ship or credit): a night sky going to dusty orange at
-## the horizon, a small pale sun, far ridges, the ground, and the colony's domes with lit windows. It covers the whole
-## screen, also outside this panel's own box, and is darker on the left so the menu text stays easy to read.
+## High contrast keeps the existing static black title screen.
+func _process(_delta: float) -> void:
+	var ui := find_parent("UiRoot") as UiRoot
+	if ui != null and ui.settings != null:
+		_backdrop.set("motion_enabled", not ui.settings.reduce_motion)
+	var high_contrast := UiTheme.is_high_contrast()
+	if _backdrop.visible == high_contrast:
+		_backdrop.visible = not high_contrast
+		queue_redraw()
+
+
 func _draw() -> void:
-	var screen := Rect2(-global_position, get_viewport_rect().size)
-	var o := screen.position
-	var w := screen.size.x
-	var h := screen.size.y
-	var horizon := o.y + h * 0.7
-	var sky_h := horizon - o.y
-	var hc := UiTheme.is_high_contrast()
-	if hc:
-		draw_rect(screen, Color(0, 0, 0))
-		draw_line(Vector2(o.x, horizon), Vector2(o.x + w, horizon), Color(1, 1, 1), 2.0)
-		return
-	_fade_v(Rect2(o.x, o.y, w, sky_h * 0.55), Color(0.025, 0.035, 0.08), Color(0.13, 0.1, 0.14))
-	_fade_v(Rect2(o.x, o.y + sky_h * 0.55, w, sky_h * 0.45), Color(0.13, 0.1, 0.14), Color(0.66, 0.38, 0.2))
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 2031
-	for i in 150:
-		var at := Vector2(o.x + rng.randf() * w, o.y + rng.randf() * sky_h * 0.8)
-		var high := 1.0 - (at.y - o.y) / (sky_h * 0.8)
-		draw_circle(at, rng.randf_range(0.8, 2.1), Color(1, 1, 1, (0.12 + 0.6 * rng.randf()) * high))
-	# the sun looks small from Mars; its glow at dusk is pale and cool
-	var sun := Vector2(o.x + w * 0.74, horizon - h * 0.085)
-	for i in 40:
-		var t := float(i) / 39.0          # many thin layers, so the glow has no visible rings
-		draw_circle(sun, h * lerpf(0.24, 0.022, sqrt(t)), Color(0.6, 0.74, 0.96, 0.012))
-	draw_circle(sun, h * 0.019, Color(0.94, 0.97, 1.0))
-	# far ridges, then the ground
-	_ridge(o, w, horizon, h * 0.06, 0.0045, Color(0.36, 0.2, 0.13))
-	_ridge(o, w, horizon, h * 0.03, 0.011, Color(0.25, 0.135, 0.09))
-	_fade_v(Rect2(o.x, horizon, w, o.y + h - horizon), Color(0.21, 0.115, 0.075), Color(0.07, 0.04, 0.035))
-	draw_line(Vector2(o.x, horizon), Vector2(o.x + w, horizon), Color(0.95, 0.6, 0.35, 0.25), 2.0)
-	# the colony on the horizon: domes, a hall between them, a mast
-	var base := horizon + h * 0.012
-	var dark := Color(0.05, 0.045, 0.055)
-	var lit := Color(1.0, 0.78, 0.45)
-	var unit := h * 0.01
-	_dome(Vector2(o.x + w * 0.6, base), unit * 9.0, dark, lit, 5)
-	_dome(Vector2(o.x + w * 0.69, base), unit * 5.5, dark, lit, 3)
-	_dome(Vector2(o.x + w * 0.86, base), unit * 7.0, dark, lit, 4)
-	draw_rect(Rect2(o.x + w * 0.6, base - unit * 3.0, w * 0.26, unit * 3.0), dark)
-	for i in 9:
-		draw_rect(Rect2(o.x + w * 0.635 + i * w * 0.024, base - unit * 2.0, unit * 1.4, unit * 0.7), Color(lit, 0.85))
-	var mast := Vector2(o.x + w * 0.785, base - unit * 3.0)
-	draw_line(mast, mast - Vector2(0, unit * 9.0), dark, maxf(2.0, unit * 0.35))
-	draw_circle(mast - Vector2(0, unit * 9.0), maxf(2.0, unit * 0.45), Color(1.0, 0.35, 0.3))
-	# shade behind the menu column
-	var shade := Color(0.015, 0.02, 0.035)
-	draw_rect(Rect2(o.x, o.y, w * 0.22, h), Color(shade, 0.8))
-	draw_polygon(PackedVector2Array([Vector2(o.x + w * 0.22, o.y), Vector2(o.x + w * 0.56, o.y), Vector2(o.x + w * 0.56, o.y + h), Vector2(o.x + w * 0.22, o.y + h)]),
-		PackedColorArray([Color(shade, 0.8), Color(shade, 0.0), Color(shade, 0.0), Color(shade, 0.8)]))
-	# accent rule under the title screen's left edge, like the line on every other panel
-	draw_rect(Rect2(o.x, o.y, w, 4.0), UiTheme.palette().accent)
-
-
-## A rectangle that fades from `top` to `bottom`.
-func _fade_v(r: Rect2, top: Color, bottom: Color) -> void:
-	draw_polygon(PackedVector2Array([r.position, r.position + Vector2(r.size.x, 0), r.end, r.position + Vector2(0, r.size.y)]),
-		PackedColorArray([top, top, bottom, bottom]))
-
-
-## A line of low hills along the horizon. `height` is the tallest hill, `wave` how tightly they are packed.
-func _ridge(o: Vector2, w: float, horizon: float, height: float, wave: float, color: Color) -> void:
-	var pts := PackedVector2Array([Vector2(o.x, horizon + 2.0)])
-	var steps := 96
-	for i in steps + 1:
-		var x := w * float(i) / float(steps)
-		var n := 0.5 + 0.28 * sin(x * wave) + 0.16 * sin(x * wave * 2.7 + 1.3) + 0.06 * sin(x * wave * 6.1 + 4.0)
-		pts.append(Vector2(o.x + x, horizon - height * clampf(n, 0.0, 1.0)))
-	pts.append(Vector2(o.x + w, horizon + 2.0))
-	draw_colored_polygon(pts, color)
-
-
-## Half a ball standing on `foot` (its middle on the ground), with a row of lit windows.
-func _dome(foot: Vector2, radius: float, color: Color, lit: Color, windows: int) -> void:
-	var pts := PackedVector2Array()
-	for i in 33:
-		var a := PI + PI * float(i) / 32.0
-		pts.append(foot + Vector2(cos(a), sin(a)) * radius)
-	draw_colored_polygon(pts, color)
-	for i in windows:
-		var x := (float(i) - float(windows - 1) * 0.5) * radius * 1.3 / float(maxi(windows, 1))
-		draw_circle(foot + Vector2(x, -radius * 0.32), maxf(1.5, radius * 0.06), Color(lit, 0.9))
+	if UiTheme.is_high_contrast():
+		draw_rect(Rect2(-global_position, get_viewport_rect().size), Color.BLACK)
