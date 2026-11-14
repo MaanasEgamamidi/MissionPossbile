@@ -1,0 +1,6 @@
+{
+	"note": "Prompt 08 part G stations. The treadmill in the rec kitchen next to the mess hall (the crew's exercise corner, with the floor mats and the resistance trainer) is the gym spot for the exercise action.",
+	"stations": [
+		{"object": "rk_treadmill", "kind": "gym", "name": "Exercise corner", "symbol": "♥", "specialty": ""}
+	]
+}

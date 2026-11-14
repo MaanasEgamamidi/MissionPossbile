@@ -25,3 +25,14 @@ data/prop_collision_cache.bin
 /idle_*.png
 /idle_*.png.import
 /capture_log.txt
+
+# intermediate crew-look capture rounds and raw renders (before = crew_looks/ingame, final = crew_looks/ingame4)
+docs/milestones/04_player/crew_v2/crew_looks/raw/
+docs/milestones/04_player/crew_v2/crew_looks/ingame2/
+docs/milestones/04_player/crew_v2/crew_looks/ingame3/*
+!docs/milestones/04_player/crew_v2/crew_looks/ingame3/suited_back.png
+!docs/milestones/04_player/crew_v2/crew_looks/ingame3/suited_back_deuteranopia.png
+# Blender working copies and backups for the crew variants
+assets_src/characters/crew_v2/variants_work/
+# weather test output
+_test_weather/

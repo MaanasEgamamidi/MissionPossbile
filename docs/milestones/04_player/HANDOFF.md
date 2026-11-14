@@ -216,3 +216,18 @@ Owner report: the player could stand half inside a dark ribbed wall with a rover
   - Things above 2.2 m (roof units, ceiling tiles) have no collision, in case a roof is ever made walkable.
   - Display suits rely on their rack's boxes.
   - The cache is written into `res://data`; an exported build cannot write there and simply rebuilds the shapes on every start (about 3 s).
+
+## Four distinct crew: hair, two body shapes, colour + symbol + band pattern (2026-11-13)
+
+- **Looks table:** `scripts/player/crew_looks.gd` (`CrewLooks`) holds each crew member's look and is read by `PlayerVisual.set_crew_identity`, the crew portraits/badges, the blueprint map and the suit displays.
+  | Crew | Out of the suit | Accent | Symbol | Helmet/backpack band |
+  |---|---|---|---|---|
+  | 0 Electrical | woman, high ponytail, dark brown hair, medium-brown skin, height 0.93 | yellow ffc400 | triangle | one thick band |
+  | 1 Medical | man, short curls, black hair, dark-brown skin, 1.03 | blue 2a7bff | plus | two thin bands |
+  | 2 Biology | woman, bob with fringe, auburn hair, light skin, 0.90 | green 178a3e | circle | row of dots |
+  | 3 Geology | man, buzz cut and beard, brown hair, olive skin, 1.00 | magenta d2379b | diamond | chevron |
+- **Model** (`assets/characters/astronaut.glb`, built by `tools/blender/character/crew_variants.py` on `crew_v2.blend`): hair meshes `Hair_Ponytail/Curly/Bob/Buzz/Beard`, under-helmet hair `HairIn_*`, blend shape `Feminine` (face and body, subtle) on the body and suit meshes, `Ident_Symbol_*` (backpack, helmet back, chest) and `Ident_Band_*` (helmet and backpack), accent rings/bands/stripes and flight-suit shoulder patches, yoke and collar in `Mat_Ident`, eye whites `Mat_EyeWhite`. Rebuilt helmet with a lower, wider visor so faces show. Helmet parts ride the Neck bone.
+- **Game:** per-instance skin, hair and accent materials (accent glows 0.4 so it holds in orange light), the crew's hair shown unsuited and `HairIn_*` + beard suited, all hair hidden in first person, symbols and bands only while suited, height on the model child (capsule unchanged; Medical capped at 1.03 because 520 grid spots in the map have 1.80-2.05 m headroom). Name tags over other crew: coloured symbol + near-white word, about 22 px at 1080p from 4 to 25 m, staggered by crew and collapsed to the symbol when two overlap.
+- **Judged in game** with `tools/godot/capture_crew.gd` (run with `--fixed-fps 60`; lineups suited/unsuited, head close-ups, gameplay views) by an independent judge model: round 1 NOT SHIP (`crew_v2/crew_looks/fable_crew_verdict_1.md`), round 2 SHIP; the round-2 polish (flush helmet bands, clean collar, centred eyes, beard, visor rim, tag overlap, badge contrast) is applied. A deuteranopia simulation is saved as `crew_looks/ingame3/suited_back_deuteranopia.png` (green darkened to 178a3e because of it).
+- **Open:** a faint light line at Geology's left ear; the specialty ⚡ icon in the HUD is thin in Segoe UI Symbol. Evidence: `docs/milestones/04_player/crew_v2/crew_looks/` (`ingame4/` is the final capture).
+- Tests: 6 suites pass (saves 56, session 91, game scene 32, game services 25, collision 40, player 112).

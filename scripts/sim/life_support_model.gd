@@ -9,6 +9,9 @@ extends RefCounted
 ## Cabin air (kg):  O2 now = start + regulator O2 - breathed - airlock loss
 ##                  N2 now = start + regulator N2 - airlock loss          CO2 now = start + exhaled - scrubbed - airlock loss
 ## Nitrogen reserve: now = start - regulator N2.   Suits: tanks now = start + refills - suit O2 used.
+## Upgrades (Prompt 08, numbers in ProgressionBalance): ls_water_reliability (recycler +1 L/h, condition floor 0.8),
+## ls_electrolysis and ls_co2_processing (more oxygen per hour at the same kWh per kg), ls_oxygen_monitoring (earlier,
+## clearer warnings and an oxygen forecast alert). None of them changes a ledger identity.
 
 ## Plain names of the processes for panels and alerts.
 const STATUS_TEXT := {
@@ -45,6 +48,8 @@ static func use_water(state: ColonyState, balance: GameBalance, count: int, dt: 
 ## for the power their output needs). Allocations take only water above the drinking reserve; if both together
 ## want more than that, each gets the same share of what it asked for. The CO2-oxygen unit never touches water.
 static func plan_processes(state: ColonyState, balance: GameBalance, dt: float) -> Dictionary:
+	apply_condition_floors(state)
+	var e_rate := electrolysis_o2_kg_per_hour(state, balance)
 	var spare := maxf(0.0, state.store(&"water_l") - balance.water_reserve_l)
 	var o2_room := state.room_in(&"oxygen_kg")
 	var ok := balance.equipment_min_condition
@@ -63,14 +68,14 @@ static func plan_processes(state: ColonyState, balance: GameBalance, dt: float) 
 		else:
 			e_status = "running"
 			want_feed = minf(float(state.water_allocation.electrolysis_feed_l_per_hour) * dt,
-				minf(balance.electrolysis_o2_kg_per_hour * dt, o2_room) * GameBalance.WATER_KG_PER_KG_O2)
+				minf(e_rate * dt, o2_room) * GameBalance.WATER_KG_PER_KG_O2)
 	var want_greenhouse := minf(float(state.water_allocation.greenhouse_l_per_hour) * dt, state.room_in(&"wastewater_l"))
 	var share := 1.0
 	if want_feed + want_greenhouse > spare:
 		share = spare / (want_feed + want_greenhouse)
 	var feed := want_feed * share
 	var e_o2 := feed / GameBalance.WATER_KG_PER_KG_O2
-	if e_status == "running" and (share < 1.0 or float(state.water_allocation.electrolysis_feed_l_per_hour) * dt < balance.electrolysis_o2_kg_per_hour * dt * GameBalance.WATER_KG_PER_KG_O2):
+	if e_status == "running" and (share < 1.0 or float(state.water_allocation.electrolysis_feed_l_per_hour) * dt < e_rate * dt * GameBalance.WATER_KG_PER_KG_O2):
 		e_status = "feed_short"
 	if e_status == "feed_short" and e_o2 <= 0.0:
 		e_status = "no_feed"
@@ -84,7 +89,7 @@ static func plan_processes(state: ColonyState, balance: GameBalance, dt: float) 
 			c_status = "tanks_full"
 		else:
 			c_status = "running"
-			c_o2 = minf(balance.co2_unit_o2_kg_per_hour * dt, o2_room - e_o2)
+			c_o2 = minf(co2_unit_o2_kg_per_hour(state, balance) * dt, o2_room - e_o2)
 	return {
 		"greenhouse_l": want_greenhouse * share, "electrolyser_o2_kg": e_o2, "co2_unit_o2_kg": c_o2,
 		"kw": {"electrolyser": e_o2 * balance.electrolysis_kwh_per_kg_o2 / dt, "co2_unit": c_o2 * balance.co2_unit_kwh_per_kg_o2 / dt},
@@ -126,7 +131,7 @@ static func run_processes(state: ColonyState, balance: GameBalance, plan: Dictio
 
 	# recycler: cleans wastewater; recycler_recovery of it comes back clean, the rest is brine
 	if recycler_working(state, balance):
-		var cap := balance.recycler_l_per_hour * dt
+		var cap := recycler_l_per_hour(state, balance) * dt
 		if balance.recycler_recovery > 0.0:
 			cap = minf(cap, state.room_in(&"water_l") / balance.recycler_recovery)
 		var taken := -state.add_to_store(&"wastewater_l", -cap)
@@ -138,6 +143,33 @@ static func run_processes(state: ColonyState, balance: GameBalance, plan: Dictio
 		state.ledger["recycler_in_l"] += taken
 		state.ledger["water_recycled_l"] += added
 		state.ledger["brine_l"] += taken - added
+
+
+## ls_water_reliability: the recycler's condition never drops below ProgressionBalance.recycler_condition_floor.
+## Applied at the start of every tick (before power is allocated), so every model reads the same condition.
+static func apply_condition_floors(state: ColonyState) -> void:
+	if state.has_upgrade("ls_water_reliability") and state.equipment.has("recycler"):
+		var floor_value := ProgressionBalance.shared().recycler_condition_floor
+		var e: Dictionary = state.equipment["recycler"]
+		e["condition"] = maxf(float(e.get("condition", 0.0)), floor_value)
+
+
+## Wastewater the recycler can clean per game hour (ls_water_reliability adds to it).
+static func recycler_l_per_hour(state: ColonyState, balance: GameBalance) -> float:
+	var bonus := ProgressionBalance.shared().recycler_bonus_l_per_hour if state.has_upgrade("ls_water_reliability") else 0.0
+	return balance.recycler_l_per_hour + bonus
+
+
+## Top oxygen output of the electrolyser per game hour (ls_electrolysis raises it; kWh per kg stays the same).
+static func electrolysis_o2_kg_per_hour(state: ColonyState, balance: GameBalance) -> float:
+	var factor := ProgressionBalance.shared().electrolysis_output_factor if state.has_upgrade("ls_electrolysis") else 1.0
+	return balance.electrolysis_o2_kg_per_hour * factor
+
+
+## Top oxygen output of the CO2-oxygen unit per game hour (ls_co2_processing raises it; kWh per kg stays the same).
+static func co2_unit_o2_kg_per_hour(state: ColonyState, balance: GameBalance) -> float:
+	var factor := ProgressionBalance.shared().co2_unit_output_factor if state.has_upgrade("ls_co2_processing") else 1.0
+	return balance.co2_unit_o2_kg_per_hour * factor
 
 
 static func recycler_working(state: ColonyState, balance: GameBalance) -> bool:
@@ -234,6 +266,16 @@ static func health_loss_per_hour(state: ColonyState, balance: GameBalance, c: Ch
 	return loss
 
 
+## "about 3.2 sols at this rate" / "about 14 hours at this rate" / "not falling at this rate".
+static func _time_left_words(amount: float, rate_per_hour: float) -> String:
+	if rate_per_hour >= -1e-9:
+		return "not falling at this rate"
+	var hours := amount / -rate_per_hour
+	if hours >= GameConfig.SOL_HOURS:
+		return "about %.1f sols at this rate" % (hours / GameConfig.SOL_HOURS)
+	return "about %d hours at this rate" % maxi(1, roundi(hours))
+
+
 ## Life-support alerts as [id, level, text]. `no_air` maps character id -> share of air missing outside.
 static func alerts(state: ColonyState, balance: GameBalance, no_air: Dictionary) -> Array:
 	var out: Array = []
@@ -260,19 +302,40 @@ static func alerts(state: ColonyState, balance: GameBalance, no_air: Dictionary)
 		"feed_short": out.append(["electrolyser_feed_short", "info", "Electrolyser is short of feed water, so it makes less oxygen."])
 	if String(state.oxygen_process.get("co2_unit", "off")) == "broken":
 		out.append(["co2_unit_broken", "warn", "CO2-oxygen unit is broken. It makes no oxygen."])
-	# oxygen reserve and cabin air
-	if state.store(&"oxygen_kg") <= 0.0:
+	# oxygen reserve and cabin air (ls_oxygen_monitoring: earlier warnings that say how long is left, and a forecast)
+	var monitor := state.has_upgrade("ls_oxygen_monitoring")
+	var pb := ProgressionBalance.shared()
+	var reserve_warn := balance.oxygen_reserve_warn_kg * (pb.monitoring_reserve_warn_factor if monitor else 1.0)
+	var o2_warn := balance.o2_warn_kpa + (pb.monitoring_o2_warn_margin_kpa if monitor else 0.0)
+	var co2_warn := balance.co2_warn_kpa - (pb.monitoring_co2_warn_margin_kpa if monitor else 0.0)
+	var reserve := state.store(&"oxygen_kg")
+	var reserve_rate := float(state.rates.get("oxygen_kg", 0.0))
+	if reserve <= 0.0:
 		out.append(["oxygen_reserve_empty", "urgent", "Oxygen reserve is empty. Cabin oxygen will slowly fall. Start the electrolyser or the CO2-oxygen unit."])
-	elif state.store(&"oxygen_kg") < balance.oxygen_reserve_warn_kg:
-		out.append(["oxygen_reserve_low", "warn", "Oxygen reserve low: %.1f kg left. Start the electrolyser or the CO2-oxygen unit." % state.store(&"oxygen_kg")])
+	elif reserve < reserve_warn:
+		var text := "Oxygen reserve low: %.1f kg left. Start the electrolyser or the CO2-oxygen unit." % reserve
+		if monitor:
+			text = "Oxygen reserve low: %.1f kg left, %s. Start the electrolyser or the CO2-oxygen unit." % [reserve, _time_left_words(reserve, reserve_rate)]
+		out.append(["oxygen_reserve_low", "warn", text])
 	if state.cabin_o2_kpa < balance.o2_low_kpa:
 		out.append(["cabin_o2_danger", "urgent", "Cabin oxygen is too low (%.1f kPa). The crew is losing health." % state.cabin_o2_kpa])
-	elif state.cabin_o2_kpa < balance.o2_warn_kpa:
-		out.append(["cabin_o2_low", "warn", "Cabin oxygen is falling (%.1f kPa). Refill the oxygen reserve." % state.cabin_o2_kpa])
+	elif state.cabin_o2_kpa < o2_warn:
+		var text := "Cabin oxygen is falling (%.1f kPa). Refill the oxygen reserve." % state.cabin_o2_kpa
+		if monitor:
+			text = "Cabin oxygen is falling: %.1f kPa (safe is 21 kPa; the crew is harmed below %.0f kPa). Refill the oxygen reserve." % [state.cabin_o2_kpa, balance.o2_low_kpa]
+		out.append(["cabin_o2_low", "warn", text])
 	if state.cabin_co2_kpa >= balance.co2_danger_kpa:
 		out.append(["co2_danger", "urgent", "Carbon dioxide is dangerous (%.2f kPa). The crew is losing health. Run the CO2 scrubber." % state.cabin_co2_kpa])
-	elif state.cabin_co2_kpa >= balance.co2_warn_kpa:
-		out.append(["co2_high", "warn", "Carbon dioxide is building up (%.2f kPa). Check the CO2 scrubber and the cabin fans." % state.cabin_co2_kpa])
+	elif state.cabin_co2_kpa >= co2_warn:
+		var text := "Carbon dioxide is building up (%.2f kPa). Check the CO2 scrubber and the cabin fans." % state.cabin_co2_kpa
+		if monitor:
+			text = "Carbon dioxide is building up: %.2f kPa (harmful above %.1f kPa). Check the CO2 scrubber and the cabin fans." % [state.cabin_co2_kpa, balance.co2_danger_kpa]
+		out.append(["co2_high", "warn", text])
+	if monitor:
+		var forecast := "Oxygen forecast: the reserve of %.1f kg is not falling at this rate." % reserve
+		if reserve_rate < -1e-9:
+			forecast = "Oxygen forecast: the reserve of %.1f kg lasts %s." % [reserve, _time_left_words(reserve, reserve_rate)]
+		out.append(["oxygen_forecast", "info", forecast])
 	if not state.is_on("scrubber"):
 		out.append(["scrubber_off", "warn", "CO2 scrubber is switched off. Carbon dioxide is building up in the cabin."])
 	if not state.is_on("cabin_fans"):

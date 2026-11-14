@@ -199,7 +199,8 @@ func _make_settings(tab: int) -> UiPanel:
 
 func _panels() -> Array:
 	return [["MainMenu", _make_main_menu], ["PauseMenu", _make_pause_menu],
-		["SettingsPanel Display", _make_settings.bind(0)], ["SettingsPanel Controls", _make_settings.bind(1)]]
+		["SettingsPanel Display", _make_settings.bind(0)], ["SettingsPanel Controls", _make_settings.bind(1)],
+		["SettingsPanel Graphics", _make_settings.bind(2)]]
 
 
 func _test_layouts() -> void:

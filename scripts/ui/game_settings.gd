@@ -1,6 +1,6 @@
 class_name GameSettings
 extends Resource
-## The player's own settings (not part of the colony save): screen, text, camera and controls.
+## The player's own settings (not part of the colony save): screen, graphics, text, camera and controls.
 ## Every value is clamped when set, and a new value emits Resource's own `changed` signal (emit_changed()).
 ## Gameplay code reads fov_degrees, mouse_sensitivity, invert_y and toggle_sprint from here.
 
@@ -9,7 +9,7 @@ const DEFAULT_PATH := "user://settings.json"
 const TEXT_SCALES: Array[float] = [1.0, 1.25, 1.5]
 ## Names of the stored values, in file order.
 const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov_degrees", &"mouse_sensitivity",
-	&"invert_y", &"toggle_sprint", &"reduce_motion", &"high_contrast"]
+	&"invert_y", &"toggle_sprint", &"reduce_motion", &"high_contrast", &"graphics_quality"]
 
 ## Size of all menus and the HUD (0.75 to 2.0).
 @export var ui_scale := 1.0:
@@ -71,6 +71,15 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 			emit_changed()
 
 
+## Graphics preset: GraphicsQuality.Level (0 Low, 1 Medium, 2 High, 3 Ultra).
+@export var graphics_quality: int = GraphicsQuality.DEFAULT_LEVEL:
+	set(v):
+		v = clampi(v, GraphicsQuality.Level.LOW, GraphicsQuality.Level.ULTRA)
+		if v != graphics_quality:
+			graphics_quality = v
+			emit_changed()
+
+
 ## Reads the settings file; anything missing or broken keeps its default.
 static func load_or_default(path := DEFAULT_PATH) -> GameSettings:
 	var s := GameSettings.new()
@@ -87,6 +96,8 @@ static func load_or_default(path := DEFAULT_PATH) -> GameSettings:
 			s.set(key, v)
 		elif current is float and (v is float or v is int):
 			s.set(key, float(v))
+		elif current is int and (v is float or v is int):
+			s.set(key, int(v))
 	return s
 
 
@@ -100,10 +111,13 @@ func save(path := DEFAULT_PATH) -> Error:
 	return file.get_error()
 
 
-## Puts the screen settings into effect: UI scale, text size and high contrast colours.
+## Puts the screen settings into effect: UI scale, text size, high contrast colours and the graphics preset
+## (only when the preset changed; after loading a world call GraphicsQuality.apply() so its lights get it too).
 func apply(tree: SceneTree) -> void:
 	if tree != null and tree.root != null:
 		tree.root.content_scale_factor = ui_scale
+		if GraphicsQuality.applied_level(tree) != graphics_quality:
+			GraphicsQuality.apply(tree, graphics_quality)
 	UiTheme.set_high_contrast(high_contrast)
 	UiTheme.apply_text_scale(text_scale)
 

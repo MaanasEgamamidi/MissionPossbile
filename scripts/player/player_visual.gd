@@ -37,6 +37,49 @@ const INTERRUPTERS: Array[StringName] = [&"walk", &"sprint", &"carry"]
 signal state_changed(state: StringName)
 var _limbs: Array[Node3D] = []
 var _patch_material := StandardMaterial3D.new()
+## Mat_IdentDark surfaces: the accent darkened (CrewLooks.IDENT_DARK_AMOUNT).
+var _patch_dark_material := StandardMaterial3D.new()
+## Hair_* (unsuited) and HairIn_* (under the helmet) meshes; _apply_look_parts shows this crew member's.
+var _hair_parts: Array[MeshInstance3D] = []
+## Ident_Symbol_* and Ident_Band_* suit meshes; only this crew member's symbol and band, only while suited.
+var _ident_parts: Array[MeshInstance3D] = []
+## Imported Mat_Skin / Mat_Hair -> this body's own copy (other bodies share the imported one: never edit it).
+var _look_materials := {}
+## This body's Mat_Skin copies: they glow faintly while the helmet is on, so faces read through the visor.
+var _skin_copies: Array[BaseMaterial3D] = []
+## Name over the head (other crew only; see set_name_tag): a node turned to the camera each frame, holding the
+## symbol (accent colour) and the word (near-white).
+var _name_tag: Node3D
+var _tag_symbol: Label3D
+var _tag_word: Label3D
+## Symbol and word widths in tag units, and whether only the symbol is shown.
+var _tag_symbol_w := 0.0
+var _tag_word_w := 0.0
+var _tag_collapsed := false
+## Every body that has a name tag, for the overlap check.
+static var _tagged: Array[PlayerVisual] = []
+## Each crew index raises its tag this much more, so tags of crew standing together do not sit on one line.
+const NAME_TAG_STAGGER_M := 0.12
+## A tag collapses to its symbol when a nearer tag is within this many tag-widths of it on screen.
+const NAME_TAG_OVERLAP := 1.2
+## ...and within this many lines of text above or below it.
+const NAME_TAG_OVERLAP_LINES := 2.5
+## Height of the name tag above the feet for a model at scale 1 (head top is about 1.8 m, helmet top 1.86 m).
+const NAME_TAG_HEIGHT_M := 2.05
+## Extra height over a helmet.
+const NAME_TAG_SUITED_LIFT_M := 0.15
+## Text height on a 1080-pixel-tall screen, kept between NAME_TAG_NEAR_M and NAME_TAG_FAR_M from the camera.
+const NAME_TAG_PIXELS := 22.0
+const NAME_TAG_NEAR_M := 4.0
+const NAME_TAG_FAR_M := 25.0
+## Fully faded out beyond NAME_TAG_FADE_END_M (from NAME_TAG_FAR_M + 2) and closer than NAME_TAG_FADE_NEAR_M (from +1 m).
+const NAME_TAG_FADE_END_M := 30.0
+const NAME_TAG_FADE_NEAR_M := 2.0
+const NAME_TAG_TEXT := Color("f4f1ea")
+## Font size the tag labels are rasterised at; the node's scale sets their size in the world.
+const NAME_TAG_FONT_SIZE := 64
+## Emission energy of the skin while suited (a faint "helmet light" on the face).
+const SUITED_FACE_GLOW := 0.18
 var _first_person: bool = true
 var _suited: bool = false
 var _zone_mask: int = 1
@@ -86,6 +129,10 @@ func set_model(scene: PackedScene) -> void:
 	_parts.clear()
 	_suit_parts.clear()
 	_under_suit_parts.clear()
+	_hair_parts.clear()
+	_ident_parts.clear()
+	_look_materials.clear()
+	_skin_copies.clear()
 	_limbs.clear()
 	_model = scene.instantiate() as Node3D
 	add_child(_model)
@@ -118,6 +165,10 @@ func set_model(scene: PackedScene) -> void:
 		_parts.append(node as MeshInstance3D)
 		if node.name.begins_with("Suit") or node.name == &"Pack":
 			_suit_parts.append(node as Node3D)
+		elif node.name.begins_with("Hair_") or node.name.begins_with("HairIn_"):
+			_hair_parts.append(node as MeshInstance3D)
+		elif node.name.begins_with("Ident_Symbol_") or node.name.begins_with("Ident_Band_"):
+			_ident_parts.append(node as MeshInstance3D)
 	_model_base_y = _model.position.y
 	if _animation != null:
 		for clip: StringName in LOOPING:
@@ -163,23 +214,212 @@ func set_suit(on: bool) -> void:
 		part.visible = on
 	for part: Node3D in _under_suit_parts:
 		part.visible = not on
+	_apply_look_parts()
+	_apply_face_glow()
+	_update_name_tag()
 
-## Selects a restrained shoulder patch and chest stripe colour for crew member 0..3.
-## (Not called set_identity: Node3D already has a method of that name that resets the transform.)
+## Dresses the body as crew member 0..3 from CrewLooks: hair style and colour, skin colour, the "Feminine" blend
+## shape, accent surfaces (Mat_Ident, Mat_IdentDark), suit symbol and band, and height. Whatever the model lacks is
+## skipped. (Not called set_identity: Node3D already has a method of that name that resets the transform.)
 func set_crew_identity(index: int = 0) -> void:
 	_identity = clampi(index, 0, 3)
-	var colors: Array[Color] = [Color("b96045"), Color("47849c"), Color("c0a34c"), Color("788e65")]
-	_patch_material.albedo_color = colors[_identity]
+	var look := CrewLooks.look(_identity)
+	_patch_material.albedo_color = look.accent
+	_patch_material.roughness = 1.0
+	_patch_material.emission_enabled = true
+	_patch_material.emission = look.accent
+	_patch_material.emission_energy_multiplier = CrewLooks.IDENT_EMISSION
+	_patch_dark_material.albedo_color = CrewLooks.accent_dark(_identity)
+	_patch_dark_material.roughness = 1.0
+	var feminine := float(look.feminine)
 	for part: MeshInstance3D in _parts:
 		if part.name == &"ShoulderPatch" or part.name == &"ChestStripe":
 			part.material_override = _patch_material
 		elif part.mesh != null:
-			# rigged model: the patch and stripe are the surfaces that use the material called Mat_Ident
+			# rigged model: surfaces are recognised by the name of their imported material
 			for surface: int in part.mesh.get_surface_count():
 				var material := part.mesh.surface_get_material(surface)
-				if material != null and material.resource_name.begins_with("Mat_Ident"):
+				if material == null:
+					continue
+				var material_name := material.resource_name
+				if material_name.begins_with("Mat_IdentDark"):
+					part.set_surface_override_material(surface, _patch_dark_material)
+				elif material_name.begins_with("Mat_Ident"):
 					part.set_surface_override_material(surface, _patch_material)
+				elif material_name.begins_with("Mat_Skin"):
+					part.set_surface_override_material(surface, _look_copy(material, look.skin_color, true))
+				elif material_name.begins_with("Mat_Hair"):
+					part.set_surface_override_material(surface, _look_copy(material, look.hair_color, false))
+			var shape := part.find_blend_shape_by_name(&"Feminine")
+			if shape >= 0:
+				part.set_blend_shape_value(shape, feminine)
+	# The model's origin is between its feet, so a uniform scale keeps them on the floor.
+	_model.scale = Vector3.ONE * float(look.height)
+	_apply_look_parts()
+	_apply_face_glow()
+	_update_name_tag()
 
+## Crew index 0..3 last set by set_crew_identity().
+func crew_identity() -> int:
+	return _identity
+
+## This body's own copy of an imported material, recoloured.
+func _look_copy(material: Material, color: Color, skin: bool) -> Material:
+	var copy := _look_materials.get(material) as Material
+	if copy == null:
+		copy = material.duplicate() as Material
+		_look_materials[material] = copy
+		if skin and copy is BaseMaterial3D:
+			_skin_copies.append(copy as BaseMaterial3D)
+	if copy is BaseMaterial3D:
+		(copy as BaseMaterial3D).albedo_color = color
+	return copy
+
+## Hair: this crew member's Hair_* unsuited, their HairIn_* (and beard) under the helmet. Suit symbol and band: this
+## crew member's Ident_Symbol_* / Ident_Band_*, only while the suit is on.
+func _apply_look_parts() -> void:
+	var look := CrewLooks.look(_identity)
+	var wanted: Array = look.hair_suited if _suited else look.hair
+	for hair: MeshInstance3D in _hair_parts:
+		hair.visible = wanted.has(hair.name)
+	var symbol := "Ident_Symbol_" + String(look.symbol)
+	var band := "Ident_Band_" + String(look.band)
+	for part: MeshInstance3D in _ident_parts:
+		part.visible = _suited and (part.name == symbol or part.name == band)
+
+## Inside the helmet the face has no light of its own and goes dark in dim rooms: a faint skin glow stands in for a
+## helmet light while suited.
+func _apply_face_glow() -> void:
+	for skin: BaseMaterial3D in _skin_copies:
+		skin.emission_enabled = _suited
+		skin.emission = skin.albedo_color
+		skin.emission_energy_multiplier = SUITED_FACE_GLOW
+
+## Floats `text` over the head: the crew symbol in the accent colour, then the word in near-white, both outlined.
+## "" removes it. For other crew only: the game never gives the local player's own body a tag. The tag keeps about
+## NAME_TAG_PIXELS of text height between NAME_TAG_NEAR_M and NAME_TAG_FAR_M, fades out beyond NAME_TAG_FADE_END_M
+## and very close up, and walls hide it (depth tested).
+func set_name_tag(text: String) -> void:
+	if text == "":
+		if _name_tag != null:
+			_name_tag.queue_free()
+			_name_tag = null
+			_tag_symbol = null
+			_tag_word = null
+			_tagged.erase(self)
+		return
+	if _name_tag == null:
+		_name_tag = Node3D.new()
+		_name_tag.name = "NameTag"
+		add_child(_name_tag)
+		_tag_symbol = _tag_label("Symbol", HORIZONTAL_ALIGNMENT_RIGHT)
+		_tag_word = _tag_label("Word", HORIZONTAL_ALIGNMENT_LEFT)
+		if not _tagged.has(self):
+			_tagged.append(self)
+	_tag_word.text = text
+	_update_name_tag()
+
+func _tag_label(label_name: String, align: HorizontalAlignment) -> Label3D:
+	var label := Label3D.new()
+	label.name = label_name
+	label.font_size = NAME_TAG_FONT_SIZE
+	label.pixel_size = 1.0 / NAME_TAG_FONT_SIZE      # one metre per line at scale 1; _place_name_tag scales the node
+	label.outline_size = 14
+	label.outline_modulate = Color(0.05, 0.04, 0.04, 0.9)
+	label.horizontal_alignment = align
+	label.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	_name_tag.add_child(label)
+	return label
+
+## The name tag node (children Symbol and Word), or null when there is none.
+func name_tag() -> Node3D:
+	return _name_tag
+
+## The name tag as one string ("▲ Electrical"), or "" when there is none.
+func name_tag_text() -> String:
+	return "%s %s" % [_tag_symbol.text, _tag_word.text] if _name_tag != null else ""
+
+func _update_name_tag() -> void:
+	if _name_tag == null:
+		return
+	_tag_symbol.text = CrewLooks.glyph(_identity)
+	# Glyphs differ in size within a font (● is far smaller than ▲): each is scaled to the height of the capitals.
+	_tag_symbol.font_size = roundi(NAME_TAG_FONT_SIZE * CrewLooks.glyph_scale(_identity))
+	_tag_symbol.modulate = CrewLooks.accent(_identity)
+	_tag_word.modulate = NAME_TAG_TEXT
+	var font := _tag_word.font if _tag_word.font != null else ThemeDB.fallback_font
+	_tag_word_w = font.get_string_size(_tag_word.text, HORIZONTAL_ALIGNMENT_LEFT, -1, NAME_TAG_FONT_SIZE).x * _tag_word.pixel_size
+	_tag_symbol_w = font.get_string_size(_tag_symbol.text, HORIZONTAL_ALIGNMENT_LEFT, -1, _tag_symbol.font_size).x * _tag_symbol.pixel_size
+	_lay_out_tag(false)
+	var lift := NAME_TAG_SUITED_LIFT_M if _suited else 0.0
+	_name_tag.position = Vector3(0.0, NAME_TAG_HEIGHT_M * float(CrewLooks.look(_identity).height) + lift + NAME_TAG_STAGGER_M * _identity, 0.0)
+
+## Centres the symbol and word side by side, or the symbol alone when `collapsed`.
+func _lay_out_tag(collapsed: bool) -> void:
+	_tag_collapsed = collapsed
+	_tag_word.visible = not collapsed
+	var gap := 0.25
+	var total := _tag_symbol_w if collapsed else _tag_symbol_w + gap + _tag_word_w
+	var left := -total / 2.0
+	_tag_symbol.position = Vector3(left + _tag_symbol_w, 0.0, 0.0)
+	_tag_word.position = Vector3(left + _tag_symbol_w + gap, 0.0, 0.0)
+
+## Tag width in tag units (one unit = one line of text), symbol and word.
+func _tag_width() -> float:
+	return _tag_symbol_w + 0.25 + _tag_word_w
+
+## True when the name tag shows only its symbol (another, nearer tag is next to it on screen).
+func name_tag_collapsed() -> bool:
+	return _tag_collapsed
+
+## Faces the tag to `camera`, sizes it to about NAME_TAG_PIXELS on screen, fades it by distance, and collapses it to
+## its symbol when a nearer crew member's tag sits within NAME_TAG_OVERLAP tag-widths of it on screen.
+func _place_name_tag(camera: Camera3D) -> void:
+	var to_camera := camera.global_position - _name_tag.global_position
+	var distance := to_camera.length()
+	var height := _tag_height_at(camera, distance)
+	_name_tag.global_basis = camera.global_basis.orthonormalized().scaled(Vector3.ONE * height)
+	var alpha := 1.0
+	if distance > NAME_TAG_FAR_M + 2.0:
+		alpha = clampf((NAME_TAG_FADE_END_M - distance) / (NAME_TAG_FADE_END_M - NAME_TAG_FAR_M - 2.0), 0.0, 1.0)
+	elif distance < NAME_TAG_FADE_NEAR_M + 1.0:
+		alpha = clampf(distance - NAME_TAG_FADE_NEAR_M, 0.0, 1.0)
+	_name_tag.visible = alpha > 0.0
+	_tag_symbol.modulate.a = alpha
+	_tag_word.modulate.a = alpha
+	_tag_symbol.outline_modulate.a = 0.9 * alpha
+	_tag_word.outline_modulate.a = 0.9 * alpha
+	_lay_out_tag(_crowded(camera, distance))
+
+## World height of one line of tag text at `distance` (NAME_TAG_PIXELS on a 1080-pixel-tall view, clamped range).
+func _tag_height_at(camera: Camera3D, distance: float) -> float:
+	var clamped := clampf(distance, NAME_TAG_NEAR_M, NAME_TAG_FAR_M)
+	return NAME_TAG_PIXELS / 1080.0 * 2.0 * clamped * tan(deg_to_rad(camera.fov) * 0.5)
+
+## True when a nearer crew member's tag is close to this one on screen (within NAME_TAG_OVERLAP tag-widths across and
+## NAME_TAG_OVERLAP_LINES lines of text up or down: the stagger alone separates them by less than that).
+func _crowded(camera: Camera3D, distance: float) -> bool:
+	if not _name_tag.visible or camera.is_position_behind(_name_tag.global_position):
+		return false
+	var mine := camera.unproject_position(_name_tag.global_position)
+	var view_h := camera.get_viewport().get_visible_rect().size.y
+	var px_per_m := view_h / (2.0 * distance * tan(deg_to_rad(camera.fov) * 0.5))
+	var line_px := _tag_height_at(camera, distance) * px_per_m
+	for other: PlayerVisual in _tagged:
+		if other == self or other._name_tag == null or not other.is_visible_in_tree() or not other._name_tag.visible:
+			continue
+		var at := other._name_tag.global_position
+		var other_distance := camera.global_position.distance_to(at)
+		if other_distance > distance or (is_equal_approx(other_distance, distance) and other.get_instance_id() > get_instance_id()):
+			continue
+		if camera.is_position_behind(at):
+			continue
+		var theirs := camera.unproject_position(at)
+		var other_px_per_m := view_h / (2.0 * other_distance * tan(deg_to_rad(camera.fov) * 0.5))
+		var width_px := maxf(_tag_width() * line_px, other._tag_width() * other._tag_height_at(camera, other_distance) * other_px_per_m)
+		if absf(theirs.x - mine.x) < NAME_TAG_OVERLAP * width_px and absf(theirs.y - mine.y) < NAME_TAG_OVERLAP_LINES * line_px:
+			return true
+	return false
 ## Returns a hand attachment point, right by default.
 func hand_anchor(right: bool = true) -> Node3D:
 	return _right if right else _left
@@ -289,7 +529,17 @@ func play(state: StringName, speed: float = 1.0) -> void:
 		state_changed.emit(state)
 	_speed = speed
 
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_EXIT_TREE or what == NOTIFICATION_PREDELETE:
+		_tagged.erase(self)
+	elif what == NOTIFICATION_ENTER_TREE and _name_tag != null and not _tagged.has(self):
+		_tagged.append(self)
+
 func _process(delta: float) -> void:
+	if _name_tag != null and is_inside_tree():
+		var camera := get_viewport().get_camera_3d()
+		if camera != null:
+			_place_name_tag(camera)
 	_time += delta * _speed
 	if _hold_left > 0.0:
 		_hold_left -= delta
@@ -337,7 +587,7 @@ func _process(delta: float) -> void:
 ## also took them out of every light's shadow casters: the shadow was headless.)
 func _apply_layers() -> void:
 	for part: MeshInstance3D in _parts:
-		var hidden: bool = part == _head or part == _helmet
+		var hidden: bool = part == _head or part == _helmet or _hair_parts.has(part)
 		if _head != null and _head.is_ancestor_of(part):
 			hidden = true
 		if _helmet != null and _helmet.is_ancestor_of(part):

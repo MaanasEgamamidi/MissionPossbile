@@ -39,6 +39,8 @@ var _ok_line: Label
 var _crew_badge: CrewPortrait
 var _crew_name: Label
 var _crew_specialty: Label
+## The specialty symbol before the specialty words, in the crew member's accent colour (CrewLooks).
+var _crew_specialty_icon: Label
 var _health_text: Label
 var _health_bar: ProgressBar
 var _stamina_text: Label
@@ -404,10 +406,24 @@ func _build() -> void:
 	_crew_name.name = "Name"
 	_crew_name.theme_type_variation = UiTheme.HEADING
 	who_text.add_child(_crew_name)
+	var specialty_row := HBoxContainer.new()
+	specialty_row.name = "SpecialtyRow"
+	specialty_row.add_theme_constant_override(&"separation", 6)
+	who_text.add_child(specialty_row)
+	_crew_specialty_icon = Label.new()
+	_crew_specialty_icon.name = "SpecialtyIcon"
+	_crew_specialty_icon.theme_type_variation = UiTheme.MUTED
+	# A monochrome symbol font: the default fallback draws ⚡ and ⛏ as colour emoji, which ignore the accent colour.
+	var symbols := SystemFont.new()
+	symbols.font_names = PackedStringArray(["Segoe UI Symbol", "Noto Sans Symbols 2", "Noto Sans Symbols", "DejaVu Sans"])
+	symbols.allow_system_fallback = false   # otherwise the text server still picks Segoe UI Emoji for ⚡
+	symbols.fallbacks = [ThemeDB.fallback_font]
+	_crew_specialty_icon.add_theme_font_override(&"font", symbols)
+	specialty_row.add_child(_crew_specialty_icon)
 	_crew_specialty = Label.new()
 	_crew_specialty.name = "Specialty"
 	_crew_specialty.theme_type_variation = UiTheme.MUTED
-	who_text.add_child(_crew_specialty)
+	specialty_row.add_child(_crew_specialty)
 	var bars := GridContainer.new()
 	bars.name = "Bars"
 	bars.columns = 2
@@ -690,7 +706,9 @@ func _refresh_crew() -> void:
 		_badge_for = me.id
 		_crew_badge.setup(me, CrewPortrait.crew_index(services.state(), me.id))
 	_crew_name.text = me.display_name
-	_crew_specialty.text = "%s %s" % [CrewPortrait.specialty_symbol(me.specialty), CrewPortrait.specialty_words(me.specialty)]
+	_crew_specialty_icon.text = CrewPortrait.specialty_symbol(me.specialty)
+	_crew_specialty_icon.add_theme_color_override(&"font_color", CrewPortrait.specialty_color(me.specialty))
+	_crew_specialty.text = CrewPortrait.specialty_words(me.specialty)
 	_health_text.text = "Health %d %%" % roundi(me.health)
 	_health_bar.value = me.health
 	_health_bar.theme_type_variation = UiTheme.bar_of(&"urgent" if me.health < 30.0 else (&"warn" if me.health < 60.0 else &"ok"))

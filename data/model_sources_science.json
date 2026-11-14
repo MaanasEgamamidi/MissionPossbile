@@ -1,0 +1,27 @@
+{
+	"_about": {"category": "index", "source_ids": [], "note": "Evidence category of every ScienceBalance field and of the numbers in data/samples.json and data/salvage.json (Prompt 08, Part S). Categories: balance (game tuning, no source; never a NASA figure), illustrative (a made-up value shown in place of a measurement), S06 (PDS Geosciences Node page for MSL CheMin, PARTIAL in docs/source_register.md: supports only the mission, instrument, Gale crater site and data set name of the lab reference, and that CheMin measures mineral abundance by X-ray diffraction; it holds no mineral values). No other register entry is used."},
+
+	"samples_per_site": {"category": "balance", "source_ids": [], "note": "3 samples per site, so one site cannot fill every pack."},
+	"clear_sky_tau": {"category": "balance", "source_ids": [], "note": "0.6: below it the sample label says 'clear sky'. Words only; dust opacity has no checked source (register section 10)."},
+	"dusty_sky_tau": {"category": "balance", "source_ids": [], "note": "1.0: above it the sample label says 'dusty sky'."},
+
+	"mineral_uncertainty_pct": {"category": "illustrative", "source_ids": [], "note": "+/- 6 percentage points on each mineral share the lab shows. Not a CheMin figure."},
+	"calibrated_mineral_uncertainty_pct": {"category": "illustrative", "source_ids": [], "note": "+/- 2 percentage points after sci_instrument_calibration. Not a CheMin figure."},
+	"result_uncertainty": {"category": "balance", "source_ids": [], "note": "+/- 0.08 on the nutrient setting (0..1) of a lab result."},
+	"calibrated_result_uncertainty": {"category": "balance", "source_ids": [], "note": "+/- 0.03 after sci_instrument_calibration."},
+	"nutrient_setting_volcanic": {"category": "balance", "source_ids": [], "note": "0.6. Made up for the game: the planter mix contains crushed local ground; growing crops in Mars ground has not been shown (register section 4 note, section 10)."},
+	"nutrient_setting_clay": {"category": "balance", "source_ids": [], "note": "0.45. Made up for the game (as above)."},
+	"nutrient_setting_sulfate": {"category": "balance", "source_ids": [], "note": "0.3. Made up for the game (as above)."},
+
+	"parts_per_donor": {"category": "balance", "source_ids": [], "note": "1 part recovered per donor."},
+	"parts_per_donor_upgraded": {"category": "balance", "source_ids": [], "note": "2 after res_component_refurbishment (one more)."},
+	"refurbish_hours": {"category": "balance", "source_ids": [], "note": "2 game hours on the workbench before the bench test."},
+	"refurbish_hours_upgraded": {"category": "balance", "source_ids": [], "note": "1 game hour after res_component_refurbishment."},
+	"components_per_part": {"category": "balance", "source_ids": [], "note": "1: one salvaged part in, one working component out (state.parts, ledger parts_from_salvage). Nothing is made from rock."},
+
+	"samples.json references": {"category": "S06", "source_ids": ["S06"], "note": "Provenance only: mission Mars Science Laboratory (Curiosity), instrument CheMin (X-ray diffraction), site Gale crater, data set msl-m-chemin-4-rdr-v1 named on the S06 page. No sample product was opened; the reference mineral shares are illustrative, not from the archive, and are not a measurement of the fictional map."},
+	"samples.json readouts": {"category": "illustrative", "source_ids": [], "note": "Every mineral share of the control, the references and the three sites is illustrative, not from the archive."},
+	"samples.json site rock types": {"category": "balance", "source_ids": [], "note": "Which rock lies at which site of the fictional map is made up for the game."},
+	"samples.json mineral group words": {"category": "illustrative", "source_ids": [], "note": "General geology words (volcanic minerals, clay, sulfate salts, glass) used as plain labels; not from the register."},
+	"salvage.json parts": {"category": "illustrative", "source_ids": [], "note": "Which donor part fits, its clue and its bench-test words are made up for the game. The donors are existing damaged objects of the map."}
+}

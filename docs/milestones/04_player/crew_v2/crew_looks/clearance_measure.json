@@ -1,0 +1,368 @@
+{
+ "idle": {
+  "Hair_Ponytail_F0": [
+   0.0964,
+   0,
+   80
+  ],
+  "Hair_Bob_F0": [
+   0.0409,
+   0,
+   80
+  ],
+  "Hair_Curly_F0": [
+   0.0914,
+   0,
+   80
+  ],
+  "forearm_vs_torso_F0": [
+   0.0791,
+   0,
+   4
+  ],
+  "foot_verts": [
+   130,
+   130
+  ],
+  "foot_gap_F0": 0.1341,
+  "helmet_poke_Body_Head_F0": -0.0019,
+  "helmet_poke_Hair_Beard_F0": -0.0321,
+  "helmet_poke_HairIn_Bob_F0": -0.0455,
+  "helmet_poke_HairIn_Buzz_F0": -0.0447,
+  "helmet_poke_HairIn_Curly_F0": -0.0336,
+  "helmet_poke_HairIn_Ponytail_F0": -0.0349,
+  "ident_vs_suit_arms_min": 0.0065,
+  "Hair_Ponytail_F1": [
+   0.096,
+   0,
+   80
+  ],
+  "Hair_Bob_F1": [
+   0.0436,
+   0,
+   80
+  ],
+  "Hair_Curly_F1": [
+   0.0911,
+   0,
+   80
+  ],
+  "forearm_vs_torso_F1": [
+   0.0752,
+   0,
+   26
+  ],
+  "foot_gap_F1": 0.1341,
+  "helmet_poke_Body_Head_F1": -0.0051,
+  "helmet_poke_Hair_Beard_F1": -0.0321,
+  "helmet_poke_HairIn_Bob_F1": -0.0455,
+  "helmet_poke_HairIn_Buzz_F1": -0.0447,
+  "helmet_poke_HairIn_Curly_F1": -0.0336,
+  "helmet_poke_HairIn_Ponytail_F1": -0.0349
+ },
+ "walk": {
+  "Hair_Ponytail_F0": [
+   0.0885,
+   0,
+   10
+  ],
+  "Hair_Bob_F0": [
+   0.0306,
+   0,
+   6
+  ],
+  "Hair_Curly_F0": [
+   0.0848,
+   0,
+   4
+  ],
+  "forearm_vs_torso_F0": [
+   0.0,
+   24,
+   6
+  ],
+  "foot_verts": [
+   130,
+   130
+  ],
+  "foot_gap_F0": 0.1208,
+  "helmet_poke_Body_Head_F0": 0.0014,
+  "helmet_poke_Hair_Beard_F0": -0.0403,
+  "helmet_poke_HairIn_Bob_F0": -0.037,
+  "helmet_poke_HairIn_Buzz_F0": -0.0372,
+  "helmet_poke_HairIn_Curly_F0": -0.0261,
+  "helmet_poke_HairIn_Ponytail_F0": -0.0265,
+  "ident_vs_suit_arms_min": 0.0025,
+  "Hair_Ponytail_F1": [
+   0.0881,
+   0,
+   16
+  ],
+  "Hair_Bob_F1": [
+   0.0323,
+   0,
+   8
+  ],
+  "Hair_Curly_F1": [
+   0.0833,
+   0,
+   16
+  ],
+  "forearm_vs_torso_F1": [
+   0.0001,
+   26,
+   6
+  ],
+  "foot_gap_F1": 0.1208,
+  "helmet_poke_Body_Head_F1": -0.005,
+  "helmet_poke_Hair_Beard_F1": -0.0403,
+  "helmet_poke_HairIn_Bob_F1": -0.037,
+  "helmet_poke_HairIn_Buzz_F1": -0.0372,
+  "helmet_poke_HairIn_Curly_F1": -0.0261,
+  "helmet_poke_HairIn_Ponytail_F1": -0.0265
+ },
+ "sprint": {
+  "Hair_Ponytail_F0": [
+   0.0825,
+   0,
+   0
+  ],
+  "Hair_Bob_F0": [
+   0.0277,
+   0,
+   0
+  ],
+  "Hair_Curly_F0": [
+   0.0766,
+   0,
+   0
+  ],
+  "forearm_vs_torso_F0": [
+   0.0155,
+   0,
+   8
+  ],
+  "foot_verts": [
+   130,
+   130
+  ],
+  "foot_gap_F0": 0.1988,
+  "helmet_poke_Body_Head_F0": -0.0122,
+  "helmet_poke_Hair_Beard_F0": -0.0351,
+  "helmet_poke_HairIn_Bob_F0": -0.0408,
+  "helmet_poke_HairIn_Buzz_F0": -0.0406,
+  "helmet_poke_HairIn_Curly_F0": -0.0292,
+  "helmet_poke_HairIn_Ponytail_F0": -0.0304,
+  "ident_vs_suit_arms_min": 0.0027,
+  "Hair_Ponytail_F1": [
+   0.0827,
+   0,
+   0
+  ],
+  "Hair_Bob_F1": [
+   0.0285,
+   0,
+   0
+  ],
+  "Hair_Curly_F1": [
+   0.077,
+   0,
+   0
+  ],
+  "forearm_vs_torso_F1": [
+   0.0149,
+   0,
+   8
+  ],
+  "foot_gap_F1": 0.1988,
+  "helmet_poke_Body_Head_F1": -0.0195,
+  "helmet_poke_Hair_Beard_F1": -0.0351,
+  "helmet_poke_HairIn_Bob_F1": -0.0408,
+  "helmet_poke_HairIn_Buzz_F1": -0.0406,
+  "helmet_poke_HairIn_Curly_F1": -0.0292,
+  "helmet_poke_HairIn_Ponytail_F1": -0.0304
+ },
+ "jump_start": {
+  "Hair_Ponytail_F0": [
+   0.0804,
+   0,
+   6
+  ],
+  "Hair_Bob_F0": [
+   0.0221,
+   0,
+   6
+  ],
+  "Hair_Curly_F0": [
+   0.0754,
+   0,
+   6
+  ],
+  "forearm_vs_torso_F0": [
+   0.1459,
+   0,
+   2
+  ],
+  "foot_verts": [
+   130,
+   130
+  ],
+  "foot_gap_F0": 0.0001,
+  "helmet_poke_Body_Head_F0": -0.0005,
+  "helmet_poke_Hair_Beard_F0": -0.0427,
+  "helmet_poke_HairIn_Bob_F0": -0.024,
+  "helmet_poke_HairIn_Buzz_F0": -0.0249,
+  "helmet_poke_HairIn_Curly_F0": -0.014,
+  "helmet_poke_HairIn_Ponytail_F0": -0.0127,
+  "ident_vs_suit_arms_min": 0.0308,
+  "Hair_Ponytail_F1": [
+   0.0812,
+   0,
+   6
+  ],
+  "Hair_Bob_F1": [
+   0.0268,
+   0,
+   6
+  ],
+  "Hair_Curly_F1": [
+   0.0765,
+   0,
+   6
+  ],
+  "forearm_vs_torso_F1": [
+   0.1423,
+   0,
+   2
+  ],
+  "foot_gap_F1": 0.0001,
+  "helmet_poke_Body_Head_F1": 0.0025,
+  "helmet_poke_Hair_Beard_F1": -0.0427,
+  "helmet_poke_HairIn_Bob_F1": -0.024,
+  "helmet_poke_HairIn_Buzz_F1": -0.0249,
+  "helmet_poke_HairIn_Curly_F1": -0.014,
+  "helmet_poke_HairIn_Ponytail_F1": -0.0127
+ },
+ "jump": {
+  "Hair_Ponytail_F0": [
+   0.0776,
+   0,
+   26
+  ],
+  "Hair_Bob_F0": [
+   0.0219,
+   0,
+   26
+  ],
+  "Hair_Curly_F0": [
+   0.0728,
+   0,
+   26
+  ],
+  "forearm_vs_torso_F0": [
+   0.1114,
+   0,
+   26
+  ],
+  "foot_verts": [
+   130,
+   130
+  ],
+  "foot_gap_F0": 0.0,
+  "helmet_poke_Body_Head_F0": 0.0049,
+  "helmet_poke_Hair_Beard_F0": -0.0427,
+  "helmet_poke_HairIn_Bob_F0": -0.024,
+  "helmet_poke_HairIn_Buzz_F0": -0.0249,
+  "helmet_poke_HairIn_Curly_F0": -0.014,
+  "helmet_poke_HairIn_Ponytail_F0": -0.0127,
+  "ident_vs_suit_arms_min": 0.0448,
+  "Hair_Ponytail_F1": [
+   0.0788,
+   0,
+   26
+  ],
+  "Hair_Bob_F1": [
+   0.0265,
+   0,
+   24
+  ],
+  "Hair_Curly_F1": [
+   0.0743,
+   0,
+   26
+  ],
+  "forearm_vs_torso_F1": [
+   0.1085,
+   0,
+   26
+  ],
+  "foot_gap_F1": 0.0,
+  "helmet_poke_Body_Head_F1": 0.0013,
+  "helmet_poke_Hair_Beard_F1": -0.0427,
+  "helmet_poke_HairIn_Bob_F1": -0.024,
+  "helmet_poke_HairIn_Buzz_F1": -0.0249,
+  "helmet_poke_HairIn_Curly_F1": -0.014,
+  "helmet_poke_HairIn_Ponytail_F1": -0.0127
+ },
+ "land": {
+  "Hair_Ponytail_F0": [
+   0.0708,
+   0,
+   2
+  ],
+  "Hair_Bob_F0": [
+   0.0154,
+   0,
+   2
+  ],
+  "Hair_Curly_F0": [
+   0.066,
+   0,
+   2
+  ],
+  "forearm_vs_torso_F0": [
+   0.0792,
+   0,
+   12
+  ],
+  "foot_verts": [
+   130,
+   130
+  ],
+  "foot_gap_F0": 0.1338,
+  "helmet_poke_Body_Head_F0": -0.0025,
+  "helmet_poke_Hair_Beard_F0": -0.0334,
+  "helmet_poke_HairIn_Bob_F0": -0.0168,
+  "helmet_poke_HairIn_Buzz_F0": -0.0182,
+  "helmet_poke_HairIn_Curly_F0": -0.0068,
+  "helmet_poke_HairIn_Ponytail_F0": -0.0056,
+  "ident_vs_suit_arms_min": 0.0065,
+  "Hair_Ponytail_F1": [
+   0.0722,
+   0,
+   2
+  ],
+  "Hair_Bob_F1": [
+   0.0194,
+   0,
+   4
+  ],
+  "Hair_Curly_F1": [
+   0.0676,
+   0,
+   2
+  ],
+  "forearm_vs_torso_F1": [
+   0.0754,
+   0,
+   12
+  ],
+  "foot_gap_F1": 0.1338,
+  "helmet_poke_Body_Head_F1": -0.006,
+  "helmet_poke_Hair_Beard_F1": -0.0334,
+  "helmet_poke_HairIn_Bob_F1": -0.0168,
+  "helmet_poke_HairIn_Buzz_F1": -0.0182,
+  "helmet_poke_HairIn_Curly_F1": -0.0068,
+  "helmet_poke_HairIn_Ponytail_F1": -0.0056
+ }
+}

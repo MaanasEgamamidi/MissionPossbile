@@ -1,0 +1,60 @@
+{
+	"_about": "Compatible-salvage to usable-component workflow (Prompt 08, Part S). Read by ScienceActions. Every donor is an existing damaged object of the map (data/colony_manifest.json). Which parts fit, the clues and the bench-test numbers are made up for the game (illustrative). A salvaged part is turned into one working component: nothing is made from rock, and no matter is created.",
+	"donors": [
+		{
+			"object": "ls_filter_old",
+			"name": "Old air filter unit",
+			"story": "A worn-out air filter unit, taken out of the life-support loop and left by the wall.",
+			"parts": [
+				{"id": "fan_motor", "name": "Fan motor", "compatible": true, "fits": "the cabin fans", "clue": "It spins freely and its plug matches the cabin fan sockets.", "test": "Spins at full speed for ten minutes and stays cool (illustrative test)."},
+				{"id": "blower_wheel", "name": "Blower wheel", "compatible": true, "fits": "the cabin fans", "clue": "No cracks; it is the same size as the cabin fan wheels.", "test": "Turns smoothly with no wobble (illustrative test)."},
+				{"id": "filter_mesh", "name": "Filter mesh", "compatible": false, "clue": "Clogged with fine dust and torn in two places: it cannot be cleaned."},
+				{"id": "housing_seal", "name": "Rubber seal", "compatible": false, "clue": "Hard and cracked: it would leak air."}
+			]
+		},
+		{
+			"object": "pr_bat_rack_alarm",
+			"name": "Battery rack with a fault alarm",
+			"story": "One battery rack in the Power Room has a fault alarm and is switched out of the colony battery.",
+			"parts": [
+				{"id": "bus_bar", "name": "Copper bus bar", "compatible": true, "fits": "the power panel wiring", "clue": "Clean copper, no burn marks; the bolt holes match the power panel.", "test": "Carries the test current with no heating (illustrative test)."},
+				{"id": "relay", "name": "Switching relay", "compatible": true, "fits": "the power panel switches", "clue": "It clicks on and off when tested with a small battery.", "test": "Switches on and off 100 times without a miss (illustrative test)."},
+				{"id": "battery_cell", "name": "Battery cell", "compatible": false, "clue": "Swollen case: a damaged cell is unsafe to use."},
+				{"id": "alarm_board", "name": "Alarm circuit board", "compatible": false, "clue": "Scorched around the main chip: it caused the alarm."}
+			]
+		},
+		{
+			"object": "pr_swgr_burnt",
+			"name": "Burnt switchgear cabinet",
+			"story": "A switchgear cabinet that overheated. The burnt parts are inside; some others look fine.",
+			"parts": [
+				{"id": "relay", "name": "Switching relay", "compatible": true, "fits": "the power panel switches", "clue": "Not touched by the fire; it clicks when tested.", "test": "Switches on and off 100 times without a miss (illustrative test)."},
+				{"id": "cable_lug", "name": "Cable lugs", "compatible": true, "fits": "the solar array cables", "clue": "Shiny metal, the right size for the solar cables.", "test": "Holds the cable tight under a pull test (illustrative test)."},
+				{"id": "breaker", "name": "Circuit breaker", "compatible": false, "clue": "Melted plastic case: it cannot switch safely any more."},
+				{"id": "control_card", "name": "Control card", "compatible": false, "clue": "Black with soot and its tracks are broken."}
+			]
+		},
+		{
+			"object": "cr_console_alarm",
+			"name": "Console with a fault alarm",
+			"story": "An old Command Room console that keeps sounding a fault alarm. Its screen is dead, but its cooling parts look fine.",
+			"parts": [
+				{"id": "fan_motor", "name": "Cooling fan motor", "compatible": true, "fits": "the cabin fans", "clue": "The same model as the cabin fan motors, and it spins freely.", "test": "Spins at full speed for ten minutes and stays cool (illustrative test)."},
+				{"id": "cable_lug", "name": "Cable lugs", "compatible": true, "fits": "the solar array cables", "clue": "Clean metal, the right size for the solar cables.", "test": "Holds the cable tight under a pull test (illustrative test)."},
+				{"id": "screen", "name": "Display screen", "compatible": false, "clue": "Cracked across the middle: it shows nothing."},
+				{"id": "keypad", "name": "Keypad", "compatible": false, "clue": "Half the keys are stuck with dust."}
+			]
+		},
+		{
+			"object": "sf_crash_tank",
+			"name": "Crashed lander tank",
+			"story": "A gas tank thrown clear when the cargo lander crashed. The tank is pierced, but its fittings may still work.",
+			"parts": [
+				{"id": "valve", "name": "Gas valve", "compatible": true, "fits": "the oxygen tank manifold", "clue": "It opens and closes smoothly and has the same thread as the colony's oxygen fittings.", "test": "Holds pressure with no leak for an hour (illustrative test)."},
+				{"id": "pressure_gauge", "name": "Pressure gauge", "compatible": true, "fits": "the oxygen tank manifold", "clue": "The glass is whole and the needle moves back to zero.", "test": "Reads the same as the colony's own gauge (illustrative test)."},
+				{"id": "tank_liner", "name": "Tank liner", "compatible": false, "clue": "Pierced right through by the crash."},
+				{"id": "strap", "name": "Mounting strap", "compatible": false, "clue": "Bent and torn at the bolt."}
+			]
+		}
+	]
+}

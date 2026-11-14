@@ -29,13 +29,7 @@ const SPECIALTY_INITIALS := {
 	&"biology_food": "B",
 	&"field_engineering_geology": "F",
 }
-## Marker colour of each specialty, and the colour in words for the legend.
-const SPECIALTY_COLOURS := {
-	&"electrical_comms": [Color(1.0, 0.82, 0.25), "yellow"],
-	&"medical_life_support": [Color(0.96, 0.45, 0.52), "pink"],
-	&"biology_food": [Color(0.45, 0.86, 0.45), "green"],
-	&"field_engineering_geology": [Color(0.45, 0.66, 1.0), "blue"],
-}
+## Marker colour of each crew member and its name for the legend come from CrewLooks (accent, colour_word).
 ## Drawing colours of the plan itself (shapes, not text; text uses the theme's label colour).
 const PLAN_COLOURS := {
 	"background": Color(0.05, 0.06, 0.08, 0.55),
@@ -91,11 +85,11 @@ static func legend() -> Array:
 		["▲", "You. The point shows the way you face."],
 	]
 	for sp: StringName in SPECIALTY_INITIALS:
-		out.append([String(SPECIALTY_INITIALS[sp]), "Crew member: %s (%s circle)." % [String(StationPanels.SPECIALTY_WORDS[sp]).to_lower(), String(SPECIALTY_COLOURS[sp][1])]])
+		out.append([String(SPECIALTY_INITIALS[sp]), "Crew member: %s (%s circle)." % [String(StationPanels.SPECIALTY_WORDS[sp]).to_lower(), String(CrewLooks.look(CrewLooks.index_of(sp)).colour_word)]])
 	out.append(["■", "Something on the ground that you can pick up."])
 	out.append(["!", "A cache (orange circle): things left behind when someone was brought back to the hub."])
-	for kind: String in StationPanels.SYMBOLS:
-		out.append([String(StationPanels.SYMBOLS[kind]), "Station: %s." % StationPanels.name_of(kind).to_lower()])
+	for kind: String in StationPanels.all_kinds():
+		out.append([StationPanels.symbol_of(kind), "Station: %s." % StationPanels.name_of(kind).to_lower()])
 	out.append([DUSTY_WORD, "Under a sun tracker ☀: its solar panel is more than %d %% covered in dust, so it makes less power." % roundi(DUSTY_SHARE * 100.0)])
 	out.append(["↑", "North arrow. The top of the map is north (N)."])
 	return out
@@ -381,7 +375,8 @@ func _draw_crew(st: ColonyState, font: Font, fs: int) -> void:
 			continue
 		var at := world_to_view(godot_to_plan(c.position))
 		var r := maxf(8.0, fs * 0.6)
-		var colour: Color = (SPECIALTY_COLOURS.get(c.specialty, [PLAN_COLOURS["item"], ""]) as Array)[0]
+		var look_index := CrewLooks.index_of(c.specialty)
+		var colour: Color = CrewLooks.accent(look_index) if look_index >= 0 else PLAN_COLOURS["item"]
 		draw_circle(at, r, colour)
 		draw_arc(at, r, 0.0, TAU, 24, PLAN_COLOURS["outline"], 1.5, true)
 		var initial := String(SPECIALTY_INITIALS.get(c.specialty, "?"))

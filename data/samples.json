@@ -1,0 +1,91 @@
+{
+	"_about": "Field-sample to lab-comparison activity (Prompt 08, Part S). Read by ScienceActions. Every mineral share here is ILLUSTRATIVE, NOT FROM THE ARCHIVE: the source register (docs/source_register.md, S06) gives only the mission, instrument, site and data set of the reference, and that CheMin measures mineral abundance by X-ray diffraction of powdered rock and soil. Which rock lies at which site on the map is made up for the game. A Gale crater value is never a measurement of the fictional map.",
+	"groups": [
+		{"id": "volcanic", "name": "Volcanic minerals", "detail": "feldspar, pyroxene and olivine crystals, found in dark volcanic rock"},
+		{"id": "clay", "name": "Clay minerals", "detail": "very fine minerals that usually form when water changes rock"},
+		{"id": "sulfate", "name": "Sulfate salts", "detail": "salty minerals such as gypsum, left behind when salty water dries"},
+		{"id": "glass", "name": "Glassy material", "detail": "material with no crystal pattern, so X-rays show no clear peaks"}
+	],
+	"control": {
+		"id": "blank_holder",
+		"name": "Empty sample holder (blank control)",
+		"why": "The same measurement with nothing in the holder. It shows what the machine reads by itself, so you know the signal comes from the sample and not from the instrument.",
+		"readout": {"volcanic": 1, "clay": 0, "sulfate": 1, "glass": 0},
+		"category": "illustrative"
+	},
+	"references": [
+		{
+			"id": "ref_basaltic_sand",
+			"name": "Reference 1: dark basaltic sand",
+			"needs_upgrade": "",
+			"source_id": "S06",
+			"mission": "Mars Science Laboratory (Curiosity rover)",
+			"instrument": "CheMin, mineral abundance by X-ray diffraction",
+			"site": "Gale crater (a real place, not this colony)",
+			"archive": "PDS Geosciences Node, MSL CheMin data set msl-m-chemin-4-rdr-v1",
+			"values_label": "Mineral shares are illustrative, not from the archive.",
+			"readout": {"volcanic": 70, "clay": 4, "sulfate": 4, "glass": 22}
+		},
+		{
+			"id": "ref_clay_mudstone",
+			"name": "Reference 2: clay-bearing mudstone",
+			"needs_upgrade": "sci_sample_comparison",
+			"source_id": "S06",
+			"mission": "Mars Science Laboratory (Curiosity rover)",
+			"instrument": "CheMin, mineral abundance by X-ray diffraction",
+			"site": "Gale crater (a real place, not this colony)",
+			"archive": "PDS Geosciences Node, MSL CheMin data set msl-m-chemin-4-rdr-v1",
+			"values_label": "Mineral shares are illustrative, not from the archive.",
+			"readout": {"volcanic": 36, "clay": 26, "sulfate": 6, "glass": 32}
+		}
+	],
+	"interpretations": [
+		{"id": "volcanic", "text": "Mostly volcanic minerals, like reference 1: dark volcanic sand or rock."},
+		{"id": "clay", "text": "Much more clay than reference 1: this rock was changed by water long ago."},
+		{"id": "sulfate", "text": "Much more sulfate salt than reference 1: a salty crust left by drying water."}
+	],
+	"rock_types": {
+		"volcanic": {"name": "dark volcanic sand", "use": "It adds little plant food, so a bed mixed with it needs a higher nutrient setting."},
+		"clay": {"name": "clay-rich soil", "use": "Clay holds on to plant food, so a bed mixed with it needs a middle nutrient setting."},
+		"sulfate": {"name": "salty sulfate crust", "use": "It is salty, so a bed mixed with it needs a lower nutrient setting to keep the mix from getting too salty."}
+	},
+	"use_note": "In this game the greenhouse planter mix contains some crushed local ground, so the lab result suggests a nutrient setting. This is made up for the game: growing crops in Mars ground has not been shown.",
+	"sites": [
+		{
+			"id": "site_east_rocks",
+			"name": "East rock field",
+			"rock_type": "volcanic",
+			"ground": "Dark, gritty sand between small rocks, east of the rover track.",
+			"picked_from": "Next to rocks rock_0719, rock_0982 and rock_0974 (colony_manifest.json environment objects).",
+			"readouts": [
+				{"volcanic": 68, "clay": 6, "sulfate": 4, "glass": 22},
+				{"volcanic": 63, "clay": 8, "sulfate": 6, "glass": 23},
+				{"volcanic": 72, "clay": 3, "sulfate": 3, "glass": 22}
+			]
+		},
+		{
+			"id": "site_mast_boulders",
+			"name": "Boulders by the light mast",
+			"rock_type": "clay",
+			"ground": "Pale, fine-grained broken rock around a group of boulders near the west light mast.",
+			"picked_from": "Next to rocks rock_0986, rock_0985 and rock_0972 and the light mast sf_light_mast.002 (colony_manifest.json).",
+			"readouts": [
+				{"volcanic": 38, "clay": 27, "sulfate": 5, "glass": 30},
+				{"volcanic": 33, "clay": 31, "sulfate": 7, "glass": 29},
+				{"volcanic": 41, "clay": 22, "sulfate": 4, "glass": 33}
+			]
+		},
+		{
+			"id": "site_crash_crust",
+			"name": "Pale crust by the crash site",
+			"rock_type": "sulfate",
+			"ground": "A light, crunchy crust on the ground at the edge of the crash site.",
+			"picked_from": "Edge of the crash site pad (colony_manifest.json pads_y_up, Crash site, centre -0.25, 49.35).",
+			"readouts": [
+				{"volcanic": 40, "clay": 6, "sulfate": 30, "glass": 24},
+				{"volcanic": 35, "clay": 8, "sulfate": 34, "glass": 23},
+				{"volcanic": 44, "clay": 5, "sulfate": 25, "glass": 26}
+			]
+		}
+	]
+}

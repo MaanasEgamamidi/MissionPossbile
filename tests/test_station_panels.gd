@@ -53,9 +53,11 @@ func _test_for_station() -> void:
 	var st := _gs.state()
 	var bad := PackedStringArray()
 	var count := 0
+	var base: Array = ["power", "computer", "comms", "food", "lifesupport", "heal", "board", "survivor", "suits", "solar"]
 	for id: String in st.stations:
-		count += 1
 		var kind := String(st.stations[id].kind)
+		if base.has(kind):
+			count += 1
 		var panel := StationPanels.for_station(StringName(id), _gs)
 		# Prompt 07: the life-support console, the suit rack and the 12 sun trackers have their own panels.
 		var ok := false
@@ -74,11 +76,12 @@ func _test_for_station() -> void:
 		ok = ok and panel != null and (panel as StationPanel).kind == kind
 		if panel != null:
 			ok = ok and bool(panel.get_meta(&"station_surface", false)) and StringName(panel.get_meta(&"station_id", &"")) == StringName(id)
-			ok = ok and panel.panel_title() == StationPanels.name_of(kind)
+			# Built-in kinds use their kind's name; data-file stations may name themselves (beds are numbered: "Planter 2").
+			ok = ok and (panel.panel_title() == StationPanels.name_of(kind) if base.has(kind) else panel.panel_title() != "")
 			panel.free()
 		if not ok:
 			bad.append("%s (%s)" % [id, kind])
-	_check("for_station: right panel for each of the 21 stations (9 + 12 sun trackers), suit rack included", count == 21 and bad.is_empty(),
+	_check("for_station: right panel for every station (21 base + those added by data files), suit rack included", count == 21 and bad.is_empty(),
 		"%d stations, wrong: %s" % [count, ", ".join(bad)])
 
 
@@ -201,9 +204,10 @@ func _test_upgrades() -> void:
 		sectors[String(extra.get("sector", ""))] = true
 		fields_ok = fields_ok and d is UpgradeDefinition and d.id != &"" and not d.title.is_empty() and not d.zone.is_empty() and d.cost_parts > 0 \
 			and UpgradeCardsPanel.SECTORS.has(String(extra.get("sector", ""))) and not String(extra.get("effect", "")).is_empty() \
-			and bool(extra.get("placeholder", false))
-	_check("upgrade cards load into UpgradeDefinition (6 to 8, all five sectors, placeholder)", up.definitions.size() >= 6 and up.definitions.size() <= 8
-		and fields_ok and sectors.size() == 5 and up.note.contains("PLACEHOLDER"), "%d cards, sectors %s" % [up.definitions.size(), sectors.keys()])
+			and not d.questions.is_empty() and not d.evidence.is_empty() and d.install_station != &""
+	# Prompt 08: the real catalogue (16 cards) replaced the 8 placeholder cards.
+	_check("upgrade cards load into UpgradeDefinition (16 cards, all five sectors)", up.definitions.size() == 16
+		and fields_ok and sectors.size() == 5 and not up.note.is_empty(), "%d cards, sectors %s" % [up.definitions.size(), sectors.keys()])
 
 	var bad := PackedStringArray()
 	for i in up.definitions.size():
@@ -213,15 +217,16 @@ func _test_upgrades() -> void:
 		var b := up.install_buttons[i]
 		if not cost.contains("Needs %d parts — the colony has %d" % [d.cost_parts, st.parts]):
 			bad.append("%s cost '%s'" % [d.id, cost])
-		if not reason.contains(UpgradeCardsPanel.LATER_REASON):
+		if not reason.begins_with("Locked:"):
 			bad.append("%s reason '%s'" % [d.id, reason])
-		if not b.disabled or not b.tooltip_text.contains(UpgradeCardsPanel.LATER_REASON) or not b.visible:
+		if not b.disabled or b.tooltip_text.is_empty() or not b.visible:
 			bad.append("%s install button" % d.id)
 	_check("cards show cost vs parts, the locked reason, and a disabled install button", bad.is_empty(), "; ".join(bad))
-	var brushes := up.reason_label(&"panel_brushes").text
-	var racks := up.reason_label(&"plant_racks").text
-	_check("locked reasons in words: not enough parts, needs another upgrade first", up.cost_label(&"panel_brushes").text.begins_with("!")
-		and brushes.contains("Not enough parts yet.") and racks.contains("First needs: Brighter grow lights."), "%s | %s" % [brushes, racks])
+	var tracking := up.reason_label(&"energy_solar_tracking").text
+	var automation := up.reason_label(&"energy_cleaner_automation").text
+	_check("locked reasons in words: sector level, questions to answer, things to do", up.cost_label(&"energy_solar_tracking").text.begins_with("✓")
+		and tracking.contains("Energy level 1 needed") and tracking.contains("Answer: ") and automation.contains("Energy level 2 needed")
+		and automation.contains("Do: "), "%s | %s" % [tracking, automation])
 
 	# Keyboard: focus starts on the first card and arrow keys move between cards.
 	var first := up.first_focus()
@@ -235,7 +240,7 @@ func _test_upgrades() -> void:
 	await process_frame
 	var moved_back := up.install_buttons[0].has_focus()
 	_check("keyboard focus moves between the cards", first == up.install_buttons[0] and started and moved_right and moved_back,
-		"started %s, right %s, back %s, columns %d" % [started, moved_right, moved_back, (up.install_buttons[0].get_parent().get_parent().get_parent() as GridContainer).columns])
+		"started %s, right %s, back %s" % [started, moved_right, moved_back])
 	up.queue_free()
 	await process_frame
 

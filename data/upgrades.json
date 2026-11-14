@@ -1,111 +1,210 @@
 {
-	"schema": 1,
-	"note": "PLACEHOLDER CARDS for the UI; the real catalogue comes with the upgrade milestone.",
-	"numbers": "Every cost and tier here is game balance, not a NASA figure.",
+	"schema": 2,
+	"note": "Prompt 08 upgrade catalogue: 16 cards in five sectors. Loaded by ProgressionSystem.cards() into UpgradeDefinition.",
+	"numbers": "Every parts cost, tier and effect size here is game balance (ProgressionBalance), not a NASA figure. Mechanisms name their source id in docs/source_register.md.",
+	"tier_rule": "Per sector: tier 0 unfamiliar; tier 1 = a guided task done and its explanation question answered; tier 2 = a diagnosis in a changed example (a different situation from the guided one) plus the next practical evidence; tier 3 = a transfer to new operating conditions or a controlled comparison. Tiers are shared colony progress and never go down.",
+	"sectors": {
+		"energy": {
+			"name": "Energy", "symbol": "⚡", "installer": "electrical_comms",
+			"tiers": [
+				{"tier": 1, "words": "Guided task: fixed dusty panels and explained why they gave less power", "evidence": ["energy_diagnose_output_loss"], "questions": ["energy_q_dust_output"]},
+				{"tier": 2, "words": "Diagnosed a power loss in a changed example and predicted the battery from the readings", "evidence": ["energy_predict_net_power"], "diagnosis": "energy_q_diagnose"},
+				{"tier": 3, "words": "Checked the fix worked and planned for a dust storm (new conditions)", "evidence": ["energy_verify_recovery"], "questions": ["energy_q_storm"]}
+			]
+		},
+		"life_support": {
+			"name": "Life support", "symbol": "✚", "installer": "medical_life_support",
+			"tiers": [
+				{"tier": 1, "words": "Guided task: ran both oxygen makers and explained which one needs water", "evidence": ["ls_distinguish_inputs"], "questions": ["ls_q_two_paths"]},
+				{"tier": 2, "words": "Diagnosed an oxygen problem in a changed example and told the tanks from the cabin air", "evidence": ["ls_storage_vs_pressure"], "diagnosis": "ls_q_diagnose"},
+				{"tier": 3, "words": "Brought CO2 back down and planned for more crew (new conditions)", "evidence": ["ls_co2_removal"], "questions": ["ls_q_more_crew"]}
+			]
+		},
+		"food": {
+			"name": "Food", "symbol": "❀", "installer": "biology_food",
+			"tiers": [
+				{"tier": 1, "words": "Guided task: inspected a plant symptom and explained its cause", "evidence": ["food_compare_symptom"], "questions": ["food_q_symptom"]},
+				{"tier": 2, "words": "Diagnosed a symptom in a changed example and changed exactly one input", "evidence": ["food_adjust_one_cause"], "diagnosis": "food_q_diagnose"},
+				{"tier": 3, "words": "Saw the bed respond and used what you learned on another crop (new conditions)", "evidence": ["food_observe_response"], "questions": ["food_q_new_crop"]}
+			]
+		},
+		"resources": {
+			"name": "Resources and making things", "symbol": "⚙", "installer": "field_engineering_geology",
+			"tiers": [
+				{"tier": 1, "words": "Guided task: inspected a salvage donor and chose the compatible part", "evidence": ["res_identify_compatible"], "questions": ["res_q_compatible"]},
+				{"tier": 2, "words": "Judged a part in a changed example and passed a bench test", "evidence": ["res_assembly_test"], "diagnosis": "res_q_diagnose"},
+				{"tier": 3, "words": "Planned salvage from a new wreck (new conditions)", "evidence": ["res_assembly_test"], "questions": ["res_q_new_donor"]}
+			]
+		},
+		"science": {
+			"name": "Science", "symbol": "✦", "installer": "",
+			"tiers": [
+				{"tier": 1, "words": "Guided task: took a field sample with its site, time and conditions", "evidence": ["sci_record_context"], "questions": ["sci_q_context"]},
+				{"tier": 2, "words": "Read an odd result in a changed example and compared with a reference and a control", "evidence": ["sci_compare_controls"], "diagnosis": "sci_q_diagnose"},
+				{"tier": 3, "words": "Applied a lab result to a real colony setting and checked it (controlled comparison)", "evidence": ["sci_apply_result"], "questions": ["sci_q_apply"]}
+			]
+		}
+	},
+	"evidence": {
+		"energy_predict_net_power": {"sector": "energy", "words": "Predict the battery from the readings (question at the power panel)"},
+		"energy_diagnose_output_loss": {"sector": "energy", "words": "Clean a dusty panel or repair the cleaner while the panels give less than 80 % of their clean power"},
+		"energy_verify_recovery": {"sector": "energy", "words": "See the panels back above 95 % of their clean power within a sol of that fix"},
+		"ls_distinguish_inputs": {"sector": "life_support", "words": "Run the electrolyser and the CO2-oxygen unit for at least one hour each"},
+		"ls_co2_removal": {"sector": "life_support", "words": "Bring cabin CO2 back below the warning level after it rose"},
+		"ls_storage_vs_pressure": {"sector": "life_support", "words": "Explain oxygen tanks vs cabin pressure (question at the life-support console)"},
+		"food_compare_symptom": {"sector": "food", "words": "Inspect a plant symptom and read the measurement that proves it"},
+		"food_adjust_one_cause": {"sector": "food", "words": "Change exactly one input on a bed that shows a symptom"},
+		"food_observe_response": {"sector": "food", "words": "See that bed grow faster after the change"},
+		"res_identify_compatible": {"sector": "resources", "words": "Inspect a salvage donor and choose the compatible part"},
+		"res_assembly_test": {"sector": "resources", "words": "Refurbish a component that passes its bench test"},
+		"sci_record_context": {"sector": "science", "words": "Take a field sample with its site, time and conditions"},
+		"sci_compare_controls": {"sector": "science", "words": "Compare the sample with the reference and a control in the lab"},
+		"sci_apply_result": {"sector": "science", "words": "Apply a lab result to a real colony setting"}
+	},
 	"cards": [
 		{
-			"id": "oxygen_maker_2",
-			"title": "Bigger oxygen maker",
-			"sector": "health_life_support",
-			"zone": "Life Support",
-			"tier": 1,
-			"cost_parts": 4,
-			"prerequisites": [],
-			"specialty": "medical_life_support",
-			"effect": "Makes more oxygen from water each sol, but uses more electricity.",
-			"question": "How can a colony make the air it breathes?",
-			"placeholder": true
+			"id": "energy_battery_reserve", "title": "Battery reserve for life support", "sector": "energy", "tier": 1,
+			"function": "Adds battery modules and a guard: room lights and greenhouse lights can no longer use the last part of the battery, so the air and water machines keep running through a long night.",
+			"effect": "Battery capacity +25 % (800 → 1000 kWh). The last 20 % of the battery is kept for life support: lights are switched off first when only the reserve is left.",
+			"questions": ["energy_q_battery_night", "energy_q_net_power"], "evidence": ["energy_predict_net_power"],
+			"cost_parts": 3, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power", "zone": "Power Room",
+			"effect_owner": "G", "automation": false, "source_ids": [],
+			"source_labels": ["Game balance: battery size and reserve share (fiction 2080 battery bank).", "Physics: no sunlight at night, so night power must be stored."]
 		},
 		{
-			"id": "health_scanner",
-			"title": "Health scanner",
-			"sector": "health_life_support",
-			"zone": "Med Bay",
-			"tier": 1,
-			"cost_parts": 3,
-			"prerequisites": [],
-			"specialty": "medical_life_support",
-			"effect": "Shows how each crew member is doing before they feel ill.",
-			"question": "What does living on Mars do to the body?",
-			"placeholder": true
+			"id": "energy_solar_tracking", "title": "Better sun tracking", "sector": "energy", "tier": 1,
+			"function": "Tunes the tracker motors so they follow the sun more exactly and use less power doing it.",
+			"effect": "Tracker drives use half the power (0.6 → 0.3 kW) and tracking panels give 10 % more power.",
+			"questions": ["energy_q_tracking", "energy_q_dust_output"], "evidence": ["energy_diagnose_output_loss"],
+			"cost_parts": 2, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power", "zone": "Power Room",
+			"effect_owner": "G", "automation": false, "source_ids": [],
+			"source_labels": ["Physics: a panel facing the sun catches more light.", "Game balance: the size of the gain and the motor power."]
 		},
 		{
-			"id": "grow_lights",
-			"title": "Brighter grow lights",
-			"sector": "food_production",
-			"zone": "Greenhouse",
-			"tier": 1,
-			"cost_parts": 4,
-			"prerequisites": [],
-			"specialty": "biology_food",
-			"effect": "Plants grow more food each sol, but the lights use more electricity.",
-			"question": "How much light do plants need to grow?",
-			"placeholder": true
+			"id": "energy_cleaner_automation", "title": "Self-repairing panel cleaner", "sector": "energy", "tier": 2,
+			"function": "Gives the panel cleaner a spare drive and a self-test, so it fixes itself instead of waiting for a repair trip.",
+			"effect": "If the cleaner breaks, it repairs itself after one sol and keeps wiping the panels at sunrise. The repair chore goes away.",
+			"questions": ["energy_q_cleaner", "energy_q_diagnose"], "evidence": ["energy_verify_recovery"],
+			"cost_parts": 4, "specialty": "electrical_comms", "install_station": "pw_panel", "install_kind": "power", "zone": "Power Room",
+			"effect_owner": "G", "automation": true, "source_ids": [],
+			"source_labels": ["Game balance: one sol to self-repair.", "Simplified: Mars dust on panels is real (see the dust note in the register); a self-repairing cleaner is fiction 2080 equipment."]
 		},
 		{
-			"id": "plant_racks",
-			"title": "More plant racks",
-			"sector": "food_production",
-			"zone": "Greenhouse",
-			"tier": 2,
-			"cost_parts": 6,
-			"prerequisites": ["grow_lights"],
-			"specialty": "biology_food",
-			"effect": "Room for more plants, so the greenhouse makes more meals.",
-			"question": "Which plants give the most food for the space they take?",
-			"placeholder": true
+			"id": "ls_water_reliability", "title": "Reliable water recycler", "sector": "life_support", "tier": 1,
+			"function": "Adds a second filter stage and a pump service kit to the water recycler.",
+			"effect": "The recycler cleans 1 L more wastewater per hour (3 → 4 L/h) and its condition never drops below 0.8, so its water stays clean enough for the electrolyser.",
+			"questions": ["ls_q_recycler", "ls_q_two_paths"], "evidence": ["ls_distinguish_inputs"],
+			"cost_parts": 2, "specialty": "medical_life_support", "install_station": "ls_console", "install_kind": "lifesupport", "zone": "Life Support",
+			"effect_owner": "G", "automation": false, "source_ids": ["S08"],
+			"source_labels": ["ISS analog (S08): water recovery of about 90 percent.", "Game balance: the extra litre per hour and the condition floor."]
 		},
 		{
-			"id": "parts_printer",
-			"title": "Parts printer",
-			"sector": "resources_manufacturing",
-			"zone": "Hangar bay",
-			"tier": 1,
-			"cost_parts": 5,
-			"prerequisites": [],
-			"specialty": "field_engineering_geology",
-			"effect": "Turns broken parts and scrap into new spare parts.",
-			"question": "What can we make from things we already have?",
-			"placeholder": true
+			"id": "ls_electrolysis", "title": "Stronger electrolyser", "sector": "life_support", "tier": 1,
+			"function": "Adds more cell stacks to the electrolyser that splits water into oxygen and hydrogen.",
+			"effect": "Up to 50 % more oxygen per hour (0.2 → 0.3 kg/h) at the same 6 kWh per kg. It still uses 1.126 L of water per kg of oxygen, so it needs more feed water when it runs flat out.",
+			"questions": ["ls_q_electrolysis", "ls_q_two_paths"], "evidence": ["ls_distinguish_inputs"],
+			"cost_parts": 3, "specialty": "medical_life_support", "install_station": "ls_console", "install_kind": "lifesupport", "zone": "Life Support",
+			"effect_owner": "G", "automation": false, "source_ids": ["S08"],
+			"source_labels": ["ISS analog (S08): oxygen made by electrolysis of water.", "Physics: 1.126 L of water per kg of oxygen.", "Game balance: the output and the energy per kg."]
 		},
 		{
-			"id": "battery_bank",
-			"title": "Extra battery bank",
-			"sector": "energy",
-			"zone": "Power Room",
-			"tier": 1,
-			"cost_parts": 6,
-			"prerequisites": [],
-			"specialty": "electrical_comms",
-			"effect": "Stores more electricity for the night.",
-			"question": "Why does a solar colony need batteries?",
-			"placeholder": true
+			"id": "ls_co2_processing", "title": "Bigger CO2-oxygen unit", "sector": "life_support", "tier": 2,
+			"function": "Adds a second processing core to the unit that takes oxygen from the carbon dioxide in the Mars air.",
+			"effect": "Up to 50 % more oxygen per hour (0.15 → 0.225 kg/h) at the same 20 kWh per kg. It still needs no water.",
+			"questions": ["ls_q_moxie", "ls_q_diagnose"], "evidence": ["ls_storage_vs_pressure"],
+			"cost_parts": 4, "specialty": "medical_life_support", "install_station": "ls_console", "install_kind": "lifesupport", "zone": "Life Support",
+			"effect_owner": "G", "automation": false, "source_ids": ["S09"],
+			"source_labels": ["Technology demonstration on Mars (S09, MOXIE): oxygen from atmospheric CO2, best 12 g per hour.", "Fiction scaled from S09: a colony-size unit and its upgrade."]
 		},
 		{
-			"id": "panel_brushes",
-			"title": "Solar panel dust brushes",
-			"sector": "energy",
-			"zone": "Power Room",
-			"tier": 2,
-			"cost_parts": 12,
-			"prerequisites": ["battery_bank"],
-			"specialty": "electrical_comms",
-			"effect": "Keeps dust off the solar panels so they give more power.",
-			"question": "What does Mars dust do to solar panels?",
-			"placeholder": true
+			"id": "ls_oxygen_monitoring", "title": "Oxygen and cabin-air monitor", "sector": "life_support", "tier": 2,
+			"function": "Adds sensors and a forecast screen for the oxygen tanks and the cabin air.",
+			"effect": "Warnings come earlier and say how long is left: oxygen reserve warning at 30 kg instead of 20 kg, cabin oxygen at 20 kPa instead of 19 kPa, CO2 at 0.4 kPa instead of 0.5 kPa, and an oxygen forecast line on the screen. The air itself does not change.",
+			"questions": ["ls_q_tank_vs_cabin", "ls_q_co2"], "evidence": ["ls_co2_removal", "ls_storage_vs_pressure"],
+			"cost_parts": 3, "specialty": "medical_life_support", "install_station": "ls_console", "install_kind": "lifesupport", "zone": "Life Support",
+			"effect_owner": "G", "automation": false, "source_ids": ["S08"],
+			"source_labels": ["Physics: partial pressure from the ideal gas law.", "Game balance: the warning levels."]
 		},
 		{
-			"id": "rock_lab",
-			"title": "Rock lab bench",
-			"sector": "science_research",
-			"zone": "Command Room",
-			"tier": 1,
-			"cost_parts": 3,
-			"prerequisites": [],
-			"specialty": "field_engineering_geology",
-			"effect": "Lets the crew study the rocks they bring back.",
-			"question": "What can rocks tell us about water on Mars long ago?",
-			"placeholder": true
+			"id": "food_irrigation_reliability", "title": "Reliable irrigation", "sector": "food", "tier": 1,
+			"function": "Adds drip lines and a level sensor to every bed.",
+			"effect": "Beds never dry out while water is allocated to the greenhouse.",
+			"questions": ["food_q_water", "food_q_symptom"], "evidence": ["food_compare_symptom"],
+			"cost_parts": 2, "specialty": "biology_food", "install_station": "gh_console", "install_kind": "food", "zone": "Greenhouse",
+			"effect_owner": "F", "automation": true, "source_ids": ["S11"],
+			"source_labels": ["ISS analog (S11): plants grown in Veggie need water delivered to the roots.", "Game balance: bed water levels."]
+		},
+		{
+			"id": "food_nutrient_metering", "title": "Nutrient metering", "sector": "food", "tier": 1,
+			"function": "Adds a meter and a dosing pump for plant nutrients.",
+			"effect": "The nutrient level of every bed is held in the good band automatically.",
+			"questions": ["food_q_one_change", "food_q_symptom"], "evidence": ["food_adjust_one_cause"],
+			"cost_parts": 2, "specialty": "biology_food", "install_station": "gh_console", "install_kind": "food", "zone": "Greenhouse",
+			"effect_owner": "F", "automation": true, "source_ids": ["S11"],
+			"source_labels": ["ISS analog (S11).", "Game balance: the nutrient band.", "No source yet for fertilizer amounts (register section 10)."]
+		},
+		{
+			"id": "food_scheduled_care", "title": "Scheduled plant care", "sector": "food", "tier": 2,
+			"function": "Adds timers to the grow lights and the watering.",
+			"effect": "Grow lights and watering run on a schedule with no player action.",
+			"questions": ["food_q_light", "food_q_diagnose"], "evidence": ["food_observe_response"],
+			"cost_parts": 3, "specialty": "biology_food", "install_station": "gh_console", "install_kind": "food", "zone": "Greenhouse",
+			"effect_owner": "F", "automation": true, "source_ids": ["S11"],
+			"source_labels": ["ISS analog (S11): Veggie runs lights on a schedule.", "Game balance: the schedule."]
+		},
+		{
+			"id": "res_salvage_inspection", "title": "Salvage scanner", "sector": "resources", "tier": 1,
+			"function": "A hand scanner that reads size, voltage and type labels on salvage.",
+			"effect": "Inspecting a donor shows every compatible part at once.",
+			"questions": ["res_q_compatible", "res_q_matter"], "evidence": ["res_identify_compatible"],
+			"cost_parts": 2, "specialty": "field_engineering_geology", "install_station": "hg_control_board", "install_kind": "workbench", "zone": "Hangar bay",
+			"effect_owner": "S", "automation": false, "source_ids": [],
+			"source_labels": ["Game balance and fiction 2080 equipment.", "Rule kept: nothing is made from nothing."]
+		},
+		{
+			"id": "res_component_refurbishment", "title": "Refurbishing jig", "sector": "resources", "tier": 1,
+			"function": "A jig and tool set for the workbench.",
+			"effect": "Refurbishing takes less time and recovers one more part from a donor.",
+			"questions": ["res_q_bench_test", "res_q_matter"], "evidence": ["res_assembly_test"],
+			"cost_parts": 2, "specialty": "field_engineering_geology", "install_station": "hg_control_board", "install_kind": "workbench", "zone": "Hangar bay",
+			"effect_owner": "S", "automation": false, "source_ids": [],
+			"source_labels": ["Game balance and fiction 2080 equipment."]
+		},
+		{
+			"id": "res_repeat_assembly", "title": "Assembly records", "sector": "resources", "tier": 2,
+			"function": "Keeps a tested record of every component type assembled at the bench.",
+			"effect": "A component type assembled before needs no bench test again.",
+			"questions": ["res_q_bench_test", "res_q_diagnose"], "evidence": ["res_assembly_test"],
+			"cost_parts": 3, "specialty": "field_engineering_geology", "install_station": "hg_control_board", "install_kind": "workbench", "zone": "Hangar bay",
+			"effect_owner": "S", "automation": true, "source_ids": [],
+			"source_labels": ["Game balance and fiction 2080 equipment."]
+		},
+		{
+			"id": "sci_instrument_calibration", "title": "Instrument calibration", "sector": "science", "tier": 1,
+			"function": "Calibration standards for the lab instrument.",
+			"effect": "Lab results carry a smaller uncertainty.",
+			"questions": ["sci_q_uncertainty", "sci_q_context"], "evidence": ["sci_record_context"],
+			"cost_parts": 2, "specialty": "", "install_station": "mb_glovebox", "install_kind": "lab", "zone": "Med Bay",
+			"effect_owner": "S", "automation": false, "source_ids": ["S06"],
+			"source_labels": ["Mission and instrument provenance only (S06, MSL CheMin, PARTIAL).", "Any mineral value in the lab is illustrative, not from the archive."]
+		},
+		{
+			"id": "sci_sample_comparison", "title": "Second reference sample", "sector": "science", "tier": 1,
+			"function": "A second reference sample for the lab.",
+			"effect": "A second reference sample becomes available for comparisons.",
+			"questions": ["sci_q_reference", "sci_q_control"], "evidence": ["sci_record_context"],
+			"cost_parts": 2, "specialty": "", "install_station": "mb_glovebox", "install_kind": "lab", "zone": "Med Bay",
+			"effect_owner": "S", "automation": false, "source_ids": ["S06", "S07"],
+			"source_labels": ["Mission and instrument provenance only (S06, S07, PARTIAL).", "Any mineral value in the lab is illustrative, not from the archive."]
+		},
+		{
+			"id": "sci_evidence_settings", "title": "Evidence-based settings", "sector": "science", "tier": 2,
+			"function": "Links the lab's result sheet to the greenhouse and equipment controls.",
+			"effect": "Lab results can be applied directly to crop and equipment settings.",
+			"questions": ["sci_q_control", "sci_q_diagnose"], "evidence": ["sci_compare_controls"],
+			"cost_parts": 3, "specialty": "", "install_station": "mb_glovebox", "install_kind": "lab", "zone": "Med Bay",
+			"effect_owner": "S, F", "automation": false, "source_ids": [],
+			"source_labels": ["Game balance.", "A lab result is a model value in this game, not a measurement of the fictional map."]
 		}
 	]
 }

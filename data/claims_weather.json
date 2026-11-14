@@ -1,0 +1,102 @@
+{
+ "schema": 1,
+ "note": "Claims the weather screens show (Prompt 09). Archive claims cite the W entries in data/sources_weather.json; numbers are read from the bundle products in data/weather/bundle (built by tools/weather/build_bundle.py). game_time and balance claims describe what the game changes and have no source.",
+ "claims": [
+  {
+   "id": "weather_data_origin",
+   "title": "Where the weather comes from",
+   "text": "The weather in the game comes from real measurements made at Jezero crater on Mars by NASA's Perseverance rover and by a spacecraft orbiting Mars, between 2019 and 2022.",
+   "source_ids": ["W01", "W02", "W03", "W09", "W10", "W11"],
+   "category": "archive",
+   "note": "Perseverance MEDA products for mission sols 289, 313, 317 and 579 (Dec 2021 to Oct 2022); dust optical depth from the LMD dust climatology built from Mars Reconnaissance Orbiter MCS retrievals, Mars years 35 and 36 (Mar 2019 to Dec 2022). Jezero crater is a real place, not the colony."
+  },
+  {
+   "id": "weather_not_forecast",
+   "title": "Old measurements, played faster",
+   "text": "The weather screen shows old measurements from Jezero crater, played faster. It is not live weather and not a forecast for this colony.",
+   "source_ids": [],
+   "category": "game_time",
+   "note": "Archive observation dates are shown next to game time. Checking for archive updates never changes the weather of a running game."
+  },
+  {
+   "id": "weather_dust_tau",
+   "title": "Measuring dust in the air",
+   "text": "Dust in the air is measured as optical depth. Over Jezero it was about 0.2 on clear days and rose to about 2 in a big dust storm in October 2022.",
+   "source_ids": ["W10", "W12"],
+   "category": "archive",
+   "note": "Visible-equivalent column optical depth = 2.6 x the LMD 9.3 micron absorption value (factor from the LMD page), interpolated to Jezero. Mars year 36 range 0.20 to 2.03; the peak map is dated 5 Oct 2022 (Ls 316). Kriged maps, so this is worked out from orbital measurements, not measured at the rover."
+  },
+  {
+   "id": "weather_storm_jan2022",
+   "title": "A dust storm reaches Jezero",
+   "text": "In early January 2022 a dust storm reached Jezero. In a few sols the dust optical depth there went from about 0.3 to about 0.8.",
+   "source_ids": ["W10"],
+   "category": "archive",
+   "note": "LMD Mars year 36 maps at Jezero: 0.30 on 3 Jan 2022 (Ls 152.0), 0.81 on 8 Jan 2022 (Ls 155.2), back to 0.44 by 12 Jan. Episode jezero_my36_ls155 in the bundle."
+  },
+  {
+   "id": "weather_wind_sensor",
+   "title": "A wind sensor hurt by the weather",
+   "text": "Harsh weather damaged parts of Perseverance's wind sensor. The archive has no wind measurements after sol 315, in January 2022.",
+   "source_ids": ["W11", "W05"],
+   "category": "archive",
+   "note": "MEDA release notes, section B.4. The derived wind collection lists sols 36 to 315. Most dust events in the game therefore have no measured wind."
+  },
+  {
+   "id": "weather_pressure",
+   "title": "Air pressure at Jezero",
+   "text": "Air pressure at Jezero changes with the seasons. It averaged about 628 pascals on a sol in December 2021 and about 736 pascals on a sol in October 2022.",
+   "source_ids": ["W01", "W08"],
+   "category": "archive",
+   "note": "Means of the measured 1 Hz derived pressure on mission sols 289 (Ls 140.6) and 579 (Ls 316.5). MEDA measures about half of each sol, so these are averages of the measured hours."
+  },
+  {
+   "id": "weather_temperature",
+   "title": "Cold nights, cool afternoons",
+   "text": "On a clear sol in December 2021 the air at Jezero was about 196 K (-77 °C) before dawn and about 256 K (-17 °C) in the afternoon.",
+   "source_ids": ["W03"],
+   "category": "archive",
+   "note": "10-minute averages of the median of the three mast air temperature sensors, mission sol 289; coldest near 05 h and warmest near 15 h local mean solar time."
+  },
+  {
+   "id": "weather_wind_speed",
+   "title": "Wind at Jezero",
+   "text": "On a clear sol in December 2021 the wind at Jezero blew at about 3 m/s on average, with gusts up to about 16 m/s.",
+   "source_ids": ["W02"],
+   "category": "archive",
+   "note": "Mean and largest 1 Hz derived horizontal wind speed on mission sol 289 (measured hours only, rover still)."
+  },
+  {
+   "id": "weather_episode_source",
+   "title": "Dust events copied from real ones",
+   "text": "Each dust event in the game copies the rise and fall of a real dust event seen over Jezero between 2020 and 2022.",
+   "source_ids": ["W09", "W10"],
+   "category": "archive",
+   "note": "Nine episodes: periods when the optical depth over Jezero rose at least 0.35 above the usual sky for that season (data/weather/bundle/episodes.json)."
+  },
+  {
+   "id": "weather_game_speed",
+   "title": "Storms come faster in the game",
+   "text": "In the game, dust events come sooner and closer together than they did at Jezero, and they last minutes instead of weeks. That is a game change, not how often storms happen on Mars.",
+   "source_ids": [],
+   "category": "game_time",
+   "note": "Gaps, durations and strength are scaled from the observed episodes by the game. They are a game transformation and say nothing about real storm frequency."
+  },
+  {
+   "id": "weather_severity_balance",
+   "title": "Ready colonies see stronger storms",
+   "text": "How strong a dust event can get in the game depends on how ready the colony is: battery charge, a working panel cleaner and clean panels. That rule is game balance, not NASA data.",
+   "source_ids": [],
+   "category": "balance",
+   "note": "The first event is always a small one, and only after the crew has learned to clean panels."
+  },
+  {
+   "id": "weather_solar_formula",
+   "title": "Dust and solar power in the game",
+   "text": "The game turns dust optical depth into less solar power with a simple game rule. It is game balance, not a measurement of real panels.",
+   "source_ids": [],
+   "category": "balance",
+   "note": "Atmosphere term exp(-0.6 x (tau - 0.5)) from docs/MODEL_P07.md; the episodes' solar_factor_at_peak uses the same rule."
+  }
+ ]
+}

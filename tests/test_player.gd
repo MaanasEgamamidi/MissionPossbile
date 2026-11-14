@@ -40,6 +40,7 @@ func _initialize() -> void:
 	await _test_cameras()
 	await _test_authority()
 	await _test_visual()
+	_test_crew_looks()
 	_check("position reported every physics frame", _reports > 100 and _reported_position.distance_to(_player.global_position) < 0.001)
 	_world.queue_free()
 	await process_frame
@@ -517,6 +518,214 @@ func _test_visual() -> void:
 	_player.set_physics_process(true)
 	await _frames(2)
 
+## A small mesh with the given surface materials (named like the imported ones) and, optionally, a "Feminine" shape.
+func _look_mesh(part_name: String, materials: Array[String], feminine: bool) -> MeshInstance3D:
+	var mesh := ArrayMesh.new()
+	if feminine:
+		mesh.add_blend_shape(&"Feminine")
+	for material_name: String in materials:
+		var arrays := []
+		arrays.resize(Mesh.ARRAY_MAX)
+		arrays[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3.ZERO, Vector3.RIGHT, Vector3.UP])
+		var shapes := []
+		if feminine:
+			var shape := []
+			shape.resize(Mesh.ARRAY_MAX)
+			shape[Mesh.ARRAY_VERTEX] = PackedVector3Array([Vector3.ZERO, Vector3.RIGHT * 0.9, Vector3.UP * 0.9])
+			shapes.append(shape)
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays, shapes)
+		var material := StandardMaterial3D.new()
+		material.resource_name = material_name
+		material.albedo_color = Color.WHITE
+		mesh.surface_set_material(mesh.get_surface_count() - 1, material)
+	var part := MeshInstance3D.new()
+	part.name = part_name
+	part.mesh = mesh
+	return part
+
+## The surface override of `part` whose imported material is called `material_name`, or null.
+func _override_of(part: MeshInstance3D, material_name: String) -> Material:
+	for surface: int in part.mesh.get_surface_count():
+		if part.mesh.surface_get_material(surface).resource_name == material_name:
+			return part.get_surface_override_material(surface)
+	return null
+
+func _test_crew_looks() -> void:
+	# Synthetic stand-in for the astronaut model the Blender agent is building: hair meshes, the "Feminine" shape,
+	# Mat_Skin / Mat_Hair / Mat_Ident / Mat_IdentDark surfaces.
+	var model := Node3D.new()
+	var parts: Array[MeshInstance3D] = [
+		_look_mesh("Body_Head", ["Mat_Skin", "Mat_Hair"], true), _look_mesh("Body_Torso", ["Mat_Skin"], true),
+		_look_mesh("Suit_Helmet", ["Mat_SuitWhite", "Mat_Ident"], false), _look_mesh("Suit_Torso", ["Mat_SuitWhite", "Mat_Ident", "Mat_IdentDark"], true)]
+	for hair_name: String in ["Hair_Ponytail", "Hair_Curly", "Hair_Bob", "Hair_Buzz", "Hair_Beard", "HairIn_Ponytail", "HairIn_Curly", "HairIn_Bob", "HairIn_Buzz"]:
+		parts.append(_look_mesh(hair_name, ["Mat_Hair"], false))
+	for ident_name: String in ["Ident_Symbol_Triangle", "Ident_Symbol_Plus", "Ident_Symbol_Circle", "Ident_Symbol_Diamond", "Ident_Band_Solid", "Ident_Band_Double", "Ident_Band_Dots", "Ident_Band_Chevron"]:
+		parts.append(_look_mesh(ident_name, ["Mat_Ident"], false))
+	for part: MeshInstance3D in parts:
+		model.add_child(part)
+		part.owner = model
+	var packed := PackedScene.new()
+	packed.pack(model)
+	model.free()
+	var a := PlayerVisual.new()
+	var b := PlayerVisual.new()
+	_world.add_child(a)
+	_world.add_child(b)
+	a.set_model(packed)
+	b.set_model(packed)
+	a.set_suit(false)
+	b.set_suit(false)
+	a.set_crew_identity(0)
+	b.set_crew_identity(3)
+	var shown := func(v: PlayerVisual) -> Array[String]:
+		var out: Array[String] = []
+		for hair: Node in v.find_children("Hair*", "MeshInstance3D", true, false) + v.find_children("Ident_*", "MeshInstance3D", true, false):
+			if (hair as Node3D).visible:
+				out.append(String(hair.name))
+		out.sort()
+		return out
+	_check("looks: each crew member shows only their own hair", shown.call(a) == ["Hair_Ponytail"] and shown.call(b) == ["Hair_Beard", "Hair_Buzz"], "%s / %s" % [shown.call(a), shown.call(b)])
+	a.set_crew_identity(1)
+	var curly: Array[String] = shown.call(a)
+	a.set_crew_identity(2)
+	_check("looks: changing identity swaps the hair", curly == ["Hair_Curly"] and shown.call(a) == ["Hair_Bob"])
+	a.set_suit(true)
+	var suited_hair: Array[String] = shown.call(a)
+	a.set_suit(false)
+	b.set_suit(true)
+	var suited_b: Array[String] = shown.call(b)
+	b.set_suit(false)
+	_check("looks: suited shows the in-helmet hair (beard stays), the crew's own symbol and band", suited_hair == ["HairIn_Bob", "Ident_Band_Dots", "Ident_Symbol_Circle"]
+		and suited_b == ["HairIn_Buzz", "Hair_Beard", "Ident_Band_Chevron", "Ident_Symbol_Diamond"] and shown.call(a) == ["Hair_Bob"], "%s / %s" % [suited_hair, suited_b])
+	a.set_first_person(true)
+	var fp_ok := true
+	for hair: Node in a.find_children("Hair*", "MeshInstance3D", true, false):
+		fp_ok = fp_ok and (hair as GeometryInstance3D).cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_SHADOWS_ONLY
+	var a_torso := a.find_child("Body_Torso", true, false) as MeshInstance3D
+	fp_ok = fp_ok and a_torso.cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	a.set_first_person(false)
+	var hair_drawn := (a.find_child("Hair_Bob", true, false) as GeometryInstance3D).cast_shadow == GeometryInstance3D.SHADOW_CASTING_SETTING_ON
+	_check("looks: hair is hidden from the first-person camera like the head", fp_ok and hair_drawn)
+	var fem := func(v: PlayerVisual, part_name: String) -> float:
+		var mi := v.find_child(part_name, true, false) as MeshInstance3D
+		return mi.get_blend_shape_value(mi.find_blend_shape_by_name(&"Feminine"))
+	_check("looks: Feminine shape follows the identity on body and suit", is_equal_approx(fem.call(a, "Body_Head"), 1.0) and is_equal_approx(fem.call(a, "Suit_Torso"), 1.0)
+		and is_equal_approx(fem.call(b, "Body_Head"), 0.0) and is_equal_approx(fem.call(b, "Body_Torso"), 0.0))
+	var a_head := a.find_child("Body_Head", true, false) as MeshInstance3D
+	var b_head := b.find_child("Body_Head", true, false) as MeshInstance3D
+	var a_skin := _override_of(a_head, "Mat_Skin") as StandardMaterial3D
+	var b_skin := _override_of(b_head, "Mat_Skin") as StandardMaterial3D
+	var a_hair := _override_of(a_head, "Mat_Hair") as StandardMaterial3D
+	var b_hair := _override_of(b_head, "Mat_Hair") as StandardMaterial3D
+	var imported := a_head.mesh.surface_get_material(0) as StandardMaterial3D
+	_check("looks: skin and hair are per-body copies in the crew's colours", a_skin != null and b_skin != null and a_skin != b_skin and a_hair != b_hair
+		and a_skin.albedo_color.is_equal_approx(CrewLooks.look(2).skin_color) and b_skin.albedo_color.is_equal_approx(CrewLooks.look(3).skin_color)
+		and b_hair.albedo_color.is_equal_approx(CrewLooks.look(3).hair_color) and imported.albedo_color == Color.WHITE
+		and (_override_of(a_torso, "Mat_Skin") as StandardMaterial3D).albedo_color.is_equal_approx(a_skin.albedo_color))
+	var b_suit := b.find_child("Suit_Torso", true, false) as MeshInstance3D
+	var ident := _override_of(b_suit, "Mat_Ident") as StandardMaterial3D
+	var ident_dark := _override_of(b_suit, "Mat_IdentDark") as StandardMaterial3D
+	_check("looks: accent and darkened accent surfaces", ident != null and ident_dark != null and ident.albedo_color.is_equal_approx(CrewLooks.accent(3))
+		and ident_dark.albedo_color.is_equal_approx(CrewLooks.accent_dark(3)) and ident_dark.albedo_color.v < ident.albedo_color.v
+		and ident.emission_enabled and ident.emission.is_equal_approx(CrewLooks.accent(3)) and is_equal_approx(ident.roughness, 1.0))
+	a.set_suit(true)
+	var glow_on := a_skin.emission_enabled
+	a.set_suit(false)
+	_check("looks: the face glows faintly only under the helmet", glow_on and not a_skin.emission_enabled)
+	var a_model := a.get("_model") as Node3D
+	_check("looks: height scales the model, not the body node (feet stay at the origin)", a_model.scale.is_equal_approx(Vector3.ONE * float(CrewLooks.look(2).height))
+		and a.scale == Vector3.ONE and is_zero_approx(a_model.position.y))
+	a.set_name_tag(CrewLooks.tag_text("Electrical and communications", 2))
+	var tag := a.name_tag()
+	var symbol := tag.get_node("Symbol") as Label3D if tag != null else null
+	var word := tag.get_node("Word") as Label3D if tag != null else null
+	var low := tag.position.y if tag != null else 0.0
+	a.set_suit(true)
+	var lift := tag.position.y - low if tag != null else 0.0
+	a.set_suit(false)
+	_check("looks: name tag is the crew symbol in the accent colour and a near-white word, higher over a helmet", tag != null and a.name_tag_text() == "● Biology"
+		and symbol.modulate.is_equal_approx(CrewLooks.accent(2)) and word.modulate.is_equal_approx(PlayerVisual.NAME_TAG_TEXT) and word.outline_size > 0
+		and low > 1.7 and is_equal_approx(lift, PlayerVisual.NAME_TAG_SUITED_LIFT_M), a.name_tag_text())
+	var tag_cam := Camera3D.new()
+	_world.add_child(tag_cam)
+	var sizes: Array[float] = []
+	var alphas: Array[float] = []
+	for d: float in [1.0, 6.0, 20.0, 40.0]:
+		tag_cam.global_transform = Transform3D(Basis(), tag.global_position + Vector3(0, 0, d))
+		a.call("_place_name_tag", tag_cam)
+		var pixels := tag.global_basis.get_scale().y / (2.0 * d * tan(deg_to_rad(tag_cam.fov) * 0.5)) * 1080.0
+		sizes.append(pixels)
+		alphas.append(word.modulate.a if tag.visible else 0.0)
+	# Two crew standing together: the farther tag shows its symbol only, the nearer one stays whole; apart, both whole.
+	b.set_name_tag("Geology")
+	a.global_position = Vector3(0, 0, 0)
+	b.global_position = Vector3(0.3, 0, -1.0)
+	tag_cam.global_transform = Transform3D(Basis(), Vector3(0, 2.2, 8.0))
+	a.call("_place_name_tag", tag_cam)
+	b.call("_place_name_tag", tag_cam)
+	var together := [a.name_tag_collapsed(), b.name_tag_collapsed()]
+	b.global_position = Vector3(6.0, 0, -1.0)
+	a.call("_place_name_tag", tag_cam)
+	b.call("_place_name_tag", tag_cam)
+	var apart := [a.name_tag_collapsed(), b.name_tag_collapsed()]
+	_check("looks: tags of crew standing together: the farther one collapses to its symbol", together == [false, true] and apart == [false, false], "%s %s" % [together, apart])
+	_check("looks: tags are staggered by crew index", is_equal_approx(b.name_tag().position.y - a.name_tag().position.y,
+		PlayerVisual.NAME_TAG_HEIGHT_M * (float(CrewLooks.look(3).height) - float(CrewLooks.look(2).height)) + PlayerVisual.NAME_TAG_STAGGER_M))
+	var circle_size := (a.name_tag().get_node("Symbol") as Label3D).font_size
+	a.set_crew_identity(0)
+	var triangle_size := (a.name_tag().get_node("Symbol") as Label3D).font_size
+	a.set_crew_identity(2)
+	_check("looks: small glyphs are drawn larger so every symbol matches the capitals", circle_size > triangle_size and triangle_size == PlayerVisual.NAME_TAG_FONT_SIZE)
+	b.set_name_tag("")
+	a.global_position = Vector3.ZERO
+	b.global_position = Vector3.ZERO
+	tag_cam.queue_free()
+	_check("looks: name tag about 22 px at 6 and 20 m, gone up close and far away", absf(sizes[1] - 22.0) < 0.5 and absf(sizes[2] - 22.0) < 0.5
+		and is_zero_approx(alphas[0]) and is_equal_approx(alphas[1], 1.0) and is_equal_approx(alphas[2], 1.0) and is_zero_approx(alphas[3]), "%s %s" % [sizes, alphas])
+	a.set_name_tag("")
+	_check("looks: name tag can be removed; a short display name is shown as is", a.name_tag() == null and CrewLooks.tag_text("Ana", 0) == "Ana")
+	# Graceful fallback: the stand-in and a model without hair, shapes or look materials.
+	var plain := PlayerVisual.new()
+	_world.add_child(plain)
+	var fallback_ok := true
+	for i: int in 4:
+		plain.set_crew_identity(i)
+		plain.set_suit(i % 2 == 0)
+		fallback_ok = fallback_ok and plain.crew_identity() == i
+	var bare := Node3D.new()
+	var only_head := MeshInstance3D.new()
+	only_head.name = "Head"
+	only_head.mesh = BoxMesh.new()
+	bare.add_child(only_head)
+	only_head.owner = bare
+	var bare_packed := PackedScene.new()
+	bare_packed.pack(bare)
+	bare.free()
+	plain.set_model(bare_packed)
+	plain.set_crew_identity(1)
+	_check("looks: stand-in and bare models take every identity without the new parts", fallback_ok and plain.crew_identity() == 1 and plain.find_children("Hair_*", "", true, false).is_empty())
+	# The real astronaut, when imported: two bodies never share a recoloured skin.
+	var scene := PlayerVisual.rigged_scene()
+	if scene != null:
+		var r0 := PlayerVisual.new()
+		var r1 := PlayerVisual.new()
+		_world.add_child(r0)
+		_world.add_child(r1)
+		r0.set_model(scene)
+		r1.set_model(scene)
+		r0.set_crew_identity(0)
+		r1.set_crew_identity(1)
+		var h0 := r0.find_child("Body_Head", true, false) as MeshInstance3D
+		var h1 := r1.find_child("Body_Head", true, false) as MeshInstance3D
+		var s0 := _override_of(h0, "Mat_Skin") if h0 != null else null
+		var s1 := _override_of(h1, "Mat_Skin") if h1 != null else null
+		var hair_count := r0.find_children("Hair_*", "MeshInstance3D", true, false).size()
+		_check("looks: real astronaut gets per-body skin (hair meshes in this build: %d)" % hair_count, s0 != null and s1 != null and s0 != s1)
+		r0.queue_free()
+		r1.queue_free()
+	a.queue_free()
+	b.queue_free()
+	plain.queue_free()
 func _submit(action: StringName, target: StringName, params: Dictionary) -> ActionResult:
 	_calls.append({"action": action, "target": target, "params": params.duplicate(true)})
 	if _refuse:

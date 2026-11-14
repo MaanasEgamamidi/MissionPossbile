@@ -3,7 +3,7 @@ extends Control
 ## A portrait of one crew member.
 ## With the rigged astronaut available it renders a head-and-shoulders view of a PlayerVisual once, in a small
 ## SubViewport of its own (own world, own camera and lights). Without it, or when `prefer_rig` is false, it draws a
-## badge: a circle in the specialist colour with the specialist symbol.
+## badge: a circle in the crew accent colour with the crew symbol (CrewLooks, as on the suit and name tag).
 
 ## Pixel size of the rendered portrait.
 const PORTRAIT_SIZE := Vector2i(160, 200)
@@ -21,20 +21,13 @@ const WORDS := {
 	&"biology_food": "Biology and food",
 	&"field_engineering_geology": "Field engineering and geology",
 }
-## Same colours as the shoulder patch and chest stripe of each crew member (PlayerVisual.set_crew_identity).
-## UiTheme has no crew colours yet; these move there when it does.
-const COLORS := {
-	&"electrical_comms": Color("b96045"),
-	&"medical_life_support": Color("47849c"),
-	&"biology_food": Color("c0a34c"),
-	&"field_engineering_geology": Color("788e65"),
-}
+## Crew colours, hair, skin and height come from CrewLooks (the same table the 3D bodies use).
 
 ## True: use the rigged 3D portrait when the astronaut model exists. False: always draw the badge.
 var prefer_rig := true
 ## The crew member shown.
 var character: CharacterState
-## Crew index 0..3 (for the suit patch colour).
+## Crew index 0..3 (the look shown when the character's specialty is not one of CrewLooks').
 var index := 0
 
 var _viewport: SubViewport
@@ -99,8 +92,15 @@ static func specialty_words(specialty: StringName) -> String:
 	return String(WORDS.get(specialty, "Crew member"))
 
 
+## The crew member's identity mark (CrewLooks glyph: ▲ ✚ ● ◆), as on their suit and name tag.
+static func crew_glyph(specialty: StringName) -> String:
+	var i := CrewLooks.index_of(specialty)
+	return CrewLooks.glyph(i) if i >= 0 else "●"
+
+
 static func specialty_color(specialty: StringName) -> Color:
-	return COLORS.get(specialty, Color(0.5, 0.5, 0.5)) as Color
+	var i := CrewLooks.index_of(specialty)
+	return CrewLooks.accent(i) if i >= 0 else Color(0.5, 0.5, 0.5)
 
 
 func _build_rig() -> void:
@@ -121,7 +121,8 @@ func _build_rig() -> void:
 	_visual.name = "Body"
 	_viewport.add_child(_visual)
 	_visual.use_rig_if_available()
-	_visual.set_crew_identity(index)
+	var look := CrewLooks.index_of(character.specialty) if character != null else -1
+	_visual.set_crew_identity(look if look >= 0 else index)
 	_visual.set_first_person(false)
 	if character != null:
 		_visual.set_suit(character.suit_on)
@@ -129,9 +130,10 @@ func _build_rig() -> void:
 	var camera := Camera3D.new()
 	camera.name = "Camera"
 	camera.fov = 30.0
-	var eye := Vector3(0.0, 1.5, -1.6)
-	var look := Vector3(0.0, 1.42, 0.0)
-	camera.transform = Transform3D(Basis.looking_at(look - eye, Vector3.UP), eye)
+	var tall := float(CrewLooks.look(_visual.crew_identity()).height)   # frame the head at any crew height
+	var eye := Vector3(0.0, 1.5 * tall, -1.6)
+	var aim := Vector3(0.0, 1.42 * tall, 0.0)
+	camera.transform = Transform3D(Basis.looking_at(aim - eye, Vector3.UP), eye)
 	camera.current = true
 	_viewport.add_child(camera)
 	var key := DirectionalLight3D.new()
@@ -160,15 +162,30 @@ func _draw() -> void:
 	var radius := minf(size.x, size.y) * 0.45
 	var centre := size * 0.5
 	draw_circle(centre, radius, specialty_color(character.specialty))
-	var font := get_theme_font(&"font", &"Label")
-	var font_size := maxi(8, int(radius))
-	var text := specialty_symbol(character.specialty)
-	var ascent := font.get_ascent(font_size)
-	var descent := font.get_descent(font_size)
-	var baseline := centre.y + (ascent - descent) * 0.5
-	draw_string(font, Vector2(centre.x - radius, baseline), text, HORIZONTAL_ALIGNMENT_CENTER, radius * 2.0, font_size,
-		get_theme_color(&"font_color", &"Label"))
+	# The crew mark (CrewLooks symbol) drawn as a shape, dark on the accent disc: every mark the same size, centred,
+	# readable on yellow as well as on blue (font glyphs differ in size and sit on the text baseline).
+	draw_crew_mark(self, CrewLooks.index_of(character.specialty), centre, radius * 0.55, MARK_COLOR)
 
+
+## Colour of the crew mark on the badge disc (the suit's dark backing plate).
+const MARK_COLOR := Color("1a1a1f")
+
+
+## Draws crew `index`'s mark (triangle, plus, circle, diamond) on `canvas`, fitting a circle of `r` around `centre`.
+static func draw_crew_mark(canvas: CanvasItem, index: int, centre: Vector2, r: float, colour: Color) -> void:
+	match String(CrewLooks.look(index).symbol) if index >= 0 else "":
+		"Triangle":
+			canvas.draw_colored_polygon(PackedVector2Array([centre + Vector2(0, -r), centre + Vector2(r * 0.95, r * 0.7),
+				centre + Vector2(-r * 0.95, r * 0.7)]), colour)
+		"Plus":
+			var w := r * 0.36
+			canvas.draw_rect(Rect2(centre - Vector2(w, r * 0.9), Vector2(w * 2.0, r * 1.8)), colour)
+			canvas.draw_rect(Rect2(centre - Vector2(r * 0.9, w), Vector2(r * 1.8, w * 2.0)), colour)
+		"Diamond":
+			canvas.draw_colored_polygon(PackedVector2Array([centre + Vector2(0, -r), centre + Vector2(r * 0.75, 0),
+				centre + Vector2(0, r), centre + Vector2(-r * 0.75, 0)]), colour)
+		_:
+			canvas.draw_circle(centre, r * 0.75, colour)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:

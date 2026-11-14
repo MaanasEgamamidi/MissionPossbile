@@ -1,0 +1,375 @@
+{
+	"schema": 1,
+	"note": "Prompt 08 knowledge questions. Each has 3 answers, the right one (index from 0), a plain explanation tied to the colony's equipment, and at least one retry variant (changed numbers or situation). Answering right records state.knowledge[id] once. role: guided (tier 1 explanation check), diagnosis (tier 2: shown in a changed example, never the guided one's), transfer (tier 3), check (card question). 'example' names the situation, so the game can tell a changed example from the guided one. Numbers in questions are the game's model values (game balance) unless a source id is named.",
+	"questions": [
+		{
+			"id": "energy_q_dust_output", "sector": "energy", "role": "guided", "title": "Why dusty panels give less power",
+			"variants": [
+				{"example": "dusty_panels", "text": "At noon the 12 panels give 55 kW. On a clear day with clean panels they gave 100 kW. The sky is normal and the trackers turn. What is the most likely cause?",
+					"answers": ["Dust has settled on the panels and blocks the sunlight", "The battery is full", "The colony uses too many lights"], "correct": 0,
+					"explanation": "Settled dust covers part of each panel, so less sunlight reaches it. Panels 45 % covered give about 45 % less power. Cleaning them at the trackers, or repairing the panel cleaner, brings the power back."},
+				{"example": "one_dusty_tracker", "text": "Tracker 4 gives 4 kW at noon. The trackers next to it give 8 kW each. They all turn to face the sun. What is wrong with tracker 4?",
+					"answers": ["It is night at tracker 4", "Its panel is covered in dust", "It is too far from the battery"], "correct": 1,
+					"explanation": "All trackers see the same sun and sky, so a panel that gives half as much has something on it: dust. Cleaning that one panel fixes it."}
+			]
+		},
+		{
+			"id": "energy_q_diagnose", "sector": "energy", "role": "diagnosis", "changed_from": "energy_q_dust_output", "title": "Find the cause of a power loss in a new case",
+			"variants": [
+				{"example": "dusty_panels", "text": "The panels give 60 kW at noon instead of 100 kW. The sky is clear and the trackers turn. Which check comes first?",
+					"answers": ["Switch off the CO2 scrubber", "Wait for the night", "Look at the dust on the panels"], "correct": 2,
+					"explanation": "With a clear sky and turning trackers, the usual cause is dust on the panels. Check the dust first; then clean the panels or repair the cleaner."},
+				{"example": "storm_sky", "text": "All 12 panels were cleaned this morning, but at noon they give only 60 kW. The sky is dark orange with dust in the air. What is the cause?",
+					"answers": ["Dust in the air blocks sunlight before it reaches the panels", "The panels are dusty", "The cleaner is broken"], "correct": 0,
+					"explanation": "Clean panels still get less sun when a dust storm fills the air. Cleaning will not help: save power until the sky clears."},
+				{"example": "trackers_stopped", "text": "The panels are clean and the sky is clear, but power is lower than usual and the panels point straight up all day. What is the cause?",
+					"answers": ["Dust in the air", "The sun trackers have stopped turning the panels", "The battery is empty"], "correct": 1,
+					"explanation": "Trackers turn the panels to face the sun. When they stop (switched off, broken or shed for lack of power), fixed panels catch the sun at a slant and make less power."}
+			]
+		},
+		{
+			"id": "energy_q_net_power", "sector": "energy", "role": "check", "title": "Predict the battery from the readings",
+			"records_evidence": "energy_predict_net_power", "answer_at_kind": "power", "readings": "power",
+			"variants": [
+				{"example": "deficit", "text": "Look at the power panel. Suppose the sun gives 30 kW and the colony asks for 42 kW. What does the battery do?",
+					"answers": ["It charges at 12 kW", "It gives 12 kW to cover the gap", "Nothing changes"], "correct": 1,
+					"explanation": "Power in minus power asked for: 30 − 42 = −12 kW. The battery gives the missing 12 kW, so the kWh stored in it go down."},
+				{"example": "surplus", "text": "Look at the power panel. Suppose the sun gives 50 kW and the colony asks for 38 kW. What does the battery do?",
+					"answers": ["It gives 12 kW", "It is switched off", "It charges with the 12 kW left over"], "correct": 2,
+					"explanation": "50 − 38 = +12 kW left over. The battery stores it (about a tenth is lost as heat while charging)."}
+			]
+		},
+		{
+			"id": "energy_q_battery_night", "sector": "energy", "role": "check", "title": "Why a solar colony needs a battery",
+			"variants": [
+				{"example": "night", "text": "Why does a colony that runs on sunlight need a battery?",
+					"answers": ["At night the panels make no power, but the air machines must keep running", "Batteries make the sun brighter", "Batteries clean the panels"], "correct": 0,
+					"explanation": "The panels give nothing between sunset and sunrise. The CO2 scrubber, the fans and the heating run all night on the energy the battery stored during the day."},
+				{"example": "three_am", "text": "It is 03:00 at night. What keeps the CO2 scrubber running?",
+					"answers": ["The sun trackers", "The battery", "The greenhouse lights"], "correct": 1,
+					"explanation": "At night there is no sunlight, so every machine that runs is powered from the battery."}
+			]
+		},
+		{
+			"id": "energy_q_tracking", "sector": "energy", "role": "check", "title": "Why trackers give more power",
+			"variants": [
+				{"example": "all_day", "text": "Why does a panel on a sun tracker give more power over a sol than a fixed panel?",
+					"answers": ["It is closer to the sun", "It faces the sun all day, so sunlight hits it straight on", "It stores sunlight for the night"], "correct": 1,
+					"explanation": "Light that hits a panel straight on gives the most power. A tracker keeps turning the panel to face the sun, so it catches more light in the morning and the evening."},
+				{"example": "morning", "text": "In the morning the sun is low in the east. A fixed panel points straight up. A tracker panel turns east. Which gives more power?",
+					"answers": ["The fixed panel", "Both the same", "The tracker panel"], "correct": 2,
+					"explanation": "The tracker panel faces the low sun, the fixed panel gets the light at a slant. The tracker wins, most of all early and late in the sol."}
+			]
+		},
+		{
+			"id": "energy_q_cleaner", "sector": "energy", "role": "check", "title": "What a broken cleaner means",
+			"variants": [
+				{"example": "broken", "text": "The panel cleaner is broken and nobody repairs it. What happens over the next sols?",
+					"answers": ["Power slowly falls as dust builds up", "Power rises", "The battery breaks"], "correct": 0,
+					"explanation": "A little dust settles on the panels every sol. Without the cleaner wiping them at sunrise, it builds up and the panels give less and less power."},
+				{"example": "no_power_sunrise", "text": "The cleaner works, but at sunrise it has no power because the battery is empty. What happens?",
+					"answers": ["The panels get wiped anyway", "The trackers stop", "The dust stays until the cleaner has power at a sunrise"], "correct": 2,
+					"explanation": "The cleaner only wipes the panels when it is on, working and powered at sunrise. Keeping a little battery for the morning matters."}
+			]
+		},
+		{
+			"id": "energy_q_storm", "sector": "energy", "role": "transfer", "title": "Plan for a dust storm",
+			"variants": [
+				{"example": "storm_plan", "text": "A dust storm will darken the sky for several sols. Panels give less power even when clean. What is the best plan?",
+					"answers": ["Switch off rooms and machines that are not needed, so the battery lasts", "Clean the panels every hour", "Switch everything on to use the power while it lasts"], "correct": 0,
+					"explanation": "During a storm less sunlight reaches the panels, so less energy comes in. Use less: switch off lights and machines nobody needs, and keep the battery for life support."},
+				{"example": "storm_noon", "text": "During a storm the panels give 40 kW at noon instead of 100 kW. The colony asks for 45 kW all day. What does the battery do at noon?",
+					"answers": ["It charges", "It gives 5 kW even at noon", "It is full"], "correct": 1,
+					"explanation": "40 − 45 = −5 kW: even at noon the sun is not enough, so the battery keeps going down. Switch off 5 kW or more of loads."}
+			]
+		},
+		{
+			"id": "ls_q_two_paths", "sector": "life_support", "role": "guided", "title": "Two ways to make oxygen",
+			"variants": [
+				{"example": "water_needed", "text": "The colony has two oxygen makers: the electrolyser and the CO2-oxygen unit. Which one needs water?",
+					"answers": ["The CO2-oxygen unit", "The electrolyser", "Both"], "correct": 1,
+					"explanation": "The electrolyser splits water into hydrogen and oxygen (about 1.1 L of water per kg of oxygen), like on the ISS (S08). The CO2-oxygen unit takes carbon dioxide from the Mars air and uses only power, like MOXIE (S09)."},
+				{"example": "power_only", "text": "Clean water is low, but there is plenty of power. Which oxygen maker can still run without taking water?",
+					"answers": ["The CO2-oxygen unit", "The electrolyser", "Neither"], "correct": 0,
+					"explanation": "The CO2-oxygen unit uses the carbon dioxide in the Mars air and power, no water. The electrolyser needs feed water."}
+			]
+		},
+		{
+			"id": "ls_q_diagnose", "sector": "life_support", "role": "diagnosis", "changed_from": "ls_q_two_paths", "title": "Fix an oxygen problem in a new case",
+			"variants": [
+				{"example": "water_needed", "text": "The electrolyser is switched on but makes no oxygen. The console says 'no feed water'. What do you do?",
+					"answers": ["Switch off the CO2 scrubber", "Send water to it with the water allocation", "Refill a suit"], "correct": 1,
+					"explanation": "The electrolyser needs feed water. Set the electrolyser water allocation at the life-support console (drinking water always comes first)."},
+				{"example": "dirty_water", "text": "The electrolyser stopped: 'water not clean enough'. The water recycler is in poor condition. What is a good plan?",
+					"answers": ["Switch the electrolyser off and on again", "Run the CO2-oxygen unit meanwhile and get the recycler working well so the water becomes clean", "Open the airlock"], "correct": 1,
+					"explanation": "The cause is the water quality, which comes from the recycler. The CO2-oxygen unit needs no water, so it can make oxygen while the water gets clean again."},
+				{"example": "no_power_night", "text": "At night the battery is low and both oxygen makers stopped with 'no power'. The oxygen reserve has 50 kg and falls about 3 kg per sol. What is the right call?",
+					"answers": ["The cabin air runs out tonight", "Switch off the CO2 scrubber", "The reserve covers many sols: switch off lights so the battery lasts, and the makers restart when the sun is up"], "correct": 2,
+					"explanation": "The tanks are a store: 50 kg at 3 kg per sol lasts many sols. Save power for the scrubber and fans tonight."}
+			]
+		},
+		{
+			"id": "ls_q_tank_vs_cabin", "sector": "life_support", "role": "check", "title": "Oxygen tanks or cabin air?",
+			"records_evidence": "ls_storage_vs_pressure", "answer_at_kind": "lifesupport", "readings": "lifesupport",
+			"variants": [
+				{"example": "tank_falls_first", "text": "The oxygen reserve fell from 60 kg to 50 kg, but the cabin oxygen is still 21 kPa. Why?",
+					"answers": ["The regulator tops up the cabin air from the tanks, so the tanks fall first", "The cabin leaks oxygen into the tanks", "The reading is broken"], "correct": 0,
+					"explanation": "The oxygen reserve (kg in tanks) is a store. The cabin oxygen (kPa) is the air you breathe. The regulator keeps the cabin at 21 kPa by taking oxygen from the tanks."},
+				{"example": "tank_empty", "text": "The oxygen tanks are empty. What happens to the cabin oxygen pressure?",
+					"answers": ["It jumps to zero at once", "It slowly falls as the crew breathes, because nothing tops it up", "It rises"], "correct": 1,
+					"explanation": "The cabin still holds its air. With nothing to top it up, every breath takes a little oxygen out, so the pressure falls slowly. Start an oxygen maker."}
+			]
+		},
+		{
+			"id": "ls_q_co2", "sector": "life_support", "role": "check", "title": "Why CO2 builds up",
+			"variants": [
+				{"example": "fans_off", "text": "Cabin CO2 is rising. The CO2 scrubber is on, but the cabin fans are off. Why?",
+					"answers": ["The fans move air through the scrubber; without them it cleans only part of the air", "The fans make CO2", "The scrubber needs water"], "correct": 0,
+					"explanation": "The scrubber can only clean the air that reaches it. The fans push the cabin air through it; without them it removes only about a quarter as much."},
+				{"example": "more_breathing", "text": "Four crew are inside instead of two. What happens to the CO2 they breathe out each hour?",
+					"answers": ["It halves", "It stays the same", "It doubles, so the scrubber has twice as much to remove"], "correct": 2,
+					"explanation": "Each person breathes out about the same amount of CO2. Twice the people, twice the CO2."}
+			]
+		},
+		{
+			"id": "ls_q_recycler", "sector": "life_support", "role": "check", "title": "How much water comes back",
+			"variants": [
+				{"example": "ten_litres", "text": "The water recycler gets 10 L of wastewater. About 90 % comes back clean. How much clean water is that?",
+					"answers": ["9 L", "1 L", "10 L"], "correct": 0,
+					"explanation": "90 % of 10 L is 9 L. The ISS recovers about 90 percent of its water (S08); the last litre is left as brine."},
+				{"example": "brine", "text": "The recycler gets 20 L of wastewater and returns 90 % of it clean. How much is left as brine?",
+					"answers": ["18 L", "2 L", "0 L"], "correct": 1,
+					"explanation": "90 % of 20 L = 18 L comes back clean; the other 10 %, 2 L, is brine."}
+			]
+		},
+		{
+			"id": "ls_q_electrolysis", "sector": "life_support", "role": "check", "title": "Water for oxygen",
+			"variants": [
+				{"example": "one_kg", "text": "Making 1 kg of oxygen by electrolysis uses about how much water?",
+					"answers": ["About 1.1 L", "About 10 L", "No water"], "correct": 0,
+					"explanation": "2 H2O → 2 H2 + O2: 36 g of water gives 32 g of oxygen, so 1 kg of oxygen needs about 1.13 kg (1.1 L) of water. That is chemistry, not a game number."},
+				{"example": "two_kg", "text": "The electrolyser made 2 kg of oxygen today. About how much water did it use?",
+					"answers": ["0.2 L", "About 2.3 L", "20 L"], "correct": 1,
+					"explanation": "About 1.13 L per kg, so 2 kg uses about 2.3 L. The hydrogen that is left over is vented."}
+			]
+		},
+		{
+			"id": "ls_q_moxie", "sector": "life_support", "role": "check", "title": "Oxygen from the Mars air",
+			"variants": [
+				{"example": "source", "text": "Where does the CO2-oxygen unit get its oxygen from?",
+					"answers": ["From the water tanks", "From the carbon dioxide in the Mars air", "From the greenhouse plants"], "correct": 1,
+					"explanation": "It takes one oxygen atom from each CO2 molecule of the Mars air. MOXIE did this on Mars, best 12 g per hour (S09). Our colony-size unit is fiction scaled up from it."},
+				{"example": "leftover", "text": "The CO2-oxygen unit takes one oxygen atom from each CO2 molecule. What is left over?",
+					"answers": ["Water", "Nitrogen", "Carbon monoxide, which is vented outside"], "correct": 2,
+					"explanation": "CO2 minus one O is CO, carbon monoxide. It is poisonous, so the unit vents it outside."}
+			]
+		},
+		{
+			"id": "ls_q_more_crew", "sector": "life_support", "role": "transfer", "title": "Plan for more crew",
+			"variants": [
+				{"example": "four_breathe", "text": "Two more crew members start working, so four breathe instead of two. Which reserve must you watch more closely?",
+					"answers": ["The oxygen reserve: it now falls about twice as fast", "Nothing changes", "Only the battery"], "correct": 0,
+					"explanation": "Each person breathes about the same. Twice the crew uses oxygen twice as fast, so the reserve falls faster unless the oxygen makers run more."},
+				{"example": "scrubber_size", "text": "The scrubber removes up to 0.4 kg of CO2 per hour. Each crew member breathes out about 0.04 kg per hour. With 4 crew inside, is the scrubber big enough?",
+					"answers": ["No, it is far too small", "Yes: 4 × 0.04 = 0.16 kg per hour, less than 0.4", "Only if the fans are off"], "correct": 1,
+					"explanation": "4 × 0.04 = 0.16 kg per hour, well under 0.4. It is big enough while the fans run (without fans it gets only part of the air)."}
+			]
+		},
+		{
+			"id": "food_q_symptom", "sector": "food", "role": "guided", "title": "Read a plant symptom",
+			"variants": [
+				{"example": "yellow_leaves", "text": "Lettuce leaves turn yellow. The light is on, the water is fine, and the nutrient reading is 0.2 (low). What is the cause?",
+					"answers": ["Too much light", "Not enough nutrients", "Not enough water"], "correct": 1,
+					"explanation": "Yellow leaves with a low nutrient reading point to missing nutrients. The measurement proves it: light and water are fine."},
+				{"example": "wilting", "text": "Tomato plants droop and wilt. The light is on, nutrients read 0.7, and the bed's water reads 0.05 (nearly dry). What is the cause?",
+					"answers": ["Not enough water", "Not enough nutrients", "Too much CO2"], "correct": 0,
+					"explanation": "Wilting with a nearly dry water reading means the roots get too little water. Check the greenhouse water allocation."}
+			]
+		},
+		{
+			"id": "food_q_diagnose", "sector": "food", "role": "diagnosis", "changed_from": "food_q_symptom", "title": "Find a plant problem in a new case",
+			"variants": [
+				{"example": "yellow_leaves", "text": "A different bed shows yellow leaves. Before changing anything, what do you check?",
+					"answers": ["The battery", "The measured nutrient level of that bed", "The airlock"], "correct": 1,
+					"explanation": "A symptom is a clue, the measurement is the proof. Read that bed's nutrient level before you change it."},
+				{"example": "leggy_pale", "text": "Lettuce grows tall, thin and pale. Water reads 0.8 and nutrients 0.7, but the Greenhouse lights were shed during a night of low power. What is the cause?",
+					"answers": ["Too much water", "Too many nutrients", "Not enough light"], "correct": 2,
+					"explanation": "Tall, thin, pale plants are stretching for light. Water and nutrients are fine, so the cause is the missing light."},
+				{"example": "wilting", "text": "Plants wilt after someone set the greenhouse water allocation to 0 L per hour. Light and nutrients are fine. What is the cause?",
+					"answers": ["No water reaches the beds: the allocation is 0", "Not enough light", "Not enough nutrients"], "correct": 0,
+					"explanation": "The beds only get the water the allocation sends. With 0 L per hour they slowly dry out."}
+			]
+		},
+		{
+			"id": "food_q_one_change", "sector": "food", "role": "check", "title": "Change one thing at a time",
+			"variants": [
+				{"example": "why_one", "text": "A bed has yellow leaves. Why change only the nutrients, and not also the light and water at the same time?",
+					"answers": ["So you can tell which change helped", "Changing things is not allowed", "Light never matters"], "correct": 0,
+					"explanation": "If you change one input and the plants recover, you know that input was the cause. Change three at once and you cannot tell."},
+				{"example": "two_changes", "text": "Sam raised the nutrients AND the water on a wilting bed, and it got better. What do we know?",
+					"answers": ["The nutrients fixed it", "We cannot tell which change helped", "The water fixed it"], "correct": 1,
+					"explanation": "Two changes at once hide the cause. Next time, change one input and watch the growth."}
+			]
+		},
+		{
+			"id": "food_q_water", "sector": "food", "role": "check", "title": "Where greenhouse water comes from",
+			"variants": [
+				{"example": "source", "text": "Where does the water for the greenhouse beds come from?",
+					"answers": ["It rains in the dome", "From the clean water store, through the greenhouse water allocation", "From the oxygen tanks"], "correct": 1,
+					"explanation": "The life-support console sends clean water to the greenhouse at the allocated litres per hour. Used water goes to the wastewater tank and the recycler."},
+				{"example": "reserve", "text": "The greenhouse allocation is 2 L per hour, but clean water is below the 100 L drinking reserve. How much reaches the beds?",
+					"answers": ["2 L per hour", "4 L per hour", "None: drinking water comes first"], "correct": 2,
+					"explanation": "Allocations only take water above the drinking reserve. Below it, nothing goes to the greenhouse until the store rises."}
+			]
+		},
+		{
+			"id": "food_q_light", "sector": "food", "role": "check", "title": "Why light matters",
+			"variants": [
+				{"example": "shed", "text": "Power runs short and the Greenhouse lights are shed. What happens to the plants?",
+					"answers": ["They grow faster", "They die at once", "Growth slows or stops until the light is back"], "correct": 2,
+					"explanation": "Plants use light to grow. Without it, growth slows or stops; it starts again when the lights come back."},
+				{"example": "power", "text": "Why do the greenhouse lights use much more power (9 kW) than the room lights?",
+					"answers": ["Plants need much more light than people to grow", "They are older", "They heat the soil"], "correct": 0,
+					"explanation": "People only need light to see; plants need a lot of light to grow. That is why greenhouse lights are a big load."}
+			]
+		},
+		{
+			"id": "food_q_new_crop", "sector": "food", "role": "transfer", "title": "Use what you learned on another crop",
+			"variants": [
+				{"example": "tomato_nutrients", "text": "You learned to fix low nutrients in lettuce. Now tomatoes show yellow leaves and read 0.2 nutrients. What do you try first?",
+					"answers": ["Replant everything", "Raise the nutrients of the tomato bed and watch its growth", "Switch off the lights"], "correct": 1,
+					"explanation": "Same symptom, same measurement, different crop: try the same single change and check the growth rate rises."},
+				{"example": "what_it_proves", "text": "Lettuce has grown on the ISS in Veggie; tomato is only a plan there so far. What does our greenhouse tell us about farming on Mars?",
+					"answers": ["It proves Mars farming works", "Nothing at all", "It is a game model based on ISS tests; it does not prove farming on Mars"], "correct": 2,
+					"explanation": "The ISS grew lettuce (S11); tomatoes were planned (S11, S13). Our greenhouse is a model built on that, sped up for the game. It does not prove Mars agriculture."}
+			]
+		},
+		{
+			"id": "res_q_compatible", "sector": "resources", "role": "guided", "title": "Find the part that fits",
+			"variants": [
+				{"example": "pump_port", "text": "The water recycler needs a pump with a 40 mm port and a 24 V motor. The old filter unit has a 40 mm 24 V pump, a 60 mm valve and a 12 V fan. Which part fits?",
+					"answers": ["The 60 mm valve", "The 12 V fan", "The 40 mm 24 V pump"], "correct": 2,
+					"explanation": "A compatible part matches what the machine needs: the same type, size and voltage. Only the 40 mm 24 V pump matches."},
+				{"example": "battery_cell", "text": "The battery rack needs cells of the same type and voltage as the others (lithium, 3.6 V). A damaged rack has 3.6 V lithium cells, 12 V lead cells and a cooling fan. Which is compatible?",
+					"answers": ["The 3.6 V lithium cells", "The 12 V lead cells", "None"], "correct": 0,
+					"explanation": "Cells must match the others in type and voltage. Mixing cell types or voltages in one rack is unsafe."}
+			]
+		},
+		{
+			"id": "res_q_diagnose", "sector": "resources", "role": "diagnosis", "changed_from": "res_q_compatible", "title": "Judge a salvaged part in a new case",
+			"variants": [
+				{"example": "pump_port", "text": "A pump fits the 40 mm port, but its motor is 12 V and the colony line is 24 V. Use it?",
+					"answers": ["No: the voltage does not match, so it would not work safely", "Yes, the port fits", "Yes, if you paint it"], "correct": 0,
+					"explanation": "Fitting one measurement is not enough. Every match must hold: type, size and voltage."},
+				{"example": "cracked_housing", "text": "A salvaged valve has the right size and voltage, but its housing is cracked. What do you do?",
+					"answers": ["Install it straight away", "Do not use it until it is refurbished and passes a bench test", "Use it for oxygen only"], "correct": 1,
+					"explanation": "A damaged part can fail in the machine. Refurbish it at the workbench and bench-test it first."},
+				{"example": "unknown_label", "text": "A part from the crash site has no label. What is the safe first step?",
+					"answers": ["Install it and see", "Throw it away", "Measure its size and voltage and compare them with what the machine needs"], "correct": 2,
+					"explanation": "Without a label, measure. Then compare with the machine's needs before you recover or refurbish it."}
+			]
+		},
+		{
+			"id": "res_q_bench_test", "sector": "resources", "role": "check", "title": "Why test on the bench",
+			"variants": [
+				{"example": "why", "text": "Why bench-test a refurbished part before it goes into the colony?",
+					"answers": ["To find faults safely before a machine depends on it", "Tests make parts new", "It is just for fun"], "correct": 0,
+					"explanation": "A bench test runs the part on the workbench, where a fault does no harm. A fault found inside the water recycler would."},
+				{"example": "failed", "text": "A refurbished pump fails its bench test. What did the test save you from?",
+					"answers": ["Nothing", "Installing a broken pump in the water recycler", "Buying parts on Earth"], "correct": 1,
+					"explanation": "The test caught the fault before the colony relied on the pump."}
+			]
+		},
+		{
+			"id": "res_q_matter", "sector": "resources", "role": "check", "title": "Nothing from nothing",
+			"variants": [
+				{"example": "rock", "text": "Can the workbench turn a rock into a new circuit board?",
+					"answers": ["Yes, with enough power", "No: a component comes from real parts; the bench repairs and refits them", "Only at night"], "correct": 1,
+					"explanation": "The workbench cannot make electronics from rock. It turns a salvaged part into a working one: one part in, one component out."},
+				{"example": "count", "text": "You refurbish one salvaged pump. How many working pumps do you get?",
+					"answers": ["One: the salvaged pump becomes the working one", "Two", "Ten"], "correct": 0,
+					"explanation": "Refurbishing repairs the part you brought. Nothing is created from nothing."}
+			]
+		},
+		{
+			"id": "res_q_new_donor", "sector": "resources", "role": "transfer", "title": "Salvage from a new wreck",
+			"variants": [
+				{"example": "new_wreck", "text": "A new wreck is found with many parts. How do you choose what to recover?",
+					"answers": ["Take everything", "Check what the colony's machines need (type, size, voltage) and recover only compatible parts", "Take the shiniest part"], "correct": 1,
+					"explanation": "Carrying space and time are limited. Recover what matches a real need."},
+				{"example": "storm_worn", "text": "A donor part matches but lay outside through dust storms for years. What changes in your plan?",
+					"answers": ["Nothing", "Install it twice", "Inspect it for dust and wear, refurbish it and bench-test it before use"], "correct": 2,
+					"explanation": "New conditions (dust, cold, years outside) mean more wear. The same steps keep it safe: inspect, refurbish, test."}
+			]
+		},
+		{
+			"id": "sci_q_context", "sector": "science", "role": "guided", "title": "Record where and when",
+			"variants": [
+				{"example": "site_time", "text": "Why write down the site, the time and the conditions when you take a field sample?",
+					"answers": ["So later results can be compared and checked", "To make the sample heavier", "It is not needed"], "correct": 0,
+					"explanation": "A result only means something if you know where and when the sample came from. The notes let anyone compare and repeat it."},
+				{"example": "two_sites", "text": "Two samples look the same, but one was taken near the crash site just after a dust storm. Why does the note matter?",
+					"answers": ["It does not", "Dust from the storm or the crash could change the result, so we need to know", "Notes change the rock"], "correct": 1,
+					"explanation": "Conditions can change what a sample contains. The note tells you which results can fairly be compared."}
+			]
+		},
+		{
+			"id": "sci_q_diagnose", "sector": "science", "role": "diagnosis", "changed_from": "sci_q_context", "title": "Read an odd result in a new case",
+			"variants": [
+				{"example": "site_time", "text": "A sample result looks odd. What do you look at first?",
+					"answers": ["The battery", "The notes: site, time and conditions when it was taken", "Only the sample's colour"], "correct": 1,
+					"explanation": "Start with the context: an odd site or condition often explains an odd result."},
+				{"example": "dirty_control", "text": "The blank control (a test that should show nothing) shows a signal. What does that tell you?",
+					"answers": ["The sample is amazing", "Nothing", "Something in the lab is contaminating the test; fix that before trusting results"], "correct": 2,
+					"explanation": "A control that shows a signal means the test itself adds something. Clean up and repeat before believing the sample."},
+				{"example": "matches_nothing", "text": "Your sample matches neither the reference nor the control. What is a fair next step?",
+					"answers": ["Repeat the test and take another sample before deciding", "Say it proves life on Mars", "Delete the result"], "correct": 0,
+					"explanation": "One strange result is a question, not an answer. Repeat it and gather more samples."}
+			]
+		},
+		{
+			"id": "sci_q_control", "sector": "science", "role": "check", "title": "Why a control",
+			"variants": [
+				{"example": "blank", "text": "In the lab you test your sample, a reference sample and a blank control. Why the blank?",
+					"answers": ["To check the instrument shows nothing when there is nothing", "To make the test faster", "It is a spare"], "correct": 0,
+					"explanation": "The blank shows what the instrument reads with no sample. Anything above that comes from the sample."},
+				{"example": "both_good", "text": "The blank control reads zero and the reference reads its known value. What does that mean for your sample's result?",
+					"answers": ["The sample is wrong", "You can trust the instrument more", "Nothing"], "correct": 1,
+					"explanation": "The instrument passed both checks, so its reading of your sample is more trustworthy."}
+			]
+		},
+		{
+			"id": "sci_q_reference", "sector": "science", "role": "check", "title": "What a reference sample is",
+			"variants": [
+				{"example": "provenance", "text": "The lab's reference is linked to NASA's Curiosity rover (CheMin instrument, Gale crater). Is it a measurement of rocks at our colony?",
+					"answers": ["Yes", "No: it is another place on Mars; we only compare with it, and its numbers here are illustrative", "Only on some days"], "correct": 1,
+					"explanation": "Gale crater is a real place far from our fictional colony (S06). The game uses the mission and instrument as provenance; any mineral numbers shown are illustrative, not from the archive."},
+				{"example": "why_reference", "text": "Why compare with a well-known reference sample?",
+					"answers": ["To copy its answer", "References are prettier", "To check the instrument reads known material correctly"], "correct": 2,
+					"explanation": "If the instrument gets the reference right, you can trust its reading of the new sample more."}
+			]
+		},
+		{
+			"id": "sci_q_uncertainty", "sector": "science", "role": "check", "title": "Uncertainty",
+			"variants": [
+				{"example": "compare", "text": "Result A is 0.6 ± 0.2. Result B is 0.6 ± 0.05. Which one tells you more precisely what the value is?",
+					"answers": ["A", "B", "Both the same"], "correct": 1,
+					"explanation": "The ± is the uncertainty. B says the value is between 0.55 and 0.65; A only says between 0.4 and 0.8."},
+				{"example": "setting", "text": "A nutrient setting from the lab is 0.5 ± 0.3. Is it safe to rely on exactly 0.5?",
+					"answers": ["Yes, exactly 0.5", "It is always wrong", "Not very: the true value could be from 0.2 to 0.8; a calibrated instrument would narrow it"], "correct": 2,
+					"explanation": "A big uncertainty means a wide range. Calibration makes the range smaller, so the setting is more reliable."}
+			]
+		},
+		{
+			"id": "sci_q_apply", "sector": "science", "role": "transfer", "title": "Check a lab result in the real colony",
+			"variants": [
+				{"example": "one_bed", "text": "The lab says this soil needs more nutrients for lettuce. How do you check the setting works?",
+					"answers": ["Apply it to one bed and compare its growth with a bed left as before", "Apply it everywhere and forget it", "Do nothing"], "correct": 0,
+					"explanation": "A fair comparison: one bed with the new setting, one without, everything else the same."},
+				{"example": "other_site", "text": "A result from a dusty site is applied to a bed using clean-site soil. What should you watch?",
+					"answers": ["Nothing", "Whether that bed responds as expected, because the sites may differ", "Only the battery"], "correct": 1,
+					"explanation": "New conditions can change the answer. Watch the bed's growth to check the result transfers."}
+			]
+		}
+	]
+}

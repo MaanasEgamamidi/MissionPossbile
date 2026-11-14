@@ -78,17 +78,18 @@ static func for_station(station_id: StringName, services: GameServices) -> UiPan
 	var custom_path := "res://scripts/ui/stations/%s_station_panel.gd" % kind
 	if ResourceLoader.exists(custom_path):
 		panel = (load(custom_path) as Script).new() as StationPanel
-	match kind if panel == null else "":
-		"power":
-			panel = PowerStationPanel.new()
-		"lifesupport":
-			panel = LifeSupportStationPanel.new()
-		"solar":
-			panel = SolarStationPanel.new()
-		"suits":
-			panel = SuitRackPanel.new()
-		_:
-			panel = StationPanel.new()
+	if panel == null:
+		match kind:
+			"power":
+				panel = PowerStationPanel.new()
+			"lifesupport":
+				panel = LifeSupportStationPanel.new()
+			"solar":
+				panel = SolarStationPanel.new()
+			"suits":
+				panel = SuitRackPanel.new()
+			_:
+				panel = StationPanel.new()
 	panel.station_id = station_id
 	panel.kind = kind
 	panel.set_meta(&"station_surface", true)
@@ -102,6 +103,16 @@ static func name_of(kind: String) -> String:
 	return String(NAMES.get(kind, String(_extra_field(kind, "name", "Station"))))
 
 
+## Every station kind with a name: the built-in ones and those added by data/stations_*.json files.
+static func all_kinds() -> PackedStringArray:
+	var out := PackedStringArray(NAMES.keys())
+	for entry: Dictionary in StationCatalog.extra_entries():
+		var k := String(entry.get("kind", ""))
+		if k != "" and not out.has(k):
+			out.append(k)
+	return out
+
+
 ## A field of the first data/stations_*.json entry of this kind (later milestones name their own stations).
 static func _extra_field(kind: String, field: String, fallback: String) -> String:
 	for entry: Dictionary in StationCatalog.extra_entries():
@@ -112,9 +123,9 @@ static func _extra_field(kind: String, field: String, fallback: String) -> Strin
 
 ## The station's short name for the map ("Life support").
 static func short_name_of(kind: String) -> String:
-	return String(SHORT_NAMES.get(kind, "Station"))
+	return String(SHORT_NAMES.get(kind, _extra_field(kind, "short", _extra_field(kind, "name", "Station"))))
 
 
 ## The station's symbol.
 static func symbol_of(kind: String) -> String:
-	return String(SYMBOLS.get(kind, "●"))
+	return String(SYMBOLS.get(kind, _extra_field(kind, "symbol", "●")))

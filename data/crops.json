@@ -1,0 +1,42 @@
+{
+	"schema": 1,
+	"note": "Greenhouse crops (Prompt 08, food part). Every number here is GAME BALANCE, not a NASA figure. Crop cycles are TIME-COMPRESSED: a few sols in the game stand for weeks to months on Earth. Growing plants in an ISS chamber does not prove that crops grow on Mars.",
+	"crops": {
+		"lettuce": {
+			"name": "Lettuce",
+			"map_mesh": "gd_crop_lettuce",
+			"stages": ["seed", "sprout", "leafy", "ready"],
+			"stage_starts": [0.0, 0.15, 0.45, 1.0],
+			"cycle_sols": 3.0,
+			"cycle_category": "balance: time-compressed game cycle",
+			"earth_words": "weeks on Earth",
+			"meals": 5.0,
+			"meals_category": "balance",
+			"water_l_per_hour": 0.2,
+			"water_category": "balance",
+			"nutrient_use_per_cycle": 0.6,
+			"nutrient_category": "balance",
+			"evidence": "ISS analog: lettuce was grown in the Veggie chamber on the International Space Station (S11). That is space-station evidence, not proof that it grows on Mars.",
+			"evidence_short": "grown on the ISS (Veggie)",
+			"source_ids": ["S11"]
+		},
+		"tomato": {
+			"name": "Tomato",
+			"map_mesh": "gd_crop_tomato",
+			"stages": ["seed", "sprout", "flowering", "ready"],
+			"stage_starts": [0.0, 0.15, 0.45, 1.0],
+			"cycle_sols": 6.0,
+			"cycle_category": "balance: time-compressed game cycle",
+			"earth_words": "months on Earth",
+			"meals": 12.0,
+			"meals_category": "balance",
+			"water_l_per_hour": 0.3,
+			"water_category": "balance",
+			"nutrient_use_per_cycle": 0.9,
+			"nutrient_category": "balance",
+			"evidence": "Plan, not yet grown on the ISS: the NASA page lists tomatoes as produce the team hopes to plant in future (S11); a flight plan names tomato (S13, search lead only). It is not proof that tomatoes grow on Mars.",
+			"evidence_short": "plan, not yet grown on the ISS",
+			"source_ids": ["S11", "S13"]
+		}
+	}
+}

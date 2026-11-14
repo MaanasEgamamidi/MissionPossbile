@@ -1,7 +1,7 @@
 class_name SettingsPanel
 extends UiPanel
-## Settings in two tabs. Display: menu size, text size, high contrast, subtitles, reduce motion. Controls: mouse,
-## camera, sprint, and the key list where every action can be changed or reset.
+## Settings in three tabs. Display: menu size, text size, high contrast, subtitles, reduce motion. Controls: mouse,
+## camera, sprint, and the key list where every action can be changed or reset. Graphics: Low / Medium / High / Ultra.
 ## Changes apply at once and are saved when the panel closes (settings and key bindings).
 ## While it waits for a new key, the panel cannot close and the key it catches never reaches the game.
 
@@ -24,6 +24,8 @@ var _invert_y: CheckButton
 var _fov: HSlider
 var _fov_label: Label
 var _toggle_sprint: CheckButton
+var _quality: OptionButton
+var _quality_info: Label
 var _binding_labels: Dictionary = {}     # action -> Label
 var _change_buttons: Dictionary = {}     # action -> Button
 var _reset_buttons: Dictionary = {}      # action -> Button
@@ -52,6 +54,7 @@ func setup(p_services: GameServices) -> void:
 	outer.add_child(_tabs)
 	_build_display(_tab("Display"))
 	_build_controls(_tab("Controls"))
+	_build_graphics(_tab("Graphics"))
 	var done := Button.new()
 	done.text = "Done"
 	done.theme_type_variation = UiTheme.PRIMARY_BUTTON
@@ -80,6 +83,11 @@ func first_focus() -> Control:
 ## The tab container (tests switch tabs with it).
 func tabs() -> TabContainer:
 	return _tabs
+
+
+## The graphics preset picker (tests choose presets with it).
+func quality_button() -> OptionButton:
+	return _quality
 
 
 ## The action waiting for a new key, or &"".
@@ -299,7 +307,24 @@ func _build_controls(box: VBoxContainer) -> void:
 	_note.theme_type_variation = UiTheme.MUTED
 
 
+func _build_graphics(box: VBoxContainer) -> void:
+	_label(box, "Graphics quality")
+	_quality = OptionButton.new()
+	for item: String in GraphicsQuality.NAMES:
+		_quality.add_item(item)
+	_quality.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_quality.item_selected.connect(func(i: int) -> void:
+		settings.graphics_quality = i
+		_apply())
+	box.add_child(_quality)
+	_quality_info = _label(box, "")
+	_quality_info.theme_type_variation = UiTheme.MUTED
+	var help := _label(box, "Lower presets run faster on slower computers. High is how the colony was designed to look.")
+	help.theme_type_variation = UiTheme.MUTED
+
+
 func _read_settings() -> void:
+	_quality.select(settings.graphics_quality)
 	_ui_scale.set_value_no_signal(settings.ui_scale)
 	_text_size.select(maxi(0, GameSettings.TEXT_SCALES.find(settings.text_scale)))
 	_high_contrast.set_pressed_no_signal(settings.high_contrast)
@@ -322,6 +347,7 @@ func _update_value_labels() -> void:
 	_ui_scale_label.text = "Menu and HUD size: %d %%" % roundi(settings.ui_scale * 100.0)
 	_mouse_label.text = "Mouse speed: %.1f (normal 2.0)" % (settings.mouse_sensitivity * 1000.0)
 	_fov_label.text = "Field of view: %d°" % roundi(settings.fov_degrees)
+	_quality_info.text = GraphicsQuality.DESCRIPTIONS[settings.graphics_quality]
 
 
 func _update_bindings() -> void:

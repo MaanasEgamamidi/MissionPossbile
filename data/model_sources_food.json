@@ -1,0 +1,34 @@
+{
+	"_about": {"category": "index", "source_ids": [], "note": "Evidence category of every FoodBalance field (scripts/core/food_balance.gd) and every number in data/crops.json (Prompt 08, food part). Categories: balance (game tuning, no source; never a NASA figure), physics, S11 (NASA 'Growing Plants in Space': ISS Veggie grew lettuce; tomatoes only planned), S13 (NTRS VEG-04/05 flight definition, SEARCH-ONLY lead that VEG-05 was planned for tomato). Growing plants on the ISS does not prove that crops grow on Mars. Source ids refer to docs/source_register.md."},
+
+	"light_zone": {"category": "balance", "source_ids": [], "note": "\"Greenhouse\": the grow lights are the Greenhouse lighting circuit (9 kW in GameBalance.zone_load_kw). Game layout, not a NASA figure. Light factor 1 when switched on and not shed, else 0 (growth stops)."},
+	"bed_water_capacity_l": {"category": "balance", "source_ids": [], "note": "6 L of soil water per bed (or hydroponic tank)."},
+	"water_good": {"category": "balance", "source_ids": [], "note": "50 %: full growth speed at this soil water share or more; water factor = share / 0.5 below it, and the plants droop (wilting symptom)."},
+	"water_low": {"category": "balance", "source_ids": [], "note": "25 %: below it the colony warns that the bed is drying out."},
+	"drip_max_l_per_hour": {"category": "balance", "source_ids": [], "note": "1 L per game hour through a clean drip line."},
+	"drip_clog_per_sol": {"category": "balance", "source_ids": [], "note": "25 % of the flow lost per sol: the watering chore (flush by switching the bed's water on). Removed by food_irrigation_reliability; flushed daily by food_scheduled_care."},
+	"wilt_after_dry_hours": {"category": "balance", "source_ids": [], "note": "One sol (24.66 game hours) completely dry, then the plant wilts and must be replanted. An alert comes first."},
+	"nutrients_at_planting": {"category": "balance", "source_ids": [], "note": "70 % in fresh growing mix."},
+	"nutrient_good_low": {"category": "balance", "source_ids": [], "note": "40 %: bottom of the good band; below it yellow leaves and slower growth. No nutrient or fertilizer source has been checked (register section 10)."},
+	"nutrient_good_high": {"category": "balance", "source_ids": [], "note": "80 %: top of the good band (shown on panels)."},
+	"nutrient_floor_factor": {"category": "balance", "source_ids": [], "note": "15 % of full speed with no nutrients at all (slows, never instant death)."},
+	"metering_target": {"category": "balance", "source_ids": [], "note": "60 %: level food_nutrient_metering holds."},
+	"response_rise": {"category": "balance", "source_ids": [], "note": "The growth rate must rise 10 % over the rate at inspection to count as a response (food_observe_response)."},
+	"trial_window_hours": {"category": "balance", "source_ids": [], "note": "One sol to see a response after the change."},
+	"schedule_l_per_bed_hour": {"category": "balance", "source_ids": [], "note": "0.35 L per game hour per planted bed: what food_scheduled_care allocates if less is set."},
+	"schedule_flush_phase": {"category": "balance", "source_ids": [], "note": "Sol phase 0.3: the schedule flushes every drip line once per sol."},
+
+	"crops.lettuce.cycle_sols": {"category": "balance", "source_ids": [], "note": "3 sols seed to harvest. TIME-COMPRESSED: weeks on Earth. Not a NASA figure."},
+	"crops.lettuce.meals": {"category": "balance", "source_ids": [], "note": "5 meals per harvest (game abstraction of a food store counted in meals)."},
+	"crops.lettuce.water_l_per_hour": {"category": "balance", "source_ids": [], "note": "0.2 L per game hour from the soil."},
+	"crops.lettuce.nutrient_use_per_cycle": {"category": "balance", "source_ids": [], "note": "60 % of the nutrient level used over a full cycle."},
+	"crops.lettuce.evidence": {"category": "S11", "source_ids": ["S11"], "note": "ISS analog evidence: lettuce was grown in Veggie (S11, VERIFIED). Space-station evidence, not Mars agriculture."},
+	"crops.tomato.cycle_sols": {"category": "balance", "source_ids": [], "note": "6 sols seed to harvest. TIME-COMPRESSED: months on Earth. Not a NASA figure."},
+	"crops.tomato.meals": {"category": "balance", "source_ids": [], "note": "12 meals per harvest."},
+	"crops.tomato.water_l_per_hour": {"category": "balance", "source_ids": [], "note": "0.3 L per game hour from the soil."},
+	"crops.tomato.nutrient_use_per_cycle": {"category": "balance", "source_ids": [], "note": "90 % of the nutrient level used over a full cycle."},
+	"crops.tomato.evidence": {"category": "S11", "source_ids": ["S11", "S13"], "note": "Plan, not yet grown on the ISS: S11 lists tomatoes as future produce; S13 (SEARCH-ONLY) names a planned tomato flight. S14's 'Red Robin' lead is SEARCH-ONLY and not used. Not Mars evidence."},
+
+	"bed_water_source": {"category": "physics", "source_ids": [], "note": "Bed water is only taken from the greenhouse water LifeSupportModel delivered (ledger greenhouse_water_l); that water is already booked to wastewater, so no water is created and every ledger identity is unchanged."},
+	"meals_harvested": {"category": "balance", "source_ids": [], "note": "Ledger term: meals added to food_meals by harvest (food now = start + harvested - eaten - recovery)."}
+}

@@ -1,0 +1,29 @@
+{
+	"_about": {"category": "index", "source_ids": [], "note": "Evidence category of every ProgressionBalance field (Prompt 08, part G: upgrades, knowledge, learning, exercise). Categories: balance (game tuning, no source; never a NASA figure), S02 (length of a sol), S08 (ISS ECLSS mechanism), fiction scaled from S09 (MOXIE mechanism; colony-size unit is fiction). Source ids refer to docs/source_register.md."},
+
+	"card_parts": {"category": "balance", "source_ids": [], "note": "Parts each card consumes (2 to 4). The cheapest card of each sector costs 2, so the 10 starting parts buy one card per sector."},
+
+	"battery_capacity_factor": {"category": "balance", "source_ids": [], "note": "energy_battery_reserve: battery capacity x 1.25 once (800 -> 1000 kWh). Fiction 2080 battery bank."},
+	"battery_life_support_reserve_fraction": {"category": "balance", "source_ids": [], "note": "energy_battery_reserve: the last 20 % of the capacity is kept for life support; room and greenhouse lights cannot draw it."},
+	"tracking_drive_factor": {"category": "balance", "source_ids": [], "note": "energy_solar_tracking: tracker drives use 0.5 x their power (0.6 -> 0.3 kW)."},
+	"tracking_output_factor": {"category": "balance", "source_ids": [], "note": "energy_solar_tracking: tracking panels give 1.1 x (more exact aiming). Mechanism is physics (light straight on); the size is tuning."},
+	"cleaner_self_repair_sols": {"category": "S02", "source_ids": ["S02"], "note": "energy_cleaner_automation: a broken cleaner repairs itself after 1 sol (24.66 game hours, S02). The one-sol choice is balance."},
+
+	"recycler_bonus_l_per_hour": {"category": "balance", "source_ids": [], "note": "ls_water_reliability: recycler +1 L/h (3 -> 4). The 90 % recovery stays the S08 value."},
+	"recycler_condition_floor": {"category": "balance", "source_ids": [], "note": "ls_water_reliability: recycler condition never below 0.8, so its water quality stays 100 %."},
+	"electrolysis_output_factor": {"category": "S08", "source_ids": ["S08"], "note": "ls_electrolysis: top output x 1.5 (0.2 -> 0.3 kg/h) at the same kWh per kg. S08 supports the mechanism (ISS electrolysis); the factor is balance. Water per kg stays the physics value 1.126."},
+	"co2_unit_output_factor": {"category": "fiction scaled from S09", "source_ids": ["S09"], "note": "ls_co2_processing: top output x 1.5 (0.15 -> 0.225 kg/h). MOXIE (S09) supports the mechanism; a colony-size unit and its upgrade are fiction."},
+	"monitoring_reserve_warn_factor": {"category": "balance", "source_ids": [], "note": "ls_oxygen_monitoring: oxygen reserve warning at 1.5 x the normal level (20 -> 30 kg)."},
+	"monitoring_o2_warn_margin_kpa": {"category": "balance", "source_ids": [], "note": "ls_oxygen_monitoring: cabin oxygen warning 1 kPa earlier (19 -> 20 kPa)."},
+	"monitoring_co2_warn_margin_kpa": {"category": "balance", "source_ids": [], "note": "ls_oxygen_monitoring: cabin CO2 warning 0.1 kPa earlier (0.5 -> 0.4 kPa)."},
+
+	"low_output_share": {"category": "balance", "source_ids": [], "note": "Contract value: a fix counts as a diagnosis when the panels gave less than 80 % of their clean output."},
+	"recovered_output_share": {"category": "balance", "source_ids": [], "note": "Contract value: recovery means more than 95 % of the clean output."},
+	"recovery_window_sols": {"category": "balance", "source_ids": [], "note": "Contract value: the recovery must be seen within 1 sol of the fix."},
+	"process_run_hours": {"category": "balance", "source_ids": [], "note": "Contract value: each oxygen process must run at least 1 game hour for ls_distinguish_inputs."},
+
+	"exercise_stamina_cost": {"category": "balance", "source_ids": [], "note": "Body energy (stamina 0..100) one exercise session uses. Not electricity: the battery is never touched."},
+	"exercise_conditioning_gain": {"category": "balance", "source_ids": [], "note": "Conditioning added per session (0..1)."},
+	"conditioning_max": {"category": "balance", "source_ids": [], "note": "Cap on conditioning."},
+	"conditioning_recovery_per_hour": {"category": "balance", "source_ids": [], "note": "Extra body energy recovered per game hour at full conditioning; 0 when untrained, so the existing stamina feel is unchanged."}
+}

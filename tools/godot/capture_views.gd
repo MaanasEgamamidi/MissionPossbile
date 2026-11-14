@@ -1,7 +1,7 @@
 extends SceneTree
 ## Renders reference-camera views of the world to PNG files with no UI and no debug overlay.
 ##   godot --path . --script res://tools/godot/capture_views.gd -- --out <dir> [--cams a,b|beauty|all] [--size 1920x1080]
-##         [--frames 90] [--off zone_slug,...] [--night]
+##         [--frames 90] [--off zone_slug,...] [--night] [--quality low|medium|high|ultra]
 ## The world is drawn in an off-screen SubViewport of exactly --size, so the desktop window size does not matter.
 ## --off switches the named zones' fixtures off (lights and emission); --night removes the sun and dims the sky.
 
@@ -51,6 +51,9 @@ func _run() -> void:
 		lighting.set_zone_powered_by_slug(z, false)
 	if night:
 		lighting.set_night(true)
+	var quality := _arg("--quality", "")
+	if quality != "":
+		GraphicsQuality.apply(self, GraphicsQuality.NAMES.find(quality.capitalize()) if not quality.is_valid_int() else int(quality), vp)
 
 	var cams: Array = []
 	var holder := world.get_node("ReferenceCameras")

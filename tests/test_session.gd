@@ -8,14 +8,21 @@ var _all_invariants: bool = true
 
 func _initialize() -> void:
 	_catalog = StationCatalog.from_manifest("res://data/colony_manifest.json", ColonyZones.from_manifest("res://data/colony_manifest.json"))
+	# The 21 base stations (9 tagged map objects + 12 sun trackers) exactly; stations added by data/stations_*.json
+	# files (Prompts 08 and 09) only need a kind those files define.
+	var base: Array = ["power", "computer", "comms", "food", "lifesupport", "heal", "board", "survivor", "suits", "solar"]
 	var kinds: Array = []
+	var extra_ok := true
 	for station: Dictionary in _catalog.values():
-		kinds.append(station.kind)
+		if base.has(String(station.kind)):
+			kinds.append(station.kind)
+		else:
+			extra_ok = extra_ok and StationPanels.all_kinds().has(String(station.kind))
 	kinds.sort()
 	var expected_kinds: Array = ["board", "comms", "computer", "food", "heal", "lifesupport", "power"]
 	for tracker: int in 12: expected_kinds.append("solar")
 	expected_kinds.append_array(["suits", "survivor"])
-	_check("manifest stations", _catalog.size() == 21 and kinds == expected_kinds)
+	_check("manifest stations", kinds.size() == 21 and kinds == expected_kinds and extra_ok, "%d base, %d in all" % [kinds.size(), _catalog.size()])
 	var s := _new_session()
 	var power: StringName = LegacyStations.stations_of_kind(s.state, "power")[0]
 	_check("power zone", s.state.stations[power].zone == "Power Room")

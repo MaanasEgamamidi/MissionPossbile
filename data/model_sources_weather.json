@@ -1,0 +1,60 @@
+{
+	"_about": {"category": "index", "source_ids": [], "note": "Evidence category of every WeatherConfig field (scripts/core/weather_config.gd) used by the Prompt 09 weather part. Categories: balance (game tuning, never a NASA figure), game transformation (how archive episodes become game events: accelerated gaps, severity scaling, duration stretch; NOT NASA-observed storm frequency), engineering (software behaviour), contract (fixed by the project brief), physics, S01/S02 (register sources). The opacity curves, wind, sols and Ls themselves come from the data bundle (data/weather/bundle, part D) and its own source register entries."},
+
+	"refresh_hours": {"category": "contract", "source_ids": [], "note": "Check for published updates at startup and every hour while online."},
+	"retry_first_minutes": {"category": "contract", "source_ids": [], "note": "First retry after a failed check: 1 real minute, doubling after each failure."},
+	"retry_cap_minutes": {"category": "contract", "source_ids": [], "note": "Retry wait capped at 60 real minutes."},
+	"default_timeout_s": {"category": "engineering", "source_ids": [], "note": "Timeout of one download when the refresh entry gives none (20 s)."},
+	"default_max_bytes": {"category": "engineering", "source_ids": [], "note": "Largest download accepted when the refresh entry gives no limit (2 MB)."},
+
+	"start_ls": {"category": "game transformation", "source_ids": [], "note": "Solar longitude of sol 0 of a new game; -1 = the earliest ls_start of the bundle, so the colony starts in the observed season."},
+	"mars_year_sols": {"category": "S01", "source_ids": ["S01", "S02"], "note": "One Mars year is about 668.6 sols (orbital period 686.98 Earth days, S01, divided by the sol length, S02). The game's Ls advances with the sol count."},
+	"orbit_eccentricity": {"category": "S01", "source_ids": ["S01"], "note": "0.0935, Mars Fact Sheet orbital eccentricity; used in the equation of the centre for Ls."},
+	"ls_perihelion_deg": {"category": "physics", "source_ids": [], "note": "Ls of perihelion, about 251 degrees: standard orbital element of Mars. Ls = true anomaly + 251 degrees."},
+
+	"scale_sky_to_default": {"category": "game transformation", "source_ids": [], "note": "The archive opacity is multiplied by one factor so the sky at the start of a new game equals GameBalance.dust_tau_default (0.5); the seasonal shape and the episode curves keep their archive proportions. The factor is saved per game (state.weather.sky_scale)."},
+	"max_tau": {"category": "balance", "source_ids": [], "note": "Upper bound of the opacity the game uses (4)."},
+
+	"teach_min_sols": {"category": "contract", "source_ids": [], "note": "No dust event before 2 sols and before the panel response was taught (a panel cleaned, or evidence energy_diagnose_output_loss), whichever is later."},
+	"first_gap_hours_min": {"category": "balance", "source_ids": [], "note": "The first event starts 6 to 14 game hours after the teaching condition."},
+	"first_gap_hours_max": {"category": "balance", "source_ids": [], "note": "See first_gap_hours_min."},
+	"minor_severity_max": {"category": "balance", "source_ids": [], "note": "The first event uses the archive's smallest episode at 22 to 35 % of its observed opacity rise: minor."},
+	"minor_severity_min": {"category": "balance", "source_ids": [], "note": "See minor_severity_max."},
+
+	"gap_sols_min": {"category": "game transformation", "source_ids": [], "note": "Calm sols between events, 1 to 4, drawn per seed. ACCELERATED: not NASA-observed storm frequency."},
+	"gap_sols_max": {"category": "game transformation", "source_ids": [], "note": "See gap_sols_min."},
+	"gap_shape": {"category": "game transformation", "source_ids": [], "note": "Shape of the gap draw (1.4: short gaps somewhat more common)."},
+	"stretch_min": {"category": "game transformation", "source_ids": [], "note": "An episode's observed duration is stretched by 0.75 to 1.35, per event."},
+	"stretch_max": {"category": "game transformation", "source_ids": [], "note": "See stretch_min."},
+	"severity_step": {"category": "game transformation", "source_ids": [], "note": "Severity = share of the episode's observed opacity rise above its own background. Escalation: the ceiling grows by 0.25 per event, from the minor first one, up to severity_max."},
+	"severity_max": {"category": "game transformation", "source_ids": [], "note": "Highest severity scale, 1.25 (25 % above the observed rise)."},
+	"severity_low_share": {"category": "game transformation", "source_ids": [], "note": "A later event uses 45 to 100 % of its escalation ceiling."},
+
+	"readiness_cap_low": {"category": "balance", "source_ids": [], "note": "Severity cap at the warning when the colony is least ready (0.4) ..."},
+	"readiness_cap_high": {"category": "balance", "source_ids": [], "note": "... and when it is fully ready (1.25). Readiness = weighted battery above the reserve, cleaner working, clean panels, life support fine."},
+	"battery_reserve_kwh": {"category": "balance", "source_ids": [], "note": "Life-support battery reserve, 120 kWh: about one night of control, heating, scrubber, fans and recycler."},
+	"recovery_hours_min": {"category": "balance", "source_ids": [], "note": "At least 18 game hours between the end of an event and the next start; up to twice as long when the colony is not ready."},
+	"hold_battery_factor": {"category": "balance", "source_ids": [], "note": "An event is held back while the battery is below 1.5 x the reserve or an urgent alert is active ..."},
+	"hold_hours": {"category": "balance", "source_ids": [], "note": "... and re-checked every 6 game hours."},
+	"hold_dust": {"category": "balance", "source_ids": [], "note": "After the first, minor event, the next one also waits while the panels are at least 20 % dusty on average and the cleaner does not work: dust management before escalation (a storm's dust on uncleaned panels would otherwise leave a lasting power deficit)."},
+	"readiness_weights": {"category": "balance", "source_ids": [], "note": "Weights of battery, cleaner, panels and life support in readiness: 0.35, 0.25, 0.25, 0.15."},
+
+	"return_margin": {"category": "balance", "source_ids": [], "note": "The warning comes at least 2 x the longest current outdoor walk home (ReturnRoutes at suit walking speed) before the opacity starts to rise."},
+	"min_warning_hours": {"category": "balance", "source_ids": [], "note": "And never less than 4 game hours."},
+	"queue_length": {"category": "engineering", "source_ids": [], "note": "Future events kept in state.weather_queue (3)."},
+	"history_length": {"category": "engineering", "source_ids": [], "note": "Past events kept in state.weather.history (12)."},
+
+	"route_cell_m": {"category": "engineering", "source_ids": [], "note": "Route grid cell, 2 m (data/weather/route_grid.res, tools/godot/bake_route_grid.gd)."},
+	"route_max_slope_deg": {"category": "balance", "source_ids": [], "note": "40 degrees, the player's steepest walkable slope (PlayerTuning.max_slope_degrees)."},
+	"route_slope_penalty": {"category": "balance", "source_ids": [], "note": "Walking cost = distance x (1 + slope grade)."},
+	"route_body_radius_m": {"category": "physics", "source_ids": [], "note": "Obstacles grown by the player's capsule radius, 0.22 m (PlayerTuning.body_radius_m)."},
+	"route_step_m": {"category": "balance", "source_ids": [], "note": "Obstacles lower than 0.25 m are stepped over (PlayerTuning.step_height_m)."},
+
+	"sun_min_share": {"category": "balance", "source_ids": [], "note": "Presentation: sun light never below 25 % of normal."},
+	"sky_min_share": {"category": "balance", "source_ids": [], "note": "Presentation: sky brightness never below 35 % of normal."},
+	"fog_density_per_tau": {"category": "balance", "source_ids": [], "note": "Presentation: fog density added per unit of opacity above the default."},
+	"fog_density_max": {"category": "balance", "source_ids": [], "note": "Presentation: upper bound of the added fog density."},
+	"sky_follow_rate": {"category": "balance", "source_ids": [], "note": "Presentation: how fast the shown sky follows the opacity (1/s)."},
+	"dust_particles_max": {"category": "balance", "source_ids": [], "note": "Presentation: at most 160 dust particles around an outdoor player."},
+	"dust_particles_from_tau": {"category": "balance", "source_ids": [], "note": "Presentation: particles start 0.25 above the default opacity."}
+}

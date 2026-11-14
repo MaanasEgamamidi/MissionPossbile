@@ -162,7 +162,10 @@ func _test_mapping() -> void:
 			panel.free()
 		if not ok:
 			bad.append("%s (%s)" % [id, kind])
-	_check("every station of a new game maps to the right panel class (21 = 9 + 12 trackers)", st.stations.size() == 21
+	var base_count := 0
+	for k: String in ["power", "computer", "comms", "food", "lifesupport", "heal", "board", "survivor", "suits", "solar"]:
+		base_count += int(kinds.get(k, 0))
+	_check("every station of a new game maps to the right panel class (21 base + those added by data files)", base_count == 21
 		and int(kinds.get("solar", 0)) == 12 and int(kinds.get("suits", 0)) == 1 and int(kinds.get("lifesupport", 0)) == 1 and bad.is_empty(),
 		"%d stations %s, wrong: %s" % [st.stations.size(), kinds, ", ".join(bad)])
 

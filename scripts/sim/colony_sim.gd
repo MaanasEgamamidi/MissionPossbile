@@ -106,4 +106,9 @@ func _update_alerts(state: ColonyState, balance: GameBalance, phase_end: float, 
 		fresh.append({"id": id, "level": String(entry[1]), "text": String(entry[2]), "since_hours": since})
 		if not previous.has(id) and events != null:
 			events.system_alert.emit(StringName(id), StringName(entry[1]), String(entry[2]))
+	# Greenhouse warnings (Prompt 08) join the list the panels read; CropSystem already announced each one once.
+	for entry: Array in CropSystem.alerts(state):
+		var crop_id := String(entry[0])
+		var crop_since := float((previous[crop_id] as Dictionary).since_hours) if previous.has(crop_id) else state.sim_hours
+		fresh.append({"id": crop_id, "level": String(entry[1]), "text": String(entry[2]), "since_hours": crop_since})
 	state.alerts = fresh

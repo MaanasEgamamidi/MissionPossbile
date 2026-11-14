@@ -1,0 +1,54 @@
+[
+ {
+  "id": 0,
+  "name": "electrical",
+  "hair": "Ponytail",
+  "beard": false,
+  "feminine": 1.0,
+  "height": 0.93,
+  "skin": "a8714f",
+  "hair_col": "3b2417",
+  "accent": "ffc400",
+  "symbol": "Triangle",
+  "band": "Solid"
+ },
+ {
+  "id": 1,
+  "name": "medical",
+  "hair": "Curly",
+  "beard": false,
+  "feminine": 0.0,
+  "height": 1.05,
+  "skin": "6e452e",
+  "hair_col": "151210",
+  "accent": "2a7bff",
+  "symbol": "Plus",
+  "band": "Double"
+ },
+ {
+  "id": 2,
+  "name": "biology",
+  "hair": "Bob",
+  "beard": false,
+  "feminine": 1.0,
+  "height": 0.9,
+  "skin": "f1c9a5",
+  "hair_col": "a4502a",
+  "accent": "1e9e48",
+  "symbol": "Circle",
+  "band": "Dots"
+ },
+ {
+  "id": 3,
+  "name": "geology",
+  "hair": "Buzz",
+  "beard": true,
+  "feminine": 0.0,
+  "height": 1.0,
+  "skin": "c39a6e",
+  "hair_col": "6b4a2b",
+  "accent": "d2379b",
+  "symbol": "Diamond",
+  "band": "Chevron"
+ }
+]

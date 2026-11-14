@@ -149,8 +149,9 @@ static func _hang(mi: MeshInstance3D, suit: Dictionary, index: int) -> void:
 	mi.get_parent().add_child(visual)
 	visual.set_zone_layers(mi.layers)
 	# an empty suit: no face behind the visor, no idle breathing
-	for part: Node in visual.find_children("Body_*", "MeshInstance3D", true, false):
-		(part as Node3D).visible = false
+	for pattern: String in ["Body_*", "Hair*"]:
+		for part: Node in visual.find_children(pattern, "MeshInstance3D", true, false):
+			(part as Node3D).visible = false
 	for player: Node in visual.find_children("*", "AnimationPlayer", true, false):
 		(player as AnimationPlayer).stop()
 	visual.set_process(false)

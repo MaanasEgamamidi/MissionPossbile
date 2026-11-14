@@ -1,0 +1,107 @@
+{
+ "format": "mars_colony_weather_bundle",
+ "schema": 1,
+ "bundle_id": "fixture-min-v1",
+ "version": "1",
+ "built_utc": "2026-01-01T00:00:00Z",
+ "note": "TEST FIXTURE: synthetic numbers for format tests only, not observations.",
+ "products": [
+  {
+   "source_id": "TEST",
+   "pds_lid": "urn:nasa:pds:test_fixture:not_a_product",
+   "version": "1.0",
+   "mission": "Mars 2020",
+   "site": "Jezero crater",
+   "lat": 18.44,
+   "lon": 77.45,
+   "units_ok": [
+    "Pa",
+    "K",
+    "m/s",
+    "deg",
+    "1"
+   ],
+   "missing_value": -999.0,
+   "time_column": "sol",
+   "quality": "TEST FIXTURE: synthetic values, no flags.",
+   "license": "Test fixture written by tools/weather/build_bundle.py --fixture; not archive data.",
+   "etag": "\"fixture-1\"",
+   "last_modified": "Thu, 01 Jan 2026 00:00:00 GMT",
+   "retrieved_utc": "2026-01-01T00:00:00Z",
+   "transform": [
+    "synthetic numbers written by build_fixture()"
+   ],
+   "id": "fixture_ps",
+   "kind": "pressure",
+   "file": "fixture_ps.csv",
+   "sha256": "d29900b22abce17d183628500a74b20057306e002d46d1722851f8383ac735e8",
+   "bytes": 118,
+   "instrument": "MEDA PS (fixture)",
+   "observation_start_utc": "2022-01-01T00:00:00Z",
+   "observation_end_utc": "2022-01-01T18:30:00Z",
+   "sol_start": 100,
+   "sol_end": 100,
+   "ls_start": 150.0,
+   "ls_end": 150.4,
+   "columns": {
+    "sol": "1",
+    "pressure": "Pa"
+   },
+   "source_url": "https://fixture.invalid/weather/fixture_ps.csv"
+  },
+  {
+   "source_id": "TEST",
+   "pds_lid": "urn:nasa:pds:test_fixture:not_a_product",
+   "version": "1.0",
+   "mission": "Mars 2020",
+   "site": "Jezero crater",
+   "lat": 18.44,
+   "lon": 77.45,
+   "units_ok": [
+    "Pa",
+    "K",
+    "m/s",
+    "deg",
+    "1"
+   ],
+   "missing_value": -999.0,
+   "time_column": "sol",
+   "quality": "TEST FIXTURE: synthetic values, no flags.",
+   "license": "Test fixture written by tools/weather/build_bundle.py --fixture; not archive data.",
+   "etag": "\"fixture-1\"",
+   "last_modified": "Thu, 01 Jan 2026 00:00:00 GMT",
+   "retrieved_utc": "2026-01-01T00:00:00Z",
+   "transform": [
+    "synthetic numbers written by build_fixture()"
+   ],
+   "id": "fixture_tau",
+   "kind": "dust_opacity",
+   "file": "fixture_tau.csv",
+   "sha256": "2212684bae8b194d66f26acb78e617d3303453f3e9b6bef0782b1b33ce0f7b3e",
+   "bytes": 195,
+   "instrument": "orbital column dust optical depth (fixture)",
+   "observation_start_utc": "2022-01-01T00:00:00Z",
+   "observation_end_utc": "2022-01-08T05:00:00Z",
+   "sol_start": 100,
+   "sol_end": 107,
+   "ls_start": 150.0,
+   "ls_end": 153.85,
+   "columns": {
+    "sol": "1",
+    "ls": "deg",
+    "tau": "1"
+   },
+   "source_url": "https://fixture.invalid/weather/fixture_tau.csv"
+  }
+ ],
+ "episodes_file": "episodes.json",
+ "episodes_sha256": "5285669e9dd29bc8806db7cb47112858a87ea2b6349897c60629bbe8262e5b60",
+ "refresh": [
+  {
+   "product_id": "fixture_ps",
+   "url": "https://fixture.invalid/weather/fixture_ps.csv",
+   "max_bytes": 200000,
+   "timeout_s": 20
+  }
+ ]
+}

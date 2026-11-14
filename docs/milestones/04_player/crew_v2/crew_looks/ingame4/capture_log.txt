@@ -1,0 +1,22 @@
+model res://assets/characters/astronaut.glb modified 2026-11-14T03:47:19
+crew 0 electrical_comms: hair [&"Hair_Ponytail"] (model has ["Hair_Beard", "Hair_Bob", "Hair_Buzz", "Hair_Curly", "Hair_Ponytail"]) feminine 1.0 height 0.93 accent ffc400 skin a8714f hair colour 3b2417 tag "Electrical"
+crew 1 medical_life_support: hair [&"Hair_Curly"] (model has ["Hair_Beard", "Hair_Bob", "Hair_Buzz", "Hair_Curly", "Hair_Ponytail"]) feminine 0.0 height 1.03 accent 2a7bff skin 6e452e hair colour 151210 tag "Medical"
+crew 2 biology_food: hair [&"Hair_Bob"] (model has ["Hair_Beard", "Hair_Bob", "Hair_Buzz", "Hair_Curly", "Hair_Ponytail"]) feminine 1.0 height 0.90 accent 178a3e skin f1c9a5 hair colour a4502a tag "Biology"
+crew 3 field_engineering_geology: hair [&"Hair_Buzz", &"Hair_Beard"] (model has ["Hair_Beard", "Hair_Bob", "Hair_Buzz", "Hair_Curly", "Hair_Ponytail"]) feminine 0.0 height 1.00 accent d2379b skin c39a6e hair colour 6b4a2b tag "Geology"
+saved unsuited_front.png
+saved unsuited_back.png
+saved unsuited_threequarter.png
+saved suited_front.png
+saved suited_back.png
+saved head_unsuited_0.png
+saved head_unsuited_1.png
+saved head_unsuited_2.png
+saved head_unsuited_3.png
+saved head_suited_0.png
+saved head_suited_1.png
+saved head_suited_2.png
+saved head_suited_3.png
+saved gameplay_0.png
+saved gameplay_1.png
+saved gameplay_2.png
+saved gameplay_3.png

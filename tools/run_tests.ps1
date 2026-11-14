@@ -1,5 +1,5 @@
 param(
-	[string[]]$Tests = @("test_saves", "test_session", "test_game_services", "test_collision", "test_player", "test_net", "test_net_game"),
+	[string[]]$Tests = @("test_saves", "test_session", "test_game_services", "test_collision", "test_player", "test_net", "test_net_game", "test_graphics_quality"),
 	[string]$LogDir = "",
 	[switch]$Import
 )

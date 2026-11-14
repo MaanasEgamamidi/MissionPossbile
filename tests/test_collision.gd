@@ -14,7 +14,8 @@ func _initialize() -> void:
 	root.add_child(_world)
 	var stats := WorldCollision.stats(_world)
 	print("STATS ", JSON.stringify(stats))
-	_check(stats.doors == 24 and stats.leaves == 52 and stats.stations == 21, "24 doors, 52 leaves, 21 stations (9 tagged + 12 sun trackers)")
+	var extra_stations := StationCatalog.from_manifest("res://data/colony_manifest.json", ColonyZones.from_manifest("res://data/colony_manifest.json")).size() - 21
+	_check(stats.doors == 24 and stats.leaves == 52 and stats.stations == 21 + extra_stations, "24 doors, 52 leaves, 21 base stations + %d from data files (got %d)" % [extra_stations, stats.stations])
 	var shapes: Dictionary = {}
 	var counts: Dictionary = {}
 	for node: Node in _world.find_children("*", "CollisionShape3D", true, false):

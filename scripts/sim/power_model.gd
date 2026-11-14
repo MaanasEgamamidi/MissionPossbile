@@ -12,9 +12,14 @@ extends RefCounted
 ## Ledger identities (kWh):
 ##   battery now = battery at start + battery_in - battery_loss - battery_out
 ##   solar_offered = solar_used + solar_curtailed          load_served = solar to loads + battery_out
+## Upgrades (Prompt 08, numbers in ProgressionBalance): energy_solar_tracking (tracker drives use less power, tracking
+## panels give more), energy_battery_reserve (lights cannot use the life-support reserve; its +25 % capacity is applied
+## once at install by ProgressionActions). energy_cleaner_automation is run by ProgressionSystem.
 
 ## Load groups in shedding order: the first one is shed first when supply is short.
 const SHED_ORDER: Array[String] = ["lights", "greenhouse", "co2_unit", "electrolyser", "recycler", "trackers", "cleaner", "scrubber", "cabin_fans", "base"]
+## Load groups that may not use the life-support battery reserve (energy_battery_reserve upgrade).
+const RESERVE_UNPROTECTED: Array[String] = ["lights", "greenhouse"]
 const GREENHOUSE_ZONE := "Greenhouse"
 const SUNRISE := 0.25
 const SUNSET := 0.75
@@ -59,11 +64,21 @@ static func trackers_can_track(state: ColonyState, balance: GameBalance) -> bool
 	return state.is_on("trackers") and state.condition_of("trackers") >= balance.equipment_min_condition
 
 
-## Output of one tracker in kW.
+## Output of one tracker in kW. With the energy_solar_tracking upgrade a tracking panel gives
+## ProgressionBalance.tracking_output_factor times more.
 static func tracker_kw(state: ColonyState, balance: GameBalance, phase: float, tracking: bool, index: int) -> float:
 	var dust := clampf(float(state.panel_dust[index]), 0.0, 1.0)
+	var upgrade := ProgressionBalance.shared().tracking_output_factor if tracking and state.has_upgrade("energy_solar_tracking") else 1.0
 	return balance.solar_kw_peak / float(ColonyState.TRACKER_COUNT) * sun_term(phase, tracking) * atmosphere_term(state, balance) \
-		* (1.0 - dust) * clampf(state.condition_of("trackers"), 0.0, 1.0)
+		* (1.0 - dust) * clampf(state.condition_of("trackers"), 0.0, 1.0) * upgrade
+
+
+## Battery energy kept for life support (kWh): with the energy_battery_reserve upgrade, room and greenhouse lights may
+## not use the last ProgressionBalance.battery_life_support_reserve_fraction of the capacity. 0 without the upgrade.
+static func life_support_reserve_kwh(state: ColonyState) -> float:
+	if not state.has_upgrade("energy_battery_reserve"):
+		return 0.0
+	return float(state.capacities.get(&"battery_kwh", 0.0)) * ProgressionBalance.shared().battery_life_support_reserve_fraction
 
 
 ## Output of all trackers in kW.
@@ -80,7 +95,10 @@ static func equipment_kw(state: ColonyState, balance: GameBalance, id: String, p
 	if state.condition_of(id) < balance.equipment_min_condition:
 		return 0.0
 	match id:
-		"trackers": return balance.tracker_drive_kw
+		"trackers":
+			if state.has_upgrade("energy_solar_tracking"):
+				return balance.tracker_drive_kw * ProgressionBalance.shared().tracking_drive_factor
+			return balance.tracker_drive_kw
 		"cleaner": return balance.cleaner_kw
 		"recycler": return balance.recycler_kw
 		"scrubber": return balance.scrubber_kw
@@ -130,6 +148,17 @@ static func allocate(state: ColonyState, balance: GameBalance, phase: float, dt:
 		if g.id == "trackers" and tracking:
 			tracking = false                                   # unpowered trackers stay fixed: less sun on the panels
 			solar = solar_kw(state, balance, phase, false)
+	# energy_battery_reserve: room and greenhouse lights may only use the sun and the battery above the life-support
+	# reserve; when that is not enough they are shed (in SHED_ORDER), and life support keeps the reserve.
+	var reserve := life_support_reserve_kwh(state)
+	if reserve > 0.0:
+		var free_kw := minf(balance.battery_discharge_kw_max, maxf(0.0, state.store(&"battery_kwh") - reserve) / dt)
+		for g in groups:
+			if demand <= solar + free_kw + 1e-12:
+				break
+			if RESERVE_UNPROTECTED.has(String(g.id)) and not shed.has(String(g.id)):
+				shed.append(String(g.id))
+				demand -= float(g.kw)
 	demand = maxf(0.0, demand)
 
 	# ---- move the energy

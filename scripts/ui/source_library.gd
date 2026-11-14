@@ -12,6 +12,12 @@ const SOURCES_PATH := "res://data/sources.json"
 const CLAIMS_PATH := "res://data/claims.json"
 const EXPLANATIONS_PATH := "res://data/explanations.json"
 const CREDITS_PATH := "res://data/credits.json"
+## Folder searched for the extra files data/sources_<part>.json and data/claims_<part>.json (same formats as
+## sources.json and claims.json). Their entries come after the main ones, in file-name order; an id that is
+## already known is skipped with a warning.
+const DATA_DIR := "res://data"
+const EXTRA_SOURCES_PREFIX := "sources_"
+const EXTRA_CLAIMS_PREFIX := "claims_"
 
 const MONTHS: PackedStringArray = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
@@ -32,19 +38,37 @@ static var open_url_hook: Callable = Callable()
 static var _loaded := false
 static var _sources: Array[Dictionary] = []
 static var _sources_by_id: Dictionary = {}
+static var _extra_sources: Array[Dictionary] = []
 static var _claims: Array[Dictionary] = []
 static var _claims_by_id: Dictionary = {}
 static var _credits: Array[Dictionary] = []
 static var _explanations: Dictionary = {}
 
 
-## Every entry of the register (S, T, M and L ids), in register order.
+## Every entry of the register (S, T, M and L ids), in register order. Entries from the extra
+## data/sources_<part>.json files are not register rows (docs/source_register.md) and are not in this list:
+## see extra_sources() and all_sources(); source(id) finds both kinds.
 static func sources() -> Array[Dictionary]:
 	_ensure_loaded()
 	return _sources
 
 
-## One register entry by id ("S01"); empty if unknown.
+## Entries from the extra data/sources_<part>.json files (for example the weather products, ids W01...).
+static func extra_sources() -> Array[Dictionary]:
+	_ensure_loaded()
+	return _extra_sources
+
+
+## The register entries followed by the extra entries.
+static func all_sources() -> Array[Dictionary]:
+	_ensure_loaded()
+	var out: Array[Dictionary] = []
+	out.append_array(_sources)
+	out.append_array(_extra_sources)
+	return out
+
+
+## One source by id ("S01", or "W01" from an extra file); empty if unknown.
 static func source(id: String) -> Dictionary:
 	_ensure_loaded()
 	return _sources_by_id.get(id, {})
@@ -210,6 +234,7 @@ static func _ensure_loaded() -> void:
 	_loaded = true
 	_sources.clear()
 	_sources_by_id.clear()
+	_extra_sources.clear()
 	_claims.clear()
 	_claims_by_id.clear()
 	_credits.clear()
@@ -223,11 +248,39 @@ static func _ensure_loaded() -> void:
 		if item is Dictionary:
 			_claims.append(item)
 			_claims_by_id[String(item.get("id", ""))] = item
+	for path in _extra_files(EXTRA_SOURCES_PREFIX):
+		for item: Variant in _read_json(path).get("sources", []):
+			if item is Dictionary:
+				var id := String(item.get("id", ""))
+				if id == "" or _sources_by_id.has(id):
+					push_warning("SourceLibrary: %s repeats or lacks source id '%s'; skipped" % [path, id])
+					continue
+				_extra_sources.append(item)
+				_sources_by_id[id] = item
+	for path in _extra_files(EXTRA_CLAIMS_PREFIX):
+		for item: Variant in _read_json(path).get("claims", []):
+			if item is Dictionary:
+				var id := String(item.get("id", ""))
+				if id == "" or _claims_by_id.has(id):
+					push_warning("SourceLibrary: %s repeats or lacks claim id '%s'; skipped" % [path, id])
+					continue
+				_claims.append(item)
+				_claims_by_id[id] = item
 	var credit_data := _read_json(CREDITS_PATH)
 	for item: Variant in credit_data.get("credits", []):
 		if item is Dictionary:
 			_credits.append(item)
 	_explanations = _read_json(EXPLANATIONS_PATH)
+
+
+## res://data/<prefix>*.json files, sorted by name ("sources_" finds sources_weather.json, not sources.json).
+static func _extra_files(prefix: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	for f in DirAccess.get_files_at(DATA_DIR):
+		if f.begins_with(prefix) and f.ends_with(".json"):
+			out.append(DATA_DIR.path_join(f))
+	out.sort()
+	return out
 
 
 static func _read_json(path: String) -> Dictionary:

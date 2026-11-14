@@ -1,0 +1,141 @@
+{
+    "format":  "mars_colony_weather_bundle",
+    "schema":  1,
+    "bundle_id":  "fixture-weather-w-v1",
+    "built_utc":  "2026-11-13T00:00:00Z",
+    "version":  "1",
+    "_fixture":  "TEST FIXTURE (weather worker). Synthetic values in the bundle format; not observations. Covers: sol column in unit \u0027sol\u0027 and in unit \u00271\u0027, a non-PDS product (pds_lid \u0027none (...)\u0027), an Ls range wrapping through 0/360, wind -999.0 = not measured.",
+    "products":  [
+                     {
+                         "id":  "fx_meda_ps",
+                         "kind":  "pressure",
+                         "file":  "meda_ps.csv",
+                         "sha256":  "a73f2af88fdae37f1da56406117cdad6d48b683731839fd88cca42f1938028ec",
+                         "bytes":  391,
+                         "source_id":  "S04",
+                         "pds_lid":  "urn:nasa:pds:fixture:fx_meda_ps",
+                         "version":  "fixture-1",
+                         "mission":  "Mars 2020",
+                         "instrument":  "MEDA (fixture)",
+                         "site":  "Jezero crater",
+                         "lat":  18.44,
+                         "lon":  77.45,
+                         "observation_start_utc":  "2022-01-01T00:00:00Z",
+                         "observation_end_utc":  "2022-01-31T00:00:00Z",
+                         "sol_start":  300,
+                         "sol_end":  330,
+                         "ls_start":  150,
+                         "ls_end":  165,
+                         "columns":  {
+                                         "sol":  "sol",
+                                         "ps_pa":  "Pa",
+                                         "ps_flag":  "1"
+                                     },
+                         "units_ok":  [
+                                          "Pa",
+                                          "1"
+                                      ],
+                         "missing_value":  -999,
+                         "quality":  "fixture: flag 0 = good, 1 = gap",
+                         "license":  "fixture (synthetic test data)",
+                         "source_url":  "https://example.invalid/fixture/meda_ps.csv",
+                         "etag":  "\"fx-fx_meda_ps-1\"",
+                         "last_modified":  "Sat, 01 Jan 2022 00:00:00 GMT",
+                         "retrieved_utc":  "2026-11-13T00:00:00Z",
+                         "transform":  [
+                                           "fixture: synthetic values written by the weather worker for tests",
+                                           "no real transformation"
+                                       ]
+                     },
+                     {
+                         "id":  "fx_meda_tau",
+                         "kind":  "dust_opacity",
+                         "file":  "meda_tau.csv",
+                         "sha256":  "c0679940914618dd56693c8d57cb8d1a280b03113364e5018a5324794d5992f4",
+                         "bytes":  871,
+                         "source_id":  "S04",
+                         "pds_lid":  "none (fixture: research-archive style product, not in PDS)",
+                         "version":  "fixture-1",
+                         "mission":  "Mars 2020",
+                         "instrument":  "MEDA (fixture)",
+                         "site":  "Jezero crater",
+                         "lat":  18.44,
+                         "lon":  77.45,
+                         "observation_start_utc":  "2022-01-01T00:00:00Z",
+                         "observation_end_utc":  "2022-01-31T00:00:00Z",
+                         "sol_start":  300,
+                         "sol_end":  330,
+                         "ls_start":  359.928,
+                         "ls_end":  12.5,
+                         "columns":  {
+                                         "sol":  "1",
+                                         "tau":  "1",
+                                         "tau_flag":  "1"
+                                     },
+                         "units_ok":  [
+                                          "1"
+                                      ],
+                         "missing_value":  -999,
+                         "quality":  "fixture: flag 0 = good, 1 = gap",
+                         "license":  "fixture (synthetic test data)",
+                         "source_url":  "https://example.invalid/fixture/meda_tau.csv",
+                         "etag":  "\"fx-fx_meda_tau-1\"",
+                         "last_modified":  "Sat, 01 Jan 2022 00:00:00 GMT",
+                         "retrieved_utc":  "2026-11-13T00:00:00Z",
+                         "transform":  [
+                                           "fixture: synthetic values written by the weather worker for tests",
+                                           "no real transformation"
+                                       ]
+                     },
+                     {
+                         "id":  "fx_meda_wind",
+                         "kind":  "wind",
+                         "file":  "meda_wind.csv",
+                         "sha256":  "f69601b752d050a46fbaf75cf8ee7122f3aad9a397a10dfd5128f652a1b64edb",
+                         "bytes":  306,
+                         "source_id":  "S04",
+                         "pds_lid":  "urn:nasa:pds:fixture:fx_meda_wind",
+                         "version":  "fixture-1",
+                         "mission":  "Mars 2020",
+                         "instrument":  "MEDA (fixture)",
+                         "site":  "Jezero crater",
+                         "lat":  18.44,
+                         "lon":  77.45,
+                         "observation_start_utc":  "2022-01-01T00:00:00Z",
+                         "observation_end_utc":  "2022-01-31T00:00:00Z",
+                         "sol_start":  300,
+                         "sol_end":  330,
+                         "ls_start":  150,
+                         "ls_end":  165,
+                         "columns":  {
+                                         "sol":  "1",
+                                         "wind_ms":  "m/s"
+                                     },
+                         "units_ok":  [
+                                          "m/s",
+                                          "1"
+                                      ],
+                         "missing_value":  -999,
+                         "quality":  "fixture: flag 0 = good, 1 = gap",
+                         "license":  "fixture (synthetic test data)",
+                         "source_url":  "https://example.invalid/fixture/meda_wind.csv",
+                         "etag":  "\"fx-fx_meda_wind-1\"",
+                         "last_modified":  "Sat, 01 Jan 2022 00:00:00 GMT",
+                         "retrieved_utc":  "2026-11-13T00:00:00Z",
+                         "transform":  [
+                                           "fixture: synthetic values written by the weather worker for tests",
+                                           "no real transformation"
+                                       ]
+                     }
+                 ],
+    "episodes_file":  "episodes.json",
+    "episodes_sha256":  "b51b7d040455734f7a4648f2a16d2188648d2a904401a3aab8e66527b8ed81bf",
+    "refresh":  [
+                    {
+                        "product_id":  "fx_meda_tau",
+                        "url":  "https://example.invalid/fixture/meda_tau.csv",
+                        "max_bytes":  200000,
+                        "timeout_s":  20
+                    }
+                ]
+}

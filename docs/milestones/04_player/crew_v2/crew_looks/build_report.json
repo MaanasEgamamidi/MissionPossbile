@@ -1,0 +1,676 @@
+{
+ "blend": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\crew_v2\\crew_v2.blend",
+ "helmet": {
+  "bone": "Neck",
+  "bottom_edge_z": 1.52,
+  "bottom_edge_r": 0.113,
+  "tris": 328
+ },
+ "ponytail_tip": [
+  0.0,
+  0.26,
+  1.627
+ ],
+ "curly_blobs": 38,
+ "hair": {
+  "Hair_Ponytail": {
+   "tris": 322
+  },
+  "HairIn_Ponytail": {
+   "tris": 248
+  },
+  "Hair_Curly": {
+   "tris": 538
+  },
+  "HairIn_Curly": {
+   "tris": 538
+  },
+  "Hair_Bob": {
+   "tris": 340
+  },
+  "HairIn_Bob": {
+   "tris": 340
+  },
+  "Hair_Buzz": {
+   "tris": 144
+  },
+  "HairIn_Buzz": {
+   "tris": 144
+  },
+  "Hair_Beard": {
+   "tris": 316
+  }
+ },
+ "suit_arms_ident_faces": 240,
+ "pack_box": [
+  -0.17,
+  0.17,
+  0.179,
+  0.299,
+  1.02,
+  1.46,
+  0.399,
+  1.04,
+  1.44
+ ],
+ "suit_torso_ident_faces": 28,
+ "suit_legs_ident_faces": 36,
+ "patch_arm_radius_L": 0.051,
+ "patch_arm_radius_R": 0.051,
+ "body_arms_ident_faces": 160,
+ "collar_neck_edges": 20,
+ "collar_neck_z": [
+  1.495,
+  1.553
+ ],
+ "collar_angles_missing": 2,
+ "body_torso_ident_faces": 220,
+ "chest_symbol_at": [
+  -0.128,
+  -0.105,
+  1.315
+ ],
+ "ident": {
+  "Ident_Symbol_Triangle": 57,
+  "Ident_Symbol_Plus": 156,
+  "Ident_Symbol_Circle": 200,
+  "Ident_Symbol_Diamond": 68,
+  "Ident_Band_Solid": 332,
+  "Ident_Band_Double": 664,
+  "Ident_Band_Dots": 420,
+  "Ident_Band_Chevron": 344
+ },
+ "feminine": {
+  "Body_Head": {
+   "max_offset_m": 0.0143,
+   "rigid_pack_verts": 0
+  },
+  "Body_Torso": {
+   "max_offset_m": 0.0173,
+   "rigid_pack_verts": 0
+  },
+  "Body_Arms": {
+   "max_offset_m": 0.0164,
+   "rigid_pack_verts": 0
+  },
+  "Body_Legs": {
+   "max_offset_m": 0.0006,
+   "rigid_pack_verts": 0
+  },
+  "Suit_Torso": {
+   "max_offset_m": 0.0172,
+   "rigid_pack_verts": 112
+  },
+  "Suit_Arms": {
+   "max_offset_m": 0.0164,
+   "rigid_pack_verts": 0
+  },
+  "Suit_Legs": {
+   "max_offset_m": 0.0008,
+   "rigid_pack_verts": 0
+  }
+ },
+ "meshes": {
+  "Body_Arms": {
+   "tris": 1104,
+   "mats": [
+    "Mat_Skin",
+    "Mat_FlightSuit",
+    "Mat_Ident",
+    "Mat_SuitWhite"
+   ],
+   "groups": "body",
+   "shape_keys": [
+    "Basis",
+    "Feminine"
+   ]
+  },
+  "Body_Head": {
+   "tris": 428,
+   "mats": [
+    "Mat_Skin",
+    "Mat_Eye",
+    "Mat_Hair",
+    "Mat_EyeWhite"
+   ],
+   "groups": "body",
+   "shape_keys": [
+    "Basis",
+    "Feminine"
+   ]
+  },
+  "Body_Legs": {
+   "tris": 964,
+   "mats": [
+    "Mat_Skin",
+    "Mat_FlightSuit",
+    "Mat_Boot"
+   ],
+   "groups": "body",
+   "shape_keys": [
+    "Basis",
+    "Feminine"
+   ]
+  },
+  "Body_Torso": {
+   "tris": 1044,
+   "mats": [
+    "Mat_Skin",
+    "Mat_FlightSuit",
+    "Mat_FlightSuitSeam",
+    "Mat_Ident"
+   ],
+   "groups": "body",
+   "shape_keys": [
+    "Basis",
+    "Feminine"
+   ]
+  },
+  "Hair_Beard": {
+   "tris": 316,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": "body",
+   "shape_keys": []
+  },
+  "Hair_Bob": {
+   "tris": 340,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "Hair_Buzz": {
+   "tris": 144,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "Hair_Curly": {
+   "tris": 538,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "Hair_Ponytail": {
+   "tris": 322,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "HairIn_Bob": {
+   "tris": 340,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "HairIn_Buzz": {
+   "tris": 144,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "HairIn_Curly": {
+   "tris": 538,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "HairIn_Ponytail": {
+   "tris": 248,
+   "mats": [
+    "Mat_Hair"
+   ],
+   "groups": [
+    "Head"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Band_Chevron": {
+   "tris": 344,
+   "mats": [
+    "Mat_Ident"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Band_Dots": {
+   "tris": 420,
+   "mats": [
+    "Mat_Ident"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Band_Double": {
+   "tris": 664,
+   "mats": [
+    "Mat_Ident"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Band_Solid": {
+   "tris": 332,
+   "mats": [
+    "Mat_Ident"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Symbol_Circle": {
+   "tris": 200,
+   "mats": [
+    "Mat_Ident",
+    "Mat_SuitDark"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Symbol_Diamond": {
+   "tris": 68,
+   "mats": [
+    "Mat_Ident",
+    "Mat_SuitDark"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Symbol_Plus": {
+   "tris": 156,
+   "mats": [
+    "Mat_Ident",
+    "Mat_SuitDark"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Ident_Symbol_Triangle": {
+   "tris": 57,
+   "mats": [
+    "Mat_Ident",
+    "Mat_SuitDark"
+   ],
+   "groups": [
+    "Chest",
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Suit_Arms": {
+   "tris": 1104,
+   "mats": [
+    "Mat_SuitOrange",
+    "Mat_SuitWhite",
+    "Mat_Ident"
+   ],
+   "groups": "body",
+   "shape_keys": [
+    "Basis",
+    "Feminine"
+   ]
+  },
+  "Suit_Helmet": {
+   "tris": 328,
+   "mats": [
+    "Mat_SuitWhite",
+    "Mat_Visor",
+    "Mat_SuitOrange",
+    "Mat_SuitGlow"
+   ],
+   "groups": [
+    "Neck"
+   ],
+   "shape_keys": []
+  },
+  "Suit_Legs": {
+   "tris": 496,
+   "mats": [
+    "Mat_SuitOrange",
+    "Mat_SuitWhite",
+    "Mat_SuitDark",
+    "Mat_Ident"
+   ],
+   "groups": "body",
+   "shape_keys": [
+    "Basis",
+    "Feminine"
+   ]
+  },
+  "Suit_Torso": {
+   "tris": 444,
+   "mats": [
+    "Mat_SuitOrange",
+    "Mat_SuitWhite",
+    "Mat_SuitDark",
+    "Mat_SuitGrey",
+    "Mat_SuitGlow",
+    "Mat_SuitScreen",
+    "Mat_SuitLamp",
+    "Mat_Ident"
+   ],
+   "groups": "body",
+   "shape_keys": [
+    "Basis",
+    "Feminine"
+   ]
+  }
+ },
+ "tris_total_all_meshes": 11083,
+ "glb": {
+  "mesh_nodes": {
+   "Body_Arms": {
+    "skin": true,
+    "targets": [
+     "Feminine"
+    ],
+    "materials": [
+     "Mat_FlightSuit",
+     "Mat_Ident",
+     "Mat_Skin",
+     "Mat_SuitWhite"
+    ]
+   },
+   "Body_Head": {
+    "skin": true,
+    "targets": [
+     "Feminine"
+    ],
+    "materials": [
+     "Mat_Eye",
+     "Mat_EyeWhite",
+     "Mat_Hair",
+     "Mat_Skin"
+    ]
+   },
+   "Body_Legs": {
+    "skin": true,
+    "targets": [
+     "Feminine"
+    ],
+    "materials": [
+     "Mat_Boot",
+     "Mat_FlightSuit",
+     "Mat_Skin"
+    ]
+   },
+   "Body_Torso": {
+    "skin": true,
+    "targets": [
+     "Feminine"
+    ],
+    "materials": [
+     "Mat_FlightSuit",
+     "Mat_FlightSuitSeam",
+     "Mat_Ident",
+     "Mat_Skin"
+    ]
+   },
+   "Hair_Beard": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "Hair_Bob": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "Hair_Buzz": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "Hair_Curly": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "Hair_Ponytail": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "HairIn_Bob": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "HairIn_Buzz": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "HairIn_Curly": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "HairIn_Ponytail": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Hair"
+    ]
+   },
+   "Ident_Band_Chevron": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident"
+    ]
+   },
+   "Ident_Band_Dots": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident"
+    ]
+   },
+   "Ident_Band_Double": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident"
+    ]
+   },
+   "Ident_Band_Solid": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident"
+    ]
+   },
+   "Ident_Symbol_Circle": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident",
+     "Mat_SuitDark"
+    ]
+   },
+   "Ident_Symbol_Diamond": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident",
+     "Mat_SuitDark"
+    ]
+   },
+   "Ident_Symbol_Plus": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident",
+     "Mat_SuitDark"
+    ]
+   },
+   "Ident_Symbol_Triangle": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_Ident",
+     "Mat_SuitDark"
+    ]
+   },
+   "Suit_Arms": {
+    "skin": true,
+    "targets": [
+     "Feminine"
+    ],
+    "materials": [
+     "Mat_Ident",
+     "Mat_SuitOrange",
+     "Mat_SuitWhite"
+    ]
+   },
+   "Suit_Helmet": {
+    "skin": true,
+    "targets": null,
+    "materials": [
+     "Mat_SuitGlow",
+     "Mat_SuitOrange",
+     "Mat_SuitWhite",
+     "Mat_Visor"
+    ]
+   },
+   "Suit_Legs": {
+    "skin": true,
+    "targets": [
+     "Feminine"
+    ],
+    "materials": [
+     "Mat_Ident",
+     "Mat_SuitDark",
+     "Mat_SuitOrange",
+     "Mat_SuitWhite"
+    ]
+   },
+   "Suit_Torso": {
+    "skin": true,
+    "targets": [
+     "Feminine"
+    ],
+    "materials": [
+     "Mat_Ident",
+     "Mat_SuitDark",
+     "Mat_SuitGlow",
+     "Mat_SuitGrey",
+     "Mat_SuitLamp",
+     "Mat_SuitOrange",
+     "Mat_SuitScreen",
+     "Mat_SuitWhite"
+    ]
+   }
+  },
+  "materials": [
+   "Mat_Boot",
+   "Mat_Eye",
+   "Mat_EyeWhite",
+   "Mat_FlightSuit",
+   "Mat_FlightSuitSeam",
+   "Mat_Hair",
+   "Mat_Ident",
+   "Mat_Skin",
+   "Mat_SuitDark",
+   "Mat_SuitGlow",
+   "Mat_SuitGrey",
+   "Mat_SuitLamp",
+   "Mat_SuitOrange",
+   "Mat_SuitScreen",
+   "Mat_SuitWhite",
+   "Mat_Visor"
+  ],
+  "animations": [
+   "carry",
+   "idle",
+   "jump",
+   "jump_mx",
+   "jump_q",
+   "jump_start",
+   "jump_start_mx",
+   "jump_start_q",
+   "land",
+   "land_mx",
+   "land_q",
+   "seated",
+   "sprint",
+   "sprint_mx_medium",
+   "sprint_mx_standard",
+   "sprint_q",
+   "sprint_q_jog",
+   "suit",
+   "use",
+   "walk",
+   "walk_mixamo",
+   "walk_q",
+   "walk_q_formal"
+  ]
+ },
+ "saved": "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\crew_v2\\crew_v2.blend"
+}

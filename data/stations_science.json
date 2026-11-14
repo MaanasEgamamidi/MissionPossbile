@@ -1,0 +1,15 @@
+{
+	"_about": "Stations of the science and fabrication part (Prompt 08, Part S); see StationCatalog. Sample sites are new ids with Godot positions in the Exterior on walkable ground (checked against data/terrain_height.res in tests/test_science.gd). Salvage donors are existing damaged map objects. The lab is the Med Bay glovebox; the workbench is the hangar control board (the scissor table already carries the transceiver board station).",
+	"stations": [
+		{"id": "site_east_rocks", "position": [29.5, 0.0, 25.0], "kind": "sample_site", "name": "Sample site", "symbol": "◈", "specialty": ""},
+		{"id": "site_mast_boulders", "position": [19.8, -0.03, 29.5], "kind": "sample_site", "name": "Sample site", "symbol": "◈", "specialty": ""},
+		{"id": "site_crash_crust", "position": [4.0, -0.05, 44.0], "kind": "sample_site", "name": "Sample site", "symbol": "◈", "specialty": ""},
+		{"object": "mb_glovebox", "kind": "lab", "name": "Lab glovebox", "symbol": "⚗", "specialty": ""},
+		{"object": "ls_filter_old", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "pr_bat_rack_alarm", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "pr_swgr_burnt", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "cr_console_alarm", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "sf_crash_tank", "kind": "salvage", "name": "Salvage donor", "symbol": "♻", "specialty": ""},
+		{"object": "hg_control_board", "kind": "workbench", "name": "Workbench", "symbol": "⚒", "specialty": ""}
+	]
+}

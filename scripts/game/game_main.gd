@@ -13,6 +13,8 @@ const INPUT_PATH := "user://input.json"
 @export var load_world := true
 ## Start at the main menu (true) or go straight into the newest save or a new colony (tests and capture tools).
 @export var show_menu := true
+## Check the NASA weather data for published updates in the background (Prompt 09). Never in headless runs (tests).
+@export var check_weather_updates := true
 ## Tests point saves at a folder inside the project instead of user://.
 @export var save_directory := ""
 
@@ -20,6 +22,8 @@ var services: GameServices
 var world: Node3D
 var collision: Node3D
 var lighting: ZoneLighting
+## Sky, sun and fog follow the dust in the air (Prompt 09).
+var weather_presenter: WeatherPresenter
 var player: PlayerController
 var hud: GameHud
 ## Menus, panels, pause menu and subtitles (Prompt 05).
@@ -67,6 +71,7 @@ func _ready() -> void:
 		lighting.name = "ZoneLighting"
 		add_child(lighting)
 		lighting.setup(world)
+		GraphicsQuality.apply(get_tree(), settings.graphics_quality)   # after setup: it swaps in its own environment copy
 		for cam in world.find_children("*", "Camera3D", true, false):
 			(cam as Camera3D).current = false
 
@@ -149,6 +154,16 @@ func _begin_play() -> void:
 	_sync_items()
 	_apply_all_zone_power()
 	_update_sun(true)
+	# Prompt 09: the sky follows the dust in the air (after ZoneLighting, which owns the environment it adjusts), and
+	# the weather data is checked for published updates in the background. The running game keeps its pinned data.
+	weather_presenter = WeatherPresenter.new()
+	weather_presenter.name = "WeatherPresenter"
+	add_child(weather_presenter)
+	weather_presenter.setup(world, services)
+	if check_weather_updates and DisplayServer.get_name() != "headless":
+		var refresh := WeatherRefresh.new()
+		refresh.name = "WeatherRefresh"
+		add_child(refresh)
 	_apply_player_settings()
 	ui.close_all()        # leaves menu mode: the mouse is captured for play
 
@@ -355,6 +370,7 @@ func _rebuild_crew() -> void:
 				v.rotation.y = c.yaw
 				v.play(&"idle")
 			v.set_suit(c.suit_on)
+			v.set_name_tag(CrewLooks.tag_text(c.display_name, _identity_of(c)))   # other crew only, never your own body
 			# Only crew someone is playing are "there" for doors: parked crew on the hub ring must not hold a door open.
 			(v.get_node("Presence") as CollisionObject3D).collision_layer = Layers.PLAYER if c.is_active() else 0
 			if services.zones != null:
