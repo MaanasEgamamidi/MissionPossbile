@@ -1,0 +1,1793 @@
+{
+    "status":  "verified_with_documented_limitations",
+    "blender":  "5.3.0",
+    "tag":  "final01",
+    "defects":  [
+                    "Rigid suit joints and convex mitten gloves are visibly stylized; pressure liners show through outer-shell gaps at hips, knees and ankles.",
+                    "The coverall, shoulder patch and hair cap retain hard shading or polygon seams; the boots are deliberately simple rounded forms.",
+                    "The original outer suit shell alone does not enclose all body vertices: torso 0.743%, arms 0.047%, legs 13.465% outside. Exported pressure liners bring the complete-suit measurements to 0% in all three regions.",
+                    "Seated feet are approximately 10 mm above ground. The pose targets an approximately 0.45 m seat; exact seat contact was not numerically certified.",
+                    "Only representative stills were visually inspected. Full-motion self-collision and Godot rendering, transparency and gameplay were not tested; Godot was not run.",
+                    "The body bundle README states CC0, while its separate embedded License names the Rain Rig under CC BY 4.0. Both exact texts are recorded; the colony suit licence was not established."
+                ],
+    "visual_review":  "Reviewed all 32 final01 Workbench stills through four front/side crew/suit contact sheets, plus the full-size jump side image. Also inspected six images rendered after importing the actual GLB: carry, sprint and seated, side view, both crew and suit. No exploded weights, detached suit pieces or obvious limb-through-torso penetration was observed at these sampled poses. This is not an exhaustive animation collision test.",
+    "config":  {
+
+               },
+    "body_object_names":  [
+                              "stylized_jaw",
+                              "stylized_head",
+                              "stylized_hand",
+                              "stylized_foot",
+                              "stylized_eye",
+                              "stylized_body_male",
+                              "stylized_body_female",
+                              "Skull - Realistic",
+                              "Skull - Planar",
+                              "realistic_skull",
+                              "realistic_jaw",
+                              "realistic_head_sculpting",
+                              "realistic_head_animation",
+                              "realistic_hand",
+                              "realistic_foot",
+                              "realistic_eye",
+                              "realistic_body_male",
+                              "realistic_body_emale",
+                              "realisitc_skeleton",
+                              "primitive_head_realistic",
+                              "primitive_head_generic",
+                              "primitive_body_male_stylized",
+                              "primitive_body_male_realistic",
+                              "primitive_body_female_stylized",
+                              "primitive_body_female_realistic",
+                              "planar_skull",
+                              "planar_head",
+                              "GEO-body_male_realistic",
+                              "Jaw - Stylized ",
+                              "Jaw - Realistic",
+                              "Head - Planar",
+                              "Head - Generic Topology",
+                              "Hand - Stylized ",
+                              "Hand  - Realistic",
+                              "GEO-toe_ring_primitive_female_realistic.R",
+                              "GEO-toe_ring_primitive_female_realistic.L",
+                              "GEO-toe_ring_male_primitive_stylized.R",
+                              "GEO-toe_ring_male_primitive_stylized.L",
+                              "GEO-toe_ring_male_primitive_realistic.R",
+                              "GEO-toe_ring_male_primitive_realistic.L",
+                              "GEO-toe_ring_female_primitive_stylized.R",
+                              "GEO-toe_ring_female_primitive_stylized.L",
+                              "GEO-toe_pinky_primitive_female_realistic.R",
+                              "GEO-toe_pinky_primitive_female_realistic.L",
+                              "GEO-toe_pinky_male_primitive_stylized.R",
+                              "GEO-toe_pinky_male_primitive_stylized.L",
+                              "GEO-toe_pinky_male_primitive_realistic.R",
+                              "GEO-toe_pinky_male_primitive_realistic.L",
+                              "GEO-toe_pinky_female_primitive_stylized.R",
+                              "GEO-toe_pinky_female_primitive_stylized.L",
+                              "GEO-toe_middle_primitive_female_realistic.R",
+                              "GEO-toe_middle_primitive_female_realistic.L",
+                              "GEO-toe_middle_male_primitive_stylized.R",
+                              "GEO-toe_middle_male_primitive_stylized.L",
+                              "GEO-toe_middle_male_primitive_realistic.R",
+                              "GEO-toe_middle_male_primitive_realistic.L",
+                              "GEO-toe_middle_female_primitive_stylized.R",
+                              "GEO-toe_middle_female_primitive_stylized.L",
+                              "GEO-toe_index_primitive_female_realistic.R",
+                              "GEO-toe_index_primitive_female_realistic.L",
+                              "GEO-toe_index_male_primitive_stylized.R",
+                              "GEO-toe_index_male_primitive_stylized.L",
+                              "GEO-toe_index_male_primitive_realistic.R",
+                              "GEO-toe_index_male_primitive_realistic.L",
+                              "GEO-toe_index_female_primitive_stylized.R",
+                              "GEO-toe_index_female_primitive_stylized.L",
+                              "GEO-toe_big_primitive_female_realistic.R",
+                              "GEO-toe_big_primitive_female_realistic.L",
+                              "GEO-toe_big_male_primitive_stylized.R",
+                              "GEO-toe_big_male_primitive_stylized.L",
+                              "GEO-toe_big_female_primitive_stylized.R",
+                              "GEO-toe_big_female_primitive_stylized.L",
+                              "GEO-thumb_primitive_female_realistic.R",
+                              "GEO-thumb_primitive_female_realistic.L",
+                              "GEO-thumb_male_primitive_stylized.R",
+                              "GEO-thumb_male_primitive_stylized.L",
+                              "GEO-thumb_male_primitive_realistic.R",
+                              "GEO-thumb_male_primitive_realistic.L",
+                              "GEO-thumb_female_primitive_stylized.R",
+                              "GEO-thumb_female_primitive_stylized.L",
+                              "GEO-teo_big_male_primitive_realistic.R",
+                              "GEO-teo_big_male_primitive_realistic.L",
+                              "GEO-skeletion.spine_thoracic_t3",
+                              "GEO-skeletion.spine_thoracic_t12",
+                              "GEO-skeletion.spine_thoracic_t11",
+                              "GEO-skeletion.spine_thoracic_t1",
+                              "GEO-skeletion.spine_thoracic_9",
+                              "GEO-skeletion.spine_thoracic_8",
+                              "GEO-skeletion.spine_thoracic_7",
+                              "GEO-skeletion.spine_thoracic_6",
+                              "GEO-skeletion.spine_thoracic_5",
+                              "GEO-skeletion.spine_thoracic_4",
+                              "GEO-skeletion.spine_thoracic_2",
+                              "GEO-skeletion.spine_thoracic_10",
+                              "GEO-skeletion.spine_lumbar_l5",
+                              "GEO-skeletion.spine_lumbar_l4.5",
+                              "GEO-skeletion.spine_lumbar_l4",
+                              "GEO-skeletion.spine_lumbar_l3.5",
+                              "GEO-skeletion.spine_lumbar_l3",
+                              "GEO-skeletion.spine_lumbar_l2.5",
+                              "GEO-skeletion.spine_lumbar_l2",
+                              "GEO-skeletion.spine_lumbar_l1.5",
+                              "GEO-skeletion.spine_lumbar_l1",
+                              "GEO-skeletion.spine_cervical_c7",
+                              "GEO-skeletion.spine_cervical_c6",
+                              "GEO-skeletion.spine_cervical_c5",
+                              "GEO-skeletion.spine_cervical_c4",
+                              "GEO-skeletion.spine_cervical_c3",
+                              "GEO-skeletion.spine_cervical_c2",
+                              "GEO-skeletion.spine_cervical_c1",
+                              "GEO-skeletion.skull",
+                              "GEO-skeletion.shoulder_scapula.R",
+                              "GEO-skeletion.shoulder_scapula.L",
+                              "GEO-skeletion.sacral",
+                              "GEO-skeletion.ripcage",
+                              "GEO-skeletion.proximal.thumb.R",
+                              "GEO-skeletion.proximal.thumb.L",
+                              "GEO-skeletion.proximal.ring.R",
+                              "GEO-skeletion.proximal.ring.L",
+                              "GEO-skeletion.proximal.middle.R",
+                              "GEO-skeletion.proximal.middle.L",
+                              "GEO-skeletion.proximal.little.R",
+                              "GEO-skeletion.proximal.little.L",
+                              "GEO-skeletion.proximal.index.R",
+                              "GEO-skeletion.proximal.index.L",
+                              "GEO-skeletion.proximal.5.R",
+                              "GEO-skeletion.proximal.5.L",
+                              "GEO-skeletion.proximal.4.R",
+                              "GEO-skeletion.proximal.4.L",
+                              "GEO-skeletion.proximal.3.R",
+                              "GEO-skeletion.proximal.3.L",
+                              "GEO-skeletion.proximal.2.R",
+                              "GEO-skeletion.proximal.2.L",
+                              "GEO-skeletion.proximal.1.R",
+                              "GEO-skeletion.proximal.1.L",
+                              "GEO-skeletion.middle.ring.R",
+                              "GEO-skeletion.middle.ring.L",
+                              "GEO-skeletion.middle.middle.R",
+                              "GEO-skeletion.middle.middle.L",
+                              "GEO-skeletion.middle.little.R",
+                              "GEO-skeletion.middle.little.L",
+                              "GEO-skeletion.middle.index.R",
+                              "GEO-skeletion.middle.index.L",
+                              "GEO-skeletion.middle.5.R",
+                              "GEO-skeletion.middle.5.L",
+                              "GEO-skeletion.middle.4.R",
+                              "GEO-skeletion.middle.4.L",
+                              "GEO-skeletion.middle.3.R",
+                              "GEO-skeletion.middle.3.L",
+                              "GEO-skeletion.middle.2.R",
+                              "GEO-skeletion.middle.2.L",
+                              "GEO-skeletion.metatarsal.5.R",
+                              "GEO-skeletion.metatarsal.5.L",
+                              "GEO-skeletion.metatarsal.4.R",
+                              "GEO-skeletion.metatarsal.4.L",
+                              "GEO-skeletion.metatarsal.3.R",
+                              "GEO-skeletion.metatarsal.3.L",
+                              "GEO-skeletion.metatarsal.2.R",
+                              "GEO-skeletion.metatarsal.2.L",
+                              "GEO-skeletion.metatarsal.1.R",
+                              "GEO-skeletion.metatarsal.1.L",
+                              "GEO-skeletion.metacarpal.thumb.R",
+                              "GEO-skeletion.metacarpal.thumb.L",
+                              "GEO-skeletion.metacarpal.ring.R",
+                              "GEO-skeletion.metacarpal.ring.L",
+                              "GEO-skeletion.metacarpal.middle.R",
+                              "GEO-skeletion.metacarpal.middle.L",
+                              "GEO-skeletion.metacarpal.little.R",
+                              "GEO-skeletion.metacarpal.little.L",
+                              "GEO-skeletion.metacarpal.index.R",
+                              "GEO-skeletion.metacarpal.index.L",
+                              "GEO-skeletion.leg_tibula.R",
+                              "GEO-skeletion.leg_tibula.L",
+                              "GEO-skeletion.leg_patella.R",
+                              "GEO-skeletion.leg_patella.L",
+                              "GEO-skeletion.leg_fibula.R",
+                              "GEO-skeletion.leg_fibula.L",
+                              "GEO-skeletion.leg_femur.R",
+                              "GEO-skeletion.leg_femur.L",
+                              "GEO-skeletion.hip",
+                              "GEO-skeletion.hand_center.R",
+                              "GEO-skeletion.hand_center.L",
+                              "GEO-skeletion.foot_talus.R",
+                              "GEO-skeletion.foot_talus.L",
+                              "GEO-skeletion.foot_center.R",
+                              "GEO-skeletion.foot_center.L",
+                              "GEO-skeletion.foot_calcaneus.R",
+                              "GEO-skeletion.foot_calcaneus.L",
+                              "GEO-skeletion.distal.thumb.R",
+                              "GEO-skeletion.distal.thumb.L",
+                              "GEO-skeletion.distal.ring.R",
+                              "GEO-skeletion.distal.ring.L",
+                              "GEO-skeletion.distal.middle.R",
+                              "GEO-skeletion.distal.middle.L",
+                              "GEO-skeletion.distal.little.R",
+                              "GEO-skeletion.distal.little.L",
+                              "GEO-skeletion.distal.index.R",
+                              "GEO-skeletion.distal.index.L",
+                              "GEO-skeletion.distal.5.R",
+                              "GEO-skeletion.distal.5.L",
+                              "GEO-skeletion.distal.4.R",
+                              "GEO-skeletion.distal.4.L",
+                              "GEO-skeletion.distal.3.R",
+                              "GEO-skeletion.distal.3.L",
+                              "GEO-skeletion.distal.2.R",
+                              "GEO-skeletion.distal.2.L",
+                              "GEO-skeletion.distal.1.R",
+                              "GEO-skeletion.distal.1.L",
+                              "GEO-skeletion.coccygeal",
+                              "GEO-skeletion.clavicle.R",
+                              "GEO-skeletion.clavicle.L",
+                              "GEO-skeletion.arm_ulna.R",
+                              "GEO-skeletion.arm_ulna.L",
+                              "GEO-skeletion.arm_radius.R",
+                              "GEO-skeletion.arm_radius.L",
+                              "GEO-skeletion.arm_humerus.R",
+                              "GEO-skeletion.arm_humerus.L",
+                              "GEO-shoulder_primitive_female_realistic.R",
+                              "GEO-shoulder_primitive_female_realistic.L",
+                              "GEO-shoulder_male_primitive_stylized.R",
+                              "GEO-shoulder_male_primitive_stylized.L",
+                              "GEO-shoulder_male_primitive_realistic.R",
+                              "GEO-shoulder_male_primitive_realistic.L",
+                              "GEO-shoulder_female_primitive_stylized.R",
+                              "GEO-shoulder_female_primitive_stylized.L",
+                              "GEO-pelvis_male_primitive_stylized",
+                              "GEO-pelvis_male_primitive_realistic",
+                              "GEO-pelvis_female_primitive_stylized",
+                              "GEO-pelvis_female_primitive_realistic",
+                              "GEO-nose_primitve_female_realistic",
+                              "GEO-nose_primitve",
+                              "GEO-nose_male_primitive_stylized",
+                              "GEO-nose_male_primitive_realistic",
+                              "GEO-nose_female_primitive_stylized",
+                              "GEO-nose_bridge_primitve_female_realistic",
+                              "GEO-nose_bridge_primitve",
+                              "GEO-nose_bridge_male_primitive_stylized",
+                              "GEO-nose_bridge_male_primitive_realistic",
+                              "GEO-nose_bridge_female_primitive_stylized",
+                              "GEO-neck_primitive_female_realistic",
+                              "GEO-neck_male_primitive_stylized",
+                              "GEO-neck_male_primitive_realistic",
+                              "GEO-neck_female_primitive_stylized",
+                              "GEO-leg_upper_primitive_female_realistic.R",
+                              "GEO-leg_upper_primitive_female_realistic.L",
+                              "GEO-leg_upper_male_primitive_stylized.R",
+                              "GEO-leg_upper_male_primitive_stylized.L",
+                              "GEO-leg_upper_male_primitive_realistic.R",
+                              "GEO-leg_upper_male_primitive_realistic.L",
+                              "GEO-leg_upper_female_primitive_stylized.R",
+                              "GEO-leg_upper_female_primitive_stylized.L",
+                              "GEO-leg_lower_primitive_female_realistic.R",
+                              "GEO-leg_lower_primitive_female_realistic.L",
+                              "GEO-leg_lower_male_primitive_stylized.R",
+                              "GEO-leg_lower_male_primitive_stylized.L",
+                              "GEO-leg_lower_male_primitive_realistic.R",
+                              "GEO-leg_lower_male_primitive_realistic.L",
+                              "GEO-leg_lower_female_primitive_stylized.R",
+                              "GEO-leg_lower_female_primitive_stylized.L",
+                              "GEO-head_stylized.eye.R",
+                              "GEO-head_stylized.eye.L",
+                              "GEO-head_stylized",
+                              "GEO-head_sculpting_realistic.sclera.R",
+                              "GEO-head_sculpting_realistic.sclera.L",
+                              "GEO-head_sculpting_realistic.iris.R",
+                              "GEO-head_sculpting_realistic.iris.L",
+                              "GEO-head_sculpting_realistic",
+                              "GEO-head_primitve",
+                              "GEO-head_primitive_female_realistic",
+                              "GEO-head_male_primitive_stylized",
+                              "GEO-head_male_primitive_realistic",
+                              "GEO-head_female_primitive_stylized",
+                              "GEO-head_animation_realistic.sclera.R",
+                              "GEO-head_animation_realistic.sclera.L",
+                              "GEO-head_animation_realistic.iris.R",
+                              "GEO-head_animation_realistic.iris.L",
+                              "GEO-head_animation_realistic",
+                              "GEO-hand_primitive_female_realistic.R",
+                              "GEO-hand_primitive_female_realistic.L",
+                              "GEO-hand_male_primitive_stylized.R",
+                              "GEO-hand_male_primitive_stylized.L",
+                              "GEO-hand_male_primitive_realistic.R",
+                              "GEO-hand_male_primitive_realistic.L",
+                              "GEO-hand_female_primitive_stylized.R",
+                              "GEO-hand_female_primitive_stylized.L",
+                              "GEO-foot_primitive_female_realistic.R",
+                              "GEO-foot_primitive_female_realistic.L",
+                              "GEO-foot_male_primitive_stylized.R",
+                              "GEO-foot_male_primitive_stylized.L",
+                              "GEO-foot_female_primitive_stylized.R",
+                              "GEO-foot_female_primitive_stylized.L",
+                              "GEO-foot.005_male_primitive_realistic.R",
+                              "GEO-foot.005_male_primitive_realistic.L",
+                              "GEO-finger_ring_primitive_female_realistic.R",
+                              "GEO-finger_ring_primitive_female_realistic.L",
+                              "GEO-finger_ring_male_primitive_stylized.R",
+                              "GEO-finger_ring_male_primitive_stylized.L",
+                              "GEO-finger_ring_male_primitive_realistic.R",
+                              "GEO-finger_ring_male_primitive_realistic.L",
+                              "GEO-finger_ring_female_primitive_stylized.R",
+                              "GEO-finger_ring_female_primitive_stylized.L",
+                              "GEO-finger_pinky_primitive_female_realistic.R",
+                              "GEO-finger_pinky_primitive_female_realistic.L",
+                              "GEO-finger_pinky_male_primitive_stylized.R",
+                              "GEO-finger_pinky_male_primitive_stylized.L",
+                              "GEO-finger_pinky_male_primitive_realistic.R",
+                              "GEO-finger_pinky_male_primitive_realistic.L",
+                              "GEO-finger_pinky_female_primitive_stylized.R",
+                              "GEO-finger_pinky_female_primitive_stylized.L",
+                              "GEO-finger_middle_primitive_female_realistic.R",
+                              "GEO-finger_middle_primitive_female_realistic.L",
+                              "GEO-finger_middle_male_primitive_stylized.R",
+                              "GEO-finger_middle_male_primitive_stylized.L",
+                              "GEO-finger_middle_male_primitive_realistic.R",
+                              "GEO-finger_middle_male_primitive_realistic.L",
+                              "GEO-finger_middle_female_primitive_stylized.R",
+                              "GEO-finger_middle_female_primitive_stylized.L",
+                              "GEO-finger_index_primitive_female_realistic.R",
+                              "GEO-finger_index_primitive_female_realistic.L",
+                              "GEO-finger_index_male_primitive_stylized.R",
+                              "GEO-finger_index_male_primitive_stylized.L",
+                              "GEO-finger_index_male_primitive_realistic.R",
+                              "GEO-finger_index_male_primitive_realistic.L",
+                              "GEO-finger_index_female_primitive_stylized.R",
+                              "GEO-finger_index_female_primitive_stylized.L",
+                              "GEO-eyelid_upper_primitve_female_realistic.R",
+                              "GEO-eyelid_upper_primitve_female_realistic.L",
+                              "GEO-eyelid_upper_primitve.R",
+                              "GEO-eyelid_upper_primitve.L",
+                              "GEO-eyelid_upper_male_primitive_stylized.R",
+                              "GEO-eyelid_upper_male_primitive_stylized.L",
+                              "GEO-eyelid_upper_male_primitive_realistic.R",
+                              "GEO-eyelid_upper_male_primitive_realistic.L",
+                              "GEO-eyelid_upper_female_primitive_stylized.R",
+                              "GEO-eyelid_upper_female_primitive_stylized.L",
+                              "GEO-eyelid_lower_primitve_female_realistic.R",
+                              "GEO-eyelid_lower_primitve_female_realistic.L",
+                              "GEO-eyelid_lower_primitve.R",
+                              "GEO-eyelid_lower_primitve.L",
+                              "GEO-eyelid_lower_male_primitive_stylized.R",
+                              "GEO-eyelid_lower_male_primitive_stylized.L",
+                              "GEO-eyelid_lower_male_primitive_realistic.R",
+                              "GEO-eyelid_lower_male_primitive_realistic.L",
+                              "GEO-eyelid_lower_female_primitive_stylized.R",
+                              "GEO-eyelid_lower_female_primitive_stylized.L",
+                              "GEO-eye_primitve_female_realistic.R",
+                              "GEO-eye_primitve_female_realistic.L",
+                              "GEO-eye_primitve.R",
+                              "GEO-eye_primitve.L",
+                              "GEO-eye_male_primitive_stylized.R",
+                              "GEO-eye_male_primitive_stylized.L",
+                              "GEO-eye_male_primitive_realistic.R",
+                              "GEO-eye_male_primitive_realistic.L",
+                              "GEO-eye_female_primitive_stylized.R",
+                              "GEO-eye_female_primitive_stylized.L",
+                              "GEO-ear_primitve_female_realistic.R",
+                              "GEO-ear_primitve_female_realistic.L",
+                              "GEO-ear_primitve.R",
+                              "GEO-ear_primitve.L",
+                              "GEO-ear_male_primitive_stylized.R",
+                              "GEO-ear_male_primitive_stylized.L",
+                              "GEO-ear_male_primitive_realistic.R",
+                              "GEO-ear_male_primitive_realistic.L",
+                              "GEO-ear_female_primitive_stylized.R",
+                              "GEO-ear_female_primitive_stylized.L",
+                              "GEO-chest_primitive_female_realistic",
+                              "GEO-chest_male_primitive_stylized",
+                              "GEO-chest_male_primitive_realistic",
+                              "GEO-chest_female_primitive_stylized",
+                              "GEO-breasts_primitive_female_realistic",
+                              "GEO-breast_female_primitive_stylized.R",
+                              "GEO-breast_female_primitive_stylized.L",
+                              "GEO-body_male_stylized.eye.R",
+                              "GEO-body_male_stylized.eye.L",
+                              "GEO-body_male_stylized",
+                              "GEO-body_male_realistic.eye.R",
+                              "GEO-body_male_realistic.eye.L",
+                              "GEO-body_female_stylized.eye.R",
+                              "GEO-body_female_stylized.eye.L",
+                              "GEO-body_female_stylized",
+                              "GEO-body_female_realistic.eye.R",
+                              "GEO-body_female_realistic.eye.L",
+                              "GEO-body_female_realistic",
+                              "GEO-belly_primitive_female_realistic",
+                              "GEO-belly_male_primitive_stylized",
+                              "GEO-belly_male_primitive_realistic",
+                              "GEO-belly_female_primitive_stylized",
+                              "GEO-arm_upper_primitive_female_realistic.R",
+                              "GEO-arm_upper_primitive_female_realistic.L",
+                              "GEO-arm_upper_male_primitive_stylized.R",
+                              "GEO-arm_upper_male_primitive_stylized.L",
+                              "GEO-arm_upper_male_primitive_realistic.R",
+                              "GEO-arm_upper_male_primitive_realistic.L",
+                              "GEO-arm_upper_female_primitive_stylized.R",
+                              "GEO-arm_upper_female_primitive_stylized.L",
+                              "GEO-arm_lower_primitive_female_realistic.R",
+                              "GEO-arm_lower_primitive_female_realistic.L",
+                              "GEO-arm_lower_male_primitive_stylized.R",
+                              "GEO-arm_lower_male_primitive_stylized.L",
+                              "GEO-arm_lower_male_primitive_realistic.R",
+                              "GEO-arm_lower_male_primitive_realistic.L",
+                              "GEO-arm_lower_female_primitive_stylized.R",
+                              "GEO-arm_lower_female_primitive_stylized.L",
+                              "Foot - Stylized ",
+                              "Foot - Realistic",
+                              "Eye - Stylized",
+                              "Eye - Realistic"
+                          ],
+    "license_readme":  "Important Info\n==============\n\nHuman Base Meshes: Asset Bundle - Version 1.4\n\nAll provided assets are public domain under the CC0 license.\nThe minimum supported Blender version is 4.2!\n\nWhat\u0027s included\n==============\n\nThese are various human base meshes that are provided by the Blender community and the Blender Studio.\nThey include:\n    - Quad topology for multi-resolution sculpting\n    - Closed volumes for voxel remeshing\n    - Face sets\n    - UV maps (including UDIMs)\n    - Multiresoluton levels for realistic assets\n    - Creased edges and Subdiv modifiers for planar/primitive assets\n\nHow to install the Asset Bundle\n===============================\n\nIt\u0027s recommended to create a new Asset Library in the preferences first:\n- Open the Preferences\n- Go to \"File Paths\"\n- Add a New Asset Library with the + button and call it \"Human Base Meshes\"\n- Set the \"Import Method\" to \"Append\"\n\nTo add the assets from this file to the Asset Library:\n- In the Asset Browser below, click on \"Copy Bundle to Asset Library\"\n- Choose a target Asset Library\n- Choose a target folder location\n\nThat\u0027s it. Enjoy!",
+    "license_other":  "LICENSE\n\nThe Rain Rig is released under the Creative Commons Attribution 4.0 license. \nThe attribution is © Blender Foundation | cloud.blender.org",
+    "body_source":  {
+                        "file":  "G:\\nasa app\\grand_colony\\work\\_downloads\\human_base_meshes\\extracted\\human-base-meshes-bundle-v1.4.1\\human_base_meshes_bundle.blend",
+                        "object":  "GEO-body_male_realistic",
+                        "triangles":  21160,
+                        "scale":  1.0651133223362708,
+                        "bounds":  [
+                                       [
+                                           -0.4404309391975403,
+                                           0.4402700662612915
+                                       ],
+                                       [
+                                           -0.17945513129234314,
+                                           0.11099401116371155
+                                       ],
+                                       [
+                                           -0.005547828506678343,
+                                           1.684413194656372
+                                       ]
+                                   ]
+                    },
+    "body_reduction":  {
+                           "before":  21160,
+                           "after":  15480
+                       },
+    "automatic_weights":  {
+                              "operator":  "ARMATURE_AUTO",
+                              "unweighted_vertices":  0
+                          },
+    "body_triangles":  14089,
+    "suit_source":  {
+                        "file":  "G:\\nasa app\\grand_colony\\grand_colony.blend",
+                        "object":  "qt_spacesuit",
+                        "triangles":  86524,
+                        "bounds":  [
+                                       [
+                                           -0.3606029450893402,
+                                           0.3606029450893402
+                                       ],
+                                       [
+                                           -0.4448176920413971,
+                                           0.07499999552965164
+                                       ],
+                                       [
+                                           0.0,
+                                           1.8808631896972656
+                                       ]
+                                   ],
+                        "loose_parts":  73
+                    },
+    "suit_material_mapping":  {
+                                  "GC_kit_rubber":  "Mat_Suit_kit_rubber",
+                                  "GC_kit_frame":  "Mat_Suit_kit_frame",
+                                  "GC_kit_alu":  "Mat_Suit_kit_alu",
+                                  "GC_kit_sign":  "Mat_Suit_kit_sign",
+                                  "GC_pp_suit":  "Mat_Suit_pp_suit",
+                                  "GC_pp_bearing":  "Mat_Suit_pp_bearing",
+                                  "GC_kit_acc_hgr":  "Mat_Suit_kit_acc_hgr",
+                                  "GC_fabric_bl":  "Mat_Suit_fabric_bl",
+                                  "GC_cream":  "Mat_Suit_cream",
+                                  "GC_pp_boot":  "Mat_Suit_pp_boot",
+                                  "GC_white":  "Mat_Suit_white",
+                                  "GC_black":  "Mat_Suit_black",
+                                  "GC_scr_green":  "Mat_Suit_scr_green",
+                                  "GC_gunmetal":  "Mat_Suit_gunmetal",
+                                  "GC_red":  "Mat_Suit_red",
+                                  "GC_glass_pp_bubble":  "Mat_Visor",
+                                  "GC_visor":  "Mat_Visor",
+                                  "GC_glass":  "Mat_Visor"
+                              },
+    "suit_scale":  {
+                       "radial":  1.4,
+                       "method":  "piecewise joint-to-joint mapping; longitudinal scale is target/source segment length",
+                       "segments":  {
+                                        "Chest":  1.045454501308179,
+                                        "Head":  1.0499997559691854,
+                                        "UpperArmL":  1.0425351130132507,
+                                        "LowerArmL":  0.7197853574593369,
+                                        "HandL":  0.9048675318741186,
+                                        "UpperArmR":  1.0425351130132507,
+                                        "LowerArmR":  0.7197853574593369,
+                                        "HandR":  0.9048675318741186,
+                                        "UpperLegL":  1.1230149282194306,
+                                        "UpperLegR":  1.1230149282194306,
+                                        "FootL":  1.0499999224816323,
+                                        "FootR":  1.0499999224816323,
+                                        "LowerLegL":  1.2077964594468762,
+                                        "LowerLegR":  1.2077964594468762
+                                    }
+                   },
+    "suit_parts":  [
+                       {
+                           "source_part":  0,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  1,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  2,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  3,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  4,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  5,
+                           "bone":  "Chest",
+                           "triangles_before":  480,
+                           "triangles_after":  210
+                       },
+                       {
+                           "source_part":  6,
+                           "bone":  "Head",
+                           "triangles_before":  688,
+                           "triangles_after":  310
+                       },
+                       {
+                           "source_part":  7,
+                           "bone":  "UpperArmL",
+                           "triangles_before":  512,
+                           "triangles_after":  224
+                       },
+                       {
+                           "source_part":  8,
+                           "bone":  "UpperArmL",
+                           "triangles_before":  448,
+                           "triangles_after":  194
+                       },
+                       {
+                           "source_part":  9,
+                           "bone":  "LowerArmL",
+                           "triangles_before":  356,
+                           "triangles_after":  150
+                       },
+                       {
+                           "source_part":  9,
+                           "bone":  "HandL",
+                           "triangles_before":  92,
+                           "triangles_after":  24
+                       },
+                       {
+                           "source_part":  10,
+                           "bone":  "LowerArmL",
+                           "triangles_before":  240,
+                           "triangles_after":  94
+                       },
+                       {
+                           "source_part":  10,
+                           "bone":  "HandL",
+                           "triangles_before":  208,
+                           "triangles_after":  78
+                       },
+                       {
+                           "source_part":  11,
+                           "bone":  "UpperArmL",
+                           "triangles_before":  316,
+                           "triangles_after":  130
+                       },
+                       {
+                           "source_part":  12,
+                           "bone":  "UpperArmL",
+                           "triangles_before":  92,
+                           "triangles_after":  24
+                       },
+                       {
+                           "source_part":  13,
+                           "bone":  "UpperArmL",
+                           "triangles_before":  316,
+                           "triangles_after":  130
+                       },
+                       {
+                           "source_part":  14,
+                           "bone":  "UpperArmR",
+                           "triangles_before":  512,
+                           "triangles_after":  224
+                       },
+                       {
+                           "source_part":  15,
+                           "bone":  "UpperArmR",
+                           "triangles_before":  448,
+                           "triangles_after":  194
+                       },
+                       {
+                           "source_part":  16,
+                           "bone":  "LowerArmR",
+                           "triangles_before":  356,
+                           "triangles_after":  150
+                       },
+                       {
+                           "source_part":  16,
+                           "bone":  "HandR",
+                           "triangles_before":  92,
+                           "triangles_after":  24
+                       },
+                       {
+                           "source_part":  17,
+                           "bone":  "LowerArmR",
+                           "triangles_before":  240,
+                           "triangles_after":  94
+                       },
+                       {
+                           "source_part":  17,
+                           "bone":  "HandR",
+                           "triangles_before":  208,
+                           "triangles_after":  78
+                       },
+                       {
+                           "source_part":  18,
+                           "bone":  "UpperArmR",
+                           "triangles_before":  12,
+                           "triangles_after":  12
+                       },
+                       {
+                           "source_part":  19,
+                           "bone":  "UpperLegL",
+                           "triangles_before":  488,
+                           "triangles_after":  214
+                       },
+                       {
+                           "source_part":  19,
+                           "bone":  "UpperLegR",
+                           "triangles_before":  24,
+                           "triangles_after":  0
+                       },
+                       {
+                           "source_part":  20,
+                           "bone":  "UpperLegL",
+                           "triangles_before":  506,
+                           "triangles_after":  221
+                       },
+                       {
+                           "source_part":  20,
+                           "bone":  "UpperLegR",
+                           "triangles_before":  6,
+                           "triangles_after":  6
+                       },
+                       {
+                           "source_part":  21,
+                           "bone":  "FootL",
+                           "triangles_before":  512,
+                           "triangles_after":  224
+                       },
+                       {
+                           "source_part":  22,
+                           "bone":  "FootL",
+                           "triangles_before":  188,
+                           "triangles_after":  70
+                       },
+                       {
+                           "source_part":  23,
+                           "bone":  "FootL",
+                           "triangles_before":  188,
+                           "triangles_after":  70
+                       },
+                       {
+                           "source_part":  24,
+                           "bone":  "UpperLegR",
+                           "triangles_before":  488,
+                           "triangles_after":  214
+                       },
+                       {
+                           "source_part":  24,
+                           "bone":  "UpperLegL",
+                           "triangles_before":  24,
+                           "triangles_after":  0
+                       },
+                       {
+                           "source_part":  25,
+                           "bone":  "UpperLegR",
+                           "triangles_before":  506,
+                           "triangles_after":  221
+                       },
+                       {
+                           "source_part":  25,
+                           "bone":  "UpperLegL",
+                           "triangles_before":  6,
+                           "triangles_after":  6
+                       },
+                       {
+                           "source_part":  26,
+                           "bone":  "FootR",
+                           "triangles_before":  512,
+                           "triangles_after":  224
+                       },
+                       {
+                           "source_part":  27,
+                           "bone":  "FootR",
+                           "triangles_before":  188,
+                           "triangles_after":  70
+                       },
+                       {
+                           "source_part":  28,
+                           "bone":  "FootR",
+                           "triangles_before":  188,
+                           "triangles_after":  70
+                       },
+                       {
+                           "source_part":  29,
+                           "bone":  "Chest",
+                           "triangles_before":  188,
+                           "triangles_after":  70
+                       },
+                       {
+                           "source_part":  30,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  31,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  32,
+                           "bone":  "Chest",
+                           "triangles_before":  796,
+                           "triangles_after":  362
+                       },
+                       {
+                           "source_part":  33,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  34,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  35,
+                           "removed":  "wall stand / mounting hardware"
+                       },
+                       {
+                           "source_part":  36,
+                           "bone":  "Chest",
+                           "triangles_before":  236,
+                           "triangles_after":  92
+                       },
+                       {
+                           "source_part":  37,
+                           "bone":  "Chest",
+                           "triangles_before":  108,
+                           "triangles_after":  30
+                       },
+                       {
+                           "source_part":  38,
+                           "bone":  "Chest",
+                           "triangles_before":  108,
+                           "triangles_after":  30
+                       },
+                       {
+                           "source_part":  39,
+                           "bone":  "Chest",
+                           "triangles_before":  44,
+                           "triangles_after":  2
+                       },
+                       {
+                           "source_part":  40,
+                           "bone":  "Chest",
+                           "triangles_before":  236,
+                           "triangles_after":  92
+                       },
+                       {
+                           "source_part":  41,
+                           "bone":  "Chest",
+                           "triangles_before":  236,
+                           "triangles_after":  92
+                       },
+                       {
+                           "source_part":  42,
+                           "bone":  "Chest",
+                           "triangles_before":  236,
+                           "triangles_after":  92
+                       },
+                       {
+                           "source_part":  43,
+                           "bone":  "Chest",
+                           "triangles_before":  284,
+                           "triangles_after":  116
+                       },
+                       {
+                           "source_part":  44,
+                           "bone":  "Chest",
+                           "triangles_before":  12,
+                           "triangles_after":  12
+                       },
+                       {
+                           "source_part":  45,
+                           "bone":  "Chest",
+                           "triangles_before":  284,
+                           "triangles_after":  116
+                       },
+                       {
+                           "source_part":  46,
+                           "bone":  "Chest",
+                           "triangles_before":  796,
+                           "triangles_after":  362
+                       },
+                       {
+                           "source_part":  47,
+                           "bone":  "Chest",
+                           "triangles_before":  284,
+                           "triangles_after":  116
+                       },
+                       {
+                           "source_part":  48,
+                           "bone":  "Head",
+                           "triangles_before":  292,
+                           "triangles_after":  120
+                       },
+                       {
+                           "source_part":  49,
+                           "bone":  "Head",
+                           "triangles_before":  92,
+                           "triangles_after":  24
+                       },
+                       {
+                           "source_part":  50,
+                           "bone":  "Head",
+                           "triangles_before":  92,
+                           "triangles_after":  24
+                       },
+                       {
+                           "source_part":  51,
+                           "bone":  "Head",
+                           "triangles_before":  92,
+                           "triangles_after":  24
+                       },
+                       {
+                           "source_part":  52,
+                           "bone":  "Head",
+                           "triangles_before":  92,
+                           "triangles_after":  24
+                       },
+                       {
+                           "source_part":  53,
+                           "bone":  "Head",
+                           "triangles_before":  76,
+                           "triangles_after":  16
+                       },
+                       {
+                           "source_part":  54,
+                           "bone":  "Head",
+                           "triangles_before":  76,
+                           "triangles_after":  16
+                       },
+                       {
+                           "source_part":  55,
+                           "bone":  "Head",
+                           "triangles_before":  108,
+                           "triangles_after":  30
+                       },
+                       {
+                           "source_part":  56,
+                           "bone":  "Chest",
+                           "triangles_before":  5256,
+                           "triangles_after":  2502
+                       },
+                       {
+                           "source_part":  57,
+                           "bone":  "UpperArmL",
+                           "triangles_before":  1986,
+                           "triangles_after":  932
+                       },
+                       {
+                           "source_part":  57,
+                           "bone":  "LowerArmL",
+                           "triangles_before":  6312,
+                           "triangles_after":  3008
+                       },
+                       {
+                           "source_part":  57,
+                           "bone":  "HandL",
+                           "triangles_before":  6,
+                           "triangles_after":  6
+                       },
+                       {
+                           "source_part":  58,
+                           "bone":  "LowerArmL",
+                           "triangles_before":  26,
+                           "triangles_after":  0
+                       },
+                       {
+                           "source_part":  58,
+                           "bone":  "HandL",
+                           "triangles_before":  262,
+                           "triangles_after":  105
+                       },
+                       {
+                           "source_part":  59,
+                           "bone":  "HandL",
+                           "triangles_before":  616,
+                           "triangles_after":  274
+                       },
+                       {
+                           "source_part":  60,
+                           "bone":  "UpperArmR",
+                           "triangles_before":  1985,
+                           "triangles_after":  932
+                       },
+                       {
+                           "source_part":  60,
+                           "bone":  "LowerArmR",
+                           "triangles_before":  6311,
+                           "triangles_after":  3008
+                       },
+                       {
+                           "source_part":  60,
+                           "bone":  "HandR",
+                           "triangles_before":  8,
+                           "triangles_after":  8
+                       },
+                       {
+                           "source_part":  61,
+                           "bone":  "LowerArmR",
+                           "triangles_before":  26,
+                           "triangles_after":  0
+                       },
+                       {
+                           "source_part":  61,
+                           "bone":  "HandR",
+                           "triangles_before":  262,
+                           "triangles_after":  105
+                       },
+                       {
+                           "source_part":  62,
+                           "bone":  "HandR",
+                           "triangles_before":  608,
+                           "triangles_after":  270
+                       },
+                       {
+                           "source_part":  63,
+                           "bone":  "UpperLegL",
+                           "triangles_before":  5398,
+                           "triangles_after":  2570
+                       },
+                       {
+                           "source_part":  63,
+                           "bone":  "LowerLegL",
+                           "triangles_before":  3602,
+                           "triangles_after":  1708
+                       },
+                       {
+                           "source_part":  63,
+                           "bone":  "FootL",
+                           "triangles_before":  2292,
+                           "triangles_after":  1080
+                       },
+                       {
+                           "source_part":  64,
+                           "bone":  "FootL",
+                           "triangles_before":  784,
+                           "triangles_after":  356
+                       },
+                       {
+                           "source_part":  65,
+                           "bone":  "FootL",
+                           "triangles_before":  1120,
+                           "triangles_after":  517
+                       },
+                       {
+                           "source_part":  66,
+                           "bone":  "UpperLegR",
+                           "triangles_before":  5398,
+                           "triangles_after":  2570
+                       },
+                       {
+                           "source_part":  66,
+                           "bone":  "LowerLegR",
+                           "triangles_before":  3600,
+                           "triangles_after":  1707
+                       },
+                       {
+                           "source_part":  66,
+                           "bone":  "FootR",
+                           "triangles_before":  2294,
+                           "triangles_after":  1081
+                       },
+                       {
+                           "source_part":  67,
+                           "bone":  "FootR",
+                           "triangles_before":  784,
+                           "triangles_after":  356
+                       },
+                       {
+                           "source_part":  68,
+                           "bone":  "FootR",
+                           "triangles_before":  1120,
+                           "triangles_after":  517
+                       },
+                       {
+                           "source_part":  69,
+                           "bone":  "Head",
+                           "triangles_before":  3248,
+                           "triangles_after":  1538
+                       },
+                       {
+                           "source_part":  70,
+                           "bone":  "Head",
+                           "triangles_before":  5288,
+                           "triangles_after":  2518
+                       },
+                       {
+                           "source_part":  71,
+                           "bone":  "Head",
+                           "triangles_before":  724,
+                           "triangles_after":  326
+                       },
+                       {
+                           "source_part":  72,
+                           "bone":  "Head",
+                           "triangles_before":  1552,
+                           "triangles_after":  724
+                       }
+                   ],
+    "suit_triangles":  42314,
+    "outer_shell_containment":  {
+                                    "method":  "Union of ray-parity tests per connected suit component, temporary hole caps at joint cuts, 1 mm surface tolerance; includes coverall detail vertices",
+                                    "regions":  {
+                                                    "Torso":  {
+                                                                  "vertices":  1345,
+                                                                  "outside":  10,
+                                                                  "outside_percent":  0.743,
+                                                                  "outside_bounds":  [
+                                                                                         [
+                                                                                             -0.014021242968738079,
+                                                                                             0.013968748040497303
+                                                                                         ],
+                                                                                         [
+                                                                                             -0.08899086713790894,
+                                                                                             -0.08575351536273956
+                                                                                         ],
+                                                                                         [
+                                                                                             1.5349714756011963,
+                                                                                             1.534999966621399
+                                                                                         ]
+                                                                                     ],
+                                                                  "outside_nearest_bones":  {
+                                                                                                "Neck":  10
+                                                                                            }
+                                                              },
+                                                    "Arms":  {
+                                                                 "vertices":  2128,
+                                                                 "outside":  1,
+                                                                 "outside_percent":  0.047,
+                                                                 "outside_bounds":  [
+                                                                                        [
+                                                                                            -0.30321335792541504,
+                                                                                            -0.30321335792541504
+                                                                                        ],
+                                                                                        [
+                                                                                            -0.03324213996529579,
+                                                                                            -0.03324213996529579
+                                                                                        ],
+                                                                                        [
+                                                                                            1.061907172203064,
+                                                                                            1.061907172203064
+                                                                                        ]
+                                                                                    ],
+                                                                 "outside_nearest_bones":  {
+                                                                                               "LowerArmR":  1
+                                                                                           }
+                                                             },
+                                                    "Legs":  {
+                                                                 "vertices":  1218,
+                                                                 "outside":  164,
+                                                                 "outside_percent":  13.465,
+                                                                 "outside_bounds":  [
+                                                                                        [
+                                                                                            -0.2865745723247528,
+                                                                                            0.2865745723247528
+                                                                                        ],
+                                                                                        [
+                                                                                            -0.1850000023841858,
+                                                                                            0.12036692351102829
+                                                                                        ],
+                                                                                        [
+                                                                                            0.0,
+                                                                                            0.842154860496521
+                                                                                        ]
+                                                                                    ],
+                                                                 "outside_nearest_bones":  {
+                                                                                               "LowerLegR":  18,
+                                                                                               "UpperLegR":  11,
+                                                                                               "LowerLegL":  17,
+                                                                                               "UpperLegL":  10,
+                                                                                               "Hips":  1,
+                                                                                               "ToesL":  35,
+                                                                                               "FootL":  18,
+                                                                                               "ToesR":  35,
+                                                                                               "FootR":  19
+                                                                                           }
+                                                             }
+                                                }
+                                },
+    "pressure_liners":  [
+                            {
+                                "bone":  "Chest",
+                                "triangles":  436,
+                                "source_body_vertices":  414,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "Neck",
+                                "triangles":  302,
+                                "source_body_vertices":  509,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "Spine",
+                                "triangles":  266,
+                                "source_body_vertices":  236,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "Hips",
+                                "triangles":  366,
+                                "source_body_vertices":  186,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "LowerArmR",
+                                "triangles":  450,
+                                "source_body_vertices":  237,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "UpperArmR",
+                                "triangles":  332,
+                                "source_body_vertices":  206,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "HandR",
+                                "triangles":  276,
+                                "source_body_vertices":  613,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "LowerArmL",
+                                "triangles":  440,
+                                "source_body_vertices":  234,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "UpperArmL",
+                                "triangles":  320,
+                                "source_body_vertices":  217,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "HandL",
+                                "triangles":  282,
+                                "source_body_vertices":  621,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "LowerLegR",
+                                "triangles":  202,
+                                "source_body_vertices":  268,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "UpperLegR",
+                                "triangles":  268,
+                                "source_body_vertices":  205,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "LowerLegL",
+                                "triangles":  200,
+                                "source_body_vertices":  269,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "UpperLegL",
+                                "triangles":  268,
+                                "source_body_vertices":  212,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "FootL",
+                                "triangles":  360,
+                                "source_body_vertices":  132,
+                                "clearance_m":  0.008
+                            },
+                            {
+                                "bone":  "FootR",
+                                "triangles":  360,
+                                "source_body_vertices":  132,
+                                "clearance_m":  0.008
+                            }
+                        ],
+    "rest_containment":  {
+                             "method":  "Union of ray-parity tests per connected suit component, temporary hole caps at joint cuts, 1 mm surface tolerance; includes coverall detail vertices",
+                             "regions":  {
+                                             "Torso":  {
+                                                           "vertices":  1345,
+                                                           "outside":  0,
+                                                           "outside_percent":  0.0,
+                                                           "outside_bounds":  [
+
+                                                                              ],
+                                                           "outside_nearest_bones":  {
+
+                                                                                     }
+                                                       },
+                                             "Arms":  {
+                                                          "vertices":  2128,
+                                                          "outside":  0,
+                                                          "outside_percent":  0.0,
+                                                          "outside_bounds":  [
+
+                                                                             ],
+                                                          "outside_nearest_bones":  {
+
+                                                                                    }
+                                                      },
+                                             "Legs":  {
+                                                          "vertices":  1218,
+                                                          "outside":  0,
+                                                          "outside_percent":  0.0,
+                                                          "outside_bounds":  [
+
+                                                                             ],
+                                                          "outside_nearest_bones":  {
+
+                                                                                    }
+                                                      }
+                                         }
+                         },
+    "bone_names":  [
+                       "Hips",
+                       "Spine",
+                       "Chest",
+                       "Neck",
+                       "Head",
+                       "ShoulderL",
+                       "UpperArmL",
+                       "LowerArmL",
+                       "HandL",
+                       "UpperLegL",
+                       "LowerLegL",
+                       "FootL",
+                       "ToesL",
+                       "HandAnchorL",
+                       "ShoulderR",
+                       "UpperArmR",
+                       "LowerArmR",
+                       "HandR",
+                       "UpperLegR",
+                       "LowerLegR",
+                       "FootR",
+                       "ToesR",
+                       "HandAnchorR"
+                   ],
+    "source_sha256_before":  {
+                                 "G:\\nasa app\\grand_colony\\work\\_downloads\\human_base_meshes\\extracted\\human-base-meshes-bundle-v1.4.1\\human_base_meshes_bundle.blend":  "3c121505651140ceb4d69fd1d8923f7788ffadd81672f5be14845a5f2c75c137",
+                                 "G:\\nasa app\\grand_colony\\grand_colony.blend":  "6aad006f0ca604ddf263e644d046f19e53f9b093082ebc3ebfb90d0cd15c916b"
+                             },
+    "mesh_weight_checks":  {
+                               "Body_Head":  {
+                                                 "unweighted":  0,
+                                                 "max_influences":  5,
+                                                 "max_sum_error":  0.06059853732585907
+                                             },
+                               "Body_Arms":  {
+                                                 "unweighted":  0,
+                                                 "max_influences":  4,
+                                                 "max_sum_error":  0.070645771920681
+                                             },
+                               "Body_Legs":  {
+                                                 "unweighted":  0,
+                                                 "max_influences":  4,
+                                                 "max_sum_error":  0.051002342253923416
+                                             },
+                               "Body_Torso":  {
+                                                  "unweighted":  0,
+                                                  "max_influences":  7,
+                                                  "max_sum_error":  0.111271221190691
+                                              },
+                               "Suit_Helmet":  {
+                                                   "unweighted":  0,
+                                                   "max_influences":  1,
+                                                   "max_sum_error":  0.0
+                                               },
+                               "Suit_Torso":  {
+                                                  "unweighted":  0,
+                                                  "max_influences":  1,
+                                                  "max_sum_error":  0.0
+                                              },
+                               "Suit_Arms":  {
+                                                 "unweighted":  0,
+                                                 "max_influences":  1,
+                                                 "max_sum_error":  0.0
+                                             },
+                               "Suit_Legs":  {
+                                                 "unweighted":  0,
+                                                 "max_influences":  1,
+                                                 "max_sum_error":  0.0
+                                             }
+                           },
+    "clips":  {
+                  "idle":  {
+                               "frames":  120,
+                               "seconds":  4.0,
+                               "minimum_foot_vertex_z":  0.00010000876500271261,
+                               "max_vertical_ground_correction":  7.827648751401739E-09
+                           },
+                  "walk":  {
+                               "frames":  30,
+                               "seconds":  1.0,
+                               "minimum_foot_vertex_z":  9.9912285804748535E-05,
+                               "max_vertical_ground_correction":  0.02089006081223488
+                           },
+                  "sprint":  {
+                                 "frames":  21,
+                                 "seconds":  0.7,
+                                 "minimum_foot_vertex_z":  9.9938362836837769E-05,
+                                 "max_vertical_ground_correction":  0.020815081894397736
+                             },
+                  "jump":  {
+                               "frames":  12,
+                               "seconds":  0.4,
+                               "minimum_foot_vertex_z":  9.9967190180905163E-05,
+                               "max_vertical_ground_correction":  0.00847566407173872
+                           },
+                  "land":  {
+                               "frames":  12,
+                               "seconds":  0.4,
+                               "minimum_foot_vertex_z":  9.9990764283575118E-05,
+                               "max_vertical_ground_correction":  0.008688006550073624
+                           },
+                  "carry":  {
+                                "frames":  60,
+                                "seconds":  2.0,
+                                "minimum_foot_vertex_z":  0.00010000876500271261,
+                                "max_vertical_ground_correction":  7.827648751401739E-09
+                            },
+                  "use":  {
+                              "frames":  30,
+                              "seconds":  1.0,
+                              "minimum_foot_vertex_z":  0.00010000876500271261,
+                              "max_vertical_ground_correction":  7.827648751401739E-09
+                          },
+                  "suit":  {
+                               "frames":  30,
+                               "seconds":  1.0,
+                               "minimum_foot_vertex_z":  0.00010000876500271261,
+                               "max_vertical_ground_correction":  7.827648751401739E-09
+                           },
+                  "seated":  {
+                                 "frames":  1,
+                                 "seconds":  0.03333333333333333,
+                                 "minimum_foot_vertex_z":  0.010000566951930523,
+                                 "max_vertical_ground_correction":  0
+                             }
+              },
+    "glb_bytes":  2054944,
+    "glb_animations":  [
+                           {
+                               "name":  "idle",
+                               "seconds":  4
+                           },
+                           {
+                               "name":  "walk",
+                               "seconds":  1
+                           },
+                           {
+                               "name":  "sprint",
+                               "seconds":  0.7
+                           },
+                           {
+                               "name":  "jump",
+                               "seconds":  0.4
+                           },
+                           {
+                               "name":  "land",
+                               "seconds":  0.4
+                           },
+                           {
+                               "name":  "carry",
+                               "seconds":  2
+                           },
+                           {
+                               "name":  "use",
+                               "seconds":  1
+                           },
+                           {
+                               "name":  "suit",
+                               "seconds":  1
+                           },
+                           {
+                               "name":  "seated",
+                               "seconds":  0.03333333333333333
+                           }
+                       ],
+    "glb_images":  0,
+    "glb_sha256":  "3720085afb2ecd90546a8984b79e70b1324b5242038d2bdbf920744b60e4c11a",
+    "glb_mesh_nodes":  [
+                           "Body_Arms",
+                           "Body_Head",
+                           "Body_Legs",
+                           "Body_Torso",
+                           "Suit_Arms",
+                           "Suit_Helmet",
+                           "Suit_Legs",
+                           "Suit_Torso"
+                       ],
+    "outputs":  {
+                    "blend":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\final01\\astronaut.blend",
+                    "glb":  "G:\\nasa app\\mars_colony_godot\\assets\\characters\\final01\\astronaut.glb",
+                    "poses":  "G:\\nasa app\\docs\\milestones\\04_player\\rig\\final01\\poses"
+                },
+    "reimport":  {
+                     "note":  "Importer-generated bone display helpers are excluded from character mesh inventory; GLB nodes inspected separately.",
+                     "armatures":  [
+                                       {
+                                           "name":  "Armature",
+                                           "bones":  [
+                                                         "Hips",
+                                                         "Spine",
+                                                         "Chest",
+                                                         "Neck",
+                                                         "Head",
+                                                         "ShoulderL",
+                                                         "UpperArmL",
+                                                         "LowerArmL",
+                                                         "HandL",
+                                                         "HandAnchorL",
+                                                         "ShoulderR",
+                                                         "UpperArmR",
+                                                         "LowerArmR",
+                                                         "HandR",
+                                                         "HandAnchorR",
+                                                         "UpperLegL",
+                                                         "LowerLegL",
+                                                         "FootL",
+                                                         "ToesL",
+                                                         "UpperLegR",
+                                                         "LowerLegR",
+                                                         "FootR",
+                                                         "ToesR"
+                                                     ]
+                                       }
+                                   ],
+                     "meshes":  [
+                                    {
+                                        "name":  "Body_Arms",
+                                        "triangles":  4150,
+                                        "materials":  [
+                                                          "Mat_Coverall",
+                                                          "Mat_Skin",
+                                                          "Mat_Ident"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    },
+                                    {
+                                        "name":  "Body_Head",
+                                        "triangles":  5124,
+                                        "materials":  [
+                                                          "Mat_Skin",
+                                                          "Mat_Hair"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    },
+                                    {
+                                        "name":  "Body_Legs",
+                                        "triangles":  2353,
+                                        "materials":  [
+                                                          "Mat_Coverall",
+                                                          "Mat_Boot"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    },
+                                    {
+                                        "name":  "Body_Torso",
+                                        "triangles":  2462,
+                                        "materials":  [
+                                                          "Mat_Coverall",
+                                                          "Mat_Ident"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    },
+                                    {
+                                        "name":  "Suit_Arms",
+                                        "triangles":  13452,
+                                        "materials":  [
+                                                          "Mat_Suit_kit_sign",
+                                                          "Mat_Suit_pp_suit",
+                                                          "Mat_Suit_pp_bearing",
+                                                          "Mat_Suit_kit_acc_hgr",
+                                                          "Mat_Suit_fabric_bl",
+                                                          "Mat_Suit_cream",
+                                                          "Mat_Suit_Liner"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    },
+                                    {
+                                        "name":  "Suit_Helmet",
+                                        "triangles":  5694,
+                                        "materials":  [
+                                                          "Mat_Suit_pp_bearing",
+                                                          "Mat_Suit_kit_acc_hgr",
+                                                          "Mat_Suit_white",
+                                                          "Mat_Suit_black",
+                                                          "Mat_Suit_gunmetal",
+                                                          "Mat_Visor"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    },
+                                    {
+                                        "name":  "Suit_Legs",
+                                        "triangles":  17490,
+                                        "materials":  [
+                                                          "Mat_Suit_kit_rubber",
+                                                          "Mat_Suit_pp_suit",
+                                                          "Mat_Suit_pp_bearing",
+                                                          "Mat_Suit_pp_boot",
+                                                          "Mat_Suit_Liner"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    },
+                                    {
+                                        "name":  "Suit_Torso",
+                                        "triangles":  5677,
+                                        "materials":  [
+                                                          "Mat_Suit_kit_rubber",
+                                                          "Mat_Suit_kit_frame",
+                                                          "Mat_Suit_pp_suit",
+                                                          "Mat_Suit_pp_bearing",
+                                                          "Mat_Suit_kit_acc_hgr",
+                                                          "Mat_Suit_white",
+                                                          "Mat_Suit_black",
+                                                          "Mat_Suit_scr_green",
+                                                          "Mat_Suit_gunmetal",
+                                                          "Mat_Suit_red",
+                                                          "Mat_Suit_Liner"
+                                                      ],
+                                        "armature_modifiers":  1
+                                    }
+                                ],
+                     "materials":  [
+                                       "Mat_Boot",
+                                       "Mat_Coverall",
+                                       "Mat_Hair",
+                                       "Mat_Ident",
+                                       "Mat_Skin",
+                                       "Mat_Suit_Liner",
+                                       "Mat_Suit_black",
+                                       "Mat_Suit_cream",
+                                       "Mat_Suit_fabric_bl",
+                                       "Mat_Suit_gunmetal",
+                                       "Mat_Suit_kit_acc_hgr",
+                                       "Mat_Suit_kit_frame",
+                                       "Mat_Suit_kit_rubber",
+                                       "Mat_Suit_kit_sign",
+                                       "Mat_Suit_pp_bearing",
+                                       "Mat_Suit_pp_boot",
+                                       "Mat_Suit_pp_suit",
+                                       "Mat_Suit_red",
+                                       "Mat_Suit_scr_green",
+                                       "Mat_Suit_white",
+                                       "Mat_Visor"
+                                   ],
+                     "actions":  [
+                                     {
+                                         "name":  "carry",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             60.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "idle",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             120.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "jump",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             12.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "land",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             12.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "seated",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             1.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "sprint",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             21.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "suit",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             30.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "use",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             30.0
+                                                         ]
+                                     },
+                                     {
+                                         "name":  "walk",
+                                         "frame_range":  [
+                                                             0.0,
+                                                             30.0
+                                                         ]
+                                     }
+                                 ]
+                 },
+    "checks":  {
+                   "bone_names":  true,
+                   "mesh_names":  true,
+                   "animation_names":  true,
+                   "no_image_textures":  true,
+                   "body_budget":  true,
+                   "suit_budget":  true,
+                   "ground_all_sampled_frames":  true,
+                   "root_horizontal_motion":  "Hips keyed only vertically; armature object never animated",
+                   "source_hashes_unchanged":  true
+               },
+    "source_sha256_after":  {
+                                "G:\\nasa app\\grand_colony\\work\\_downloads\\human_base_meshes\\extracted\\human-base-meshes-bundle-v1.4.1\\human_base_meshes_bundle.blend":  "3c121505651140ceb4d69fd1d8923f7788ffadd81672f5be14845a5f2c75c137",
+                                "G:\\nasa app\\grand_colony\\grand_colony.blend":  "6aad006f0ca604ddf263e644d046f19e53f9b093082ebc3ebfb90d0cd15c916b"
+                            },
+    "visual_evidence_review":  {
+                                   "glb_sha256":  "3720085afb2ecd90546a8984b79e70b1324b5242038d2bdbf920744b60e4c11a",
+                                   "run":  "final01",
+                                   "summary":  "Reviewed all 32 final01 Workbench stills through four front/side crew/suit contact sheets, plus the full-size jump side image. Also inspected six images rendered after importing the actual GLB: carry, sprint and seated, side view, both crew and suit. No exploded weights, detached suit pieces or obvious limb-through-torso penetration was observed at these sampled poses. This is not an exhaustive animation collision test.",
+                                   "reviewed_pose_count":  32,
+                                   "reviewed_reimport_pose_count":  6,
+                                   "defects":  [
+                                                   "Rigid suit joints and convex mitten gloves are visibly stylized; pressure liners show through outer-shell gaps at hips, knees and ankles.",
+                                                   "The coverall, shoulder patch and hair cap retain hard shading or polygon seams; the boots are deliberately simple rounded forms.",
+                                                   "The original outer suit shell alone does not enclose all body vertices: torso 0.743%, arms 0.047%, legs 13.465% outside. Exported pressure liners bring the complete-suit measurements to 0% in all three regions.",
+                                                   "Seated feet are approximately 10 mm above ground. The pose targets an approximately 0.45 m seat; exact seat contact was not numerically certified.",
+                                                   "Only representative stills were visually inspected. Full-motion self-collision and Godot rendering, transparency and gameplay were not tested; Godot was not run.",
+                                                   "The body bundle README states CC0, while its separate embedded License names the Rain Rig under CC BY 4.0. Both exact texts are recorded; the colony suit licence was not established."
+                                               ],
+                                   "exported_glb_validation":  {
+                                                                   "glb_sha256":  "3720085afb2ecd90546a8984b79e70b1324b5242038d2bdbf920744b60e4c11a",
+                                                                   "weights":  {
+                                                                                   "Body_Arms":  {
+                                                                                                     "unweighted":  0,
+                                                                                                     "maximum_influences":  4,
+                                                                                                     "maximum_sum_error":  8.1956386566162109E-08
+                                                                                                 },
+                                                                                   "Body_Head":  {
+                                                                                                     "unweighted":  0,
+                                                                                                     "maximum_influences":  4,
+                                                                                                     "maximum_sum_error":  1.0989606380462646E-07
+                                                                                                 },
+                                                                                   "Body_Legs":  {
+                                                                                                     "unweighted":  0,
+                                                                                                     "maximum_influences":  4,
+                                                                                                     "maximum_sum_error":  8.1956386566162109E-08
+                                                                                                 },
+                                                                                   "Body_Torso":  {
+                                                                                                      "unweighted":  0,
+                                                                                                      "maximum_influences":  4,
+                                                                                                      "maximum_sum_error":  1.0430812835693359E-07
+                                                                                                  },
+                                                                                   "Suit_Arms":  {
+                                                                                                     "unweighted":  0,
+                                                                                                     "maximum_influences":  1,
+                                                                                                     "maximum_sum_error":  0.0
+                                                                                                 },
+                                                                                   "Suit_Helmet":  {
+                                                                                                       "unweighted":  0,
+                                                                                                       "maximum_influences":  1,
+                                                                                                       "maximum_sum_error":  0.0
+                                                                                                   },
+                                                                                   "Suit_Legs":  {
+                                                                                                     "unweighted":  0,
+                                                                                                     "maximum_influences":  1,
+                                                                                                     "maximum_sum_error":  0.0
+                                                                                                 },
+                                                                                   "Suit_Torso":  {
+                                                                                                      "unweighted":  0,
+                                                                                                      "maximum_influences":  1,
+                                                                                                      "maximum_sum_error":  0.0
+                                                                                                  }
+                                                                               },
+                                                                   "animated_ground":  {
+                                                                                           "carry":  {
+                                                                                                         "minimum_world_z":  9.979395690606907E-05,
+                                                                                                         "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                                                         "seconds":  2.0
+                                                                                                     },
+                                                                                           "idle":  {
+                                                                                                        "minimum_world_z":  9.979395690606907E-05,
+                                                                                                        "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                                                        "seconds":  4.0
+                                                                                                    },
+                                                                                           "jump":  {
+                                                                                                        "minimum_world_z":  9.9731936643365771E-05,
+                                                                                                        "maximum_hips_horizontal_offset":  2.738283821912546E-09,
+                                                                                                        "seconds":  0.4
+                                                                                                    },
+                                                                                           "land":  {
+                                                                                                        "minimum_world_z":  9.979395690606907E-05,
+                                                                                                        "maximum_hips_horizontal_offset":  2.738283821912546E-09,
+                                                                                                        "seconds":  0.4
+                                                                                                    },
+                                                                                           "seated":  {
+                                                                                                          "minimum_world_z":  0.009999511763453484,
+                                                                                                          "maximum_hips_horizontal_offset":  1.3862566206057636E-08,
+                                                                                                          "seconds":  0.03333333333333333
+                                                                                                      },
+                                                                                           "sprint":  {
+                                                                                                          "minimum_world_z":  9.9793076515197754E-05,
+                                                                                                          "maximum_hips_horizontal_offset":  7.1589328909382743E-10,
+                                                                                                          "seconds":  0.7
+                                                                                                      },
+                                                                                           "suit":  {
+                                                                                                        "minimum_world_z":  9.979395690606907E-05,
+                                                                                                        "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                                                        "seconds":  1.0
+                                                                                                    },
+                                                                                           "use":  {
+                                                                                                       "minimum_world_z":  9.979395690606907E-05,
+                                                                                                       "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                                                       "seconds":  1.0
+                                                                                                   },
+                                                                                           "walk":  {
+                                                                                                        "minimum_world_z":  9.979395690606907E-05,
+                                                                                                        "maximum_hips_horizontal_offset":  7.1845990268215587E-10,
+                                                                                                        "seconds":  1.0
+                                                                                                    }
+                                                                                       },
+                                                                   "passed":  true
+                                                               },
+                                   "reimport_triangle_totals":  {
+                                                                    "suit":  42313,
+                                                                    "body":  14089
+                                                                }
+                               },
+    "canonical_outputs":  {
+                              "glb":  "G:\\nasa app\\mars_colony_godot\\assets\\characters\\astronaut.glb",
+                              "poses":  "G:\\nasa app\\docs\\milestones\\04_player\\rig\\poses",
+                              "blend":  "G:\\nasa app\\mars_colony_godot\\assets_src\\characters\\astronaut.blend"
+                          }
+}

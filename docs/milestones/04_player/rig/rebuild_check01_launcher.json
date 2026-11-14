@@ -1,0 +1,6 @@
+{
+    "run":  "rebuild_check01",
+    "command":  "blender-launcher.exe -b --factory-startup --disable-autoexec --python build_character.py",
+    "started_utc":  "2026-11-11T15:58:28.3605740Z",
+    "exit_code":  0
+}

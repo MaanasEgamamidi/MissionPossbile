@@ -1,0 +1,185 @@
+name,kind,area,x,y,z,rot_x_deg,rot_y_deg,rot_z_deg,lens_mm,hfov_deg,vfov_deg,clip_start,clip_end,existing_renders,latest_existing_render
+Cam_Hangar_1,legacy,Hangar bay,23.9001,-3.568,7.9921,50.0,-0.0,22.0,28.0,65.47,39.76,0.05,2000.0,0,
+Cam_Hangar_2,legacy,Hangar bay,23.593,-1.1504,3.2724,68.0,-0.0,20.0,32.0,58.716,35.116,0.05,2000.0,0,
+Cam_Hangar_3,legacy,Hangar bay,16.8723,-1.1484,3.2051,73.0,-0.0,-18.0,28.0,65.47,39.76,0.05,2000.0,0,
+Cam_Hangar_4,legacy,Hangar bay,26.9542,-0.557,2.9013,72.0,-0.0,50.0,30.0,61.928,37.299,0.05,2000.0,0,
+Cam_Library,legacy,Asset library,17.1831,-154.4425,84.2649,40.0,-0.0,20.0,40.0,48.455,28.409,0.05,2000.0,0,
+Cam_Overview,legacy,Overview,30.4255,-18.0105,30.565,46.0,-0.0,30.0,40.0,48.455,28.409,0.05,2000.0,0,
+Rv_a01_medbay_cu_bed3,review,Med Bay,-5.7,14.9,1.5,70.003,-0.0,27.897,32.0,58.716,35.116,0.05,2000.0,3,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_bed3.png
+Rv_a01_medbay_cu_cart,review,Med Bay,-9.25,14.55,1.45,66.383,0.0,42.274,35.0,54.432,32.269,0.05,2000.0,4,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_cart.png
+Rv_a01_medbay_cu_ct,review,Med Bay,-3.6,14.0,1.55,79.898,-0.0,-24.905,28.0,65.47,39.76,0.05,2000.0,4,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_ct.png
+Rv_a01_medbay_cu_desk,review,Med Bay,-2.3,11.0,1.55,74.706,0.0,-157.751,30.0,61.928,37.299,0.05,2000.0,3,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_desk.png
+Rv_a01_medbay_cu_exam,review,Med Bay,-9.7,10.9,1.55,71.121,-0.0,133.152,30.0,61.928,37.299,0.05,2000.0,4,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_exam.png
+Rv_a01_medbay_cu_iv,review,Med Bay,-8.75,15.75,1.5,84.626,-0.0,41.186,32.0,58.716,35.116,0.05,2000.0,3,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_iv.png
+Rv_a01_medbay_cu_lab,review,Med Bay,-6.0,10.3,1.55,73.61,0.0,-180.0,30.0,61.928,37.299,0.05,2000.0,4,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_lab.png
+Rv_a01_medbay_cu_monitor,review,Med Bay,-9.0,16.1,1.6,86.285,0.0,35.754,40.0,48.455,28.409,0.05,2000.0,4,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_monitor.png
+Rv_a01_medbay_cu_sink,review,Med Bay,-10.0,12.2,1.6,78.904,0.0,78.69,30.0,61.928,37.299,0.05,2000.0,4,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_sink.png
+Rv_a01_medbay_cu_survivor,review,Med Bay,-7.95,15.15,1.55,74.211,0.0,34.439,35.0,54.432,32.269,0.05,2000.0,5,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_cu_survivor.png
+Rv_a01_medbay_heal,review,Med Bay,-5.0,15.9,1.6,76.866,-0.0,0.0,24.0,73.74,45.747,0.05,2000.0,7,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_heal.png
+Rv_a01_medbay_spawn,review,Med Bay,-7.3,14.5,1.62,76.635,0.0,37.073,24.0,73.74,45.747,0.05,2000.0,9,G:/nasa app/grand_colony/work/shell/med1/a01_medbay_spawn.png
+Rv_a02_commons_cu_chair,review,Mess hall,8.9,8.0,1.3,61.457,0.0,45.0,35.0,54.432,32.269,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a02_commons_cu_chair.png
+Rv_a02_commons_cu_crew,review,Mess hall,6.3,15.4,1.6,86.424,-0.0,0.0,35.0,54.432,32.269,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a02_commons_cu_crew.png
+Rv_a02_commons_cu_lounge,review,Mess hall,8.6,14.6,1.5,75.465,0.0,-48.504,30.0,61.928,37.299,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a02_commons_cu_lounge.png
+Rv_a02_commons_cu_pass,review,Mess hall,11.6,15.6,1.6,79.146,-0.0,-57.529,35.0,54.432,32.269,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a02_commons_cu_pass.png
+Rv_a02_commons_cu_table,review,Mess hall,4.9,11.6,1.55,70.179,0.0,-144.782,35.0,54.432,32.269,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a02_commons_cu_table.png
+Rv_a03_rec_kitchen_cu_ared,review,Rec kitchen,16.4,14.4,1.5,72.367,-0.0,140.528,32.0,58.716,35.116,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a03_rec_kitchen_cu_ared.png
+Rv_a03_rec_kitchen_cu_galley,review,Rec kitchen,18.3,17.3,1.65,77.678,0.0,-6.843,28.0,65.47,39.76,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a03_rec_kitchen_cu_galley.png
+Rv_a03_rec_kitchen_cu_game,review,Rec kitchen,17.9,15.2,1.45,61.699,-0.0,0.0,40.0,48.455,28.409,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a03_rec_kitchen_cu_game.png
+Rv_a03_rec_kitchen_cu_gym,review,Rec kitchen,18.6,15.4,1.6,76.752,0.0,-160.346,26.0,69.39,42.554,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a03_rec_kitchen_cu_gym.png
+Rv_a03_rec_kitchen_cu_lounge,review,Rec kitchen,19.4,17.8,1.5,83.865,-0.0,-115.463,24.0,73.74,45.747,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a03_rec_kitchen_cu_lounge.png
+Rv_a03_rec_kitchen_cu_rehyd,review,Rec kitchen,17.75,18.3,1.5,72.276,0.0,6.115,40.0,48.455,28.409,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r4/a03_rec_kitchen_cu_rehyd.png
+Rv_a04_pipe_gallery_cu_east,review,Pipe gallery,21.2,10.6,1.6,78.31,0.0,-114.444,26.0,69.39,42.554,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a04_pipe_gallery_cu_east.png
+Rv_a04_pipe_gallery_cu_riser,review,Pipe gallery,21.6,10.0,1.55,85.763,0.0,-32.905,28.0,65.47,39.76,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a04_pipe_gallery_cu_riser.png
+Rv_a04_pipe_gallery_cu_valves,review,Pipe gallery,20.6,9.85,1.55,78.023,0.0,171.87,28.0,65.47,39.76,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a04_pipe_gallery_cu_valves.png
+Rv_a04_pipe_gallery_cu_west,review,Pipe gallery,16.3,10.4,1.6,72.289,0.0,115.201,26.0,69.39,42.554,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a04_pipe_gallery_cu_west.png
+Rv_a04_pipe_gallery_overview,review,Pipe gallery,14.4,9.9,2.4,78.114,-0.0,-88.869,16.0,96.733,64.652,0.05,2000.0,8,G:/nasa app/grand_colony/work/engineering/o1/a04_pipe_gallery_overview.png
+Rv_a05_hangar_bench,review,Hangar bay,27.35,2.6,1.6,81.551,0.0,-72.718,30.0,61.928,37.299,0.05,2000.0,3,G:/nasa app/grand_colony/work/hangar/final/a05_hangar_bench.png
+Rv_a05_hangar_crane,review,Hangar bay,23.55,0.75,1.65,91.584,0.0,-49.485,24.0,73.74,45.747,0.05,2000.0,3,G:/nasa app/grand_colony/work/hangar/final/a05_hangar_crane.png
+Rv_a05_hangar_lift,review,Hangar bay,22.85,0.85,1.5,70.775,0.0,-157.38,40.0,48.455,28.409,0.05,2000.0,4,G:/nasa app/grand_colony/work/hangar/final/a05_hangar_lift.png
+Rv_a05_hangar_mezz,review,Hangar bay,24.8,-0.9,2.3,90.0,0.0,-58.627,22.0,78.579,49.426,0.05,2000.0,1,G:/nasa app/grand_colony/work/hangar/r3/a05_hangar_mezz.png
+Rv_a05_hangar_rescue,review,Hangar bay,17.7,1.9,1.65,77.39,0.0,72.646,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/hangar/r2/a05_hangar_rescue.png
+Rv_a05_hangar_rover,review,Hangar bay,17.6,0.55,1.55,75.452,-0.0,-52.734,28.0,65.47,39.76,0.05,2000.0,4,G:/nasa app/grand_colony/work/hangar/final/a05_hangar_rover.png
+Rv_a05_hangar_rover_rear,review,Hangar bay,21.5,6.6,2.15,64.647,0.0,156.038,26.0,69.39,42.554,0.05,2000.0,3,G:/nasa app/grand_colony/work/hangar/r3/a05_hangar_rover_rear.png
+Rv_a05_hangar_service,review,Hangar bay,20.6,4.4,1.6,84.815,-0.0,-3.468,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/hangar/r4/a05_hangar_service.png
+Rv_a05_hangar_stretcher,review,Hangar bay,16.7,0.4,1.45,64.94,0.0,-37.694,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/hangar/r4/a05_hangar_stretcher.png
+Rv_a06_service_corridor_corridor,review,Service corridor,31.0,7.3,1.65,87.145,-0.0,-167.196,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a06_service_corridor_corridor.png
+Rv_a06_service_corridor_cu_cart,review,Service corridor,32.0,3.2,1.45,73.556,0.0,140.528,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a06_service_corridor_cu_cart.png
+Rv_a06_service_corridor_cu_note,review,Service corridor,32.2,-0.4,1.5,81.325,-0.0,150.776,32.0,58.716,35.116,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a06_service_corridor_cu_note.png
+Rv_a07_airlock_dust,review,Airlock,20.3,-7.5,1.5,80.362,0.0,148.109,28.0,65.47,39.76,0.05,2000.0,2,G:/nasa app/grand_colony/work/hangar/r4/a07_airlock_dust.png
+Rv_a07_airlock_east,review,Airlock,21.5,-5.8,1.6,84.775,-0.0,-79.461,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/hangar/r4/a07_airlock_east.png
+Rv_a07_airlock_glove,review,Airlock,17.5,-6.15,1.2,55.296,-0.0,136.169,45.0,43.603,25.361,0.05,2000.0,3,G:/nasa app/grand_colony/work/hangar/final/a07_airlock_glove.png
+Rv_a07_airlock_inner,review,Airlock,21.2,-7.8,1.6,92.878,-0.0,-13.57,22.0,78.579,49.426,0.05,2000.0,3,G:/nasa app/grand_colony/work/hangar/final/a07_airlock_inner.png
+Rv_a07_airlock_suits,review,Airlock,17.9,-6.6,1.65,83.114,0.0,151.113,26.0,69.39,42.554,0.05,2000.0,4,G:/nasa app/grand_colony/work/hangar/final/a07_airlock_suits.png
+Rv_a07_airlock_tunnel,review,Airlock,20.1,-4.6,1.7,82.794,0.0,-159.928,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/hangar/r3/a07_airlock_tunnel.png
+Rv_a08_power_aisle,review,Power Room,41.2,-7.3,1.62,88.109,0.0,91.534,20.0,83.974,53.701,0.05,2000.0,8,G:/nasa app/grand_colony/work/engineering/o1/a08_power_aisle.png
+Rv_a08_power_cu_burnt,review,Power Room,34.6,-6.95,1.55,85.684,0.0,148.109,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/engineering/o1/a08_power_cu_burnt.png
+Rv_a08_power_cu_console,review,Power Room,29.6,-4.3,1.5,76.85,0.0,37.405,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/engineering/o1/a08_power_cu_console.png
+Rv_a08_power_cu_panel,review,Power Room,30.6,-7.6,1.6,83.086,0.0,157.166,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/engineering/o1/a08_power_cu_panel.png
+Rv_a08_power_cu_rack,review,Power Room,34.75,-7.35,1.45,77.224,-0.0,24.905,32.0,58.716,35.116,0.05,2000.0,2,G:/nasa app/grand_colony/work/engineering/o1/a08_power_cu_rack.png
+Rv_a09_lifesupport_cu_console,review,Life Support,38.1,3.9,1.6,75.174,0.0,-180.0,32.0,58.716,35.116,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a09_lifesupport_cu_console.png
+Rv_a09_lifesupport_cu_filter,review,Life Support,37.9,0.4,1.45,69.215,0.0,137.564,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a09_lifesupport_cu_filter.png
+Rv_a09_lifesupport_cu_gas,review,Life Support,39.4,4.6,1.6,81.635,-0.0,-53.973,28.0,65.47,39.76,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a09_lifesupport_cu_gas.png
+Rv_a09_lifesupport_cu_manifold,review,Life Support,36.4,5.1,1.6,86.115,-0.0,84.806,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a09_lifesupport_cu_manifold.png
+Rv_a09_lifesupport_cu_moxie,review,Life Support,37.2,4.3,1.75,77.526,0.0,-31.43,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a09_lifesupport_cu_moxie.png
+Rv_a09_lifesupport_cu_pump,review,Life Support,38.7,0.3,1.55,77.082,-0.0,-143.393,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a09_lifesupport_cu_pump.png
+Rv_a09_lifesupport_cu_racks,review,Life Support,38.5,1.0,1.6,82.397,-0.0,-64.29,26.0,69.39,42.554,0.05,2000.0,1,G:/nasa app/grand_colony/work/engineering/o1/a09_lifesupport_cu_racks.png
+Rv_a10_east_quarters_bay_n,review,East quarters,38.9,16.65,1.6,74.693,0.0,-44.384,24.0,73.74,45.747,0.05,2000.0,1,G:/nasa app/grand_colony/work/command/w2/a10_east_quarters_bay_n.png
+Rv_a10_east_quarters_bay_s,review,East quarters,39.1,13.75,1.6,72.362,-0.0,-54.345,24.0,73.74,45.747,0.05,2000.0,1,G:/nasa app/grand_colony/work/command/w2/a10_east_quarters_bay_s.png
+Rv_a10_east_quarters_bed,review,East quarters,40.0,17.0,1.45,71.009,0.0,-31.759,32.0,58.716,35.116,0.05,2000.0,1,G:/nasa app/grand_colony/work/command/w2/a10_east_quarters_bed.png
+Rv_a10_east_quarters_chess,review,East quarters,35.6,17.0,1.35,63.094,-0.0,-45.0,40.0,48.455,28.409,0.05,2000.0,0,
+Rv_a10_east_quarters_desk,review,East quarters,39.9,17.9,1.5,76.147,-0.0,170.538,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/command/w2/a10_east_quarters_desk.png
+Rv_a10_east_quarters_lounge,review,East quarters,34.9,12.6,1.6,73.024,0.0,-31.264,26.0,69.39,42.554,0.05,2000.0,1,G:/nasa app/grand_colony/work/command/w2/a10_east_quarters_lounge.png
+Rv_a11_command_backrow,review,Command Room,27.75,10.5,1.5,69.782,0.0,-54.638,30.0,61.928,37.299,0.05,2000.0,3,G:/nasa app/grand_colony/work/command/w2/a11_command_backrow.png
+Rv_a11_command_chair,review,Command Room,26.9,14.75,1.2,65.905,0.0,40.815,40.0,48.455,28.409,0.05,2000.0,3,G:/nasa app/grand_colony/work/command/w2/a11_command_chair.png
+Rv_a11_command_coffee,review,Command Room,26.2,12.4,1.55,77.954,-0.0,129.806,32.0,58.716,35.116,0.05,2000.0,2,G:/nasa app/grand_colony/work/command/w2/a11_command_coffee.png
+Rv_a11_command_comms,review,Command Room,31.4,14.2,1.6,77.76,0.0,-49.399,30.0,61.928,37.299,0.05,2000.0,3,G:/nasa app/grand_colony/work/command/w2/a11_command_comms.png
+Rv_a11_command_computer,review,Command Room,27.0,14.55,1.6,83.991,-0.0,0.0,30.0,61.928,37.299,0.05,2000.0,3,G:/nasa app/grand_colony/work/command/w2/a11_command_computer.png
+Rv_a11_command_racks,review,Command Room,30.9,15.6,1.6,78.69,-0.0,-36.87,30.0,61.928,37.299,0.05,2000.0,0,
+Rv_a11_command_status,review,Command Room,29.0,15.2,1.6,95.353,-0.0,-12.995,34.0,55.795,33.167,0.05,2000.0,2,G:/nasa app/grand_colony/work/command/w2/a11_command_status.png
+Rv_a11_command_table,review,Command Room,31.6,12.75,2.05,60.774,-0.0,48.945,34.0,55.795,33.167,0.05,2000.0,3,G:/nasa app/grand_colony/work/command/w2/a11_command_table.png
+Rv_a12_blast_passage_ctrl,review,Blast-door passage,26.7,9.3,1.55,80.801,-0.0,-111.371,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/command/w2/a12_blast_passage_ctrl.png
+Rv_a12_blast_passage_door,review,Blast-door passage,26.0,9.75,1.6,86.73,0.0,-180.0,16.0,96.733,64.652,0.05,2000.0,2,G:/nasa app/grand_colony/work/command/w2/a12_blast_passage_door.png
+Rv_a12_blast_passage_risers,review,Blast-door passage,25.9,9.6,1.55,82.199,-0.0,99.462,26.0,69.39,42.554,0.05,2000.0,2,G:/nasa app/grand_colony/work/command/w2/a12_blast_passage_risers.png
+Rv_a13_exterior_atmo_devils,review,Exterior (crater floor),22.0,-19.0,1.7,101.793,-0.0,137.54,35.0,54.432,32.269,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_atmo_devils.png
+Rv_a13_exterior_close_crash,review,Exterior (crater floor),2.0,-39.5,2.8,81.051,0.0,124.679,30.0,61.928,37.299,0.05,2000.0,3,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_close_crash.png
+Rv_a13_exterior_close_dish,review,Exterior (crater floor),44.0,9.5,2.6,97.628,-0.0,-38.885,35.0,54.432,32.269,0.05,2000.0,3,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_close_dish.png
+Rv_a13_exterior_close_drift,review,Exterior (crater floor),-0.5,-20.5,1.6,76.886,0.0,-53.746,35.0,54.432,32.269,0.05,2000.0,1,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_close_drift.png
+Rv_a13_exterior_close_garage,review,Exterior (crater floor),17.5,-27.5,1.8,90.0,-0.0,60.945,35.0,54.432,32.269,0.05,2000.0,3,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_close_garage.png
+Rv_a13_exterior_close_lander,review,Exterior (crater floor),-16.5,-43.5,2.2,113.096,-0.0,41.186,35.0,54.432,32.269,0.05,2000.0,1,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_close_lander.png
+Rv_a13_exterior_close_orbiter,review,Exterior (crater floor),-19.5,-39.5,6.5,123.854,-0.0,46.254,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_close_orbiter.png
+Rv_a13_exterior_close_pad,review,Exterior (crater floor),-18.5,-39.0,4.5,64.18,-0.0,53.746,35.0,54.432,32.269,0.05,2000.0,3,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_close_pad.png
+Rv_a13_exterior_close_shield,review,Exterior (crater floor),-3.0,-34.0,2.0,90.0,-0.0,121.106,35.0,54.432,32.269,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_close_shield.png
+Rv_a13_exterior_close_solar,review,Exterior (crater floor),-14.2,-1.5,1.8,88.909,0.0,40.365,35.0,54.432,32.269,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_close_solar.png
+Rv_a13_exterior_close_tunnel,review,Exterior (crater floor),26.0,-21.6,1.7,93.018,0.0,24.944,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_close_tunnel.png
+Rv_a13_exterior_eye_airlock,review,Exterior (crater floor),22.0,-18.6,1.65,89.927,0.0,134.379,24.0,73.74,45.747,0.05,2000.0,4,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_eye_airlock.png
+Rv_a13_exterior_eye_airlock_w,review,Exterior (crater floor),22.0,-18.6,1.65,97.161,0.0,104.201,24.0,73.74,45.747,0.05,2000.0,1,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_eye_airlock_w.png
+Rv_a13_exterior_eye_crash,review,Exterior (crater floor),3.5,-40.5,1.65,88.049,-0.0,119.476,26.0,69.39,42.554,0.05,2000.0,3,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_eye_crash.png
+Rv_a13_exterior_eye_crash_back,review,Exterior (crater floor),-14.0,-53.0,1.65,93.696,-0.0,-33.996,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_eye_crash_back.png
+Rv_a13_exterior_eye_pad,review,Exterior (crater floor),-18.0,-48.6,1.65,110.593,-0.0,29.055,22.0,78.579,49.426,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r4/a13_exterior_eye_pad.png
+Rv_a13_exterior_eye_road,review,Exterior (crater floor),21.0,-40.0,1.65,93.778,0.0,-2.045,22.0,78.579,49.426,0.05,2000.0,3,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_eye_road.png
+Rv_a13_exterior_hall_inside,review,Exterior (crater floor),37.0,-11.2,1.65,90.88,-0.0,128.983,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_hall_inside.png
+Rv_a13_exterior_hall_se,review,Exterior (crater floor),66.0,-15.0,4.0,95.157,-0.0,68.839,26.0,69.39,42.554,0.05,2000.0,3,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_hall_se.png
+Rv_a13_exterior_wide,review,Exterior (crater floor),-6.0,-108.0,38.0,69.959,-0.0,-3.302,30.0,61.928,37.299,0.05,2000.0,10,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_wide.png
+Rv_a13_exterior_wide_se,review,Exterior (crater floor),78.0,-78.0,34.0,72.162,0.0,41.634,28.0,65.47,39.76,0.05,2000.0,2,G:/nasa app/grand_colony/work/exterior/r5/a13_exterior_wide_se.png
+Rv_a14_greenhouse_air,review,Greenhouse,10.6,-6.6,1.7,83.431,-0.0,-141.546,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_air.png
+Rv_a14_greenhouse_bay,review,Greenhouse,4.6,-7.0,1.75,79.493,0.0,-127.794,22.0,78.579,49.426,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_bay.png
+Rv_a14_greenhouse_console,review,Greenhouse,4.0,-3.4,1.6,79.992,0.0,-28.072,24.0,73.74,45.747,0.05,2000.0,6,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_console.png
+Rv_a14_greenhouse_pepper,review,Greenhouse,9.2,-7.6,1.45,69.156,0.0,-157.62,32.0,58.716,35.116,0.05,2000.0,1,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_pepper.png
+Rv_a14_greenhouse_potato,review,Greenhouse,9.4,-9.75,1.55,60.249,-0.0,-173.089,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_potato.png
+Rv_a14_greenhouse_potting,review,Greenhouse,-6.4,-2.9,1.65,77.789,-0.0,43.831,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_potting.png
+Rv_a14_greenhouse_prep,review,Greenhouse,0.6,-2.2,1.6,72.82,-0.0,25.346,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_prep.png
+Rv_a14_greenhouse_propag,review,Greenhouse,-2.0,-2.6,1.5,79.146,0.0,32.471,28.0,65.47,39.76,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_propag.png
+Rv_a14_greenhouse_rack,review,Greenhouse,-0.35,-6.9,1.45,78.095,-0.0,161.565,26.0,69.39,42.554,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_rack.png
+Rv_a14_greenhouse_rack_tier,review,Greenhouse,-0.3,-9.9,1.05,63.824,0.0,124.992,32.0,58.716,35.116,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_rack_tier.png
+Rv_a14_greenhouse_straw,review,Greenhouse,6.0,-8.35,1.45,73.003,-0.0,-136.548,35.0,54.432,32.269,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_straw.png
+Rv_a14_greenhouse_water,review,Greenhouse,-4.6,-7.2,1.7,82.183,0.0,131.82,22.0,78.579,49.426,0.05,2000.0,7,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_water.png
+Rv_a14_greenhouse_wilt,review,Greenhouse,2.1,-6.75,1.55,73.166,-0.0,146.31,28.0,65.47,39.76,0.05,2000.0,2,G:/nasa app/grand_colony/work/greenhouse/o1/a14_greenhouse_wilt.png
+Rv_a15_garden_dome_airlock,review,Garden dome,46.4,-26.1,1.62,84.883,-0.0,107.928,24.0,73.74,45.747,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_airlock.png
+Rv_a15_garden_dome_cu_beet,review,Garden dome,49.53,-29.95,0.97,54.53,-0.0,113.318,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_beet.png
+Rv_a15_garden_dome_cu_bench,review,Garden dome,53.55,-28.55,1.65,64.284,0.0,-130.815,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_bench.png
+Rv_a15_garden_dome_cu_carrot,review,Garden dome,47.79,-24.27,0.95,54.732,0.0,-59.808,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_carrot.png
+Rv_a15_garden_dome_cu_chard,review,Garden dome,47.22,-30.12,1.07,59.168,-0.0,111.801,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_chard.png
+Rv_a15_garden_dome_cu_corn,review,Garden dome,52.22,-30.35,1.2,90.0,-0.0,107.354,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_corn.png
+Rv_a15_garden_dome_cu_crate,review,Garden dome,49.67,-26.36,0.72,53.604,0.0,-42.511,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_crate.png
+Rv_a15_garden_dome_cu_hydro,review,Garden dome,52.9,-24.1,1.5,78.371,0.0,-65.695,30.0,61.928,37.299,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_hydro.png
+Rv_a15_garden_dome_cu_lettuce,review,Garden dome,45.63,-24.25,1.0,53.206,-0.0,-68.039,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_lettuce.png
+Rv_a15_garden_dome_cu_tomato,review,Garden dome,50.13,-23.35,1.27,81.55,0.0,-68.199,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_tomato.png
+Rv_a15_garden_dome_cu_tomato_fruit,review,Garden dome,50.47,-23.7,0.9,87.086,0.0,-75.256,50.0,39.598,22.895,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_cu_tomato_fruit.png
+Rv_a15_garden_dome_eye,review,Garden dome,43.8,-26.7,1.62,88.029,0.0,-91.409,18.0,90.0,58.716,0.05,2000.0,8,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_eye.png
+Rv_a15_garden_dome_in_ne,review,Garden dome,53.6,-21.4,1.62,86.168,-0.0,135.0,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_in_ne.png
+Rv_a15_garden_dome_in_nw,review,Garden dome,44.8,-22.0,1.62,86.413,0.0,-130.764,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_in_nw.png
+Rv_a15_garden_dome_in_se,review,Garden dome,53.4,-32.6,1.62,86.117,-0.0,44.236,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_in_se.png
+Rv_a15_garden_dome_in_sw,review,Garden dome,44.8,-32.0,1.62,86.413,0.0,-49.236,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_in_sw.png
+Rv_a15_garden_dome_master,review,Garden dome,28.5,-31.0,9.5,71.77,-0.0,-79.603,32.0,58.716,35.116,0.05,2000.0,8,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_master.png
+Rv_a15_garden_dome_mid_e,review,Garden dome,49.5,-27.0,1.62,86.034,0.0,-90.0,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_mid_e.png
+Rv_a15_garden_dome_mid_n,review,Garden dome,48.8,-27.3,1.62,84.382,-0.0,-1.818,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_mid_n.png
+Rv_a15_garden_dome_mid_s,review,Garden dome,48.8,-26.7,1.62,84.382,-0.0,-178.182,18.0,90.0,58.716,0.05,2000.0,1,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_mid_s.png
+Rv_a15_garden_dome_rear,review,Garden dome,56.4,-27.6,2.2,83.566,0.0,87.23,18.0,90.0,58.716,0.05,2000.0,8,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_rear.png
+Rv_a15_garden_dome_top,review,Garden dome,41.0,-38.0,14.0,46.89,0.0,-39.455,24.0,73.74,45.747,0.05,2000.0,8,G:/nasa app/grand_colony/work/garden/o1/a15_garden_dome_top.png
+Rv_x_crew_corridor_cu_note,review,Crew corridor,1.2,2.45,1.5,84.61,-0.0,103.643,40.0,48.455,28.409,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r3/x_crew_corridor_cu_note.png
+Rv_x_crew_corridor_cu_rack,review,Crew corridor,3.4,2.1,1.45,78.676,-0.0,147.724,35.0,54.432,32.269,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r3/x_crew_corridor_cu_rack.png
+Rv_x_crew_corridor_cu_wall,review,Crew corridor,8.6,3.9,1.5,84.914,-0.0,-32.276,35.0,54.432,32.269,0.05,2000.0,4,G:/nasa app/grand_colony/work/habitation/r3/x_crew_corridor_cu_wall.png
+Rv_x_plaza_exercise,review,Dome plaza,-7.4,18.5,1.5,78.312,0.0,71.03,26.0,69.39,42.554,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_plaza_exercise.png
+Rv_x_plaza_north_a,review,Dome plaza,-7.5,18.6,1.6,87.788,0.0,-86.309,20.0,83.974,53.701,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_plaza_north_a.png
+Rv_x_plaza_north_a2,review,Dome plaza,12.6,18.7,1.6,87.649,-0.0,87.255,20.0,83.974,53.701,0.05,2000.0,1,G:/nasa app/grand_colony/work/shell/p1/x_plaza_north_a2.png
+Rv_x_plaza_north_b,review,Dome plaza,32.8,18.6,1.6,85.889,-0.0,83.811,20.0,83.974,53.701,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_plaza_north_b.png
+Rv_x_plaza_south,review,Dome plaza,36.0,-10.6,1.6,87.146,0.0,94.289,20.0,83.974,53.701,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_plaza_south.png
+Rv_x_plaza_tree,review,Dome plaza,11.7,18.5,1.5,80.48,-0.0,-63.435,30.0,61.928,37.299,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_plaza_tree.png
+Rv_x_plaza_west,review,Dome plaza,-10.8,6.5,1.6,87.631,-0.0,179.21,22.0,78.579,49.426,0.05,2000.0,1,G:/nasa app/grand_colony/work/shell/p1/x_plaza_west.png
+Rv_x_roof_aerial,review,Roofs,15.0,-42.0,38.0,50.44,-0.0,0.0,32.0,58.716,35.116,0.05,600.0,2,G:/nasa app/grand_colony/work/shell/r1/x_roof_aerial.png
+Rv_x_roof_airlock,review,Roofs,15.0,-2.8,1.6,99.053,0.0,-135.807,15.0,100.389,68.039,0.05,2000.0,3,G:/nasa app/grand_colony/work/shell/final/x_roof_airlock.png
+Rv_x_roof_greenhouse,review,Roofs,-9.2,-11.2,1.6,92.527,-0.0,-63.184,15.0,100.389,68.039,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/r1/x_roof_greenhouse.png
+Rv_x_roof_hangar,review,Roofs,15.2,-1.2,1.6,97.419,-0.0,-58.61,15.0,100.389,68.039,0.05,2000.0,3,G:/nasa app/grand_colony/work/shell/final/x_roof_hangar.png
+Rv_x_roof_mess,review,Roofs,0.8,6.8,1.6,93.476,0.0,-49.105,15.0,100.389,68.039,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/r1/x_roof_mess.png
+Rv_x_roof_power,review,Roofs,27.0,-9.3,1.6,94.354,-0.0,-64.144,15.0,100.389,68.039,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/r1/x_roof_power.png
+Rv_x_shell_ceil_greenhouse,review,Shell (walls/doors),-8.5,-10.5,1.6,93.505,-0.0,-62.65,18.0,90.0,58.716,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_ceil_greenhouse.png
+Rv_x_shell_ceil_hangar,review,Shell (walls/doors),16.0,-1.0,1.6,103.496,0.0,-53.13,18.0,90.0,58.716,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_ceil_hangar.png
+Rv_x_shell_ceil_mess,review,Shell (walls/doors),6.0,9.0,1.6,100.142,-0.0,-26.565,18.0,90.0,58.716,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_ceil_mess.png
+Rv_x_shell_ceil_power,review,Shell (walls/doors),27.5,-8.8,1.6,96.963,-0.0,-63.194,18.0,90.0,58.716,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_ceil_power.png
+Rv_x_shell_corridor,review,Shell (walls/doors),13.3,3.0,1.6,88.708,-0.0,90.0,20.0,83.974,53.701,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_corridor.png
+Rv_x_shell_door_cmw,review,Shell (walls/doors),27.0,12.1,1.6,85.914,0.0,-180.0,22.0,78.579,49.426,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_door_cmw.png
+Rv_x_shell_door_hgw,review,Shell (walls/doors),26.0,6.0,1.6,88.568,-0.0,0.0,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_door_hgw.png
+Rv_x_shell_door_hgw_airlock,review,Shell (walls/doors),22.0,-3.9,1.6,86.987,-0.0,0.0,24.0,73.74,45.747,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_door_hgw_airlock.png
+Rv_x_shell_door_hgw_small,review,Shell (walls/doors),17.0,5.9,1.6,90.0,-0.0,0.0,22.0,78.579,49.426,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_door_hgw_small.png
+Rv_x_shell_door_msw,review,Shell (walls/doors),11.9,15.0,1.6,85.914,0.0,-90.0,22.0,78.579,49.426,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_door_msw.png
+Rv_x_shell_door_qtw,review,Shell (walls/doors),2.1,3.0,1.6,85.914,-0.0,90.0,22.0,78.579,49.426,0.05,2000.0,1,G:/nasa app/grand_colony/work/shell/r1/x_shell_door_qtw.png
+Rv_x_shell_door_stw,review,Shell (walls/doors),31.9,3.0,1.6,85.914,0.0,-90.0,22.0,78.579,49.426,0.05,2000.0,2,G:/nasa app/grand_colony/work/shell/final/x_shell_door_stw.png
+Rv_x_west_bunk_cu_bunks,review,West bunk room,-6.8,3.9,1.55,77.593,-0.0,90.0,26.0,69.39,42.554,0.05,2000.0,3,G:/nasa app/grand_colony/work/habitation/r3/x_west_bunk_cu_bunks.png
+Rv_x_west_bunk_cu_corner,review,West bunk room,-6.6,2.4,1.4,75.569,-0.0,126.027,35.0,54.432,32.269,0.05,2000.0,3,G:/nasa app/grand_colony/work/habitation/r3/x_west_bunk_cu_corner.png
+Rv_x_west_bunk_cu_desk,review,West bunk room,-3.0,5.4,1.5,73.791,0.0,26.565,35.0,54.432,32.269,0.05,2000.0,3,G:/nasa app/grand_colony/work/habitation/r3/x_west_bunk_cu_desk.png
+Rv_x_west_bunk_cu_memorial,review,West bunk room,-5.5,5.7,1.85,85.473,0.0,27.759,35.0,54.432,32.269,0.05,2000.0,3,G:/nasa app/grand_colony/work/habitation/r3/x_west_bunk_cu_memorial.png
+Shot_01_MedBay,beauty,Med Bay,-1.0,9.0,1.65,85.678,-0.0,49.086,20.0,83.974,53.701,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_01_MedBay.png
+Shot_02_MessHall,beauty,Mess hall,13.2,6.8,1.65,86.72,0.0,51.203,18.0,90.0,58.716,0.05,3000.0,4,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_02_MessHall.png
+Shot_03_RecKitchen,beauty,Rec kitchen,15.0,12.8,1.65,85.414,-0.0,-48.468,18.0,90.0,58.716,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_03_RecKitchen.png
+Shot_04_CrewCorridor,beauty,Crew corridor,0.8,3.0,1.65,87.971,0.0,-90.0,18.0,90.0,58.716,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_04_CrewCorridor.png
+Shot_05_Hangar,beauty,Hangar bay,15.0,-1.2,2.2,84.287,-0.0,-59.036,16.0,96.733,64.652,0.05,3000.0,4,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_05_Hangar.png
+Shot_06_Airlock,beauty,Airlock,25.2,-2.8,1.7,86.025,-0.0,122.586,16.0,96.733,64.652,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_06_Airlock.png
+Shot_07_PowerRoom,beauty,Power Room,26.8,-2.8,1.65,86.664,-0.0,-115.159,16.0,96.733,64.652,0.05,3000.0,4,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_07_PowerRoom.png
+Shot_08_LifeSupport,beauty,Life Support,34.8,-1.2,1.65,86.405,-0.0,-31.293,16.0,96.733,64.652,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_08_LifeSupport.png
+Shot_09_Command,beauty,Command Room,24.8,10.8,1.65,85.876,0.0,-52.028,16.0,96.733,64.652,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_09_Command.png
+Shot_10_EastQuarters,beauty,East quarters,34.8,10.8,1.65,85.949,-0.0,-39.251,16.0,96.733,64.652,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_10_EastQuarters.png
+Shot_11_Greenhouse,beauty,Greenhouse,13.2,-0.8,1.7,88.052,0.0,115.694,16.0,96.733,64.652,0.05,3000.0,3,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_11_Greenhouse.png
+Shot_12_WestBunk,beauty,West bunk room,-0.8,0.8,1.65,85.827,-0.0,52.907,16.0,96.733,64.652,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_12_WestBunk.png
+Shot_13_Exterior_Airlock,beauty,Exterior (crater floor),30.0,-40.0,1.8,93.683,-0.0,20.556,24.0,73.74,45.747,0.05,3000.0,3,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_13_Exterior_Airlock.png
+Shot_14_Exterior_Wide,beauty,Exterior (crater floor),-40.0,-75.0,32.0,72.442,0.0,-37.716,26.0,69.39,42.554,0.05,3000.0,3,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_14_Exterior_Wide.png
+Shot_15_GardenDome,beauty,Garden dome,38.0,-40.0,2.0,91.619,0.0,-42.709,24.0,73.74,45.747,0.05,3000.0,2,G:/nasa app/grand_colony/work/_v12/final_cycles/Shot_15_GardenDome.png

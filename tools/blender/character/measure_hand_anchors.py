@@ -2,7 +2,7 @@ import bpy,sys,json
 from pathlib import Path
 from mathutils import Matrix
 from mathutils.bvhtree import BVHTree
-root=Path(sys.argv[sys.argv.index('--')+1]);out=root/'docs/milestones/04_player/rig/hand_anchor_measurements.json'
+root=Path(sys.argv[sys.argv.index('--')+1]);out=root/'mars_colony_godot/docs/milestones/04_player/rig/hand_anchor_measurements.json'
 bpy.ops.wm.read_factory_settings(use_empty=True);bpy.ops.import_scene.gltf(filepath=str(root/'mars_colony_godot/assets/characters/astronaut.glb'))
 arm=next(o for o in bpy.context.scene.objects if o.type=='ARMATURE');arm.animation_data_clear()
 for p in arm.pose.bones:p.matrix_basis=Matrix.Identity(4)

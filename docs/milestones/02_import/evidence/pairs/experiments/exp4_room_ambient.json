@@ -1,0 +1,6 @@
+{
+ "Q1_probe_amb_1p5": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.06, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi": false, "probes.ambient_mode": "color", "probes.ambient_energy": 1.5, "sun.energy_scale": 0.11, "sky.energy": 0.45},
+ "Q2_probe_amb_3p0": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.06, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi": false, "probes.ambient_mode": "color", "probes.ambient_energy": 3.0, "sun.energy_scale": 0.11, "sky.energy": 0.45},
+ "Q3_sdfgi_on_amb_2p0": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.06, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi": true, "probes.ambient_mode": "color", "probes.ambient_energy": 2.0, "sun.energy_scale": 0.11, "sky.energy": 0.45},
+ "Q4_no_ambient_at_all": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.06, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi": false, "probes.ambient_mode": "color", "probes.ambient_energy": 0.0, "sun.energy_scale": 0.11, "sky.energy": 0.45}
+}

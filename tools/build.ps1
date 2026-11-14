@@ -2,7 +2,7 @@
 #   & "G:\nasa app\mars_colony_godot\tools\build.ps1" [-SkipImport]
 param([string]$Project = "G:\nasa app\mars_colony_godot", [switch]$SkipImport,
       [string]$Godot = "C:\Users\josev\Downloads\Godot_v4.7.2-stable_win64.exe\Godot_v4.7.2-stable_win64_console.exe",
-      [string]$Log = "G:\nasa app\docs\milestones\02_import\evidence\build")
+      [string]$Log = "G:\nasa app\mars_colony_godot\docs\milestones\02_import\evidence\build")
 New-Item -ItemType Directory -Force $Log | Out-Null
 py -I (Join-Path $Project "tools\gen_materials.py") $Project
 if (-not $SkipImport) {

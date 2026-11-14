@@ -1,0 +1,93 @@
+{
+  "glb_sha256": "3720085afb2ecd90546a8984b79e70b1324b5242038d2bdbf920744b60e4c11a",
+  "weights": {
+    "Body_Arms": {
+      "unweighted": 0,
+      "maximum_influences": 4,
+      "maximum_sum_error": 8.195638656616211e-08
+    },
+    "Body_Head": {
+      "unweighted": 0,
+      "maximum_influences": 4,
+      "maximum_sum_error": 1.0989606380462646e-07
+    },
+    "Body_Legs": {
+      "unweighted": 0,
+      "maximum_influences": 4,
+      "maximum_sum_error": 8.195638656616211e-08
+    },
+    "Body_Torso": {
+      "unweighted": 0,
+      "maximum_influences": 4,
+      "maximum_sum_error": 1.043081283569336e-07
+    },
+    "Suit_Arms": {
+      "unweighted": 0,
+      "maximum_influences": 1,
+      "maximum_sum_error": 0.0
+    },
+    "Suit_Helmet": {
+      "unweighted": 0,
+      "maximum_influences": 1,
+      "maximum_sum_error": 0.0
+    },
+    "Suit_Legs": {
+      "unweighted": 0,
+      "maximum_influences": 1,
+      "maximum_sum_error": 0.0
+    },
+    "Suit_Torso": {
+      "unweighted": 0,
+      "maximum_influences": 1,
+      "maximum_sum_error": 0.0
+    }
+  },
+  "animated_ground": {
+    "carry": {
+      "minimum_world_z": 9.979395690606907e-05,
+      "maximum_hips_horizontal_offset": 3.4234234370933425e-12,
+      "seconds": 2.0
+    },
+    "idle": {
+      "minimum_world_z": 9.979395690606907e-05,
+      "maximum_hips_horizontal_offset": 3.4234234370933425e-12,
+      "seconds": 4.0
+    },
+    "jump": {
+      "minimum_world_z": 9.973193664336577e-05,
+      "maximum_hips_horizontal_offset": 2.738283821912546e-09,
+      "seconds": 0.4
+    },
+    "land": {
+      "minimum_world_z": 9.979395690606907e-05,
+      "maximum_hips_horizontal_offset": 2.738283821912546e-09,
+      "seconds": 0.4
+    },
+    "seated": {
+      "minimum_world_z": 0.009999511763453484,
+      "maximum_hips_horizontal_offset": 1.3862566206057636e-08,
+      "seconds": 0.03333333333333333
+    },
+    "sprint": {
+      "minimum_world_z": 9.979307651519775e-05,
+      "maximum_hips_horizontal_offset": 7.158932890938274e-10,
+      "seconds": 0.7
+    },
+    "suit": {
+      "minimum_world_z": 9.979395690606907e-05,
+      "maximum_hips_horizontal_offset": 3.4234234370933425e-12,
+      "seconds": 1.0
+    },
+    "use": {
+      "minimum_world_z": 9.979395690606907e-05,
+      "maximum_hips_horizontal_offset": 3.4234234370933425e-12,
+      "seconds": 1.0
+    },
+    "walk": {
+      "minimum_world_z": 9.979395690606907e-05,
+      "maximum_hips_horizontal_offset": 7.184599026821559e-10,
+      "seconds": 1.0
+    }
+  },
+  "passed": true
+}

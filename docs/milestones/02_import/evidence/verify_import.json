@@ -1,0 +1,115 @@
+{
+ "cameras": {
+  "expected": 184,
+  "godot": 184,
+  "max_position_error_m": 0.0
+ },
+ "colony": {
+  "area_parent_mismatch": 0,
+  "by_area": {
+   "Airlock": 69,
+   "Blast-door Passage": 7,
+   "Command Room": 84,
+   "Crew Corridor": 63,
+   "Dome plaza": 42,
+   "East Quarters": 80,
+   "Exterior": 63,
+   "Garden Dome": 52,
+   "Greenhouse": 184,
+   "Hangar": 131,
+   "Life Support": 58,
+   "Med Bay": 92,
+   "Mess Hall": 130,
+   "Pipe gallery": 19,
+   "Power Room": 120,
+   "Rec Kitchen": 72,
+   "Roofs": 510,
+   "Service Corridor": 29,
+   "West Bunk Room": 52
+  },
+  "door_leaves": 52,
+  "doors": 24,
+  "expected": 1857,
+  "floor_class_nodes": 387,
+  "gc_asset_meta_mismatch": 0,
+  "interactables": [
+   "board",
+   "comms",
+   "computer",
+   "food",
+   "heal",
+   "lifesupport",
+   "power",
+   "suits",
+   "survivor"
+  ],
+  "matched": 1857,
+  "max_basis_error": 0.000001,
+  "max_position_error_m": 0.0,
+  "mesh_nodes": 1857,
+  "missing": [],
+  "triangles_godot": 11258217,
+  "triangles_manifest": 11258462,
+  "unique_mesh_resources": 593,
+  "worst": "sf_light_mast.002"
+ },
+ "environment": {
+  "expected": 1060,
+  "matched": 1060,
+  "max_position_error_m": 0.000001,
+  "mesh_nodes": 1060,
+  "terrain_tiles": 26,
+  "terrain_tiles_white_or_uncoloured": [],
+  "terrain_tiles_with_vertex_colour": 25,
+  "triangles_godot": 6952830,
+  "triangles_manifest": 6952830,
+  "unique_mesh_resources": 78
+ },
+ "lights": {
+  "godot_fixture_lights": 417,
+  "godot_suns": 1,
+  "in_blender_render": 418,
+  "not_carried": 53,
+  "source_lights_total": 471
+ },
+ "materials": {
+  "glass": {
+   "en_water": {
+    "opacity": 0.55,
+    "shader": "colony_glass"
+   },
+   "gd_water": {
+    "opacity": 0.55,
+    "shader": "colony_glass"
+   },
+   "glass": {
+    "opacity": 0.22,
+    "shader": "colony_glass"
+   },
+   "glass_clear": {
+    "opacity": 0.16,
+    "shader": "colony_glass"
+   },
+   "glass_gd": {
+    "opacity": 0.22,
+    "shader": "colony_glass"
+   },
+   "glass_mb_bag": {
+    "opacity": 0.35,
+    "shader": "colony_glass"
+   },
+   "glass_pp_bubble": {
+    "opacity": 0.2,
+    "shader": "colony_glass"
+   },
+   "sf_hall_glass": {
+    "opacity": 0.35,
+    "shader": "colony_glass"
+   }
+  },
+  "not_external": 0,
+  "used": 246
+ },
+ "ok": true,
+ "source_sha256": "6AAD006F0CA604DDF263E644D046F19E53F9B093082EBC3EBFB90D0CD15C916B"
+}

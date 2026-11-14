@@ -1,0 +1,7 @@
+{
+ "A_baseline": {},
+ "B_sdfgi_off": {"gi.sdfgi": false},
+ "C_indirect_x4": {"fixtures.indirect_energy": 4.0},
+ "D_sdfgi_energy_x3": {"gi.sdfgi_energy": 3.0},
+ "E_probe_ambient": {"gi.sdfgi": false, "probes.ambient_mode": "color", "probes.ambient_energy": 0.6}
+}

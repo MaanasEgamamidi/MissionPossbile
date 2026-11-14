@@ -1,0 +1,177 @@
+{
+ "report": "G:\\nasa app\\docs\\milestones\\01_audit\\evidence\\blend_reports\\mars_kit.json",
+ "file": {
+  "filepath": "G:\\nasa app\\mars_kit\\mars_kit.blend",
+  "bytes": 12634045,
+  "saved_with_version": [
+   5,
+   2,
+   45
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": false
+ },
+ "counts": {
+  "scenes": 3,
+  "objects": 259,
+  "meshes": 154,
+  "curves": 87,
+  "materials": 40,
+  "textures": 0,
+  "images": 0,
+  "cameras": 10,
+  "lights": 8,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 20,
+  "node_groups": 2,
+  "worlds": 3,
+  "libraries": 0,
+  "texts": 0,
+  "lightprobes": 0,
+  "volumes": 0,
+  "shape_keys": 0,
+  "grease_pencils": 0
+ },
+ "scenes": [
+  [
+   "MK_Asset_Library",
+   184,
+   "BLENDER_EEVEE",
+   "MKLIB_Cam_Creatures",
+   "Khronos PBR Neutral",
+   0.0
+  ],
+  [
+   "MK_Shot02",
+   62,
+   "BLENDER_EEVEE",
+   "MK02_Camera",
+   "Khronos PBR Neutral",
+   0.0
+  ],
+  [
+   "MK_Shot06",
+   13,
+   "BLENDER_EEVEE",
+   "MK06_Camera",
+   "Khronos PBR Neutral",
+   -0.25
+  ]
+ ],
+ "mesh_totals": {
+  "unique_meshes": 154,
+  "unique_verts": 822307,
+  "unique_polys": 273401,
+  "unique_tris": 537904,
+  "meshes_with_color_attributes": 1,
+  "meshes_with_uvs": 0
+ },
+ "objects_by_type": {
+  "CAMERA": 10,
+  "LIGHT": 8,
+  "MESH": 154,
+  "FONT": 87
+ },
+ "instanced_scene_tris": 537904,
+ "meshes_shared": 0,
+ "collection_instances": 0,
+ "modifiers": {
+  "BEVEL": 46
+ },
+ "custom_property_keys": {
+  "mk_roles": 152,
+  "mk_asset": 87,
+  "mk_category": 87
+ },
+ "cameras": [
+  "MK02_Camera",
+  "MK06_Camera",
+  "MKLIB_Cam_Colony_Structures",
+  "MKLIB_Cam_Connectors_and_Utilities",
+  "MKLIB_Cam_Creatures",
+  "MKLIB_Cam_Interior_Modular",
+  "MKLIB_Cam_Interior_Props",
+  "MKLIB_Cam_Nature",
+  "MKLIB_Cam_Ruins",
+  "MKLIB_Cam_Vehicles"
+ ],
+ "lights": {
+  "SUN": 2,
+  "AREA": 5,
+  "SPOT": 1
+ },
+ "armatures": [],
+ "actions": [],
+ "skinned_meshes": 0,
+ "materials_summary": {
+  "count": 40,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 0,
+  "using_vertex_color_or_attribute": 2,
+  "with_volume": 0,
+  "transmissive_or_glass": 0,
+  "alpha_below_one": 1,
+  "emissive": 6,
+  "render_methods": {
+   "DITHERED": 39,
+   "BLENDED": 1
+  }
+ },
+ "images": 0,
+ "missing_files": [],
+ "libraries": [],
+ "category_hits": {
+  "rover_vehicle": [
+   6,
+   2252
+  ],
+  "human_body": [
+   0,
+   0
+  ],
+  "suit": [
+   0,
+   0
+  ],
+  "spaceship": [
+   2,
+   610
+  ],
+  "crops_plants": [
+   18,
+   5100
+  ],
+  "energy": [
+   8,
+   3094
+  ],
+  "life_support": [
+   0,
+   0
+  ],
+  "comms": [
+   2,
+   512
+  ],
+  "doors_glass": [
+   19,
+   13894
+  ],
+  "terrain_rock": [
+   12,
+   51726
+  ],
+  "salvage_fab": [
+   6,
+   492
+  ],
+  "science": [
+   88,
+   580
+  ]
+ },
+ "is_dirty_after_audit": false
+}

@@ -14,7 +14,7 @@ args=P.parse_args(sys.argv[sys.argv.index('--')+1:]);ROOT=Path(args.root).resolv
 CFG=json.loads(Path(args.config).read_text()) if args.config else {}
 TAG=args.tag
 if not TAG or any(c not in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-' for c in TAG): raise ValueError('Unsafe tag')
-OUT=ROOT/'docs/milestones/04_player/rig'/TAG
+OUT=ROOT/'mars_colony_godot/docs/milestones/04_player/rig'/TAG
 BLEND=ROOT/'mars_colony_godot/assets_src/characters'/TAG/'astronaut.blend'
 GLB=ROOT/'mars_colony_godot/assets/characters'/TAG/'astronaut.glb'
 for p in (OUT, BLEND.parent, GLB.parent):

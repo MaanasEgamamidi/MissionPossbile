@@ -1,0 +1,135 @@
+{
+ "adapter": "NVIDIA GeForce RTX 4060 Ti",
+ "frames_per_view": 100,
+ "godot": "4.7.2-stable (official)",
+ "night": false,
+ "off": "",
+ "pass": 3,
+ "preset": "reference_day_powered",
+ "size": [
+  1920,
+  1080
+ ],
+ "views": [
+  {
+   "camera": "Shot_01_MedBay",
+   "draw_calls": 2653,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_01_MedBay.png",
+   "primitives": 6661446,
+   "render_cpu_ms": 1.91,
+   "render_gpu_ms": 9.9
+  },
+  {
+   "camera": "Shot_02_MessHall",
+   "draw_calls": 6141,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_02_MessHall.png",
+   "primitives": 7996196,
+   "render_cpu_ms": 4.52,
+   "render_gpu_ms": 13.19
+  },
+  {
+   "camera": "Shot_03_RecKitchen",
+   "draw_calls": 4781,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_03_RecKitchen.png",
+   "primitives": 6660536,
+   "render_cpu_ms": 4.07,
+   "render_gpu_ms": 10.05
+  },
+  {
+   "camera": "Shot_04_CrewCorridor",
+   "draw_calls": 11858,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_04_CrewCorridor.png",
+   "primitives": 8764796,
+   "render_cpu_ms": 10.68,
+   "render_gpu_ms": 17.21
+  },
+  {
+   "camera": "Shot_05_Hangar",
+   "draw_calls": 8697,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_05_Hangar.png",
+   "primitives": 7800012,
+   "render_cpu_ms": 7.87,
+   "render_gpu_ms": 17.14
+  },
+  {
+   "camera": "Shot_06_Airlock",
+   "draw_calls": 6516,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_06_Airlock.png",
+   "primitives": 7422858,
+   "render_cpu_ms": 5.44,
+   "render_gpu_ms": 16.89
+  },
+  {
+   "camera": "Shot_07_PowerRoom",
+   "draw_calls": 5278,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_07_PowerRoom.png",
+   "primitives": 6584783,
+   "render_cpu_ms": 4.56,
+   "render_gpu_ms": 11.78
+  },
+  {
+   "camera": "Shot_08_LifeSupport",
+   "draw_calls": 3709,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_08_LifeSupport.png",
+   "primitives": 6085084,
+   "render_cpu_ms": 3.52,
+   "render_gpu_ms": 11.12
+  },
+  {
+   "camera": "Shot_09_Command",
+   "draw_calls": 2047,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_09_Command.png",
+   "primitives": 5096372,
+   "render_cpu_ms": 2.29,
+   "render_gpu_ms": 10.56
+  },
+  {
+   "camera": "Shot_10_EastQuarters",
+   "draw_calls": 1175,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_10_EastQuarters.png",
+   "primitives": 4817502,
+   "render_cpu_ms": 1.45,
+   "render_gpu_ms": 9.02
+  },
+  {
+   "camera": "Shot_11_Greenhouse",
+   "draw_calls": 2958,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_11_Greenhouse.png",
+   "primitives": 5295434,
+   "render_cpu_ms": 3.35,
+   "render_gpu_ms": 23.9
+  },
+  {
+   "camera": "Shot_12_WestBunk",
+   "draw_calls": 5240,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_12_WestBunk.png",
+   "primitives": 7456923,
+   "render_cpu_ms": 4.16,
+   "render_gpu_ms": 11.87
+  },
+  {
+   "camera": "Shot_13_Exterior_Airlock",
+   "draw_calls": 11938,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_13_Exterior_Airlock.png",
+   "primitives": 6828094,
+   "render_cpu_ms": 12.72,
+   "render_gpu_ms": 28.0
+  },
+  {
+   "camera": "Shot_14_Exterior_Wide",
+   "draw_calls": 9564,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_14_Exterior_Wide.png",
+   "primitives": 3604628,
+   "render_cpu_ms": 11.3,
+   "render_gpu_ms": 15.16
+  },
+  {
+   "camera": "Shot_15_GardenDome",
+   "draw_calls": 1212,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3/Shot_15_GardenDome.png",
+   "primitives": 4421823,
+   "render_cpu_ms": 1.49,
+   "render_gpu_ms": 9.33
+  }
+ ]
+}

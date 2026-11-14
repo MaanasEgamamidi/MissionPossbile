@@ -1,0 +1,658 @@
+{
+ "summary": {
+  "tag": "pass3",
+  "pairs": 15,
+  "missing": [],
+  "mean_ssim": 0.7459,
+  "mean_abs_ev": 0.14,
+  "mean_de76": 9.91,
+  "settings": "960x540 Lanczos; SSIM on sRGB luma, Gaussian 11x11 sigma 1.5, K1 0.01 K2 0.03; dE76 at 480x270"
+ },
+ "pairs": [
+  {
+   "camera": "Shot_01_MedBay",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.7854,
+   "lum_ref": 0.1983,
+   "lum_godot": 0.2095,
+   "lum_ratio": 1.057,
+   "ev_diff": 0.08,
+   "de76_mean": 8.2,
+   "rg_shift": 1.022,
+   "bg_shift": 0.99,
+   "contrast_ref": 0.1754,
+   "contrast_godot": 0.1945,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0008,
+   "clip_lo_ref": 0.0056,
+   "clip_lo_godot": 0.0007,
+   "grid_ev": [
+    [
+     -0.67,
+     -0.52,
+     -0.36
+    ],
+    [
+     0.17,
+     0.51,
+     0.35
+    ],
+    [
+     0.15,
+     0.04,
+     0.11
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_02_MessHall",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.842,
+   "lum_ref": 0.1726,
+   "lum_godot": 0.1691,
+   "lum_ratio": 0.98,
+   "ev_diff": -0.03,
+   "de76_mean": 7.41,
+   "rg_shift": 1.044,
+   "bg_shift": 0.954,
+   "contrast_ref": 0.1765,
+   "contrast_godot": 0.178,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0011,
+   "clip_lo_ref": 0.0024,
+   "clip_lo_godot": 0.0005,
+   "grid_ev": [
+    [
+     -0.02,
+     -0.24,
+     -0.2
+    ],
+    [
+     0.48,
+     0.08,
+     0.13
+    ],
+    [
+     -0.12,
+     -0.0,
+     -0.4
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_03_RecKitchen",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.8027,
+   "lum_ref": 0.2407,
+   "lum_godot": 0.2406,
+   "lum_ratio": 1.0,
+   "ev_diff": -0.0,
+   "de76_mean": 8.28,
+   "rg_shift": 1.008,
+   "bg_shift": 0.961,
+   "contrast_ref": 0.1836,
+   "contrast_godot": 0.2115,
+   "clip_hi_ref": 0.0002,
+   "clip_hi_godot": 0.0003,
+   "clip_lo_ref": 0.0,
+   "clip_lo_godot": 0.0,
+   "grid_ev": [
+    [
+     -0.4,
+     -0.61,
+     -0.34
+    ],
+    [
+     0.1,
+     0.12,
+     0.33
+    ],
+    [
+     0.02,
+     0.07,
+     -0.04
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_04_CrewCorridor",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.8606,
+   "lum_ref": 0.0708,
+   "lum_godot": 0.0689,
+   "lum_ratio": 0.974,
+   "ev_diff": -0.04,
+   "de76_mean": 6.92,
+   "rg_shift": 0.993,
+   "bg_shift": 1.052,
+   "contrast_ref": 0.1364,
+   "contrast_godot": 0.1354,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0003,
+   "clip_lo_ref": 0.0255,
+   "clip_lo_godot": 0.0083,
+   "grid_ev": [
+    [
+     -0.22,
+     -0.28,
+     -0.28
+    ],
+    [
+     -0.03,
+     -0.06,
+     0.15
+    ],
+    [
+     0.15,
+     -0.34,
+     0.35
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_05_Hangar",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.7005,
+   "lum_ref": 0.2336,
+   "lum_godot": 0.2798,
+   "lum_ratio": 1.198,
+   "ev_diff": 0.26,
+   "de76_mean": 12.09,
+   "rg_shift": 0.986,
+   "bg_shift": 0.989,
+   "contrast_ref": 0.2094,
+   "contrast_godot": 0.1902,
+   "clip_hi_ref": 0.0001,
+   "clip_hi_godot": 0.0005,
+   "clip_lo_ref": 0.0005,
+   "clip_lo_godot": 0.0,
+   "grid_ev": [
+    [
+     0.92,
+     1.05,
+     0.27
+    ],
+    [
+     0.15,
+     0.21,
+     0.04
+    ],
+    [
+     0.12,
+     0.05,
+     0.28
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_06_Airlock",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.6179,
+   "lum_ref": 0.1709,
+   "lum_godot": 0.1732,
+   "lum_ratio": 1.014,
+   "ev_diff": 0.02,
+   "de76_mean": 13.22,
+   "rg_shift": 1.066,
+   "bg_shift": 0.951,
+   "contrast_ref": 0.2322,
+   "contrast_godot": 0.237,
+   "clip_hi_ref": 0.0001,
+   "clip_hi_godot": 0.0003,
+   "clip_lo_ref": 0.01,
+   "clip_lo_godot": 0.0347,
+   "grid_ev": [
+    [
+     -0.29,
+     0.98,
+     0.89
+    ],
+    [
+     -1.93,
+     0.24,
+     0.24
+    ],
+    [
+     -0.04,
+     -0.17,
+     0.24
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_07_PowerRoom",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.6707,
+   "lum_ref": 0.1085,
+   "lum_godot": 0.1628,
+   "lum_ratio": 1.501,
+   "ev_diff": 0.59,
+   "de76_mean": 12.88,
+   "rg_shift": 0.947,
+   "bg_shift": 1.012,
+   "contrast_ref": 0.2171,
+   "contrast_godot": 0.2282,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0004,
+   "clip_lo_ref": 0.0836,
+   "clip_lo_godot": 0.0068,
+   "grid_ev": [
+    [
+     0.31,
+     2.59,
+     2.09
+    ],
+    [
+     0.62,
+     0.72,
+     0.41
+    ],
+    [
+     0.49,
+     0.28,
+     0.03
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_08_LifeSupport",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.7106,
+   "lum_ref": 0.2313,
+   "lum_godot": 0.2767,
+   "lum_ratio": 1.196,
+   "ev_diff": 0.26,
+   "de76_mean": 10.42,
+   "rg_shift": 1.015,
+   "bg_shift": 0.976,
+   "contrast_ref": 0.2594,
+   "contrast_godot": 0.2423,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0006,
+   "clip_lo_ref": 0.0082,
+   "clip_lo_godot": 0.0008,
+   "grid_ev": [
+    [
+     0.47,
+     1.52,
+     0.71
+    ],
+    [
+     0.36,
+     0.2,
+     0.68
+    ],
+    [
+     0.03,
+     0.01,
+     0.11
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_09_Command",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.7372,
+   "lum_ref": 0.0975,
+   "lum_godot": 0.1192,
+   "lum_ratio": 1.222,
+   "ev_diff": 0.29,
+   "de76_mean": 9.27,
+   "rg_shift": 1.002,
+   "bg_shift": 0.996,
+   "contrast_ref": 0.1829,
+   "contrast_godot": 0.1708,
+   "clip_hi_ref": 0.0005,
+   "clip_hi_godot": 0.0009,
+   "clip_lo_ref": 0.0419,
+   "clip_lo_godot": 0.0046,
+   "grid_ev": [
+    [
+     0.77,
+     0.92,
+     0.26
+    ],
+    [
+     0.41,
+     0.74,
+     0.29
+    ],
+    [
+     0.01,
+     -0.09,
+     0.05
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_10_EastQuarters",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.822,
+   "lum_ref": 0.1614,
+   "lum_godot": 0.1638,
+   "lum_ratio": 1.015,
+   "ev_diff": 0.02,
+   "de76_mean": 10.49,
+   "rg_shift": 1.005,
+   "bg_shift": 0.967,
+   "contrast_ref": 0.1668,
+   "contrast_godot": 0.1747,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0005,
+   "clip_lo_ref": 0.0015,
+   "clip_lo_godot": 0.0005,
+   "grid_ev": [
+    [
+     -0.22,
+     -0.48,
+     -0.21
+    ],
+    [
+     0.21,
+     0.21,
+     0.27
+    ],
+    [
+     -0.07,
+     -0.06,
+     0.14
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_11_Greenhouse",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.793,
+   "lum_ref": 0.2821,
+   "lum_godot": 0.3137,
+   "lum_ratio": 1.112,
+   "ev_diff": 0.15,
+   "de76_mean": 11.03,
+   "rg_shift": 1.003,
+   "bg_shift": 1.017,
+   "contrast_ref": 0.2351,
+   "contrast_godot": 0.233,
+   "clip_hi_ref": 0.0001,
+   "clip_hi_godot": 0.0014,
+   "clip_lo_ref": 0.0002,
+   "clip_lo_godot": 0.0,
+   "grid_ev": [
+    [
+     -0.11,
+     -0.35,
+     0.06
+    ],
+    [
+     0.52,
+     0.21,
+     0.13
+    ],
+    [
+     0.03,
+     -0.0,
+     1.47
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_12_WestBunk",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.8365,
+   "lum_ref": 0.1208,
+   "lum_godot": 0.1277,
+   "lum_ratio": 1.058,
+   "ev_diff": 0.08,
+   "de76_mean": 7.12,
+   "rg_shift": 1.019,
+   "bg_shift": 0.993,
+   "contrast_ref": 0.1635,
+   "contrast_godot": 0.1649,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0001,
+   "clip_lo_ref": 0.008,
+   "clip_lo_godot": 0.0006,
+   "grid_ev": [
+    [
+     0.01,
+     0.11,
+     0.33
+    ],
+    [
+     0.18,
+     0.16,
+     0.54
+    ],
+    [
+     -0.04,
+     -0.3,
+     -0.15
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_13_Exterior_Airlock",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.5801,
+   "lum_ref": 0.0472,
+   "lum_godot": 0.0518,
+   "lum_ratio": 1.097,
+   "ev_diff": 0.13,
+   "de76_mean": 14.0,
+   "rg_shift": 1.073,
+   "bg_shift": 1.182,
+   "contrast_ref": 0.0995,
+   "contrast_godot": 0.1289,
+   "clip_hi_ref": 0.0001,
+   "clip_hi_godot": 0.0001,
+   "clip_lo_ref": 0.0209,
+   "clip_lo_godot": 0.0616,
+   "grid_ev": [
+    [
+     -0.23,
+     -1.16,
+     -1.18
+    ],
+    [
+     0.39,
+     -0.14,
+     -0.24
+    ],
+    [
+     0.56,
+     0.44,
+     0.99
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_14_Exterior_Wide",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.7571,
+   "lum_ref": 0.0383,
+   "lum_godot": 0.0406,
+   "lum_ratio": 1.06,
+   "ev_diff": 0.08,
+   "de76_mean": 7.95,
+   "rg_shift": 1.063,
+   "bg_shift": 1.159,
+   "contrast_ref": 0.104,
+   "contrast_godot": 0.0987,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0001,
+   "clip_lo_ref": 0.0438,
+   "clip_lo_godot": 0.0701,
+   "grid_ev": [
+    [
+     0.06,
+     -0.07,
+     0.11
+    ],
+    [
+     -0.13,
+     0.71,
+     -0.06
+    ],
+    [
+     -0.25,
+     0.16,
+     0.74
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_15_GardenDome",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.6726,
+   "lum_ref": 0.0483,
+   "lum_godot": 0.0458,
+   "lum_ratio": 0.95,
+   "ev_diff": -0.07,
+   "de76_mean": 9.39,
+   "rg_shift": 1.02,
+   "bg_shift": 1.169,
+   "contrast_ref": 0.1007,
+   "contrast_godot": 0.1111,
+   "clip_hi_ref": 0.0005,
+   "clip_hi_godot": 0.0019,
+   "clip_lo_ref": 0.0155,
+   "clip_lo_godot": 0.0543,
+   "grid_ev": [
+    [
+     0.28,
+     -0.27,
+     -0.79
+    ],
+    [
+     0.01,
+     0.09,
+     -0.37
+    ],
+    [
+     0.33,
+     -0.13,
+     -0.13
+    ]
+   ]
+  }
+ ]
+}

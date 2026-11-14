@@ -1,0 +1,426 @@
+{
+ "X0_pass2a": {
+  "overrides": {},
+  "views": {
+   "Shot_14_Exterior_Wide": {
+    "gpu_ms": 6.05,
+    "ev": {
+     "all": -0.22,
+     "top": -0.18,
+     "mid": -0.26,
+     "bot": -0.18
+    },
+    "rg_shift": 0.931,
+    "bg_shift": 1.293,
+    "contrast": [
+     0.105,
+     0.092
+    ]
+   },
+   "Shot_13_Exterior_Airlock": {
+    "gpu_ms": 9.69,
+    "ev": {
+     "all": 0.05,
+     "top": -0.74,
+     "mid": 0.17,
+     "bot": 0.3
+    },
+    "rg_shift": 0.95,
+    "bg_shift": 1.302,
+    "contrast": [
+     0.1,
+     0.13
+    ]
+   },
+   "Shot_15_GardenDome": {
+    "gpu_ms": 3.86,
+    "ev": {
+     "all": -0.27,
+     "top": -0.24,
+     "mid": -0.28,
+     "bot": -0.27
+    },
+    "rg_shift": 0.878,
+    "bg_shift": 1.27,
+    "contrast": [
+     0.101,
+     0.108
+    ]
+   },
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.66,
+    "ev": {
+     "all": -0.1,
+     "top": -0.31,
+     "mid": 0.07,
+     "bot": -0.24
+    },
+    "rg_shift": 1.006,
+    "bg_shift": 1.01,
+    "contrast": [
+     0.176,
+     0.176
+    ]
+   },
+   "Shot_06_Airlock": {
+    "gpu_ms": 6.44,
+    "ev": {
+     "all": -0.02,
+     "top": 0.89,
+     "mid": -0.18,
+     "bot": -0.1
+    },
+    "rg_shift": 1.026,
+    "bg_shift": 0.979,
+    "contrast": [
+     0.232,
+     0.239
+    ]
+   }
+  }
+ },
+ "X1_fog": {
+  "overrides": {
+   "fog.enabled": true,
+   "fog.density": 0.0012,
+   "fog.sky_affect": 0.2
+  },
+  "views": {
+   "Shot_14_Exterior_Wide": {
+    "gpu_ms": 6.15,
+    "ev": {
+     "all": 0.59,
+     "top": 1.3,
+     "mid": 0.39,
+     "bot": 0.24
+    },
+    "rg_shift": 0.693,
+    "bg_shift": 1.361,
+    "contrast": [
+     0.105,
+     0.075
+    ]
+   },
+   "Shot_13_Exterior_Airlock": {
+    "gpu_ms": 9.6,
+    "ev": {
+     "all": 0.35,
+     "top": 0.29,
+     "mid": 0.4,
+     "bot": 0.34
+    },
+    "rg_shift": 0.848,
+    "bg_shift": 1.326,
+    "contrast": [
+     0.1,
+     0.113
+    ]
+   },
+   "Shot_15_GardenDome": {
+    "gpu_ms": 3.82,
+    "ev": {
+     "all": 0.18,
+     "top": 0.91,
+     "mid": 0.06,
+     "bot": -0.22
+    },
+    "rg_shift": 0.793,
+    "bg_shift": 1.218,
+    "contrast": [
+     0.101,
+     0.096
+    ]
+   },
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.54,
+    "ev": {
+     "all": -0.09,
+     "top": -0.3,
+     "mid": 0.08,
+     "bot": -0.24
+    },
+    "rg_shift": 1.008,
+    "bg_shift": 1.009,
+    "contrast": [
+     0.176,
+     0.174
+    ]
+   },
+   "Shot_06_Airlock": {
+    "gpu_ms": 6.47,
+    "ev": {
+     "all": -0.02,
+     "top": 0.9,
+     "mid": -0.17,
+     "bot": -0.1
+    },
+    "rg_shift": 1.028,
+    "bg_shift": 0.977,
+    "contrast": [
+     0.232,
+     0.234
+    ]
+   }
+  }
+ },
+ "X2_fog_sat": {
+  "overrides": {
+   "fog.enabled": true,
+   "fog.density": 0.0012,
+   "fog.sky_affect": 0.2,
+   "adjustment.enabled": true,
+   "adjustment.saturation": 1.15
+  },
+  "views": {
+   "Shot_14_Exterior_Wide": {
+    "gpu_ms": 6.16,
+    "ev": {
+     "all": 0.62,
+     "top": 1.33,
+     "mid": 0.42,
+     "bot": 0.27
+    },
+    "rg_shift": 0.773,
+    "bg_shift": 1.218,
+    "contrast": [
+     0.105,
+     0.075
+    ]
+   },
+   "Shot_13_Exterior_Airlock": {
+    "gpu_ms": 9.73,
+    "ev": {
+     "all": 0.39,
+     "top": 0.31,
+     "mid": 0.43,
+     "bot": 0.39
+    },
+    "rg_shift": 0.961,
+    "bg_shift": 1.19,
+    "contrast": [
+     0.1,
+     0.113
+    ]
+   },
+   "Shot_15_GardenDome": {
+    "gpu_ms": 3.88,
+    "ev": {
+     "all": 0.21,
+     "top": 0.93,
+     "mid": 0.08,
+     "bot": -0.17
+    },
+    "rg_shift": 0.878,
+    "bg_shift": 1.129,
+    "contrast": [
+     0.101,
+     0.096
+    ]
+   },
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.57,
+    "ev": {
+     "all": -0.08,
+     "top": -0.29,
+     "mid": 0.09,
+     "bot": -0.22
+    },
+    "rg_shift": 1.044,
+    "bg_shift": 0.952,
+    "contrast": [
+     0.176,
+     0.174
+    ]
+   },
+   "Shot_06_Airlock": {
+    "gpu_ms": 6.48,
+    "ev": {
+     "all": -0.01,
+     "top": 0.91,
+     "mid": -0.16,
+     "bot": -0.09
+    },
+    "rg_shift": 1.072,
+    "bg_shift": 0.946,
+    "contrast": [
+     0.232,
+     0.234
+    ]
+   }
+  }
+ },
+ "X3_fog_contrast": {
+  "overrides": {
+   "fog.enabled": true,
+   "fog.density": 0.0012,
+   "fog.sky_affect": 0.2,
+   "tonemap.agx_contrast": 1.45,
+   "sun.energy_scale": 0.16
+  },
+  "views": {
+   "Shot_14_Exterior_Wide": {
+    "gpu_ms": 6.14,
+    "ev": {
+     "all": 0.47,
+     "top": 1.18,
+     "mid": 0.26,
+     "bot": 0.12
+    },
+    "rg_shift": 0.794,
+    "bg_shift": 1.194,
+    "contrast": [
+     0.105,
+     0.083
+    ]
+   },
+   "Shot_13_Exterior_Airlock": {
+    "gpu_ms": 9.46,
+    "ev": {
+     "all": 0.27,
+     "top": 0.11,
+     "mid": 0.33,
+     "bot": 0.31
+    },
+    "rg_shift": 0.976,
+    "bg_shift": 1.171,
+    "contrast": [
+     0.1,
+     0.122
+    ]
+   },
+   "Shot_15_GardenDome": {
+    "gpu_ms": 3.86,
+    "ev": {
+     "all": 0.07,
+     "top": 0.74,
+     "mid": -0.03,
+     "bot": -0.31
+    },
+    "rg_shift": 0.887,
+    "bg_shift": 1.135,
+    "contrast": [
+     0.101,
+     0.102
+    ]
+   },
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.62,
+    "ev": {
+     "all": -0.1,
+     "top": -0.45,
+     "mid": 0.09,
+     "bot": -0.22
+    },
+    "rg_shift": 1.023,
+    "bg_shift": 0.973,
+    "contrast": [
+     0.176,
+     0.188
+    ]
+   },
+   "Shot_06_Airlock": {
+    "gpu_ms": 6.49,
+    "ev": {
+     "all": 0.01,
+     "top": 0.86,
+     "mid": -0.16,
+     "bot": -0.03
+    },
+    "rg_shift": 1.043,
+    "bg_shift": 0.961,
+    "contrast": [
+     0.232,
+     0.25
+    ]
+   }
+  }
+ },
+ "X4_warm_sun_less_sky": {
+  "overrides": {
+   "fog.enabled": true,
+   "fog.density": 0.002,
+   "fog.sky_affect": 0.2,
+   "sky.energy": 0.3,
+   "sun.energy_scale": 0.17,
+   "adjustment.enabled": true,
+   "adjustment.saturation": 1.1
+  },
+  "views": {
+   "Shot_14_Exterior_Wide": {
+    "gpu_ms": 6.13,
+    "ev": {
+     "all": 1.0,
+     "top": 1.78,
+     "mid": 0.77,
+     "bot": 0.58
+    },
+    "rg_shift": 0.673,
+    "bg_shift": 1.311,
+    "contrast": [
+     0.105,
+     0.078
+    ]
+   },
+   "Shot_13_Exterior_Airlock": {
+    "gpu_ms": 9.65,
+    "ev": {
+     "all": 0.54,
+     "top": 0.42,
+     "mid": 0.6,
+     "bot": 0.56
+    },
+    "rg_shift": 0.885,
+    "bg_shift": 1.253,
+    "contrast": [
+     0.1,
+     0.108
+    ]
+   },
+   "Shot_15_GardenDome": {
+    "gpu_ms": 3.88,
+    "ev": {
+     "all": 0.44,
+     "top": 1.2,
+     "mid": 0.31,
+     "bot": 0.0
+    },
+    "rg_shift": 0.81,
+    "bg_shift": 1.164,
+    "contrast": [
+     0.101,
+     0.102
+    ]
+   },
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.62,
+    "ev": {
+     "all": -0.08,
+     "top": -0.28,
+     "mid": 0.09,
+     "bot": -0.22
+    },
+    "rg_shift": 1.033,
+    "bg_shift": 0.97,
+    "contrast": [
+     0.176,
+     0.172
+    ]
+   },
+   "Shot_06_Airlock": {
+    "gpu_ms": 6.48,
+    "ev": {
+     "all": -0.0,
+     "top": 0.93,
+     "mid": -0.16,
+     "bot": -0.09
+    },
+    "rg_shift": 1.058,
+    "bg_shift": 0.955,
+    "contrast": [
+     0.232,
+     0.233
+    ]
+   }
+  }
+ }
+}

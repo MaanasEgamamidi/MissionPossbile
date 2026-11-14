@@ -1,0 +1,5 @@
+{
+ "R1_amb_0p5": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.06, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi": false, "probes.ambient_mode": "color", "probes.ambient_energy": 0.5, "sun.energy_scale": 0.11, "sky.energy": 0.45},
+ "R2_amb_1p0": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.06, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi": false, "probes.ambient_mode": "color", "probes.ambient_energy": 1.0, "sun.energy_scale": 0.11, "sky.energy": 0.45},
+ "R3_amb_0p3_spot_0p05": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.014, "fixtures.spot_energy_scale": 0.05, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi": false, "probes.ambient_mode": "color", "probes.ambient_energy": 0.3, "sun.energy_scale": 0.11, "sky.energy": 0.45}
+}

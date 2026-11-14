@@ -1,0 +1,2949 @@
+{
+ "label": "v12_k2_kit",
+ "file": {
+  "filepath": "G:\\nasa app\\grand_colony\\work\\_v12\\k2\\kit.blend",
+  "bytes": 572420,
+  "saved_with_version": [
+   5,
+   2,
+   45
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": false
+ },
+ "counts": {
+  "scenes": 1,
+  "objects": 45,
+  "meshes": 15,
+  "curves": 0,
+  "materials": 20,
+  "textures": 0,
+  "images": 2,
+  "cameras": 3,
+  "lights": 2,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 4,
+  "node_groups": 1,
+  "worlds": 1,
+  "libraries": 0,
+  "texts": 0,
+  "lightprobes": 0,
+  "volumes": 0,
+  "shape_keys": 0,
+  "grease_pencils": 0
+ },
+ "libraries": [],
+ "texts": [],
+ "scenes": [
+  {
+   "name": "Scene",
+   "objects": 45,
+   "engine": "BLENDER_EEVEE",
+   "resolution": [
+    1280,
+    720,
+    100
+   ],
+   "fps": 24,
+   "frame_range": [
+    1,
+    250,
+    1
+   ],
+   "active_camera": "cam3",
+   "film_transparent": false,
+   "units": {
+    "system": "METRIC",
+    "scale_length": 1.0,
+    "length_unit": "METERS"
+   },
+   "color_management": {
+    "display_device": "sRGB",
+    "view_transform": "AgX",
+    "look": "AgX - Medium High Contrast",
+    "exposure": 0.0,
+    "gamma": 1.0,
+    "use_curve_mapping": false
+   },
+   "world": "GC_World",
+   "gravity": [
+    0.0,
+    0.0,
+    -9.81
+   ],
+   "view_layers": [
+    "ViewLayer"
+   ],
+   "cycles": {
+    "samples": 128,
+    "preview_samples": 64,
+    "use_denoising": true,
+    "max_bounces": 10,
+    "device": "GPU",
+    "use_adaptive_sampling": true,
+    "adaptive_threshold": 0.019999999552965164,
+    "volume_bounces": 1,
+    "film_exposure": 1.0
+   },
+   "eevee": {
+    "taa_render_samples": 32,
+    "use_raytracing": true,
+    "use_shadows": true,
+    "use_volumetric_shadows": true,
+    "volumetric_tile_size": "4",
+    "gi_diffuse_bounces": 3,
+    "shadow_ray_count": 2,
+    "shadow_step_count": 12
+   },
+   "compositor_nodes": {
+    "CompositorNodeRLayers": 1,
+    "CompositorNodeGlare": 1,
+    "CompositorNodeLensdist": 1,
+    "CompositorNodeColorBalance": 1,
+    "CompositorNodeEllipseMask": 1,
+    "CompositorNodeBlur": 1,
+    "ShaderNodeMath": 1,
+    "ShaderNodeMix": 1,
+    "NodeGroupOutput": 1
+   },
+   "markers": []
+  }
+ ],
+ "worlds": [
+  {
+   "name": "GC_World",
+   "node_kinds": {
+    "ShaderNodeOutputWorld": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeValToRGB": 1,
+    "ShaderNodeMapRange": 1,
+    "ShaderNodeVectorMath": 1,
+    "ShaderNodeMath": 2,
+    "ShaderNodeMix": 1,
+    "ShaderNodeBackground": 1
+   },
+   "backgrounds": [
+    {
+     "strength": 1.0,
+     "strength_linked": false,
+     "color": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "color_linked": true
+    }
+   ]
+  }
+ ],
+ "mesh_totals": {
+  "unique_meshes": 15,
+  "unique_verts": 13976,
+  "unique_polys": 12886,
+  "unique_tris": 26764,
+  "meshes_with_color_attributes": 0,
+  "meshes_with_uvs": 0
+ },
+ "meshes_top_by_tris": [
+  {
+   "name": "GCM_t_door",
+   "verts": 2416,
+   "polys": 2404,
+   "tris": 4728,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_floor",
+   "verts": 2280,
+   "polys": 1374,
+   "tris": 4284,
+   "users": 9,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_wall_window",
+   "verts": 1712,
+   "polys": 1696,
+   "tris": 3352,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_wall_panel",
+   "verts": 1496,
+   "polys": 1398,
+   "tris": 2884,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_wall_vent",
+   "verts": 1184,
+   "polys": 1160,
+   "tris": 2264,
+   "users": 1,
+   "materials": 7,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_wall_light",
+   "verts": 1128,
+   "polys": 1096,
+   "tris": 2176,
+   "users": 3,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_wall_screen",
+   "verts": 1056,
+   "polys": 1024,
+   "tris": 2032,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_floor_g",
+   "verts": 1048,
+   "polys": 1136,
+   "tris": 1928,
+   "users": 1,
+   "materials": 3,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_wall",
+   "verts": 976,
+   "polys": 944,
+   "tris": 1880,
+   "users": 6,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_leaf_l",
+   "verts": 208,
+   "polys": 196,
+   "tris": 376,
+   "users": 1,
+   "materials": 6,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_leaf_r",
+   "verts": 208,
+   "polys": 196,
+   "tris": 376,
+   "users": 1,
+   "materials": 6,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_ceiling_light",
+   "verts": 112,
+   "polys": 108,
+   "tris": 216,
+   "users": 6,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_floor_p",
+   "verts": 104,
+   "polys": 110,
+   "tris": 188,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "GCM_t_floor_v",
+   "verts": 40,
+   "polys": 38,
+   "tris": 68,
+   "users": 1,
+   "materials": 3,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "ceil",
+   "verts": 8,
+   "polys": 6,
+   "tris": 12,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  }
+ ],
+ "meshes_with_color_attributes_sample": [],
+ "objects": {
+  "by_type": {
+   "CAMERA": 3,
+   "MESH": 35,
+   "LIGHT": 7
+  },
+  "parented": 0,
+  "collection_instances": 0,
+  "hidden_in_render": 0,
+  "modifiers": {},
+  "custom_property_keys": {
+   "gc_asset": 34,
+   "dust": 34
+  },
+  "name_prefixes_top": {
+   "t_wall": 13,
+   "t_floor": 12,
+   "FX_t": 6,
+   "t_ceiling": 6,
+   "cam": 3,
+   "t_leaf": 2,
+   "ceil": 1,
+   "GC_MarsSun": 1,
+   "t_door": 1
+  },
+  "lod_like_name_tokens": {},
+  "non_unit_scale_objects": 1,
+  "negative_scale_objects": 6,
+  "mesh_objects": 35,
+  "mesh_objects_sharing_data": 24,
+  "meshes_used_once": 11,
+  "meshes_shared": 4,
+  "instanced_scene_tris": 75868,
+  "top_shared_meshes": [
+   [
+    "GCM_t_floor",
+    9,
+    4284
+   ],
+   [
+    "GCM_t_ceiling_light",
+    6,
+    216
+   ],
+   [
+    "GCM_t_wall",
+    6,
+    1880
+   ],
+   [
+    "GCM_t_wall_light",
+    3,
+    2176
+   ]
+  ]
+ },
+ "skinned_meshes": [],
+ "armatures": [],
+ "actions": [],
+ "shape_keys": [],
+ "animated_objects": [],
+ "cameras": [
+  {
+   "name": "cam1",
+   "data": "cam1",
+   "scenes": [
+    "Scene"
+   ],
+   "collections": [
+    "Scene Collection"
+   ],
+   "location": [
+    0.7,
+    0.7,
+    1.6
+   ],
+   "rotation_euler_xyz_deg": [
+    87.708,
+    0.0,
+    -45.0
+   ],
+   "forward": [
+    0.7065,
+    0.7065,
+    -0.04
+   ],
+   "type": "PERSP",
+   "lens_mm": 18.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 90.0,
+   "angle_y_deg": 67.38,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     0.70711,
+     0.02828,
+     -0.70654,
+     0.7
+    ],
+    [
+     -0.70711,
+     0.02828,
+     -0.70654,
+     0.7
+    ],
+    [
+     -0.0,
+     0.9992,
+     0.03999,
+     1.6
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "cam2",
+   "data": "cam2",
+   "scenes": [
+    "Scene"
+   ],
+   "collections": [
+    "Scene Collection"
+   ],
+   "location": [
+    6.5,
+    2.0,
+    1.5
+   ],
+   "rotation_euler_xyz_deg": [
+    86.964,
+    -0.0,
+    45.0
+   ],
+   "forward": [
+    -0.7061,
+    0.7061,
+    -0.053
+   ],
+   "type": "PERSP",
+   "lens_mm": 24.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 73.74,
+   "angle_y_deg": 53.13,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     0.70711,
+     -0.03745,
+     0.70611,
+     6.5
+    ],
+    [
+     0.70711,
+     0.03745,
+     -0.70611,
+     2.0
+    ],
+    [
+     0.0,
+     0.9986,
+     0.05296,
+     1.5
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "cam3",
+   "data": "cam3",
+   "scenes": [
+    "Scene"
+   ],
+   "collections": [
+    "Scene Collection"
+   ],
+   "location": [
+    3.0,
+    4.6,
+    1.4
+   ],
+   "rotation_euler_xyz_deg": [
+    85.914,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.9975,
+    -0.0712
+   ],
+   "type": "PERSP",
+   "lens_mm": 30.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 61.928,
+   "angle_y_deg": 43.603,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     3.0
+    ],
+    [
+     0.0,
+     0.07125,
+     -0.99746,
+     4.6
+    ],
+    [
+     0.0,
+     0.99746,
+     0.07125,
+     1.4
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  }
+ ],
+ "lights_summary": {
+  "by_type": {
+   "AREA": 6,
+   "SUN": 1
+  },
+  "energy_sum_by_type": {
+   "AREA": 20.56,
+   "SUN": 2.6
+  },
+  "unique_light_datablocks": 2,
+  "light_objects": 7,
+  "by_collection": {
+   "Fixture Lights": 6,
+   "Render Lights": 1
+  }
+ },
+ "lights": [
+  {
+   "name": "FX_t_ceiling_light",
+   "data": "FX_t_ceiling_light_0",
+   "type": "AREA",
+   "energy": 3.4267,
+   "color": [
+    1.0,
+    0.8907,
+    0.7583
+   ],
+   "location": [
+    0.0,
+    -0.024,
+    -0.121
+   ],
+   "collections": [
+    "Fixture Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": false,
+   "data_users": 6,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "RECTANGLE",
+   "size": 1.16,
+   "size_y": 0.2452,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "FX_t_ceiling_light.001",
+   "data": "FX_t_ceiling_light_0",
+   "type": "AREA",
+   "energy": 3.4267,
+   "color": [
+    1.0,
+    0.8907,
+    0.7583
+   ],
+   "location": [
+    0.0,
+    -0.024,
+    -0.121
+   ],
+   "collections": [
+    "Fixture Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": false,
+   "data_users": 6,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "RECTANGLE",
+   "size": 1.16,
+   "size_y": 0.2452,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "FX_t_ceiling_light.002",
+   "data": "FX_t_ceiling_light_0",
+   "type": "AREA",
+   "energy": 3.4267,
+   "color": [
+    1.0,
+    0.8907,
+    0.7583
+   ],
+   "location": [
+    0.0,
+    -0.024,
+    -0.121
+   ],
+   "collections": [
+    "Fixture Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": false,
+   "data_users": 6,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "RECTANGLE",
+   "size": 1.16,
+   "size_y": 0.2452,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "FX_t_ceiling_light.003",
+   "data": "FX_t_ceiling_light_0",
+   "type": "AREA",
+   "energy": 3.4267,
+   "color": [
+    1.0,
+    0.8907,
+    0.7583
+   ],
+   "location": [
+    0.0,
+    -0.024,
+    -0.121
+   ],
+   "collections": [
+    "Fixture Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": false,
+   "data_users": 6,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "RECTANGLE",
+   "size": 1.16,
+   "size_y": 0.2452,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "FX_t_ceiling_light.004",
+   "data": "FX_t_ceiling_light_0",
+   "type": "AREA",
+   "energy": 3.4267,
+   "color": [
+    1.0,
+    0.8907,
+    0.7583
+   ],
+   "location": [
+    0.0,
+    -0.024,
+    -0.121
+   ],
+   "collections": [
+    "Fixture Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": false,
+   "data_users": 6,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "RECTANGLE",
+   "size": 1.16,
+   "size_y": 0.2452,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "FX_t_ceiling_light.005",
+   "data": "FX_t_ceiling_light_0",
+   "type": "AREA",
+   "energy": 3.4267,
+   "color": [
+    1.0,
+    0.8907,
+    0.7583
+   ],
+   "location": [
+    0.0,
+    -0.024,
+    -0.121
+   ],
+   "collections": [
+    "Fixture Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": false,
+   "data_users": 6,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "RECTANGLE",
+   "size": 1.16,
+   "size_y": 0.2452,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "GC_MarsSun",
+   "data": "GC_MarsSun",
+   "type": "SUN",
+   "energy": 2.6,
+   "color": [
+    1.0,
+    0.93,
+    0.84
+   ],
+   "location": [
+    15.0,
+    4.0,
+    60.0
+   ],
+   "collections": [
+    "Render Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "angle": 0.0157,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  }
+ ],
+ "lightprobes": [],
+ "materials": [
+  {
+   "name": "GC_glass",
+   "users": 2,
+   "nodes": 23,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 1,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 6,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 2,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeMapRange": 2,
+    "ShaderNodeMix": 2
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 2,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.7949,
+      0.7995,
+      0.8021,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_glass_clear",
+   "users": 1,
+   "nodes": 23,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 1,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 6,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 2,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeMapRange": 2,
+    "ShaderNodeMix": 2
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 2,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.9443,
+      0.968,
+      0.9812,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_acc_hab",
+   "users": 1,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 9,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_acc_med",
+   "users": 10,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 9,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_alu",
+   "users": 8,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeMapping": 1,
+    "ShaderNodeBump": 1,
+    "ShaderNodeTangent": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_fl_grate",
+   "users": 1,
+   "nodes": 60,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeMapping": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_fl_plate",
+   "users": 1,
+   "nodes": 60,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeMapping": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_fl_rubber",
+   "users": 1,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 25,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeHueSaturation": 1,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_fl_vinyl",
+   "users": 1,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 25,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeHueSaturation": 1,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_frame",
+   "users": 10,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeMapping": 1,
+    "ShaderNodeBump": 1,
+    "ShaderNodeTangent": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_ink",
+   "users": 1,
+   "nodes": 51,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 21,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 5,
+    "ShaderNodeMapRange": 6,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeMix": 5,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 5,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_led",
+   "users": 2,
+   "nodes": 14,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 1,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 3,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeLightPath": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.35,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      0.8714,
+      0.7157,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_led_grn",
+   "users": 1,
+   "nodes": 14,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 1,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 3,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeLightPath": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.35,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      0.0976,
+      1.0,
+      0.2623,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_lower",
+   "users": 9,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 9,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_panel",
+   "users": 7,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 9,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_panel_lt",
+   "users": 4,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 24,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeMix": 9,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_rubber",
+   "users": 9,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 25,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeHueSaturation": 1,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_seam",
+   "users": 11,
+   "nodes": 51,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 21,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 5,
+    "ShaderNodeMapRange": 6,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeMix": 5,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 5,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_kit_sign",
+   "users": 1,
+   "nodes": 61,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 25,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 7,
+    "ShaderNodeMapRange": 7,
+    "ShaderNodeHueSaturation": 1,
+    "ShaderNodeMix": 7,
+    "ShaderNodeAmbientOcclusion": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeBump": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 7,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": true
+    },
+    "IOR": {
+     "v": 1.46,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": true
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "GC_scr_cyan",
+   "users": 1,
+   "nodes": 18,
+   "node_kinds": {
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeObjectInfo": 1,
+    "ShaderNodeVectorMath": 2,
+    "ShaderNodeCombineXYZ": 1,
+    "ShaderNodeMath": 3,
+    "ShaderNodeNewGeometry": 1,
+    "ShaderNodeAttribute": 3,
+    "ShaderNodeTexNoise": 1,
+    "ShaderNodeTexWave": 1,
+    "ShaderNodeMapRange": 2
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 2,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.01,
+      0.012,
+      0.014,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.05,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      0.0782,
+      0.7682,
+      0.8879,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": true
+    },
+    "Coat Weight": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  }
+ ],
+ "materials_summary": {
+  "count": 20,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 18,
+  "using_vertex_color_or_attribute": 20,
+  "with_volume": 0,
+  "transmissive_or_glass": [
+   "GC_glass",
+   "GC_glass_clear"
+  ],
+  "alpha_below_one": [],
+  "emissive": [],
+  "node_kind_totals": {
+   "ShaderNodeMath": 379,
+   "ShaderNodeMix": 115,
+   "ShaderNodeMapRange": 109,
+   "ShaderNodeTexNoise": 106,
+   "ShaderNodeAttribute": 60,
+   "ShaderNodeVectorMath": 36,
+   "ShaderNodeOutputMaterial": 20,
+   "ShaderNodeBsdfPrincipled": 20,
+   "ShaderNodeTexCoord": 20,
+   "ShaderNodeObjectInfo": 20,
+   "ShaderNodeCombineXYZ": 20,
+   "ShaderNodeNewGeometry": 20,
+   "ShaderNodeSeparateXYZ": 17,
+   "ShaderNodeAmbientOcclusion": 15,
+   "ShaderNodeBump": 15,
+   "ShaderNodeMapping": 4,
+   "ShaderNodeHueSaturation": 4,
+   "ShaderNodeTangent": 2,
+   "ShaderNodeLightPath": 2,
+   "ShaderNodeTexWave": 1
+  },
+  "render_methods": {
+   "DITHERED": 20
+  }
+ },
+ "images": [
+  {
+   "name": "Render Result",
+   "size": [
+    0,
+    0
+   ],
+   "source": "VIEWER",
+   "filepath": "",
+   "packed": false,
+   "users": 1,
+   "colorspace": ""
+  },
+  {
+   "name": "Viewer Node",
+   "size": [
+    256,
+    256
+   ],
+   "source": "VIEWER",
+   "filepath": "",
+   "packed": false,
+   "users": 1,
+   "colorspace": ""
+  }
+ ],
+ "node_groups": [
+  {
+   "name": "GC_Comp",
+   "type": "CompositorNodeTree",
+   "nodes": 9,
+   "users": 1
+  }
+ ],
+ "missing_files": [],
+ "collection_trees": [
+  {
+   "scene": "Scene",
+   "tree": {
+    "name": "Scene Collection",
+    "direct_objects": 3,
+    "all_objects": 45,
+    "instanced_tris": 75868,
+    "hide_render": false,
+    "hide_viewport": false,
+    "children": [
+     {
+      "name": "Colony (colour)",
+      "direct_objects": 35,
+      "all_objects": 35,
+      "instanced_tris": 75868,
+      "hide_render": false,
+      "hide_viewport": false,
+      "children": [
+       {
+        "name": "Lights",
+        "direct_objects": 0,
+        "all_objects": 0,
+        "instanced_tris": 0,
+        "hide_render": false,
+        "hide_viewport": false
+       }
+      ]
+     },
+     {
+      "name": "Render Lights",
+      "direct_objects": 1,
+      "all_objects": 7,
+      "instanced_tris": 0,
+      "hide_render": false,
+      "hide_viewport": false,
+      "children": [
+       {
+        "name": "Fixture Lights",
+        "direct_objects": 6,
+        "all_objects": 6,
+        "instanced_tris": 0,
+        "hide_render": false,
+        "hide_viewport": false
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "scene_bbox": {
+  "Scene": {
+   "min": [
+    -0.222,
+    -0.222,
+    -0.16
+   ],
+   "max": [
+    8.222,
+    6.222,
+    3.15
+   ],
+   "size": [
+    8.444,
+    6.444,
+    3.31
+   ]
+  }
+ },
+ "collection_bboxes": {
+  "Scene/Colony (colour)": {
+   "min": [
+    -0.222,
+    -0.222,
+    -0.16
+   ],
+   "max": [
+    8.222,
+    6.222,
+    3.15
+   ],
+   "size": [
+    8.444,
+    6.444,
+    3.31
+   ]
+  },
+  "Scene/Colony (colour)/Lights": null,
+  "Scene/Render Lights": null,
+  "Scene/Render Lights/Fixture Lights": null
+ },
+ "category_search": {
+  "rover_vehicle": {
+   "pattern": "rover|chassis|wheel|buggy|vehicle|truck|cart|tire|tyre",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "human_body": {
+   "pattern": "human|person|people|crew|survivor|body|man|woman|head|hand|torso|leg|arm_|astronaut",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "suit": {
+   "pattern": "suit|helmet|visor|glove|boot|eva|backpack|plss",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "spaceship": {
+   "pattern": "ship|shuttle|lander|orbiter|rocket|spacecraft|booster|capsule|ex_lander",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "crops_plants": {
+   "pattern": "tomato|lettuce|plant|crop|leaf|vine|seedling|tray|hydro|grow",
+   "object_hits": 2,
+   "tris": 752,
+   "types": {
+    "MESH": 2
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "t_leaf_l",
+     1
+    ],
+    [
+     "t_leaf_r",
+     1
+    ]
+   ],
+   "sample_names": [
+    "t_leaf_l",
+    "t_leaf_r"
+   ]
+  },
+  "energy": {
+   "pattern": "solar|panel|battery|reactor|generator|tracker|cleaner",
+   "object_hits": 1,
+   "tris": 2884,
+   "types": {
+    "MESH": 1
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "t_wall_panel",
+     1
+    ]
+   ],
+   "sample_names": [
+    "t_wall_panel"
+   ]
+  },
+  "life_support": {
+   "pattern": "oxygen|o2|co2|electroly|moxie|water|tank|scrubber|pump|recycl",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "comms": {
+   "pattern": "antenna|dish|radio|comm|relay|mast",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "doors_glass": {
+   "pattern": "door|airlock|glass|dome|window|hatch",
+   "object_hits": 2,
+   "tris": 8080,
+   "types": {
+    "MESH": 2
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "t_door",
+     1
+    ],
+    [
+     "t_wall_window",
+     1
+    ]
+   ],
+   "sample_names": [
+    "t_door",
+    "t_wall_window"
+   ]
+  },
+  "terrain_rock": {
+   "pattern": "terrain|rock|boulder|dune|ground|mountain|crater|regolith",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "salvage_fab": {
+   "pattern": "salvage|crate|scrap|wreck|crash|debris|fabricat|printer|workbench|lathe",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "science": {
+   "pattern": "sample|lab|microscope|spectro|instrument|drill|core|analy",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  }
+ }
+}

@@ -1,0 +1,6183 @@
+{
+ "label": "mars_kit",
+ "file": {
+  "filepath": "G:\\nasa app\\mars_kit\\mars_kit.blend",
+  "bytes": 12634045,
+  "saved_with_version": [
+   5,
+   2,
+   45
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": false
+ },
+ "counts": {
+  "scenes": 3,
+  "objects": 259,
+  "meshes": 154,
+  "curves": 87,
+  "materials": 40,
+  "textures": 0,
+  "images": 0,
+  "cameras": 10,
+  "lights": 8,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 20,
+  "node_groups": 2,
+  "worlds": 3,
+  "libraries": 0,
+  "texts": 0,
+  "lightprobes": 0,
+  "volumes": 0,
+  "shape_keys": 0,
+  "grease_pencils": 0
+ },
+ "libraries": [],
+ "texts": [],
+ "scenes": [
+  {
+   "name": "MK_Asset_Library",
+   "objects": 184,
+   "engine": "BLENDER_EEVEE",
+   "resolution": [
+    1600,
+    1000,
+    100
+   ],
+   "fps": 24,
+   "frame_range": [
+    1,
+    250,
+    1
+   ],
+   "active_camera": "MKLIB_Cam_Creatures",
+   "film_transparent": false,
+   "units": {
+    "system": "METRIC",
+    "scale_length": 1.0,
+    "length_unit": "METERS"
+   },
+   "color_management": {
+    "display_device": "sRGB",
+    "view_transform": "Khronos PBR Neutral",
+    "look": "None",
+    "exposure": 0.0,
+    "gamma": 1.0,
+    "use_curve_mapping": false
+   },
+   "world": "MKLIB_World",
+   "gravity": [
+    0.0,
+    0.0,
+    -9.81
+   ],
+   "view_layers": [
+    "ViewLayer"
+   ],
+   "cycles": {
+    "samples": 4096,
+    "preview_samples": 1024,
+    "use_denoising": true,
+    "max_bounces": 12,
+    "device": "CPU",
+    "use_adaptive_sampling": true,
+    "adaptive_threshold": 0.009999999776482582,
+    "volume_bounces": 0,
+    "film_exposure": 1.0
+   },
+   "eevee": {
+    "taa_render_samples": 32,
+    "use_raytracing": true,
+    "use_shadows": true,
+    "use_volumetric_shadows": false,
+    "volumetric_tile_size": "8",
+    "gi_diffuse_bounces": 3,
+    "shadow_ray_count": 2,
+    "shadow_step_count": 8
+   },
+   "compositor_nodes": {},
+   "markers": []
+  },
+  {
+   "name": "MK_Shot02",
+   "objects": 62,
+   "engine": "BLENDER_EEVEE",
+   "resolution": [
+    1950,
+    1300,
+    100
+   ],
+   "fps": 24,
+   "frame_range": [
+    1,
+    250,
+    1
+   ],
+   "active_camera": "MK02_Camera",
+   "film_transparent": false,
+   "units": {
+    "system": "METRIC",
+    "scale_length": 1.0,
+    "length_unit": "METERS"
+   },
+   "color_management": {
+    "display_device": "sRGB",
+    "view_transform": "Khronos PBR Neutral",
+    "look": "None",
+    "exposure": 0.0,
+    "gamma": 1.0,
+    "use_curve_mapping": false
+   },
+   "world": "MK02_World",
+   "gravity": [
+    0.0,
+    0.0,
+    -9.81
+   ],
+   "view_layers": [
+    "ViewLayer"
+   ],
+   "cycles": {
+    "samples": 4096,
+    "preview_samples": 1024,
+    "use_denoising": true,
+    "max_bounces": 12,
+    "device": "CPU",
+    "use_adaptive_sampling": true,
+    "adaptive_threshold": 0.009999999776482582,
+    "volume_bounces": 0,
+    "film_exposure": 1.0
+   },
+   "eevee": {
+    "taa_render_samples": 128,
+    "use_raytracing": true,
+    "use_shadows": true,
+    "use_volumetric_shadows": false,
+    "volumetric_tile_size": "8",
+    "gi_diffuse_bounces": 3,
+    "shadow_ray_count": 2,
+    "shadow_step_count": 8
+   },
+   "compositor_nodes": {
+    "CompositorNodeRLayers": 1,
+    "NodeGroupOutput": 1,
+    "CompositorNodeBlur": 2,
+    "ShaderNodeMapRange": 3,
+    "ShaderNodeMix": 3,
+    "CompositorNodeGlare": 1,
+    "CompositorNodeEllipseMask": 1
+   },
+   "markers": []
+  },
+  {
+   "name": "MK_Shot06",
+   "objects": 13,
+   "engine": "BLENDER_EEVEE",
+   "resolution": [
+    1950,
+    1300,
+    100
+   ],
+   "fps": 24,
+   "frame_range": [
+    1,
+    250,
+    1
+   ],
+   "active_camera": "MK06_Camera",
+   "film_transparent": false,
+   "units": {
+    "system": "METRIC",
+    "scale_length": 1.0,
+    "length_unit": "METERS"
+   },
+   "color_management": {
+    "display_device": "sRGB",
+    "view_transform": "Khronos PBR Neutral",
+    "look": "None",
+    "exposure": -0.25,
+    "gamma": 1.0,
+    "use_curve_mapping": false
+   },
+   "world": "MK06_World",
+   "gravity": [
+    0.0,
+    0.0,
+    -9.81
+   ],
+   "view_layers": [
+    "ViewLayer"
+   ],
+   "cycles": {
+    "samples": 4096,
+    "preview_samples": 1024,
+    "use_denoising": true,
+    "max_bounces": 12,
+    "device": "CPU",
+    "use_adaptive_sampling": true,
+    "adaptive_threshold": 0.009999999776482582,
+    "volume_bounces": 0,
+    "film_exposure": 1.0
+   },
+   "eevee": {
+    "taa_render_samples": 128,
+    "use_raytracing": true,
+    "use_shadows": true,
+    "use_volumetric_shadows": false,
+    "volumetric_tile_size": "8",
+    "gi_diffuse_bounces": 3,
+    "shadow_ray_count": 2,
+    "shadow_step_count": 8
+   },
+   "compositor_nodes": {
+    "CompositorNodeRLayers": 1,
+    "CompositorNodeGlare": 1,
+    "NodeGroupOutput": 1,
+    "CompositorNodeEllipseMask": 1,
+    "CompositorNodeBlur": 1,
+    "ShaderNodeMapRange": 1,
+    "ShaderNodeMix": 1
+   },
+   "markers": []
+  }
+ ],
+ "worlds": [
+  {
+   "name": "MK02_World",
+   "node_kinds": {
+    "ShaderNodeBackground": 2,
+    "ShaderNodeOutputWorld": 1,
+    "ShaderNodeLightPath": 1,
+    "ShaderNodeTexCoord": 1,
+    "ShaderNodeSeparateXYZ": 1,
+    "ShaderNodeValToRGB": 1,
+    "ShaderNodeMixShader": 1
+   },
+   "backgrounds": [
+    {
+     "strength": 1.5,
+     "strength_linked": false,
+     "color": [
+      0.2874,
+      0.2423,
+      0.2462,
+      1.0
+     ],
+     "color_linked": false
+    },
+    {
+     "strength": 1.0,
+     "strength_linked": false,
+     "color": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "color_linked": true
+    }
+   ]
+  },
+  {
+   "name": "MK06_World",
+   "node_kinds": {
+    "ShaderNodeBackground": 1,
+    "ShaderNodeOutputWorld": 1
+   },
+   "backgrounds": [
+    {
+     "strength": 0.4,
+     "strength_linked": false,
+     "color": [
+      0.6867,
+      0.6445,
+      0.6308,
+      1.0
+     ],
+     "color_linked": false
+    }
+   ]
+  },
+  {
+   "name": "MKLIB_World",
+   "node_kinds": {
+    "ShaderNodeBackground": 1,
+    "ShaderNodeOutputWorld": 1
+   },
+   "backgrounds": [
+    {
+     "strength": 1.0,
+     "strength_linked": false,
+     "color": [
+      0.55,
+      0.55,
+      0.57,
+      1.0
+     ],
+     "color_linked": false
+    }
+   ]
+  }
+ ],
+ "mesh_totals": {
+  "unique_meshes": 154,
+  "unique_verts": 822307,
+  "unique_polys": 273401,
+  "unique_tris": 537904,
+  "meshes_with_color_attributes": 1,
+  "meshes_with_uvs": 0
+ },
+ "meshes_top_by_tris": [
+  {
+   "name": "MK_Grass_Near",
+   "verts": 320328,
+   "polys": 80082,
+   "tris": 160164,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Grass_Mid",
+   "verts": 257256,
+   "polys": 64314,
+   "tris": 128628,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Grass_Far",
+   "verts": 145152,
+   "polys": 36288,
+   "tris": 72576,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Terrain_02",
+   "verts": 25821,
+   "polys": 25500,
+   "tris": 51000,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": [
+    "Col"
+   ]
+  },
+  {
+   "name": "MK_Corridor.001",
+   "verts": 3292,
+   "polys": 3006,
+   "tris": 6072,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hub_Room",
+   "verts": 4024,
+   "polys": 2780,
+   "tris": 5896,
+   "users": 1,
+   "materials": 11,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Panorama_Module",
+   "verts": 2184,
+   "polys": 1964,
+   "tris": 4112,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Panorama_Module.001",
+   "verts": 2184,
+   "polys": 1964,
+   "tris": 4112,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Corridor",
+   "verts": 2148,
+   "polys": 1958,
+   "tris": 3968,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Corridor_B",
+   "verts": 2148,
+   "polys": 1958,
+   "tris": 3968,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hab_Gable",
+   "verts": 2056,
+   "polys": 1804,
+   "tris": 3712,
+   "users": 1,
+   "materials": 9,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Greenhouse",
+   "verts": 1868,
+   "polys": 1872,
+   "tris": 3348,
+   "users": 1,
+   "materials": 11,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hab_Gable.001",
+   "verts": 1816,
+   "polys": 1564,
+   "tris": 3232,
+   "users": 1,
+   "materials": 9,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Airlock.001",
+   "verts": 1632,
+   "polys": 1398,
+   "tris": 2996,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_GeoDome",
+   "verts": 2088,
+   "polys": 1366,
+   "tris": 2910,
+   "users": 1,
+   "materials": 6,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_GeoDome.001",
+   "verts": 1992,
+   "polys": 1314,
+   "tris": 2798,
+   "users": 1,
+   "materials": 6,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Airlock",
+   "verts": 1464,
+   "polys": 1232,
+   "tris": 2664,
+   "users": 1,
+   "materials": 10,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hab_Long",
+   "verts": 1316,
+   "polys": 1082,
+   "tris": 2384,
+   "users": 1,
+   "materials": 11,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hab_Box",
+   "verts": 1188,
+   "polys": 1002,
+   "tris": 2160,
+   "users": 1,
+   "materials": 11,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Silo",
+   "verts": 1058,
+   "polys": 1012,
+   "tris": 2016,
+   "users": 1,
+   "materials": 9,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hub_Octagon",
+   "verts": 1072,
+   "polys": 954,
+   "tris": 1980,
+   "users": 1,
+   "materials": 9,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hub_Dark",
+   "verts": 1088,
+   "polys": 932,
+   "tris": 1976,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hub_Dark.001",
+   "verts": 1088,
+   "polys": 932,
+   "tris": 1976,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Corridor_Junction",
+   "verts": 992,
+   "polys": 848,
+   "tris": 1856,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Module_XRoof",
+   "verts": 992,
+   "polys": 898,
+   "tris": 1852,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Corridor_Elbow",
+   "verts": 928,
+   "polys": 808,
+   "tris": 1744,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Pod_Small",
+   "verts": 888,
+   "polys": 784,
+   "tris": 1672,
+   "users": 1,
+   "materials": 8,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Coral_0",
+   "verts": 984,
+   "polys": 1060,
+   "tris": 1600,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Coral_1",
+   "verts": 984,
+   "polys": 1060,
+   "tris": 1600,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Coral_2",
+   "verts": 984,
+   "polys": 1060,
+   "tris": 1600,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Plant_Coral",
+   "verts": 984,
+   "polys": 1060,
+   "tris": 1600,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hose_Coil",
+   "verts": 856,
+   "polys": 570,
+   "tris": 1428,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Hose_Coil.001",
+   "verts": 856,
+   "polys": 570,
+   "tris": 1428,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Tree_Ridge_0",
+   "verts": 864,
+   "polys": 1208,
+   "tris": 1424,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Tree_Ridge_3",
+   "verts": 864,
+   "polys": 1208,
+   "tris": 1424,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Tree_Ridge_4",
+   "verts": 864,
+   "polys": 1208,
+   "tris": 1424,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Tree_Ridge_5",
+   "verts": 864,
+   "polys": 1208,
+   "tris": 1424,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Tree_Ridge_6",
+   "verts": 864,
+   "polys": 1208,
+   "tris": 1424,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Tree_Ridge_7",
+   "verts": 864,
+   "polys": 1208,
+   "tris": 1424,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  },
+  {
+   "name": "MK_Tree_Teal",
+   "verts": 864,
+   "polys": 1208,
+   "tris": 1424,
+   "users": 1,
+   "materials": 2,
+   "uv_layers": 0,
+   "color_attributes": []
+  }
+ ],
+ "meshes_with_color_attributes_sample": [
+  {
+   "name": "MK_Terrain_02",
+   "verts": 25821,
+   "polys": 25500,
+   "tris": 51000,
+   "users": 1,
+   "materials": 1,
+   "uv_layers": 0,
+   "color_attributes": [
+    "Col"
+   ]
+  }
+ ],
+ "objects": {
+  "by_type": {
+   "CAMERA": 10,
+   "LIGHT": 8,
+   "MESH": 154,
+   "FONT": 87
+  },
+  "parented": 0,
+  "collection_instances": 0,
+  "hidden_in_render": 0,
+  "modifiers": {
+   "BEVEL": 46
+  },
+  "custom_property_keys": {
+   "mk_roles": 152,
+   "mk_asset": 87,
+   "mk_category": 87
+  },
+  "name_prefixes_top": {
+   "MK_Label": 87,
+   "MK_Tree": 15,
+   "MK": 10,
+   "MKLIB_Cam": 8,
+   "MK_Corridor": 6,
+   "MK_DomeTree": 6,
+   "MK_Mesa": 6,
+   "MK_Plant": 5,
+   "MK_Rock": 5,
+   "MK_YPlant": 5,
+   "MK_Canister": 4,
+   "MK_Crate": 4,
+   "MK_Creature": 4,
+   "MK_Fern": 4,
+   "MK_Grass": 4,
+   "MK_Hab": 4,
+   "MK_Hose": 4,
+   "MK_Hub": 4,
+   "MK_Coral": 3,
+   "MK_Grow": 3,
+   "MK_Rover": 3,
+   "MK_Ruins": 3,
+   "MK_Solar": 3,
+   "MK_Wall": 3,
+   "MK_Airlock": 2,
+   "MK_Door": 2,
+   "MK_Drone": 2,
+   "MK_GeoDome": 2,
+   "MK_Mushroom": 2,
+   "MK_Panorama": 2,
+   "MK_Planet": 2,
+   "MK_Terrain": 2,
+   "MK_Tower": 2,
+   "MK_Alien": 1,
+   "MK_Bed": 1,
+   "MK_Boulder": 1,
+   "MK_Bunk": 1,
+   "MK_Ceiling": 1,
+   "MK_Chair": 1,
+   "MK_Control": 1,
+   "MK_Cryo": 1,
+   "MK_Crystals": 1,
+   "MK_Desk": 1,
+   "MK_Dining": 1,
+   "MK_Drill": 1,
+   "MK_Floor": 1,
+   "MK_Flowers": 1,
+   "MK_Fuel": 1,
+   "MK_GlassRoom": 1,
+   "MK_Greenhouse": 1,
+   "MK_Holo": 1,
+   "MK_Keypad": 1,
+   "MK_Kitchen": 1,
+   "MK_Landing": 1,
+   "MK_Locker": 1,
+   "MK_Med": 1,
+   "MK_Module": 1,
+   "MK_Office": 1,
+   "MK_Pod": 1,
+   "MK_Satellite": 1,
+   "MK_Sentry": 1,
+   "MK_Shelf": 1,
+   "MK_Shuttle": 1,
+   "MK_Silo": 1,
+   "MK_Sleep": 1,
+   "MK_Small": 1,
+   "MK_Sofa": 1,
+   "MK_Stairs": 1,
+   "MK_Vending": 1,
+   "MKLIB_Ground": 1,
+   "MKLIB_Sun": 1
+  },
+  "lod_like_name_tokens": {},
+  "non_unit_scale_objects": 2,
+  "negative_scale_objects": 0,
+  "mesh_objects": 154,
+  "mesh_objects_sharing_data": 0,
+  "meshes_used_once": 154,
+  "meshes_shared": 0,
+  "instanced_scene_tris": 537904,
+  "top_shared_meshes": []
+ },
+ "skinned_meshes": [],
+ "armatures": [],
+ "actions": [],
+ "shape_keys": [],
+ "animated_objects": [],
+ "cameras": [
+  {
+   "name": "MK02_Camera",
+   "data": "MK02_Camera",
+   "scenes": [
+    "MK_Shot02"
+   ],
+   "collections": [
+    "MK02_Cam"
+   ],
+   "location": [
+    0.0,
+    0.0,
+    4.5
+   ],
+   "rotation_euler_xyz_deg": [
+    80.8,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.9871,
+    -0.1599
+   ],
+   "type": "PERSP",
+   "lens_mm": 24.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 73.74,
+   "angle_y_deg": 53.13,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     0.15988,
+     -0.98714,
+     0.0
+    ],
+    [
+     0.0,
+     0.98714,
+     0.15988,
+     4.5
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MK06_Camera",
+   "data": "MK06_Camera",
+   "scenes": [
+    "MK_Shot06"
+   ],
+   "collections": [
+    "MK06_Cam"
+   ],
+   "location": [
+    0.0,
+    0.0,
+    1.62
+   ],
+   "rotation_euler_xyz_deg": [
+    90.0,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    1.0,
+    0.0
+   ],
+   "type": "PERSP",
+   "lens_mm": 16.7,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 94.291,
+   "angle_y_deg": 71.399,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     0.0
+    ],
+    [
+     0.0,
+     -0.0,
+     -1.0,
+     0.0
+    ],
+    [
+     0.0,
+     1.0,
+     -0.0,
+     1.62
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Colony_Structures",
+   "data": "MKLIB_Cam_Colony_Structures",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    29.2843,
+    -37.7919,
+    49.8093
+   ],
+   "rotation_euler_xyz_deg": [
+    52.8,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.7965,
+    -0.6046
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     29.28428
+    ],
+    [
+     0.0,
+     0.6046,
+     -0.79653,
+     -37.79185
+    ],
+    [
+     0.0,
+     0.79653,
+     0.6046,
+     49.80935
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Connectors_and_Utilities",
+   "data": "MKLIB_Cam_Connectors_and_Utilities",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    12.589,
+    42.58,
+    19.8276
+   ],
+   "rotation_euler_xyz_deg": [
+    52.268,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.7909,
+    -0.612
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     12.58896
+    ],
+    [
+     0.0,
+     0.61197,
+     -0.79088,
+     42.58
+    ],
+    [
+     0.0,
+     0.79088,
+     0.61197,
+     19.82761
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Creatures",
+   "data": "MKLIB_Cam_Creatures",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    6.4826,
+    231.2097,
+    10.2101
+   ],
+   "rotation_euler_xyz_deg": [
+    52.456,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.7929,
+    -0.6094
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     6.48259
+    ],
+    [
+     0.0,
+     0.60938,
+     -0.79288,
+     231.20966
+    ],
+    [
+     0.0,
+     0.79288,
+     0.60938,
+     10.21008
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Interior_Modular",
+   "data": "MKLIB_Cam_Interior_Modular",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    11.365,
+    97.5348,
+    17.8999
+   ],
+   "rotation_euler_xyz_deg": [
+    52.595,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.7944,
+    -0.6074
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     11.365
+    ],
+    [
+     0.0,
+     0.60744,
+     -0.79437,
+     97.53476
+    ],
+    [
+     0.0,
+     0.79437,
+     0.60744,
+     17.89987
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Interior_Props",
+   "data": "MKLIB_Cam_Interior_Props",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    12.945,
+    120.5927,
+    20.3884
+   ],
+   "rotation_euler_xyz_deg": [
+    52.438,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.7927,
+    -0.6096
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     12.945
+    ],
+    [
+     0.0,
+     0.60962,
+     -0.7927,
+     120.59267
+    ],
+    [
+     0.0,
+     0.7927,
+     0.60962,
+     20.38837
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Nature",
+   "data": "MKLIB_Cam_Nature",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    23.7052,
+    135.3943,
+    37.3357
+   ],
+   "rotation_euler_xyz_deg": [
+    52.713,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.7956,
+    -0.6058
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     23.70518
+    ],
+    [
+     0.0,
+     0.60581,
+     -0.79561,
+     135.39426
+    ],
+    [
+     0.0,
+     0.79561,
+     0.60581,
+     37.33566
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Ruins",
+   "data": "MKLIB_Cam_Ruins",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    10.7783,
+    198.856,
+    16.9758
+   ],
+   "rotation_euler_xyz_deg": [
+    52.756,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.7961,
+    -0.6052
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     10.77826
+    ],
+    [
+     0.0,
+     0.60521,
+     -0.79607,
+     198.85605
+    ],
+    [
+     0.0,
+     0.79607,
+     0.60521,
+     16.97577
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  },
+  {
+   "name": "MKLIB_Cam_Vehicles",
+   "data": "MKLIB_Cam_Vehicles",
+   "scenes": [
+    "MK_Asset_Library"
+   ],
+   "collections": [
+    "MKLIB_Cams"
+   ],
+   "location": [
+    11.6543,
+    69.5736,
+    18.3555
+   ],
+   "rotation_euler_xyz_deg": [
+    52.653,
+    -0.0,
+    0.0
+   ],
+   "forward": [
+    0.0,
+    0.795,
+    -0.6066
+   ],
+   "type": "PERSP",
+   "lens_mm": 35.0,
+   "sensor_fit": "AUTO",
+   "sensor_width": 36.0,
+   "sensor_height": 24.0,
+   "angle_x_deg": 54.432,
+   "angle_y_deg": 37.849,
+   "clip": [
+    0.05,
+    2000.0
+   ],
+   "shift": [
+    0.0,
+    0.0
+   ],
+   "dof": {
+    "use": false,
+    "fstop": 2.8,
+    "focus_distance": 10.0
+   },
+   "ortho_scale": null,
+   "animated": false,
+   "parent": null,
+   "custom_props": {},
+   "matrix_world": [
+    [
+     1.0,
+     0.0,
+     0.0,
+     11.65431
+    ],
+    [
+     0.0,
+     0.60665,
+     -0.79497,
+     69.57362
+    ],
+    [
+     0.0,
+     0.79497,
+     0.60665,
+     18.35553
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ]
+  }
+ ],
+ "lights_summary": {
+  "by_type": {
+   "SUN": 2,
+   "AREA": 5,
+   "SPOT": 1
+  },
+  "energy_sum_by_type": {
+   "SUN": 4.7,
+   "AREA": 455.4,
+   "SPOT": 575.0
+  },
+  "unique_light_datablocks": 8,
+  "light_objects": 8,
+  "by_collection": {
+   "MK06_Lights": 6,
+   "MK02_Cam": 1,
+   "MKLIB_Lights": 1
+  }
+ },
+ "lights": [
+  {
+   "name": "MK02_Sun",
+   "data": "MK02_Sun.001",
+   "type": "SUN",
+   "energy": 1.7,
+   "color": [
+    1.0,
+    0.8714,
+    0.807
+   ],
+   "location": [
+    0.0,
+    0.0,
+    50.0
+   ],
+   "collections": [
+    "MK02_Cam"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "angle": 0.0698,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "MK06_Bounce",
+   "data": "MK06_Bounce.003",
+   "type": "AREA",
+   "energy": 59.8,
+   "color": [
+    0.9216,
+    0.9131,
+    0.9387
+   ],
+   "location": [
+    -0.3,
+    3.8,
+    3.4
+   ],
+   "collections": [
+    "MK06_Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "SQUARE",
+   "size": 5.0,
+   "size_y": 0.25,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "MK06_Ceiling",
+   "data": "MK06_Ceiling.003",
+   "type": "AREA",
+   "energy": 161.0,
+   "color": [
+    0.9216,
+    0.9131,
+    0.9387
+   ],
+   "location": [
+    -0.3,
+    4.4,
+    4.5
+   ],
+   "collections": [
+    "MK06_Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "SQUARE",
+   "size": 5.0,
+   "size_y": 0.25,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "MK06_Fill",
+   "data": "MK06_Fill.003",
+   "type": "AREA",
+   "energy": 16.1,
+   "color": [
+    0.8796,
+    0.855,
+    1.0
+   ],
+   "location": [
+    0.0,
+    -1.0,
+    4.3
+   ],
+   "collections": [
+    "MK06_Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "SQUARE",
+   "size": 3.0,
+   "size_y": 0.25,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "MK06_GlassLight",
+   "data": "MK06_GlassLight.003",
+   "type": "AREA",
+   "energy": 138.0,
+   "color": [
+    0.807,
+    0.9047,
+    1.0
+   ],
+   "location": [
+    -6.026,
+    8.495,
+    4.0
+   ],
+   "collections": [
+    "MK06_Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "SQUARE",
+   "size": 4.0,
+   "size_y": 0.25,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "MK06_OfficeLight",
+   "data": "MK06_OfficeLight.003",
+   "type": "AREA",
+   "energy": 80.5,
+   "color": [
+    1.0,
+    0.8879,
+    0.7758
+   ],
+   "location": [
+    5.142,
+    9.491,
+    4.2
+   ],
+   "collections": [
+    "MK06_Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "shape": "SQUARE",
+   "size": 3.5,
+   "size_y": 0.25,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "MK06_SunBeam",
+   "data": "MK06_SunBeam.003",
+   "type": "SPOT",
+   "energy": 575.0,
+   "color": [
+    1.0,
+    0.8963,
+    0.7454
+   ],
+   "location": [
+    -4.429,
+    9.698,
+    6.0
+   ],
+   "collections": [
+    "MK06_Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.2,
+   "spot_size": 0.6981,
+   "spot_blend": 0.15,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  },
+  {
+   "name": "MKLIB_Sun",
+   "data": "MKLIB_Sun.004",
+   "type": "SUN",
+   "energy": 3.0,
+   "color": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "location": [
+    0.0,
+    0.0,
+    50.0
+   ],
+   "collections": [
+    "MKLIB_Lights"
+   ],
+   "hide_render": false,
+   "use_shadow": true,
+   "data_users": 1,
+   "uses_nodes": true,
+   "shadow_soft_size": 0.0,
+   "angle": 0.0524,
+   "exposure": 0.0,
+   "temperature": 6500.0,
+   "use_temperature": false,
+   "normalize": true,
+   "use_custom_distance": false,
+   "cutoff_distance": 40.0,
+   "diffuse_factor": 1.0,
+   "specular_factor": 1.0,
+   "volume_factor": 1.0
+  }
+ ],
+ "lightprobes": [],
+ "materials": [
+  {
+   "name": "MK_black",
+   "users": 14,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.007,
+      0.007,
+      0.0097,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.6,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_clay",
+   "users": 501,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.5089,
+      0.491,
+      0.4621,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.8,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_dark",
+   "users": 16,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0232,
+      0.0232,
+      0.0369,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.1,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.55,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_fabric_y",
+   "users": 1,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8148,
+      0.3916,
+      0.0116,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.85,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_floor",
+   "users": 2,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0065,
+      0.0056,
+      0.0116,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.85,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_floor_gr",
+   "users": 1,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0685,
+      0.0578,
+      0.0844,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.6,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_floor_ln",
+   "users": 2,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.016,
+      0.0137,
+      0.0242,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.85,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_floor_oct",
+   "users": 1,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.1119,
+      0.0704,
+      0.1022,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.85,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_glass",
+   "users": 1,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.3467,
+      0.7454,
+      0.8228,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.05,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 0.28,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "BLENDED",
+   "blend_method": "BLEND",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_glass_blue",
+   "users": 1,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0284,
+      0.2122,
+      0.3916,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.1,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_glow",
+   "users": 17,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.4564,
+      0.9047,
+      0.8388,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.3,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      0.4564,
+      0.9047,
+      0.8388,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 2.6,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_glow_g",
+   "users": 3,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.2623,
+      1.0,
+      0.1441,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.3,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      0.2623,
+      1.0,
+      0.1441,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 4.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_glow_r",
+   "users": 2,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      1.0,
+      0.0685,
+      0.0423,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.3,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      0.0685,
+      0.0423,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 4.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_glow_y",
+   "users": 5,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      1.0,
+      0.6445,
+      0.1022,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.3,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      0.6445,
+      0.1022,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 5.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_gold",
+   "users": 8,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8879,
+      0.5149,
+      0.0252,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.7,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_grass",
+   "users": 3,
+   "nodes": 6,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeAttribute": 2,
+    "ShaderNodeValToRGB": 1,
+    "ShaderNodeMix": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.7605,
+      0.2159,
+      0.1441,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.9,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_grey",
+   "users": 5,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.2705,
+      0.2542,
+      0.2623,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.1,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.6,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_grey_dk",
+   "users": 6,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.1046,
+      0.0976,
+      0.117,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.1,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.6,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_ground",
+   "users": 1,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.5776,
+      0.1301,
+      0.0685,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.95,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_line",
+   "users": 4,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.4508,
+      0.4072,
+      0.3813,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.7,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_mesa",
+   "users": 5,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0222,
+      0.0212,
+      0.0423,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.9,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_metal",
+   "users": 14,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0423,
+      0.0423,
+      0.0578,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.4,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.45,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_navy",
+   "users": 6,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0075,
+      0.0091,
+      0.0194,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.1,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_orange",
+   "users": 4,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8714,
+      0.3231,
+      0.0232,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.75,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_pink",
+   "users": 5,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8228,
+      0.159,
+      0.3613,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.75,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_rock",
+   "users": 3,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.159,
+      0.1384,
+      0.162,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.85,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_rubber",
+   "users": 4,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.013,
+      0.0123,
+      0.016,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.85,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_screen",
+   "users": 3,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0497,
+      0.6867,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.3,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      0.0497,
+      0.6867,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 3.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_solar",
+   "users": 3,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0296,
+      0.0382,
+      0.0685,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.3,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.3,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_solar_ln",
+   "users": 2,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.1144,
+      0.1301,
+      0.1812,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.1,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_tan",
+   "users": 2,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.2582,
+      0.1981,
+      0.1441,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.7,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_teal",
+   "users": 11,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.063,
+      0.4508,
+      0.3325,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.75,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_terrain_vc",
+   "users": 1,
+   "nodes": 3,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1,
+    "ShaderNodeVertexColor": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": true,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8,
+      0.8,
+      0.8,
+      1.0
+     ],
+     "linked": true
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.95,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_trunk",
+   "users": 21,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.0482,
+      0.0369,
+      0.0395,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.8,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_white",
+   "users": 15,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.7913,
+      0.7605,
+      0.7454,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.6,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_white2",
+   "users": 13,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.6724,
+      0.6308,
+      0.5972,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.6,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_window",
+   "users": 5,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.1221,
+      0.4564,
+      0.5776,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.1,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      0.1221,
+      0.4564,
+      0.5776,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.4,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_yellow",
+   "users": 11,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.8228,
+      0.4233,
+      0.0232,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.5,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MK_yellow_dk",
+   "users": 2,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.5841,
+      0.2542,
+      0.0052,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.55,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  },
+  {
+   "name": "MKLIB_Ground",
+   "users": 1,
+   "nodes": 2,
+   "node_kinds": {
+    "ShaderNodeBsdfPrincipled": 1,
+    "ShaderNodeOutputMaterial": 1
+   },
+   "image_nodes": [],
+   "procedural_tex_nodes": 0,
+   "uses_vertex_color": false,
+   "principled": {
+    "Base Color": {
+     "v": [
+      0.09,
+      0.09,
+      0.1,
+      1.0
+     ],
+     "linked": false
+    },
+    "Metallic": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Roughness": {
+     "v": 0.9,
+     "linked": false
+    },
+    "IOR": {
+     "v": 1.5,
+     "linked": false
+    },
+    "Alpha": {
+     "v": 1.0,
+     "linked": false
+    },
+    "Transmission Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Emission Color": {
+     "v": [
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "linked": false
+    },
+    "Emission Strength": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Coat Weight": {
+     "v": 0.0,
+     "linked": false
+    },
+    "Normal": {
+     "v": [
+      0.0,
+      0.0,
+      0.0
+     ],
+     "linked": false
+    }
+   },
+   "has_volume": false,
+   "has_emission_node": false,
+   "has_glass_like": false,
+   "surface_render_method": "DITHERED",
+   "blend_method": "HASHED",
+   "use_backface_culling": "False",
+   "use_transparency_overlap": "True",
+   "displacement_method": "BUMP"
+  }
+ ],
+ "materials_summary": {
+  "count": 40,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 0,
+  "using_vertex_color_or_attribute": 2,
+  "with_volume": 0,
+  "transmissive_or_glass": [],
+  "alpha_below_one": [
+   "MK_glass"
+  ],
+  "emissive": [
+   "MK_glow",
+   "MK_glow_g",
+   "MK_glow_r",
+   "MK_glow_y",
+   "MK_screen",
+   "MK_window"
+  ],
+  "node_kind_totals": {
+   "ShaderNodeBsdfPrincipled": 40,
+   "ShaderNodeOutputMaterial": 40,
+   "ShaderNodeAttribute": 2,
+   "ShaderNodeValToRGB": 1,
+   "ShaderNodeMix": 1,
+   "ShaderNodeVertexColor": 1
+  },
+  "render_methods": {
+   "DITHERED": 39,
+   "BLENDED": 1
+  }
+ },
+ "images": [],
+ "node_groups": [
+  {
+   "name": "MK02_Comp",
+   "type": "CompositorNodeTree",
+   "nodes": 12,
+   "users": 1
+  },
+  {
+   "name": "MK06_Comp",
+   "type": "CompositorNodeTree",
+   "nodes": 7,
+   "users": 1
+  }
+ ],
+ "missing_files": [],
+ "collection_trees": [
+  {
+   "scene": "MK_Asset_Library",
+   "tree": {
+    "name": "Scene Collection",
+    "direct_objects": 0,
+    "all_objects": 184,
+    "instanced_tris": 65794,
+    "hide_render": false,
+    "hide_viewport": false,
+    "children": [
+     {
+      "name": "MKLIB_Assets",
+      "direct_objects": 1,
+      "all_objects": 175,
+      "instanced_tris": 65794,
+      "hide_render": false,
+      "hide_viewport": false,
+      "children": [
+       {
+        "name": "LIB Colony Structures",
+        "direct_objects": 30,
+        "all_objects": 30,
+        "instanced_tris": 33290,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "LIB Connectors & Utilities",
+        "direct_objects": 22,
+        "all_objects": 22,
+        "instanced_tris": 11580,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "LIB Vehicles",
+        "direct_objects": 8,
+        "all_objects": 8,
+        "instanced_tris": 3130,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "LIB Interior Modular",
+        "direct_objects": 14,
+        "all_objects": 14,
+        "instanced_tris": 2294,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "LIB Interior Props",
+        "direct_objects": 42,
+        "all_objects": 42,
+        "instanced_tris": 5802,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "LIB Nature",
+        "direct_objects": 42,
+        "all_objects": 42,
+        "instanced_tris": 6674,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "LIB Ruins",
+        "direct_objects": 8,
+        "all_objects": 8,
+        "instanced_tris": 2088,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "LIB Creatures",
+        "direct_objects": 8,
+        "all_objects": 8,
+        "instanced_tris": 924,
+        "hide_render": false,
+        "hide_viewport": false
+       }
+      ]
+     },
+     {
+      "name": "MKLIB_Labels",
+      "direct_objects": 0,
+      "all_objects": 0,
+      "instanced_tris": 0,
+      "hide_render": false,
+      "hide_viewport": false
+     },
+     {
+      "name": "MKLIB_Lights",
+      "direct_objects": 1,
+      "all_objects": 1,
+      "instanced_tris": 0,
+      "hide_render": false,
+      "hide_viewport": false
+     },
+     {
+      "name": "MKLIB_Cams",
+      "direct_objects": 8,
+      "all_objects": 8,
+      "instanced_tris": 0,
+      "hide_render": false,
+      "hide_viewport": false
+     }
+    ]
+   }
+  },
+  {
+   "scene": "MK_Shot02",
+   "tree": {
+    "name": "Scene Collection",
+    "direct_objects": 0,
+    "all_objects": 62,
+    "instanced_tris": 464220,
+    "hide_render": false,
+    "hide_viewport": false,
+    "children": [
+     {
+      "name": "MK02_Set",
+      "direct_objects": 0,
+      "all_objects": 60,
+      "instanced_tris": 464220,
+      "hide_render": false,
+      "hide_viewport": false,
+      "children": [
+       {
+        "name": "MK02_Nature",
+        "direct_objects": 40,
+        "all_objects": 40,
+        "instanced_tris": 431262,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "MK02_Buildings",
+        "direct_objects": 8,
+        "all_objects": 8,
+        "instanced_tris": 26382,
+        "hide_render": false,
+        "hide_viewport": false
+       },
+       {
+        "name": "MK02_Props",
+        "direct_objects": 12,
+        "all_objects": 12,
+        "instanced_tris": 6576,
+        "hide_render": false,
+        "hide_viewport": false
+       }
+      ]
+     },
+     {
+      "name": "MK02_Cam",
+      "direct_objects": 2,
+      "all_objects": 2,
+      "instanced_tris": 0,
+      "hide_render": false,
+      "hide_viewport": false
+     }
+    ]
+   }
+  },
+  {
+   "scene": "MK_Shot06",
+   "tree": {
+    "name": "Scene Collection",
+    "direct_objects": 0,
+    "all_objects": 13,
+    "instanced_tris": 7890,
+    "hide_render": false,
+    "hide_viewport": false,
+    "children": [
+     {
+      "name": "MK06_Set",
+      "direct_objects": 6,
+      "all_objects": 6,
+      "instanced_tris": 7890,
+      "hide_render": false,
+      "hide_viewport": false
+     },
+     {
+      "name": "MK06_Lights",
+      "direct_objects": 6,
+      "all_objects": 6,
+      "instanced_tris": 0,
+      "hide_render": false,
+      "hide_viewport": false
+     },
+     {
+      "name": "MK06_Cam",
+      "direct_objects": 1,
+      "all_objects": 1,
+      "instanced_tris": 0,
+      "hide_render": false,
+      "hide_viewport": false
+     }
+    ]
+   }
+  }
+ ],
+ "scene_bbox": {
+  "MK_Asset_Library": {
+   "min": [
+    -100.0,
+    -40.0,
+    -0.179
+   ],
+   "max": [
+    400.0,
+    299.662,
+    21.635
+   ],
+   "size": [
+    500.0,
+    339.662,
+    21.814
+   ]
+  },
+  "MK_Shot02": {
+   "min": [
+    -450.0,
+    2.0,
+    -1.0
+   ],
+   "max": [
+    450.0,
+    540.0,
+    97.565
+   ],
+   "size": [
+    900.0,
+    538.0,
+    98.565
+   ]
+  },
+  "MK_Shot06": {
+   "min": [
+    -10.679,
+    -2.222,
+    0.0
+   ],
+   "max": [
+    8.903,
+    13.357,
+    5.06
+   ],
+   "size": [
+    19.582,
+    15.579,
+    5.06
+   ]
+  }
+ },
+ "collection_bboxes": {
+  "MK_Asset_Library/MKLIB_Assets": {
+   "min": [
+    -100.0,
+    -40.0,
+    -0.179
+   ],
+   "max": [
+    400.0,
+    299.662,
+    21.635
+   ],
+   "size": [
+    500.0,
+    339.662,
+    21.814
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Colony Structures": {
+   "min": [
+    -0.281,
+    -1.012,
+    -0.179
+   ],
+   "max": [
+    58.565,
+    50.6,
+    20.52
+   ],
+   "size": [
+    58.846,
+    51.612,
+    20.699
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Connectors & Utilities": {
+   "min": [
+    0.0,
+    61.632,
+    -0.098
+   ],
+   "max": [
+    25.178,
+    72.79,
+    5.0
+   ],
+   "size": [
+    25.178,
+    11.158,
+    5.098
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Vehicles": {
+   "min": [
+    -0.217,
+    83.885,
+    -0.06
+   ],
+   "max": [
+    23.309,
+    100.858,
+    5.8
+   ],
+   "size": [
+    23.526,
+    16.972,
+    5.86
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Interior Modular": {
+   "min": [
+    0.0,
+    111.884,
+    -0.179
+   ],
+   "max": [
+    22.73,
+    127.558,
+    4.6
+   ],
+   "size": [
+    22.73,
+    15.674,
+    4.779
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Interior Props": {
+   "min": [
+    0.0,
+    138.655,
+    -0.06
+   ],
+   "max": [
+    25.89,
+    153.278,
+    3.0
+   ],
+   "size": [
+    25.89,
+    14.623,
+    3.06
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Nature": {
+   "min": [
+    0.0,
+    164.373,
+    -0.179
+   ],
+   "max": [
+    47.78,
+    200.094,
+    21.635
+   ],
+   "size": [
+    47.78,
+    35.721,
+    21.814
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Ruins": {
+   "min": [
+    0.0,
+    211.19,
+    0.0
+   ],
+   "max": [
+    21.557,
+    228.623,
+    6.914
+   ],
+   "size": [
+    21.557,
+    17.433,
+    6.914
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Assets/LIB Creatures": {
+   "min": [
+    -0.361,
+    239.72,
+    0.0
+   ],
+   "max": [
+    12.965,
+    247.662,
+    2.129
+   ],
+   "size": [
+    13.326,
+    7.942,
+    2.129
+   ]
+  },
+  "MK_Asset_Library/MKLIB_Labels": null,
+  "MK_Asset_Library/MKLIB_Lights": null,
+  "MK_Asset_Library/MKLIB_Cams": null,
+  "MK_Shot02/MK02_Set": {
+   "min": [
+    -450.0,
+    2.0,
+    -1.0
+   ],
+   "max": [
+    450.0,
+    540.0,
+    97.565
+   ],
+   "size": [
+    900.0,
+    538.0,
+    98.565
+   ]
+  },
+  "MK_Shot02/MK02_Set/MK02_Nature": {
+   "min": [
+    -450.0,
+    2.0,
+    -1.0
+   ],
+   "max": [
+    450.0,
+    540.0,
+    97.565
+   ],
+   "size": [
+    900.0,
+    538.0,
+    98.565
+   ]
+  },
+  "MK_Shot02/MK02_Set/MK02_Buildings": {
+   "min": [
+    -18.761,
+    8.716,
+    -0.089
+   ],
+   "max": [
+    27.729,
+    60.752,
+    20.42
+   ],
+   "size": [
+    46.49,
+    52.036,
+    20.509
+   ]
+  },
+  "MK_Shot02/MK02_Set/MK02_Props": {
+   "min": [
+    -12.659,
+    8.93,
+    -0.048
+   ],
+   "max": [
+    3.611,
+    28.67,
+    8.916
+   ],
+   "size": [
+    16.27,
+    19.741,
+    8.963
+   ]
+  },
+  "MK_Shot02/MK02_Cam": null,
+  "MK_Shot06/MK06_Set": {
+   "min": [
+    -10.679,
+    -2.222,
+    0.0
+   ],
+   "max": [
+    8.903,
+    13.357,
+    5.06
+   ],
+   "size": [
+    19.582,
+    15.579,
+    5.06
+   ]
+  },
+  "MK_Shot06/MK06_Lights": null,
+  "MK_Shot06/MK06_Cam": null
+ },
+ "category_search": {
+  "rover_vehicle": {
+   "pattern": "rover|chassis|wheel|buggy|vehicle|truck|cart|tire|tyre",
+   "object_hits": 6,
+   "tris": 2252,
+   "types": {
+    "FONT": 2,
+    "MESH": 3,
+    "CAMERA": 1
+   },
+   "collections": [
+    [
+     "LIB Vehicles",
+     8
+    ]
+   ],
+   "root_objects_top": [
+    [
+     "MK_Label_Rover (small)",
+     1
+    ],
+    [
+     "MK_Label_Rover Bus",
+     1
+    ],
+    [
+     "MK_Rover_Bus",
+     1
+    ],
+    [
+     "MK_Rover_Small",
+     1
+    ],
+    [
+     "MK_Rover_Small.001",
+     1
+    ],
+    [
+     "MKLIB_Cam_Vehicles",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MKLIB_Cam_Vehicles",
+    "MK_Label_Rover (small)",
+    "MK_Label_Rover Bus",
+    "MK_Rover_Bus",
+    "MK_Rover_Small",
+    "MK_Rover_Small.001"
+   ]
+  },
+  "human_body": {
+   "pattern": "human|person|people|crew|survivor|body|man|woman|head|hand|torso|leg|arm_|astronaut",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "suit": {
+   "pattern": "suit|helmet|visor|glove|boot|eva|backpack|plss",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "spaceship": {
+   "pattern": "ship|shuttle|lander|orbiter|rocket|spacecraft|booster|capsule|ex_lander",
+   "object_hits": 2,
+   "tris": 610,
+   "types": {
+    "FONT": 1,
+    "MESH": 1
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "MK_Label_Shuttle",
+     1
+    ],
+    [
+     "MK_Shuttle",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MK_Label_Shuttle",
+    "MK_Shuttle"
+   ]
+  },
+  "crops_plants": {
+   "pattern": "tomato|lettuce|plant|crop|leaf|vine|seedling|tray|hydro|grow",
+   "object_hits": 18,
+   "tris": 5100,
+   "types": {
+    "MESH": 13,
+    "FONT": 5
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "MK_Grow_Bed",
+     1
+    ],
+    [
+     "MK_Grow_Bed_Wheat",
+     1
+    ],
+    [
+     "MK_Grow_Rack",
+     1
+    ],
+    [
+     "MK_Label_Crystal Plant",
+     1
+    ],
+    [
+     "MK_Label_Grow Bed (cabbage)",
+     1
+    ],
+    [
+     "MK_Label_Grow Bed (wheat)",
+     1
+    ],
+    [
+     "MK_Label_Grow Rack",
+     1
+    ],
+    [
+     "MK_Label_Plant Pot",
+     1
+    ],
+    [
+     "MK_Plant_Coral",
+     1
+    ],
+    [
+     "MK_Plant_Crystal",
+     1
+    ],
+    [
+     "MK_Plant_Fern",
+     1
+    ],
+    [
+     "MK_Plant_Pot",
+     1
+    ],
+    [
+     "MK_Plant_Stalks",
+     1
+    ],
+    [
+     "MK_YPlant_0",
+     1
+    ],
+    [
+     "MK_YPlant_1",
+     1
+    ],
+    [
+     "MK_YPlant_2",
+     1
+    ],
+    [
+     "MK_YPlant_3",
+     1
+    ],
+    [
+     "MK_YPlant_4",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MK_Grow_Bed",
+    "MK_Grow_Bed_Wheat",
+    "MK_Grow_Rack",
+    "MK_Label_Crystal Plant",
+    "MK_Label_Grow Bed (cabbage)",
+    "MK_Label_Grow Bed (wheat)",
+    "MK_Label_Grow Rack",
+    "MK_Label_Plant Pot",
+    "MK_Plant_Coral",
+    "MK_Plant_Crystal",
+    "MK_Plant_Fern",
+    "MK_Plant_Pot",
+    "MK_Plant_Stalks",
+    "MK_YPlant_0",
+    "MK_YPlant_1",
+    "MK_YPlant_2",
+    "MK_YPlant_3",
+    "MK_YPlant_4"
+   ]
+  },
+  "energy": {
+   "pattern": "solar|panel|battery|reactor|generator|tracker|cleaner",
+   "object_hits": 8,
+   "tris": 3094,
+   "types": {
+    "FONT": 3,
+    "MESH": 5
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "MK_Label_Solar Array",
+     1
+    ],
+    [
+     "MK_Label_Wall Panel",
+     1
+    ],
+    [
+     "MK_Label_Wall Panel Narrow",
+     1
+    ],
+    [
+     "MK_Solar_Stand",
+     1
+    ],
+    [
+     "MK_Solar_Stand.001",
+     1
+    ],
+    [
+     "MK_Solar_Stand.002",
+     1
+    ],
+    [
+     "MK_Wall_Panel",
+     1
+    ],
+    [
+     "MK_Wall_Panel_Narrow",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MK_Label_Solar Array",
+    "MK_Label_Wall Panel",
+    "MK_Label_Wall Panel Narrow",
+    "MK_Solar_Stand",
+    "MK_Solar_Stand.001",
+    "MK_Solar_Stand.002",
+    "MK_Wall_Panel",
+    "MK_Wall_Panel_Narrow"
+   ]
+  },
+  "life_support": {
+   "pattern": "oxygen|o2|co2|electroly|moxie|water|tank|scrubber|pump|recycl",
+   "object_hits": 0,
+   "tris": 0,
+   "types": {},
+   "collections": [],
+   "root_objects_top": [],
+   "sample_names": []
+  },
+  "comms": {
+   "pattern": "antenna|dish|radio|comm|relay|mast",
+   "object_hits": 2,
+   "tris": 512,
+   "types": {
+    "FONT": 1,
+    "MESH": 1
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "MK_Label_Satellite Dish",
+     1
+    ],
+    [
+     "MK_Satellite_Dish",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MK_Label_Satellite Dish",
+    "MK_Satellite_Dish"
+   ]
+  },
+  "doors_glass": {
+   "pattern": "door|airlock|glass|dome|window|hatch",
+   "object_hits": 19,
+   "tris": 13894,
+   "types": {
+    "LIGHT": 1,
+    "MESH": 14,
+    "FONT": 4
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "MK06_GlassLight",
+     1
+    ],
+    [
+     "MK_Airlock",
+     1
+    ],
+    [
+     "MK_Airlock.001",
+     1
+    ],
+    [
+     "MK_DomeTree_0",
+     1
+    ],
+    [
+     "MK_DomeTree_1",
+     1
+    ],
+    [
+     "MK_DomeTree_2",
+     1
+    ],
+    [
+     "MK_DomeTree_3",
+     1
+    ],
+    [
+     "MK_DomeTree_4",
+     1
+    ],
+    [
+     "MK_DomeTree_5",
+     1
+    ],
+    [
+     "MK_Door_DarkFrame",
+     1
+    ],
+    [
+     "MK_Door_Frame_Dark",
+     1
+    ],
+    [
+     "MK_GeoDome",
+     1
+    ],
+    [
+     "MK_GeoDome.001",
+     1
+    ],
+    [
+     "MK_GlassRoom",
+     1
+    ],
+    [
+     "MK_Label_Airlock + Stairs",
+     1
+    ],
+    [
+     "MK_Label_Door Frame (dark)",
+     1
+    ],
+    [
+     "MK_Label_Doorway (yellow)",
+     1
+    ],
+    [
+     "MK_Label_Geodesic Dome",
+     1
+    ],
+    [
+     "MK_Wall_Doorway_Yellow",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MK06_GlassLight",
+    "MK_Airlock",
+    "MK_Airlock.001",
+    "MK_DomeTree_0",
+    "MK_DomeTree_1",
+    "MK_DomeTree_2",
+    "MK_DomeTree_3",
+    "MK_DomeTree_4",
+    "MK_DomeTree_5",
+    "MK_Door_DarkFrame",
+    "MK_Door_Frame_Dark",
+    "MK_GeoDome",
+    "MK_GeoDome.001",
+    "MK_GlassRoom",
+    "MK_Label_Airlock + Stairs",
+    "MK_Label_Door Frame (dark)",
+    "MK_Label_Doorway (yellow)",
+    "MK_Label_Geodesic Dome",
+    "MK_Wall_Doorway_Yellow"
+   ]
+  },
+  "terrain_rock": {
+   "pattern": "terrain|rock|boulder|dune|ground|mountain|crater|regolith",
+   "object_hits": 12,
+   "tris": 51726,
+   "types": {
+    "MESH": 9,
+    "FONT": 3
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "MK_Boulder",
+     1
+    ],
+    [
+     "MK_Label_Boulder",
+     1
+    ],
+    [
+     "MK_Label_Rock",
+     1
+    ],
+    [
+     "MK_Label_Rock Arch",
+     1
+    ],
+    [
+     "MK_Rock",
+     1
+    ],
+    [
+     "MK_Rock_Arch",
+     1
+    ],
+    [
+     "MK_Rock_FG",
+     1
+    ],
+    [
+     "MK_Rock_R",
+     1
+    ],
+    [
+     "MK_Rock_S",
+     1
+    ],
+    [
+     "MK_Terrain_02",
+     1
+    ],
+    [
+     "MK_Terrain_Far",
+     1
+    ],
+    [
+     "MKLIB_Ground",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MKLIB_Ground",
+    "MK_Boulder",
+    "MK_Label_Boulder",
+    "MK_Label_Rock",
+    "MK_Label_Rock Arch",
+    "MK_Rock",
+    "MK_Rock_Arch",
+    "MK_Rock_FG",
+    "MK_Rock_R",
+    "MK_Rock_S",
+    "MK_Terrain_02",
+    "MK_Terrain_Far"
+   ]
+  },
+  "salvage_fab": {
+   "pattern": "salvage|crate|scrap|wreck|crash|debris|fabricat|printer|workbench|lathe",
+   "object_hits": 6,
+   "tris": 492,
+   "types": {
+    "MESH": 4,
+    "FONT": 2
+   },
+   "collections": [],
+   "root_objects_top": [
+    [
+     "MK_Crate",
+     1
+    ],
+    [
+     "MK_Crate_Dark",
+     1
+    ],
+    [
+     "MK_Crate_Tan",
+     1
+    ],
+    [
+     "MK_Crate_Tan.001",
+     1
+    ],
+    [
+     "MK_Label_Crate",
+     1
+    ],
+    [
+     "MK_Label_Crate (tan)",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MK_Crate",
+    "MK_Crate_Dark",
+    "MK_Crate_Tan",
+    "MK_Crate_Tan.001",
+    "MK_Label_Crate",
+    "MK_Label_Crate (tan)"
+   ]
+  },
+  "science": {
+   "pattern": "sample|lab|microscope|spectro|instrument|drill|core|analy",
+   "object_hits": 88,
+   "tris": 580,
+   "types": {
+    "MESH": 1,
+    "FONT": 87
+   },
+   "collections": [
+    [
+     "MKLIB_Labels",
+     0
+    ]
+   ],
+   "root_objects_top": [
+    [
+     "MK_Drill_Rig",
+     1
+    ],
+    [
+     "MK_Label_Airlock + Stairs",
+     1
+    ],
+    [
+     "MK_Label_Alien Statue",
+     1
+    ],
+    [
+     "MK_Label_Bed",
+     1
+    ],
+    [
+     "MK_Label_Beetle",
+     1
+    ],
+    [
+     "MK_Label_Blob Crab",
+     1
+    ],
+    [
+     "MK_Label_Boulder",
+     1
+    ],
+    [
+     "MK_Label_Bunk Bed",
+     1
+    ],
+    [
+     "MK_Label_Canister",
+     1
+    ],
+    [
+     "MK_Label_Ceiling Light Ring",
+     1
+    ],
+    [
+     "MK_Label_Chair",
+     1
+    ],
+    [
+     "MK_Label_Control Console",
+     1
+    ],
+    [
+     "MK_Label_Coral Bush",
+     1
+    ],
+    [
+     "MK_Label_Corridor",
+     1
+    ],
+    [
+     "MK_Label_Corridor Elbow",
+     1
+    ],
+    [
+     "MK_Label_Corridor Interior",
+     1
+    ],
+    [
+     "MK_Label_Corridor Junction",
+     1
+    ],
+    [
+     "MK_Label_Crate",
+     1
+    ],
+    [
+     "MK_Label_Crate (tan)",
+     1
+    ],
+    [
+     "MK_Label_Cryo Tube",
+     1
+    ],
+    [
+     "MK_Label_Crystal Plant",
+     1
+    ],
+    [
+     "MK_Label_Crystals",
+     1
+    ],
+    [
+     "MK_Label_Desk + Monitor",
+     1
+    ],
+    [
+     "MK_Label_Dining Table",
+     1
+    ],
+    [
+     "MK_Label_Door Frame (dark)",
+     1
+    ]
+   ],
+   "sample_names": [
+    "MK_Drill_Rig",
+    "MK_Label_Airlock + Stairs",
+    "MK_Label_Alien Statue",
+    "MK_Label_Bed",
+    "MK_Label_Beetle",
+    "MK_Label_Blob Crab",
+    "MK_Label_Boulder",
+    "MK_Label_Bunk Bed",
+    "MK_Label_Canister",
+    "MK_Label_Ceiling Light Ring",
+    "MK_Label_Chair",
+    "MK_Label_Control Console",
+    "MK_Label_Coral Bush",
+    "MK_Label_Corridor",
+    "MK_Label_Corridor Elbow",
+    "MK_Label_Corridor Interior",
+    "MK_Label_Corridor Junction",
+    "MK_Label_Crate",
+    "MK_Label_Crate (tan)",
+    "MK_Label_Cryo Tube",
+    "MK_Label_Crystal Plant",
+    "MK_Label_Crystals",
+    "MK_Label_Desk + Monitor",
+    "MK_Label_Dining Table",
+    "MK_Label_Door Frame (dark)",
+    "MK_Label_Doorway (yellow)",
+    "MK_Label_Drill Rig",
+    "MK_Label_Drone",
+    "MK_Label_Fern",
+    "MK_Label_Floor Tile",
+    "MK_Label_Flowers",
+    "MK_Label_Fuel Cell",
+    "MK_Label_Geodesic Dome",
+    "MK_Label_Grass Clump",
+    "MK_Label_Greenhouse",
+    "MK_Label_Grow Bed (cabbage)",
+    "MK_Label_Grow Bed (wheat)",
+    "MK_Label_Grow Rack",
+    "MK_Label_Hab Module (box)",
+    "MK_Label_Hab Module (gable)"
+   ]
+  }
+ }
+}

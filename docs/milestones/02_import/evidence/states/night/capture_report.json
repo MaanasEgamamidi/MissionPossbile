@@ -1,0 +1,39 @@
+{
+ "adapter": "NVIDIA GeForce RTX 4060 Ti",
+ "frames_per_view": 90,
+ "godot": "4.7.2-stable (official)",
+ "night": true,
+ "off": "",
+ "pass": 3,
+ "preset": "reference_day_powered",
+ "size": [
+  1920,
+  1080
+ ],
+ "views": [
+  {
+   "camera": "Shot_02_MessHall",
+   "draw_calls": 991,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\night/Shot_02_MessHall.png",
+   "primitives": 1336077,
+   "render_cpu_ms": 1.63,
+   "render_gpu_ms": 10.43
+  },
+  {
+   "camera": "Shot_13_Exterior_Airlock",
+   "draw_calls": 8122,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\night/Shot_13_Exterior_Airlock.png",
+   "primitives": 4568921,
+   "render_cpu_ms": 9.19,
+   "render_gpu_ms": 24.68
+  },
+  {
+   "camera": "Shot_14_Exterior_Wide",
+   "draw_calls": 5393,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\night/Shot_14_Exterior_Wide.png",
+   "primitives": 1614768,
+   "render_cpu_ms": 7.26,
+   "render_gpu_ms": 14.04
+  }
+ ]
+}

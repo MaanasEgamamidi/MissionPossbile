@@ -1,0 +1,161 @@
+{
+ "report": "G:\\nasa app\\docs\\milestones\\01_audit\\evidence\\blend_reports\\v12_t1_test.json",
+ "file": {
+  "filepath": "G:\\nasa app\\grand_colony\\work\\_v12\\t1\\test.blend",
+  "bytes": 13329150,
+  "saved_with_version": [
+   5,
+   2,
+   45
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": false
+ },
+ "counts": {
+  "scenes": 1,
+  "objects": 1743,
+  "meshes": 379,
+  "curves": 0,
+  "materials": 141,
+  "textures": 0,
+  "images": 2,
+  "cameras": 12,
+  "lights": 54,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 24,
+  "node_groups": 1,
+  "worlds": 1,
+  "libraries": 0,
+  "texts": 0,
+  "lightprobes": 0,
+  "volumes": 0,
+  "shape_keys": 0,
+  "grease_pencils": 0
+ },
+ "scenes": [
+  [
+   "Scene",
+   1743,
+   "BLENDER_EEVEE",
+   "T_a13_exterior_eye_sw",
+   "AgX",
+   0.0
+  ]
+ ],
+ "mesh_totals": {
+  "unique_meshes": 379,
+  "unique_verts": 508373,
+  "unique_polys": 495601,
+  "unique_tris": 998598,
+  "meshes_with_color_attributes": 0,
+  "meshes_with_uvs": 0
+ },
+ "objects_by_type": {
+  "MESH": 1677,
+  "CAMERA": 12,
+  "LIGHT": 54
+ },
+ "instanced_scene_tris": 1973978,
+ "meshes_shared": 198,
+ "collection_instances": 0,
+ "modifiers": {},
+ "custom_property_keys": {
+  "gc_asset": 1677,
+  "dust": 1677,
+  "door_id": 26,
+  "door_slide": 26,
+  "inter": 9
+ },
+ "cameras": [
+  "Cam_Hangar_1",
+  "Cam_Hangar_2",
+  "Cam_Hangar_3",
+  "Cam_Hangar_4",
+  "Cam_Library",
+  "Cam_Overview",
+  "T_a01_medbay_eye",
+  "T_a05_hangar_eye",
+  "T_a07_airlock_eye",
+  "T_a11_command_eye",
+  "T_a13_exterior_eye_sw",
+  "T_a14_greenhouse_eye"
+ ],
+ "lights": {
+  "SUN": 2,
+  "AREA": 14,
+  "POINT": 38
+ },
+ "armatures": [],
+ "actions": [],
+ "skinned_meshes": 0,
+ "materials_summary": {
+  "count": 141,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 127,
+  "using_vertex_color_or_attribute": 141,
+  "with_volume": 0,
+  "transmissive_or_glass": 4,
+  "alpha_below_one": 0,
+  "emissive": 1,
+  "render_methods": {
+   "DITHERED": 141
+  }
+ },
+ "images": 2,
+ "missing_files": [],
+ "libraries": [],
+ "category_hits": {
+  "rover_vehicle": [
+   14,
+   78063
+  ],
+  "human_body": [
+   6,
+   17512
+  ],
+  "suit": [
+   5,
+   13948
+  ],
+  "spaceship": [
+   1,
+   34394
+  ],
+  "crops_plants": [
+   86,
+   308876
+  ],
+  "energy": [
+   14,
+   65744
+  ],
+  "life_support": [
+   26,
+   109618
+  ],
+  "comms": [
+   9,
+   25336
+  ],
+  "doors_glass": [
+   93,
+   119676
+  ],
+  "terrain_rock": [
+   0,
+   0
+  ],
+  "salvage_fab": [
+   53,
+   62712
+  ],
+  "science": [
+   40,
+   792
+  ]
+ },
+ "is_dirty_after_audit": false
+}

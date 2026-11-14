@@ -3,7 +3,7 @@ import bpy, json, sys, traceback
 from pathlib import Path
 
 root = Path(sys.argv[sys.argv.index('--') + 1]).resolve()
-out = root / 'docs/milestones/04_player/rig'
+out = root / 'mars_colony_godot/docs/milestones/04_player/rig'
 out.mkdir(parents=True, exist_ok=True)
 report_path = out / 'source_inventory.json'
 log_path = out / 'inspect.log'

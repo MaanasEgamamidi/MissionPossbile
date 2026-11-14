@@ -13,3 +13,5 @@ tests/tmp/
 
 # logs
 *.log
+# but keep the logs that are milestone evidence
+!docs/**/*.log

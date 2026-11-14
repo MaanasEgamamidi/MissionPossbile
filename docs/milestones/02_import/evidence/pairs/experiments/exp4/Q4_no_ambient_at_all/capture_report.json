@@ -1,0 +1,55 @@
+{
+ "adapter": "NVIDIA GeForce RTX 4060 Ti",
+ "frames_per_view": 80,
+ "godot": "4.7.2-stable (official)",
+ "night": false,
+ "off": "",
+ "pass": 0,
+ "preset": "reference_day_powered",
+ "size": [
+  960,
+  540
+ ],
+ "views": [
+  {
+   "camera": "Shot_02_MessHall",
+   "draw_calls": 6111,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\experiments\\exp4\\Q4_no_ambient_at_all/Shot_02_MessHall.png",
+   "primitives": 7248816,
+   "render_cpu_ms": 4.74,
+   "render_gpu_ms": 5.52
+  },
+  {
+   "camera": "Shot_05_Hangar",
+   "draw_calls": 5842,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\experiments\\exp4\\Q4_no_ambient_at_all/Shot_05_Hangar.png",
+   "primitives": 5302064,
+   "render_cpu_ms": 5.56,
+   "render_gpu_ms": 7.03
+  },
+  {
+   "camera": "Shot_09_Command",
+   "draw_calls": 2051,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\experiments\\exp4\\Q4_no_ambient_at_all/Shot_09_Command.png",
+   "primitives": 4159450,
+   "render_cpu_ms": 1.94,
+   "render_gpu_ms": 4.18
+  },
+  {
+   "camera": "Shot_11_Greenhouse",
+   "draw_calls": 2964,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\experiments\\exp4\\Q4_no_ambient_at_all/Shot_11_Greenhouse.png",
+   "primitives": 4838892,
+   "render_cpu_ms": 2.82,
+   "render_gpu_ms": 8.02
+  },
+  {
+   "camera": "Shot_14_Exterior_Wide",
+   "draw_calls": 9545,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\experiments\\exp4\\Q4_no_ambient_at_all/Shot_14_Exterior_Wide.png",
+   "primitives": 2910752,
+   "render_cpu_ms": 11.27,
+   "render_gpu_ms": 5.91
+  }
+ ]
+}

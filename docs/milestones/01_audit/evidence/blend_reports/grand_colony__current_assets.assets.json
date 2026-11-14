@@ -1,0 +1,8899 @@
+{
+ "rover": [
+  {
+   "tris": 57804,
+   "verts": 29594,
+   "local_min": [
+    -1.107,
+    -2.268,
+    -0.008
+   ],
+   "local_max": [
+    1.106,
+    2.14,
+    2.4
+   ],
+   "size": [
+    2.213,
+    4.408,
+    2.408
+   ],
+   "islands": 346,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_kit_lower",
+    "GC_hb_mesh",
+    "GC_steel",
+    "GC_gunmetal",
+    "GC_kit_hazard_y",
+    "GC_red",
+    "GC_white",
+    "GC_glass",
+    "GC_orange",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_seam",
+    "GC_kit_fl_plate",
+    "GC_scr_amber",
+    "GC_black",
+    "GC_hb_webbing",
+    "GC_red_dk",
+    "GC_kit_rubber",
+    "GC_steel_dk"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_rover",
+   "mesh": "GCM_hb_rover",
+   "mesh_users": 1,
+   "location": [
+    20.2,
+    3.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_rover",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 74604,
+   "verts": 38394,
+   "local_min": [
+    -1.54,
+    -2.6,
+    -0.025
+   ],
+   "local_max": [
+    1.54,
+    3.075,
+    4.141
+   ],
+   "size": [
+    3.08,
+    5.675,
+    4.166
+   ],
+   "islands": 337,
+   "materials": [
+    "GC_sf_white",
+    "GC_sf_win",
+    "GC_orange",
+    "GC_gunmetal",
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_rubber",
+    "GC_lamp_white",
+    "GC_offwhite",
+    "GC_yellow",
+    "GC_kit_fl_grate",
+    "GC_scr_red",
+    "GC_sf_pv",
+    "GC_kit_led_amb"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_rover",
+   "mesh": "GCM_sf_rover",
+   "mesh_users": 1,
+   "location": [
+    8.3,
+    -23.0,
+    -0.001
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_rover",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "spaceship": [
+  {
+   "tris": 100994,
+   "verts": 51211,
+   "local_min": [
+    -5.298,
+    -8.678,
+    -0.002
+   ],
+   "local_max": [
+    5.298,
+    2.15,
+    28.55
+   ],
+   "size": [
+    10.596,
+    10.828,
+    28.551
+   ],
+   "islands": 279,
+   "materials": [
+    "GC_sf_et_foam",
+    "GC_et_band",
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_gunmetal",
+    "GC_sf_white",
+    "GC_sf_char",
+    "GC_offwhite",
+    "GC_black",
+    "GC_sf_tile_wht",
+    "GC_sf_tile_blk",
+    "GC_sf_rcc",
+    "GC_sf_win",
+    "GC_kit_seam"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ex_lander",
+   "mesh": "GCM_ex_lander",
+   "mesh_users": 1,
+   "location": [
+    -29.121,
+    -30.472,
+    -0.05
+   ],
+   "rotation_z_deg": 40.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ex_lander",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "human": [
+  {
+   "tris": 315396,
+   "verts": 158037,
+   "local_min": [
+    -0.465,
+    -0.997,
+    -0.123
+   ],
+   "local_max": [
+    0.459,
+    0.944,
+    0.321
+   ],
+   "size": [
+    0.925,
+    1.941,
+    0.444
+   ],
+   "islands": 33,
+   "materials": [
+    "GC_pp_skin",
+    "GC_pp_hair",
+    "GC_pp_lip",
+    "GC_pp_eye",
+    "GC_pp_iris",
+    "GC_black",
+    "GC_pp_coverall",
+    "GC_cream",
+    "GC_fabric_bl",
+    "GC_kit_acc_hgr",
+    "GC_pp_bandage",
+    "GC_pp_sheet",
+    "GC_pp_blanket",
+    "GC_green"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "md_survivor",
+   "mesh": "GCM_md_survivor",
+   "mesh_users": 1,
+   "location": [
+    -9.0,
+    16.7,
+    0.7
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Med Bay"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "md_survivor",
+    "dust": 0.05,
+    "inter": "survivor"
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "suit": [
+  {
+   "tris": 1792,
+   "verts": 958,
+   "local_min": [
+    -1.6,
+    -0.385,
+    2.002
+   ],
+   "local_max": [
+    1.6,
+    0.24,
+    2.38
+   ],
+   "size": [
+    3.2,
+    0.625,
+    0.378
+   ],
+   "islands": 31,
+   "materials": [
+    "GC_hb_grey",
+    "GC_kit_alu",
+    "GC_kit_led",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_suit",
+    "GC_hb_case_w"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ak_suit_shelf",
+   "mesh": "GCM_ak_suit_shelf",
+   "mesh_users": 1,
+   "location": [
+    16.4,
+    -9.55,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Airlock"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ak_suit_shelf",
+    "dust": 0.75
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 270602,
+   "verts": 136947,
+   "local_min": [
+    -1.6,
+    -0.435,
+    -0.001
+   ],
+   "local_max": [
+    1.6,
+    0.236,
+    1.95
+   ],
+   "size": [
+    3.2,
+    0.672,
+    1.951
+   ],
+   "islands": 297,
+   "materials": [
+    "GC_kit_fl_plate",
+    "GC_kit_hazard_k",
+    "GC_kit_hazard_y",
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_kit_sign",
+    "GC_red",
+    "GC_scr_green",
+    "GC_kit_ink",
+    "GC_gunmetal",
+    "GC_kit_acc_hgr",
+    "GC_kit_rubber",
+    "GC_pp_suit",
+    "GC_pp_bearing",
+    "GC_fabric_bl",
+    "GC_cream",
+    "GC_pp_suit_dust",
+    "GC_pp_boot",
+    "GC_white",
+    "GC_offwhite",
+    "GC_black",
+    "GC_glass_pp_bubble",
+    "GC_visor",
+    "GC_glass",
+    "GC_scr_red",
+    "GC_blue"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "al_suit_rack",
+   "mesh": "GCM_al_suit_rack",
+   "mesh_users": 1,
+   "location": [
+    16.4,
+    -9.55,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Airlock"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "al_suit_rack",
+    "dust": 0.75,
+    "inter": "suits"
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 13200,
+   "verts": 6696,
+   "local_min": [
+    -0.058,
+    -0.114,
+    0.002
+   ],
+   "local_max": [
+    0.096,
+    0.185,
+    0.118
+   ],
+   "size": [
+    0.154,
+    0.299,
+    0.116
+   ],
+   "islands": 5,
+   "materials": [
+    "GC_pp_suit",
+    "GC_kit_rubber",
+    "GC_black",
+    "GC_pp_bearing"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pp_glove_torn",
+   "mesh": "GCM_pp_glove_torn",
+   "mesh_users": 1,
+   "location": [
+    16.75,
+    -6.88,
+    0.461
+   ],
+   "rotation_z_deg": 115.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Airlock"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pp_glove_torn",
+    "dust": 0.75
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 12420,
+   "verts": 6234,
+   "local_min": [
+    -0.228,
+    -0.186,
+    0.0
+   ],
+   "local_max": [
+    0.228,
+    0.199,
+    0.376
+   ],
+   "size": [
+    0.456,
+    0.386,
+    0.376
+   ],
+   "islands": 13,
+   "materials": [
+    "GC_pp_bearing",
+    "GC_glass_pp_bubble",
+    "GC_black",
+    "GC_white",
+    "GC_visor",
+    "GC_glass",
+    "GC_gunmetal",
+    "GC_kit_acc_hgr"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pp_helmet",
+   "mesh": "GCM_pp_helmet",
+   "mesh_users": 1,
+   "location": [
+    18.68,
+    -4.35,
+    0.461
+   ],
+   "rotation_z_deg": -160.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Airlock"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pp_helmet",
+    "dust": 0.75
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 86524,
+   "verts": 43769,
+   "local_min": [
+    -0.361,
+    -0.445,
+    0.0
+   ],
+   "local_max": [
+    0.361,
+    0.075,
+    1.881
+   ],
+   "size": [
+    0.721,
+    0.52,
+    1.881
+   ],
+   "islands": 73,
+   "materials": [
+    "GC_kit_rubber",
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_kit_sign",
+    "GC_pp_suit",
+    "GC_pp_bearing",
+    "GC_kit_acc_hgr",
+    "GC_fabric_bl",
+    "GC_cream",
+    "GC_pp_boot",
+    "GC_white",
+    "GC_black",
+    "GC_scr_green",
+    "GC_gunmetal",
+    "GC_red",
+    "GC_glass_pp_bubble",
+    "GC_visor",
+    "GC_glass"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "qt_spacesuit",
+   "mesh": "GCM_qt_spacesuit",
+   "mesh_users": 2,
+   "location": [
+    5.0,
+    5.75,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Crew Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "qt_spacesuit",
+    "dust": 0.25
+   },
+   "instances_of_name": 2
+  }
+ ],
+ "crash_site": [
+  {
+   "tris": 4584,
+   "verts": 2350,
+   "local_min": [
+    -2.799,
+    -2.649,
+    -0.06
+   ],
+   "local_max": [
+    4.228,
+    2.173,
+    0.504
+   ],
+   "size": [
+    7.027,
+    4.823,
+    0.564
+   ],
+   "islands": 29,
+   "materials": [
+    "GC_gunmetal",
+    "GC_black",
+    "GC_sf_mli",
+    "GC_kit_alu",
+    "GC_sf_char",
+    "GC_sf_white"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_debris_a",
+   "mesh": "GCM_sf_crash_debris_a",
+   "mesh_users": 1,
+   "location": [
+    6.83,
+    -54.489,
+    -0.05
+   ],
+   "rotation_z_deg": 144.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_debris_a",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 3552,
+   "verts": 1816,
+   "local_min": [
+    -3.213,
+    -2.773,
+    -0.141
+   ],
+   "local_max": [
+    3.433,
+    2.445,
+    0.443
+   ],
+   "size": [
+    6.646,
+    5.219,
+    0.584
+   ],
+   "islands": 20,
+   "materials": [
+    "GC_sf_white",
+    "GC_gunmetal",
+    "GC_kit_alu",
+    "GC_black",
+    "GC_sf_char",
+    "GC_sf_mli"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_debris_b",
+   "mesh": "GCM_sf_crash_debris_b",
+   "mesh_users": 1,
+   "location": [
+    -6.111,
+    -51.885,
+    -0.05
+   ],
+   "rotation_z_deg": 164.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_debris_b",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 2540,
+   "verts": 1306,
+   "local_min": [
+    -2.459,
+    -2.253,
+    -0.125
+   ],
+   "local_max": [
+    2.916,
+    1.09,
+    0.416
+   ],
+   "size": [
+    5.375,
+    3.343,
+    0.542
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_sf_mli",
+    "GC_black",
+    "GC_sf_white",
+    "GC_gunmetal",
+    "GC_kit_alu",
+    "GC_sf_char"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_debris_c",
+   "mesh": "GCM_sf_crash_debris_c",
+   "mesh_users": 1,
+   "location": [
+    -9.696,
+    -42.358,
+    -0.05
+   ],
+   "rotation_z_deg": -176.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_debris_c",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 8280,
+   "verts": 4471,
+   "local_min": [
+    -3.5,
+    -3.963,
+    -0.247
+   ],
+   "local_max": [
+    24.0,
+    4.013,
+    0.623
+   ],
+   "size": [
+    27.5,
+    7.976,
+    0.87
+   ],
+   "islands": 91,
+   "materials": [
+    "GC_sf_gouge"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_gouge",
+   "mesh": "GCM_sf_crash_gouge",
+   "mesh_users": 1,
+   "location": [
+    10.215,
+    -60.038,
+    -0.05
+   ],
+   "rotation_z_deg": 144.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_gouge",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 9660,
+   "verts": 5040,
+   "local_min": [
+    -13.213,
+    -12.433,
+    -0.15
+   ],
+   "local_max": [
+    10.966,
+    9.692,
+    1.1
+   ],
+   "size": [
+    24.178,
+    22.125,
+    1.25
+   ],
+   "islands": 105,
+   "materials": [
+    "GC_steel",
+    "GC_kit_acc_agri",
+    "GC_fabric_or",
+    "GC_orange",
+    "GC_sf_white",
+    "GC_kit_hazard_y"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_marks",
+   "mesh": "GCM_sf_crash_marks",
+   "mesh_users": 1,
+   "location": [
+    -0.249,
+    -49.346,
+    -0.05
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_marks",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 12,
+   "verts": 8,
+   "local_min": [
+    -0.01,
+    -0.01,
+    -1.02
+   ],
+   "local_max": [
+    0.01,
+    0.01,
+    -1.0
+   ],
+   "size": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "islands": 1,
+   "materials": [
+    "GC_sf_char"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_scorch",
+   "mesh": "GCM_sf_crash_scorch",
+   "mesh_users": 1,
+   "location": [
+    -0.249,
+    -49.346,
+    -0.05
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_scorch",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 14868,
+   "verts": 7470,
+   "local_min": [
+    -2.997,
+    -2.188,
+    -0.66
+   ],
+   "local_max": [
+    3.649,
+    2.218,
+    4.96
+   ],
+   "size": [
+    6.645,
+    4.405,
+    5.62
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_sf_char",
+    "GC_gunmetal",
+    "GC_kit_alu",
+    "GC_sf_mli",
+    "GC_sf_gouge"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_shield",
+   "mesh": "GCM_sf_crash_shield",
+   "mesh_users": 1,
+   "location": [
+    -10.712,
+    -38.653,
+    -0.05
+   ],
+   "rotation_z_deg": 123.5,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_shield",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 22416,
+   "verts": 11332,
+   "local_min": [
+    -4.104,
+    -5.611,
+    -1.241
+   ],
+   "local_max": [
+    4.197,
+    3.907,
+    5.499
+   ],
+   "size": [
+    8.301,
+    9.518,
+    6.741
+   ],
+   "islands": 64,
+   "materials": [
+    "GC_sf_char",
+    "GC_gunmetal",
+    "GC_sf_white",
+    "GC_sf_mli",
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_offwhite",
+    "GC_kit_seam",
+    "GC_sf_win",
+    "GC_black",
+    "GC_sf_gouge"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_stage",
+   "mesh": "GCM_sf_crash_stage",
+   "mesh_users": 1,
+   "location": [
+    -7.4,
+    -46.004,
+    -0.05
+   ],
+   "rotation_z_deg": 150.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_stage",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 4880,
+   "verts": 2452,
+   "local_min": [
+    -1.305,
+    -1.547,
+    -0.247
+   ],
+   "local_max": [
+    1.671,
+    1.186,
+    2.532
+   ],
+   "size": [
+    2.976,
+    2.733,
+    2.78
+   ],
+   "islands": 6,
+   "materials": [
+    "GC_sf_white",
+    "GC_gunmetal",
+    "GC_sf_gouge"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_crash_tank",
+   "mesh": "GCM_sf_crash_tank",
+   "mesh_users": 1,
+   "location": [
+    -3.463,
+    -55.045,
+    -0.05
+   ],
+   "rotation_z_deg": 40.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_crash_tank",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "solar": [
+  {
+   "tris": 16018,
+   "verts": 8283,
+   "local_min": [
+    -5.88,
+    -1.055,
+    -0.5
+   ],
+   "local_max": [
+    6.432,
+    0.932,
+    2.31
+   ],
+   "size": [
+    12.312,
+    1.988,
+    2.81
+   ],
+   "islands": 137,
+   "materials": [
+    "GC_steel",
+    "GC_steel_dk",
+    "GC_black",
+    "GC_gunmetal",
+    "GC_offwhite",
+    "GC_sf_pv",
+    "GC_kit_alu",
+    "GC_yellow"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_solar_tracker",
+   "mesh": "GCM_sf_solar_tracker",
+   "mesh_users": 12,
+   "location": [
+    -19.5,
+    1.0,
+    -0.054
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_solar_tracker",
+    "dust": 1.0
+   },
+   "instances_of_name": 12
+  }
+ ],
+ "moxie_o2": [
+  {
+   "tris": 10336,
+   "verts": 5290,
+   "local_min": [
+    -0.52,
+    -0.53,
+    0.0
+   ],
+   "local_max": [
+    0.552,
+    0.31,
+    3.164
+   ],
+   "size": [
+    1.072,
+    0.84,
+    3.164
+   ],
+   "islands": 61,
+   "materials": [
+    "GC_black",
+    "GC_kit_panel_lt",
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_scr_green",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_en_jacket",
+    "GC_kit_rubber"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_air_unit",
+   "mesh": "GCM_ls_air_unit",
+   "mesh_users": 1,
+   "location": [
+    35.0,
+    -1.513,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_air_unit",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 10480,
+   "verts": 5370,
+   "local_min": [
+    -0.5,
+    -0.78,
+    0.0
+   ],
+   "local_max": [
+    0.7,
+    0.31,
+    3.197
+   ],
+   "size": [
+    1.2,
+    1.09,
+    3.197
+   ],
+   "islands": 65,
+   "materials": [
+    "GC_black",
+    "GC_kit_panel_lt",
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_en_galv",
+    "GC_en_jacket",
+    "GC_kit_rubber"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_air_unit_open",
+   "mesh": "GCM_ls_air_unit_open",
+   "mesh_users": 1,
+   "location": [
+    36.2,
+    -1.513,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_air_unit_open",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 2608,
+   "verts": 1360,
+   "local_min": [
+    -0.8,
+    -0.466,
+    0.0
+   ],
+   "local_max": [
+    0.8,
+    0.3,
+    1.04
+   ],
+   "size": [
+    1.6,
+    0.766,
+    1.04
+   ],
+   "islands": 28,
+   "materials": [
+    "GC_en_rack",
+    "GC_kit_lower",
+    "GC_kit_alu",
+    "GC_kit_hazard_y",
+    "GC_gunmetal",
+    "GC_en_ss",
+    "GC_en_grey",
+    "GC_tan",
+    "GC_kit_frame",
+    "GC_scr_cyan",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_bench",
+   "mesh": "GCM_ls_bench",
+   "mesh_users": 1,
+   "location": [
+    34.477,
+    1.0,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_bench",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 1008,
+   "verts": 560,
+   "local_min": [
+    -0.45,
+    -0.29,
+    0.0
+   ],
+   "local_max": [
+    0.45,
+    0.25,
+    1.95
+   ],
+   "size": [
+    0.9,
+    0.54,
+    1.95
+   ],
+   "islands": 28,
+   "materials": [
+    "GC_black",
+    "GC_en_grey",
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_acc_ls"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_cabinet",
+   "mesh": "GCM_ls_cabinet",
+   "mesh_users": 1,
+   "location": [
+    34.427,
+    9.0,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_cabinet",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 5096,
+   "verts": 2676,
+   "local_min": [
+    -0.321,
+    -0.282,
+    -0.0
+   ],
+   "local_max": [
+    0.321,
+    0.25,
+    1.415
+   ],
+   "size": [
+    0.642,
+    0.532,
+    1.416
+   ],
+   "islands": 64,
+   "materials": [
+    "GC_black",
+    "GC_en_rack",
+    "GC_kit_alu",
+    "GC_kit_seam",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_scr_cyan",
+    "GC_kit_panel_lt",
+    "GC_scr_amber",
+    "GC_kit_frame",
+    "GC_scr_green",
+    "GC_en_red",
+    "GC_kit_acc_ls",
+    "GC_en_galv"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_console",
+   "mesh": "GCM_ls_console",
+   "mesh_users": 1,
+   "location": [
+    38.1,
+    2.2,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_console",
+    "dust": 0.3,
+    "inter": "lifesupport"
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 164,
+   "verts": 104,
+   "local_min": [
+    -0.16,
+    -0.16,
+    -0.005
+   ],
+   "local_max": [
+    0.16,
+    0.16,
+    0.004
+   ],
+   "size": [
+    0.32,
+    0.32,
+    0.01
+   ],
+   "islands": 11,
+   "materials": [
+    "GC_en_ss",
+    "GC_kit_seam"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_drain",
+   "mesh": "GCM_ls_drain",
+   "mesh_users": 2,
+   "location": [
+    39.9,
+    -0.75,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_drain",
+    "dust": 0.3
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 264,
+   "verts": 132,
+   "local_min": [
+    -0.16,
+    -0.311,
+    0.0
+   ],
+   "local_max": [
+    0.588,
+    0.143,
+    0.06
+   ],
+   "size": [
+    0.748,
+    0.454,
+    0.06
+   ],
+   "islands": 3,
+   "materials": [
+    "GC_en_ss",
+    "GC_en_water"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_drip",
+   "mesh": "GCM_ls_drip",
+   "mesh_users": 1,
+   "location": [
+    40.37,
+    -1.62,
+    0.0
+   ],
+   "rotation_z_deg": 4.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_drip",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 108,
+   "verts": 60,
+   "local_min": [
+    -0.45,
+    -0.35,
+    0.0
+   ],
+   "local_max": [
+    0.45,
+    0.344,
+    0.263
+   ],
+   "size": [
+    0.9,
+    0.695,
+    0.263
+   ],
+   "islands": 5,
+   "materials": [
+    "GC_tan",
+    "GC_kit_sign",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_filter_box",
+   "mesh": "GCM_ls_filter_box",
+   "mesh_users": 1,
+   "location": [
+    37.4,
+    -1.4,
+    0.0
+   ],
+   "rotation_z_deg": -8.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_filter_box",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 292,
+   "verts": 142,
+   "local_min": [
+    -0.42,
+    -0.162,
+    0.0
+   ],
+   "local_max": [
+    0.42,
+    0.16,
+    0.2
+   ],
+   "size": [
+    0.84,
+    0.322,
+    0.2
+   ],
+   "islands": 3,
+   "materials": [
+    "GC_en_galv",
+    "GC_beige_dk",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_filter_old",
+   "mesh": "GCM_ls_filter_old",
+   "mesh_users": 1,
+   "location": [
+    37.12,
+    -0.62,
+    0.0
+   ],
+   "rotation_z_deg": 63.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_filter_old",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 43716,
+   "verts": 22400,
+   "local_min": [
+    -1.504,
+    -0.252,
+    0.0
+   ],
+   "local_max": [
+    1.504,
+    0.246,
+    2.99
+   ],
+   "size": [
+    3.008,
+    0.498,
+    2.99
+   ],
+   "islands": 289,
+   "materials": [
+    "GC_en_galv",
+    "GC_kit_seam",
+    "GC_kit_panel_lt",
+    "GC_white",
+    "GC_gold_dk",
+    "GC_en_ss",
+    "GC_black",
+    "GC_kit_hazard_y",
+    "GC_kit_sign",
+    "GC_en_mk_b",
+    "GC_kit_lower",
+    "GC_en_mk_g",
+    "GC_glass_clear",
+    "GC_kit_ink",
+    "GC_en_red",
+    "GC_steel_dk",
+    "GC_gunmetal"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_gas_rack",
+   "mesh": "GCM_ls_gas_rack",
+   "mesh_users": 1,
+   "location": [
+    41.583,
+    5.8,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_gas_rack",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 14226,
+   "verts": 7405,
+   "local_min": [
+    -0.85,
+    -0.281,
+    -0.002
+   ],
+   "local_max": [
+    0.85,
+    0.002,
+    2.84
+   ],
+   "size": [
+    1.7,
+    0.282,
+    2.841
+   ],
+   "islands": 164,
+   "materials": [
+    "GC_en_galv",
+    "GC_kit_seam",
+    "GC_en_ss",
+    "GC_kit_hazard_y",
+    "GC_kit_ink",
+    "GC_en_mk_b",
+    "GC_kit_sign",
+    "GC_en_cu",
+    "GC_en_mk_g",
+    "GC_en_foam",
+    "GC_gold_dk",
+    "GC_black",
+    "GC_kit_frame",
+    "GC_kit_panel_lt",
+    "GC_glass_clear",
+    "GC_scr_cyan",
+    "GC_en_red",
+    "GC_kit_acc_ls"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_manifold",
+   "mesh": "GCM_ls_manifold",
+   "mesh_users": 1,
+   "location": [
+    34.172,
+    5.3,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_manifold",
+    "dust": 0.35
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 10844,
+   "verts": 5604,
+   "local_min": [
+    -0.7,
+    -0.508,
+    0.0
+   ],
+   "local_max": [
+    0.7,
+    0.5,
+    3.47
+   ],
+   "size": [
+    1.4,
+    1.008,
+    3.47
+   ],
+   "islands": 109,
+   "materials": [
+    "GC_en_rack",
+    "GC_kit_seam",
+    "GC_black",
+    "GC_en_galv",
+    "GC_en_ss",
+    "GC_gold",
+    "GC_gold_dk",
+    "GC_scr_green",
+    "GC_kit_sign",
+    "GC_kit_acc_ls",
+    "GC_kit_ink",
+    "GC_steel_dk",
+    "GC_kit_hazard_y",
+    "GC_en_grey",
+    "GC_kit_lower",
+    "GC_en_red",
+    "GC_kit_frame",
+    "GC_beige_dk",
+    "GC_en_mk_b"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_moxie",
+   "mesh": "GCM_ls_moxie",
+   "mesh_users": 1,
+   "location": [
+    35.95,
+    7.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_moxie",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 10844,
+   "verts": 5604,
+   "local_min": [
+    -0.7,
+    -0.508,
+    0.0
+   ],
+   "local_max": [
+    0.7,
+    0.5,
+    3.47
+   ],
+   "size": [
+    1.4,
+    1.008,
+    3.47
+   ],
+   "islands": 109,
+   "materials": [
+    "GC_en_rack",
+    "GC_kit_seam",
+    "GC_black",
+    "GC_en_galv",
+    "GC_en_ss",
+    "GC_gold",
+    "GC_gold_dk",
+    "GC_scr_amber",
+    "GC_kit_sign",
+    "GC_kit_acc_ls",
+    "GC_kit_ink",
+    "GC_steel_dk",
+    "GC_kit_hazard_y",
+    "GC_en_grey",
+    "GC_scr_green",
+    "GC_en_red",
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_beige_dk",
+    "GC_en_mk_b"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_moxie_b",
+   "mesh": "GCM_ls_moxie_b",
+   "mesh_users": 1,
+   "location": [
+    38.85,
+    7.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_moxie_b",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 4658,
+   "verts": 2353,
+   "local_min": [
+    -0.43,
+    -0.43,
+    0.0
+   ],
+   "local_max": [
+    0.43,
+    0.43,
+    2.564
+   ],
+   "size": [
+    0.86,
+    0.86,
+    2.564
+   ],
+   "islands": 12,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_panel_lt",
+    "GC_sh_steel",
+    "GC_kit_lower",
+    "GC_kit_sign",
+    "GC_kit_acc_cmd",
+    "GC_kit_hazard_y",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_o2_tank",
+   "mesh": "GCM_ls_o2_tank",
+   "mesh_users": 2,
+   "location": [
+    -11.55,
+    -1.7,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    0.9,
+    0.9,
+    0.9
+   ],
+   "collections": [
+    "Dome plaza"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_o2_tank",
+    "dust": 0.3
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 12302,
+   "verts": 6354,
+   "local_min": [
+    -7.83,
+    0.142,
+    2.0
+   ],
+   "local_max": [
+    -0.172,
+    11.18,
+    3.47
+   ],
+   "size": [
+    7.658,
+    11.038,
+    1.47
+   ],
+   "islands": 133,
+   "materials": [
+    "GC_en_cu",
+    "GC_en_ss",
+    "GC_en_galv",
+    "GC_steel_dk",
+    "GC_gunmetal",
+    "GC_en_red",
+    "GC_en_mk_g",
+    "GC_kit_sign",
+    "GC_en_foam",
+    "GC_kit_hazard_y",
+    "GC_kit_ink",
+    "GC_kit_seam"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_overhead",
+   "mesh": "GCM_ls_overhead",
+   "mesh_users": 1,
+   "location": [
+    42.0,
+    -2.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_overhead",
+    "dust": 0.35
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 26314,
+   "verts": 13518,
+   "local_min": [
+    -1.05,
+    -0.45,
+    -0.002
+   ],
+   "local_max": [
+    0.9,
+    0.45,
+    2.75
+   ],
+   "size": [
+    1.95,
+    0.9,
+    2.751
+   ],
+   "islands": 196,
+   "materials": [
+    "GC_en_rack",
+    "GC_en_galv",
+    "GC_blue",
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_gunmetal",
+    "GC_en_red",
+    "GC_en_ss",
+    "GC_en_cu",
+    "GC_steel_dk",
+    "GC_kit_sign",
+    "GC_glass_clear",
+    "GC_kit_ink",
+    "GC_gold_dk",
+    "GC_en_mk_g",
+    "GC_en_grey",
+    "GC_en_water"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_pump_skid",
+   "mesh": "GCM_ls_pump_skid",
+   "mesh_users": 1,
+   "location": [
+    39.3,
+    -1.373,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_pump_skid",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 11158,
+   "verts": 5762,
+   "local_min": [
+    -0.525,
+    -0.646,
+    0.0
+   ],
+   "local_max": [
+    0.525,
+    0.432,
+    3.11
+   ],
+   "size": [
+    1.05,
+    1.077,
+    3.11
+   ],
+   "islands": 103,
+   "materials": [
+    "GC_black",
+    "GC_kit_panel_lt",
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_en_grey",
+    "GC_kit_lower",
+    "GC_kit_sign",
+    "GC_kit_acc_ls",
+    "GC_kit_ink",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_en_foam",
+    "GC_en_ss",
+    "GC_en_galv",
+    "GC_gunmetal",
+    "GC_gold",
+    "GC_kit_hazard_y"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_rack_ars",
+   "mesh": "GCM_ls_rack_ars",
+   "mesh_users": 1,
+   "location": [
+    41.393,
+    0.175,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_rack_ars",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 16528,
+   "verts": 8532,
+   "local_min": [
+    -0.525,
+    -0.77,
+    0.0
+   ],
+   "local_max": [
+    0.525,
+    0.432,
+    3.11
+   ],
+   "size": [
+    1.05,
+    1.201,
+    3.11
+   ],
+   "islands": 147,
+   "materials": [
+    "GC_black",
+    "GC_kit_panel_lt",
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_en_grey",
+    "GC_kit_lower",
+    "GC_kit_sign",
+    "GC_kit_acc_ls",
+    "GC_kit_ink",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_en_foam",
+    "GC_en_ss",
+    "GC_en_galv",
+    "GC_steel_dk",
+    "GC_kit_hazard_y",
+    "GC_en_red",
+    "GC_kit_rubber"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_rack_ogs",
+   "mesh": "GCM_ls_rack_ogs",
+   "mesh_users": 1,
+   "location": [
+    41.393,
+    1.275,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_rack_ogs",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 11184,
+   "verts": 5744,
+   "local_min": [
+    -0.525,
+    -0.825,
+    0.0
+   ],
+   "local_max": [
+    0.525,
+    0.432,
+    3.11
+   ],
+   "size": [
+    1.05,
+    1.257,
+    3.11
+   ],
+   "islands": 80,
+   "materials": [
+    "GC_black",
+    "GC_kit_panel_lt",
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_en_grey",
+    "GC_kit_lower",
+    "GC_kit_sign",
+    "GC_kit_acc_ls",
+    "GC_kit_ink",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_en_foam",
+    "GC_en_ss",
+    "GC_en_galv",
+    "GC_steel_dk",
+    "GC_kit_hazard_y",
+    "GC_kit_rubber"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_rack_upa",
+   "mesh": "GCM_ls_rack_upa",
+   "mesh_users": 1,
+   "location": [
+    41.393,
+    3.475,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_rack_upa",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 11489,
+   "verts": 5905,
+   "local_min": [
+    -0.525,
+    -0.668,
+    0.0
+   ],
+   "local_max": [
+    0.525,
+    0.432,
+    3.11
+   ],
+   "size": [
+    1.05,
+    1.099,
+    3.11
+   ],
+   "islands": 91,
+   "materials": [
+    "GC_black",
+    "GC_kit_panel_lt",
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_en_grey",
+    "GC_kit_lower",
+    "GC_kit_sign",
+    "GC_kit_acc_ls",
+    "GC_kit_ink",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_en_foam",
+    "GC_en_ss",
+    "GC_en_galv",
+    "GC_glass_clear",
+    "GC_en_water",
+    "GC_en_red",
+    "GC_gold_dk",
+    "GC_en_jacket",
+    "GC_beige",
+    "GC_en_mk_g"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_rack_wpa",
+   "mesh": "GCM_ls_rack_wpa",
+   "mesh_users": 1,
+   "location": [
+    41.393,
+    2.375,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_rack_wpa",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 9884,
+   "verts": 5070,
+   "local_min": [
+    -0.506,
+    -0.614,
+    -0.002
+   ],
+   "local_max": [
+    0.58,
+    0.506,
+    2.285
+   ],
+   "size": [
+    1.086,
+    1.12,
+    2.286
+   ],
+   "islands": 64,
+   "materials": [
+    "GC_en_ss",
+    "GC_steel_dk",
+    "GC_kit_lower",
+    "GC_en_grey",
+    "GC_en_cu",
+    "GC_en_galv",
+    "GC_gold_dk",
+    "GC_glass_clear",
+    "GC_en_water",
+    "GC_en_red",
+    "GC_en_mk_g",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "ls_tank",
+   "mesh": "GCM_ls_tank",
+   "mesh_users": 1,
+   "location": [
+    41.15,
+    9.15,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Life Support"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "ls_tank",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "power": [
+  {
+   "tris": 5132,
+   "verts": 2666,
+   "local_min": [
+    -0.303,
+    -0.461,
+    0.0
+   ],
+   "local_max": [
+    0.3,
+    0.4,
+    2.65
+   ],
+   "size": [
+    0.603,
+    0.861,
+    2.65
+   ],
+   "islands": 52,
+   "materials": [
+    "GC_black",
+    "GC_kit_seam",
+    "GC_en_rack",
+    "GC_kit_lower",
+    "GC_kit_frame",
+    "GC_en_red",
+    "GC_en_galv",
+    "GC_kit_hazard_y",
+    "GC_scr_cyan",
+    "GC_scr_green",
+    "GC_kit_sign",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_bat_hv",
+   "mesh": "GCM_pr_bat_hv",
+   "mesh_users": 5,
+   "location": [
+    34.75,
+    -2.6,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_bat_hv",
+    "dust": 0.35
+   },
+   "instances_of_name": 5
+  },
+  {
+   "tris": 5132,
+   "verts": 2666,
+   "local_min": [
+    -0.303,
+    -0.461,
+    0.0
+   ],
+   "local_max": [
+    0.3,
+    0.4,
+    2.65
+   ],
+   "size": [
+    0.603,
+    0.861,
+    2.65
+   ],
+   "islands": 52,
+   "materials": [
+    "GC_black",
+    "GC_kit_seam",
+    "GC_en_rack",
+    "GC_kit_lower",
+    "GC_kit_frame",
+    "GC_en_red",
+    "GC_en_galv",
+    "GC_kit_hazard_y",
+    "GC_scr_red",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_kit_sign",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_bat_hv_alarm",
+   "mesh": "GCM_pr_bat_hv_alarm",
+   "mesh_users": 1,
+   "location": [
+    32.9,
+    -5.75,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_bat_hv_alarm",
+    "dust": 0.35
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 17072,
+   "verts": 9038,
+   "local_min": [
+    -0.303,
+    -0.434,
+    0.0
+   ],
+   "local_max": [
+    0.3,
+    0.4,
+    2.65
+   ],
+   "size": [
+    0.603,
+    0.834,
+    2.65
+   ],
+   "islands": 252,
+   "materials": [
+    "GC_black",
+    "GC_kit_seam",
+    "GC_en_rack",
+    "GC_kit_lower",
+    "GC_kit_frame",
+    "GC_en_red",
+    "GC_en_galv",
+    "GC_kit_panel_lt",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_kit_ink",
+    "GC_orange",
+    "GC_scr_cyan",
+    "GC_kit_hazard_y",
+    "GC_glass_clear",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_bat_rack",
+   "mesh": "GCM_pr_bat_rack",
+   "mesh_users": 15,
+   "location": [
+    35.35,
+    -2.6,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_bat_rack",
+    "dust": 0.35
+   },
+   "instances_of_name": 15
+  },
+  {
+   "tris": 17072,
+   "verts": 9038,
+   "local_min": [
+    -0.303,
+    -0.434,
+    0.0
+   ],
+   "local_max": [
+    0.3,
+    0.4,
+    2.65
+   ],
+   "size": [
+    0.603,
+    0.834,
+    2.65
+   ],
+   "islands": 252,
+   "materials": [
+    "GC_black",
+    "GC_kit_seam",
+    "GC_en_rack",
+    "GC_kit_lower",
+    "GC_kit_frame",
+    "GC_en_red",
+    "GC_en_galv",
+    "GC_kit_panel_lt",
+    "GC_scr_amber",
+    "GC_scr_red",
+    "GC_kit_ink",
+    "GC_orange",
+    "GC_kit_hazard_y",
+    "GC_glass_clear",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_bat_rack_alarm",
+   "mesh": "GCM_pr_bat_rack_alarm",
+   "mesh_users": 3,
+   "location": [
+    33.5,
+    -5.75,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_bat_rack_alarm",
+    "dust": 0.35
+   },
+   "instances_of_name": 3
+  },
+  {
+   "tris": 17072,
+   "verts": 9038,
+   "local_min": [
+    -0.303,
+    -0.434,
+    0.0
+   ],
+   "local_max": [
+    0.3,
+    0.4,
+    2.65
+   ],
+   "size": [
+    0.603,
+    0.834,
+    2.65
+   ],
+   "islands": 252,
+   "materials": [
+    "GC_black",
+    "GC_kit_seam",
+    "GC_en_rack",
+    "GC_kit_lower",
+    "GC_kit_frame",
+    "GC_en_red",
+    "GC_en_galv",
+    "GC_kit_panel_lt",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_kit_ink",
+    "GC_orange",
+    "GC_scr_cyan",
+    "GC_kit_hazard_y",
+    "GC_glass_clear",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_bat_rack_chg",
+   "mesh": "GCM_pr_bat_rack_chg",
+   "mesh_users": 5,
+   "location": [
+    36.55,
+    -2.6,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_bat_rack_chg",
+    "dust": 0.35
+   },
+   "instances_of_name": 5
+  },
+  {
+   "tris": 16136,
+   "verts": 8536,
+   "local_min": [
+    -0.434,
+    -0.995,
+    0.0
+   ],
+   "local_max": [
+    0.3,
+    0.4,
+    2.65
+   ],
+   "size": [
+    0.734,
+    1.395,
+    2.65
+   ],
+   "islands": 235,
+   "materials": [
+    "GC_black",
+    "GC_kit_seam",
+    "GC_en_rack",
+    "GC_kit_lower",
+    "GC_kit_frame",
+    "GC_en_red",
+    "GC_en_galv",
+    "GC_kit_panel_lt",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_kit_ink",
+    "GC_orange",
+    "GC_scr_cyan",
+    "GC_kit_hazard_y",
+    "GC_glass_clear"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_bat_rack_open",
+   "mesh": "GCM_pr_bat_rack_open",
+   "mesh_users": 1,
+   "location": [
+    34.7,
+    -5.75,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_bat_rack_open",
+    "dust": 0.35
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 1956,
+   "verts": 1022,
+   "local_min": [
+    -0.255,
+    -0.166,
+    0.92
+   ],
+   "local_max": [
+    0.255,
+    0.0,
+    2.62
+   ],
+   "size": [
+    0.51,
+    0.166,
+    1.7
+   ],
+   "islands": 22,
+   "materials": [
+    "GC_en_grey",
+    "GC_black",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_en_red",
+    "GC_kit_hazard_y",
+    "GC_kit_frame",
+    "GC_en_galv",
+    "GC_kit_alu"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_panelboard",
+   "mesh": "GCM_pr_panelboard",
+   "mesh_users": 2,
+   "location": [
+    26.78,
+    -9.828,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_panelboard",
+    "dust": 0.35
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 4376,
+   "verts": 2312,
+   "local_min": [
+    -0.383,
+    -0.525,
+    0.0
+   ],
+   "local_max": [
+    0.383,
+    0.479,
+    2.5
+   ],
+   "size": [
+    0.766,
+    1.004,
+    2.5
+   ],
+   "islands": 62,
+   "materials": [
+    "GC_black",
+    "GC_en_grey",
+    "GC_kit_seam",
+    "GC_en_galv",
+    "GC_kit_frame",
+    "GC_scr_cyan",
+    "GC_green",
+    "GC_en_red",
+    "GC_kit_hazard_y",
+    "GC_kit_sign",
+    "GC_scr_amber",
+    "GC_scr_green",
+    "GC_scr_red",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_swgr",
+   "mesh": "GCM_pr_swgr",
+   "mesh_users": 7,
+   "location": [
+    31.725,
+    -9.348,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_swgr",
+    "dust": 0.35
+   },
+   "instances_of_name": 7
+  },
+  {
+   "tris": 7224,
+   "verts": 3830,
+   "local_min": [
+    -0.932,
+    -0.807,
+    0.0
+   ],
+   "local_max": [
+    1.047,
+    0.479,
+    3.264
+   ],
+   "size": [
+    1.979,
+    1.287,
+    3.264
+   ],
+   "islands": 109,
+   "materials": [
+    "GC_black",
+    "GC_en_grey",
+    "GC_kit_seam",
+    "GC_en_galv",
+    "GC_kit_frame",
+    "GC_scr_cyan",
+    "GC_green",
+    "GC_en_red",
+    "GC_kit_hazard_y",
+    "GC_kit_sign",
+    "GC_en_soot",
+    "GC_scr_amber",
+    "GC_scr_green",
+    "GC_scr_red",
+    "GC_en_smoke",
+    "GC_en_tape",
+    "GC_kit_hazard_k",
+    "GC_en_ss",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pr_swgr_burnt",
+   "mesh": "GCM_pr_swgr_burnt",
+   "mesh_users": 1,
+   "location": [
+    33.225,
+    -9.348,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pr_swgr_burnt",
+    "dust": 0.35
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7404,
+   "verts": 3960,
+   "local_min": [
+    -1.102,
+    -0.34,
+    0.0
+   ],
+   "local_max": [
+    1.102,
+    0.3,
+    2.2
+   ],
+   "size": [
+    2.203,
+    0.64,
+    2.2
+   ],
+   "islands": 129,
+   "materials": [
+    "GC_black",
+    "GC_en_rack",
+    "GC_kit_hazard_y",
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_sign",
+    "GC_kit_acc_eng",
+    "GC_kit_ink",
+    "GC_scr_amber",
+    "GC_kit_panel_lt",
+    "GC_en_red",
+    "GC_scr_green",
+    "GC_scr_red",
+    "GC_en_mk_b",
+    "GC_kit_lower"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "pw_panel",
+   "mesh": "GCM_pw_panel",
+   "mesh_users": 1,
+   "location": [
+    30.0,
+    -9.45,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Power Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "pw_panel",
+    "dust": 0.35,
+    "inter": "power"
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "comms": [
+  {
+   "tris": 10172,
+   "verts": 5274,
+   "local_min": [
+    -0.812,
+    -0.503,
+    -0.008
+   ],
+   "local_max": [
+    0.812,
+    0.42,
+    2.94
+   ],
+   "size": [
+    1.623,
+    0.923,
+    2.948
+   ],
+   "islands": 94,
+   "materials": [
+    "GC_kit_rubber",
+    "GC_cr_housing",
+    "GC_kit_seam",
+    "GC_cr_top",
+    "GC_kit_alu",
+    "GC_green",
+    "GC_kit_frame",
+    "GC_kit_led_grn",
+    "GC_scr_red",
+    "GC_cr_bezel",
+    "GC_scr_green",
+    "GC_scr_amber",
+    "GC_red",
+    "GC_blue",
+    "GC_kit_sign",
+    "GC_kit_acc_cmd",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "cm_comms_console",
+   "mesh": "GCM_cm_comms_console",
+   "mesh_users": 1,
+   "location": [
+    33.4,
+    15.6,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Command Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "cm_comms_console",
+    "dust": 0.14,
+    "inter": "comms"
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 580,
+   "verts": 312,
+   "local_min": [
+    -0.045,
+    -0.057,
+    0.0
+   ],
+   "local_max": [
+    0.045,
+    0.055,
+    0.275
+   ],
+   "size": [
+    0.09,
+    0.112,
+    0.275
+   ],
+   "islands": 11,
+   "materials": [
+    "GC_cr_bezel",
+    "GC_kit_led_grn",
+    "GC_scr_green",
+    "GC_kit_seam",
+    "GC_kit_rubber",
+    "GC_kit_alu"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "cm_radio",
+   "mesh": "GCM_cm_radio",
+   "mesh_users": 1,
+   "location": [
+    32.0,
+    11.6,
+    0.77
+   ],
+   "rotation_z_deg": -10.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Command Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "cm_radio",
+    "dust": 0.14
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 6236,
+   "verts": 3202,
+   "local_min": [
+    -0.9,
+    -1.217,
+    -0.3
+   ],
+   "local_max": [
+    0.9,
+    0.9,
+    13.0
+   ],
+   "size": [
+    1.8,
+    2.117,
+    13.3
+   ],
+   "islands": 54,
+   "materials": [
+    "GC_sf_print",
+    "GC_steel",
+    "GC_sf_white",
+    "GC_steel_dk",
+    "GC_kit_led_red",
+    "GC_offwhite",
+    "GC_gunmetal"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "sf_antenna_mast",
+   "mesh": "GCM_sf_antenna_mast",
+   "mesh_users": 1,
+   "location": [
+    60.5,
+    20.5,
+    -0.37
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Exterior"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "sf_antenna_mast",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "crops": [
+  {
+   "tris": 264320,
+   "verts": 135042,
+   "local_min": [
+    -1.558,
+    -0.415,
+    0.065
+   ],
+   "local_max": [
+    2.026,
+    0.424,
+    0.67
+   ],
+   "size": [
+    3.584,
+    0.839,
+    0.605
+   ],
+   "islands": 1441,
+   "materials": [
+    "GC_gd_leaf_dk",
+    "GC_gd_beet",
+    "GC_rubber",
+    "GC_kit_rubber",
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_orange"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_crop_beet",
+   "mesh": "GCM_gd_crop_beet",
+   "mesh_users": 1,
+   "location": [
+    48.7,
+    -30.5,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_crop_beet",
+    "dust": 0.06
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 268950,
+   "verts": 149431,
+   "local_min": [
+    -1.581,
+    -0.574,
+    0.065
+   ],
+   "local_max": [
+    2.026,
+    0.591,
+    0.68
+   ],
+   "size": [
+    3.607,
+    1.165,
+    0.615
+   ],
+   "islands": 7478,
+   "materials": [
+    "GC_gd_leaf_dk",
+    "GC_gd_carrot",
+    "GC_rubber",
+    "GC_kit_rubber",
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_orange"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_crop_carrot",
+   "mesh": "GCM_gd_crop_carrot",
+   "mesh_users": 1,
+   "location": [
+    48.7,
+    -23.5,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_crop_carrot",
+    "dust": 0.06
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 172984,
+   "verts": 87812,
+   "local_min": [
+    -1.53,
+    -0.498,
+    0.065
+   ],
+   "local_max": [
+    2.026,
+    0.483,
+    0.883
+   ],
+   "size": [
+    3.556,
+    0.981,
+    0.818
+   ],
+   "islands": 660,
+   "materials": [
+    "GC_gd_leaf_dk",
+    "GC_gd_rib",
+    "GC_gd_corn",
+    "GC_gd_beet",
+    "GC_rubber",
+    "GC_kit_rubber",
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_orange"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_crop_chard",
+   "mesh": "GCM_gd_crop_chard",
+   "mesh_users": 1,
+   "location": [
+    46.25,
+    -30.5,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_crop_chard",
+    "dust": 0.06
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 281562,
+   "verts": 142396,
+   "local_min": [
+    -1.75,
+    -0.905,
+    0.065
+   ],
+   "local_max": [
+    2.026,
+    0.908,
+    2.299
+   ],
+   "size": [
+    3.776,
+    1.813,
+    2.234
+   ],
+   "islands": 799,
+   "materials": [
+    "GC_gd_leaf_md",
+    "GC_gd_rib",
+    "GC_gd_silk",
+    "GC_rubber",
+    "GC_kit_rubber",
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_orange"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_crop_corn",
+   "mesh": "GCM_gd_crop_corn",
+   "mesh_users": 1,
+   "location": [
+    51.15,
+    -30.5,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_crop_corn",
+    "dust": 0.06
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 334656,
+   "verts": 167778,
+   "local_min": [
+    -1.53,
+    -0.448,
+    0.065
+   ],
+   "local_max": [
+    2.026,
+    0.403,
+    0.561
+   ],
+   "size": [
+    3.556,
+    0.851,
+    0.496
+   ],
+   "islands": 225,
+   "materials": [
+    "GC_gd_leaf",
+    "GC_gd_lettuce_red",
+    "GC_rubber",
+    "GC_kit_rubber",
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_orange"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_crop_lettuce",
+   "mesh": "GCM_gd_crop_lettuce",
+   "mesh_users": 1,
+   "location": [
+    46.25,
+    -23.5,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_crop_lettuce",
+    "dust": 0.06
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 358668,
+   "verts": 186568,
+   "local_min": [
+    -1.86,
+    -0.918,
+    0.065
+   ],
+   "local_max": [
+    2.026,
+    0.903,
+    2.32
+   ],
+   "size": [
+    3.886,
+    1.822,
+    2.255
+   ],
+   "islands": 3617,
+   "materials": [
+    "GC_gd_leaf_dk",
+    "GC_gd_leaf_md",
+    "GC_gd_corn",
+    "GC_gd_silk",
+    "GC_gd_fruit",
+    "GC_gd_carrot",
+    "GC_kit_alu",
+    "GC_steel",
+    "GC_rubber",
+    "GC_kit_rubber",
+    "GC_steel_dk",
+    "GC_orange"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_crop_tomato",
+   "mesh": "GCM_gd_crop_tomato",
+   "mesh_users": 1,
+   "location": [
+    51.15,
+    -23.5,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_crop_tomato",
+    "dust": 0.06
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 33344,
+   "verts": 17210,
+   "local_min": [
+    -0.878,
+    -0.308,
+    0.0
+   ],
+   "local_max": [
+    0.878,
+    0.308,
+    2.12
+   ],
+   "size": [
+    1.756,
+    0.616,
+    2.12
+   ],
+   "islands": 277,
+   "materials": [
+    "GC_kit_alu",
+    "GC_kit_rubber",
+    "GC_cream",
+    "GC_gunmetal",
+    "GC_steel_dk",
+    "GC_kit_frame",
+    "GC_black",
+    "GC_lamp_grow",
+    "GC_gd_leaf"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_hydro",
+   "mesh": "GCM_gd_hydro",
+   "mesh_users": 1,
+   "location": [
+    54.55,
+    -23.4,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_hydro",
+    "dust": 0.06
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 100112,
+   "verts": 50664,
+   "local_min": [
+    -1.4,
+    -0.284,
+    -0.002
+   ],
+   "local_max": [
+    1.425,
+    0.33,
+    2.16
+   ],
+   "size": [
+    2.825,
+    0.614,
+    2.161
+   ],
+   "islands": 353,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_frame",
+    "GC_black",
+    "GC_steel_dk",
+    "GC_beige",
+    "GC_gr_stem",
+    "GC_gr_leaf_dk",
+    "GC_gr_leaf_md",
+    "GC_gr_fruit_grn",
+    "GC_gr_flower",
+    "GC_kit_lower",
+    "GC_gr_fruit_red",
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_gr_grow"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_pepper_row",
+   "mesh": "GCM_gr_pepper_row",
+   "mesh_users": 1,
+   "location": [
+    9.9,
+    -9.3,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_pepper_row",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 131202,
+   "verts": 66358,
+   "local_min": [
+    -1.3,
+    -0.4,
+    -0.002
+   ],
+   "local_max": [
+    1.3,
+    0.4,
+    2.0
+   ],
+   "size": [
+    2.6,
+    0.8,
+    2.001
+   ],
+   "islands": 501,
+   "materials": [
+    "GC_kit_lower",
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_black",
+    "GC_steel_dk",
+    "GC_gr_bag",
+    "GC_soil",
+    "GC_gr_stem",
+    "GC_gr_leaf_yel",
+    "GC_gr_leaf_md",
+    "GC_yellow",
+    "GC_gr_flower",
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_gr_grow"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_potato_bed",
+   "mesh": "GCM_gr_potato_bed",
+   "mesh_users": 1,
+   "location": [
+    9.6,
+    -11.25,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_potato_bed",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 3852,
+   "verts": 2112,
+   "local_min": [
+    -0.75,
+    -0.313,
+    0.0
+   ],
+   "local_max": [
+    0.75,
+    0.318,
+    2.05
+   ],
+   "size": [
+    1.5,
+    0.631,
+    2.05
+   ],
+   "islands": 93,
+   "materials": [
+    "GC_steel",
+    "GC_kit_alu",
+    "GC_gr_grow",
+    "GC_kit_frame",
+    "GC_steel_dk",
+    "GC_kit_rubber",
+    "GC_kit_sign",
+    "GC_kit_acc_agri",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_seedling_rack",
+   "mesh": "GCM_gr_seedling_rack",
+   "mesh_users": 1,
+   "location": [
+    -3.2,
+    -0.5,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_seedling_rack",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 62700,
+   "verts": 31533,
+   "local_min": [
+    -0.963,
+    -0.38,
+    -0.002
+   ],
+   "local_max": [
+    0.963,
+    0.384,
+    0.361
+   ],
+   "size": [
+    1.926,
+    0.764,
+    0.363
+   ],
+   "islands": 171,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_stem",
+    "GC_gr_leaf_md",
+    "GC_gr_leaf_lt"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_basil",
+   "mesh": "GCM_gr_tray_basil",
+   "mesh_users": 2,
+   "location": [
+    3.15,
+    -10.6,
+    0.95
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_basil",
+    "dust": 0.3
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 69228,
+   "verts": 35304,
+   "local_min": [
+    -0.993,
+    -0.506,
+    -0.002
+   ],
+   "local_max": [
+    0.989,
+    0.497,
+    0.179
+   ],
+   "size": [
+    1.983,
+    1.003,
+    0.181
+   ],
+   "islands": 345,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_leaf_md",
+    "GC_gr_leaf_lt"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_butter_m",
+   "mesh": "GCM_gr_tray_butter_m",
+   "mesh_users": 3,
+   "location": [
+    -1.45,
+    -10.6,
+    0.3
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_butter_m",
+    "dust": 0.3
+   },
+   "instances_of_name": 3
+  },
+  {
+   "tris": 48876,
+   "verts": 24936,
+   "local_min": [
+    -0.968,
+    -0.432,
+    -0.002
+   ],
+   "local_max": [
+    0.963,
+    0.44,
+    0.144
+   ],
+   "size": [
+    1.931,
+    0.872,
+    0.146
+   ],
+   "islands": 249,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_leaf_md",
+    "GC_gr_leaf_lt"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_butter_y",
+   "mesh": "GCM_gr_tray_butter_y",
+   "mesh_users": 2,
+   "location": [
+    -1.45,
+    -10.6,
+    0.95
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_butter_y",
+    "dust": 0.3
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 20268,
+   "verts": 10356,
+   "local_min": [
+    -0.963,
+    -0.457,
+    -0.002
+   ],
+   "local_max": [
+    0.963,
+    0.44,
+    0.164
+   ],
+   "size": [
+    1.926,
+    0.898,
+    0.166
+   ],
+   "islands": 111,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_leaf_md",
+    "GC_gr_leaf_lt"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_harvested",
+   "mesh": "GCM_gr_tray_harvested",
+   "mesh_users": 1,
+   "location": [
+    0.85,
+    -10.6,
+    1.6
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_harvested",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 58212,
+   "verts": 29394,
+   "local_min": [
+    -0.963,
+    -0.522,
+    -0.002
+   ],
+   "local_max": [
+    0.963,
+    0.536,
+    0.292
+   ],
+   "size": [
+    1.926,
+    1.058,
+    0.294
+   ],
+   "islands": 144,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_stem",
+    "GC_gr_leaf_dk",
+    "GC_gr_leaf_md"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_kale",
+   "mesh": "GCM_gr_tray_kale",
+   "mesh_users": 2,
+   "location": [
+    0.85,
+    -10.6,
+    0.95
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_kale",
+    "dust": 0.3
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 21516,
+   "verts": 11112,
+   "local_min": [
+    -0.963,
+    -0.372,
+    -0.002
+   ],
+   "local_max": [
+    0.963,
+    0.372,
+    0.211
+   ],
+   "size": [
+    1.926,
+    0.744,
+    0.213
+   ],
+   "islands": 129,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_beige_dk",
+    "GC_gr_stem",
+    "GC_gr_leaf_lt",
+    "GC_gr_leaf_md"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_plug",
+   "mesh": "GCM_gr_tray_plug",
+   "mesh_users": 3,
+   "location": [
+    -1.45,
+    -10.6,
+    1.6
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_plug",
+    "dust": 0.3
+   },
+   "instances_of_name": 3
+  },
+  {
+   "tris": 48876,
+   "verts": 24936,
+   "local_min": [
+    -1.039,
+    -0.47,
+    -0.002
+   ],
+   "local_max": [
+    1.009,
+    0.552,
+    0.284
+   ],
+   "size": [
+    2.048,
+    1.022,
+    0.286
+   ],
+   "islands": 249,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_leaf_dk",
+    "GC_gr_leaf_md",
+    "GC_gr_leaf_lt"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_romaine",
+   "mesh": "GCM_gr_tray_romaine",
+   "mesh_users": 2,
+   "location": [
+    -1.45,
+    -8.35,
+    0.3
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_romaine",
+    "dust": 0.3
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 60368,
+   "verts": 30626,
+   "local_min": [
+    -0.979,
+    -0.476,
+    -0.097
+   ],
+   "local_max": [
+    0.963,
+    0.495,
+    0.266
+   ],
+   "size": [
+    1.942,
+    0.971,
+    0.363
+   ],
+   "islands": 221,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_leaf_brn",
+    "GC_gr_leaf_yel",
+    "GC_gr_leaf_lt",
+    "GC_gr_stem",
+    "GC_gr_leaf_md"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_wilt_a",
+   "mesh": "GCM_gr_tray_wilt_a",
+   "mesh_users": 2,
+   "location": [
+    0.85,
+    -8.35,
+    0.95
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_wilt_a",
+    "dust": 0.3
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 69228,
+   "verts": 35304,
+   "local_min": [
+    -0.965,
+    -0.464,
+    -0.056
+   ],
+   "local_max": [
+    0.963,
+    0.446,
+    0.151
+   ],
+   "size": [
+    1.928,
+    0.911,
+    0.208
+   ],
+   "islands": 345,
+   "materials": [
+    "GC_gr_pvc",
+    "GC_kit_lower",
+    "GC_black",
+    "GC_gr_leaf_brn",
+    "GC_gr_leaf_yel",
+    "GC_gr_leaf_lt"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_tray_wilt_b",
+   "mesh": "GCM_gr_tray_wilt_b",
+   "mesh_users": 1,
+   "location": [
+    0.85,
+    -8.35,
+    0.3
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_tray_wilt_b",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 138616,
+   "verts": 70964,
+   "local_min": [
+    -1.3,
+    -0.434,
+    -0.002
+   ],
+   "local_max": [
+    1.3,
+    0.46,
+    1.69
+   ],
+   "size": [
+    2.6,
+    0.894,
+    1.691
+   ],
+   "islands": 837,
+   "materials": [
+    "GC_steel",
+    "GC_gr_pvc",
+    "GC_soil",
+    "GC_kit_sign",
+    "GC_kit_acc_agri",
+    "GC_kit_ink",
+    "GC_kit_frame",
+    "GC_steel_dk",
+    "GC_kit_alu",
+    "GC_gr_grow",
+    "GC_gr_stem",
+    "GC_gr_wheat",
+    "GC_gr_leaf_yel",
+    "GC_gr_leaf_md"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gr_wheat_bed",
+   "mesh": "GCM_gr_wheat_bed",
+   "mesh_users": 1,
+   "location": [
+    6.6,
+    -11.25,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gr_wheat_bed",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "garage_hangar": [
+  {
+   "tris": 1016,
+   "verts": 512,
+   "local_min": [
+    -1.228,
+    1.84,
+    -0.013
+   ],
+   "local_max": [
+    -0.8,
+    2.218,
+    0.76
+   ],
+   "size": [
+    0.428,
+    0.378,
+    0.773
+   ],
+   "islands": 2,
+   "materials": [
+    "GC_black"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_charge_cable",
+   "mesh": "GCM_hb_charge_cable",
+   "mesh_users": 1,
+   "location": [
+    20.2,
+    3.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_charge_cable",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 524,
+   "verts": 268,
+   "local_min": [
+    -0.25,
+    -0.129,
+    0.0
+   ],
+   "local_max": [
+    0.25,
+    0.129,
+    0.12
+   ],
+   "size": [
+    0.5,
+    0.258,
+    0.12
+   ],
+   "islands": 3,
+   "materials": [
+    "GC_kit_hazard_y",
+    "GC_hb_webbing"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_chocks",
+   "mesh": "GCM_hb_chocks",
+   "mesh_users": 2,
+   "location": [
+    19.28,
+    4.3,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_chocks",
+    "dust": 0.55
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 8812,
+   "verts": 4536,
+   "local_min": [
+    -0.32,
+    -0.338,
+    0.0
+   ],
+   "local_max": [
+    0.462,
+    0.459,
+    2.009
+   ],
+   "size": [
+    0.782,
+    0.797,
+    2.009
+   ],
+   "islands": 65,
+   "materials": [
+    "GC_gunmetal",
+    "GC_kit_frame",
+    "GC_hb_copper",
+    "GC_hb_grey",
+    "GC_orange",
+    "GC_kit_seam",
+    "GC_kit_alu",
+    "GC_white",
+    "GC_gold",
+    "GC_black",
+    "GC_red",
+    "GC_hb_paper",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_compressor",
+   "mesh": "GCM_hb_compressor",
+   "mesh_users": 1,
+   "location": [
+    18.55,
+    7.45,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_compressor",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 11334,
+   "verts": 5999,
+   "local_min": [
+    -0.802,
+    -0.22,
+    -0.002
+   ],
+   "local_max": [
+    0.802,
+    0.203,
+    1.627
+   ],
+   "size": [
+    1.603,
+    0.423,
+    1.628
+   ],
+   "islands": 171,
+   "materials": [
+    "GC_hb_galv",
+    "GC_kit_hazard_y",
+    "GC_steel",
+    "GC_kit_lower",
+    "GC_white",
+    "GC_steel_dk",
+    "GC_hb_paper",
+    "GC_kit_ink",
+    "GC_gold",
+    "GC_black",
+    "GC_kit_hazard_k",
+    "GC_teal_dk",
+    "GC_brown",
+    "GC_green"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_cyl_rack",
+   "mesh": "GCM_hb_cyl_rack",
+   "mesh_users": 1,
+   "location": [
+    20.75,
+    7.6,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_cyl_rack",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 2232,
+   "verts": 1146,
+   "local_min": [
+    -0.45,
+    -0.65,
+    0.0
+   ],
+   "local_max": [
+    0.45,
+    0.55,
+    0.768
+   ],
+   "size": [
+    0.9,
+    1.2,
+    0.768
+   ],
+   "islands": 15,
+   "materials": [
+    "GC_hb_galv",
+    "GC_kit_seam",
+    "GC_kit_hazard_y",
+    "GC_red",
+    "GC_gold",
+    "GC_hb_paper",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_drum_cradle",
+   "mesh": "GCM_hb_drum_cradle",
+   "mesh_users": 1,
+   "location": [
+    15.0,
+    7.27,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_drum_cradle",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 6324,
+   "verts": 3280,
+   "local_min": [
+    -0.55,
+    -1.088,
+    0.0
+   ],
+   "local_max": [
+    0.55,
+    0.626,
+    1.852
+   ],
+   "size": [
+    1.1,
+    1.715,
+    1.852
+   ],
+   "islands": 59,
+   "materials": [
+    "GC_red",
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_rubber",
+    "GC_kit_frame",
+    "GC_red_dk",
+    "GC_hb_galv",
+    "GC_kit_seam",
+    "GC_kit_hazard_y",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_engine_hoist",
+   "mesh": "GCM_hb_engine_hoist",
+   "mesh_users": 1,
+   "location": [
+    27.5,
+    3.2,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_engine_hoist",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 2220,
+   "verts": 1138,
+   "local_min": [
+    -0.1,
+    -0.164,
+    0.584
+   ],
+   "local_max": [
+    0.1,
+    0.0,
+    1.52
+   ],
+   "size": [
+    0.2,
+    0.164,
+    0.936
+   ],
+   "islands": 14,
+   "materials": [
+    "GC_kit_frame",
+    "GC_red",
+    "GC_hb_paper",
+    "GC_kit_rubber",
+    "GC_black",
+    "GC_steel",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_extinguisher",
+   "mesh": "GCM_hb_extinguisher",
+   "mesh_users": 3,
+   "location": [
+    11.55,
+    5.828,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Crew Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_extinguisher",
+    "dust": 0.25
+   },
+   "instances_of_name": 3
+  },
+  {
+   "tris": 15480,
+   "verts": 8054,
+   "local_min": [
+    -0.75,
+    -0.45,
+    0.0
+   ],
+   "local_max": [
+    0.75,
+    0.45,
+    1.78
+   ],
+   "size": [
+    1.5,
+    0.9,
+    1.78
+   ],
+   "islands": 159,
+   "materials": [
+    "GC_kit_frame",
+    "GC_steel_dk",
+    "GC_hb_galv",
+    "GC_kit_seam",
+    "GC_hb_mesh",
+    "GC_kit_alu",
+    "GC_gunmetal",
+    "GC_steel",
+    "GC_fabric_gr",
+    "GC_black",
+    "GC_kit_lower"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_fixture_table",
+   "mesh": "GCM_hb_fixture_table",
+   "mesh_users": 1,
+   "location": [
+    26.15,
+    2.9,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_fixture_table",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 56,
+   "verts": 32,
+   "local_min": [
+    -1.0,
+    -1.0,
+    -0.16
+   ],
+   "local_max": [
+    1.0,
+    1.0,
+    0.0
+   ],
+   "size": [
+    2.0,
+    2.0,
+    0.16
+   ],
+   "islands": 2,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_fl_epoxy"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_fl",
+   "mesh": "GCM_hb_fl",
+   "mesh_users": 34,
+   "location": [
+    15.0,
+    -1.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_fl",
+    "dust": 0.55
+   },
+   "instances_of_name": 34
+  },
+  {
+   "tris": 4700,
+   "verts": 2920,
+   "local_min": [
+    -1.0,
+    -1.0,
+    -0.16
+   ],
+   "local_max": [
+    1.0,
+    1.0,
+    0.002
+   ],
+   "size": [
+    2.0,
+    2.0,
+    0.162
+   ],
+   "islands": 285,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_fl_plate",
+    "GC_kit_frame"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_fl_plate",
+   "mesh": "GCM_hb_fl_plate",
+   "mesh_users": 4,
+   "location": [
+    25.0,
+    1.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_fl_plate",
+    "dust": 0.55
+   },
+   "instances_of_name": 4
+  },
+  {
+   "tris": 640,
+   "verts": 414,
+   "local_min": [
+    -1.0,
+    -1.0,
+    -0.16
+   ],
+   "local_max": [
+    1.0,
+    1.0,
+    0.0
+   ],
+   "size": [
+    2.0,
+    2.0,
+    0.16
+   ],
+   "islands": 47,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_fl_epoxy",
+    "GC_hb_galv"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_fl_trench",
+   "mesh": "GCM_hb_fl_trench",
+   "mesh_users": 2,
+   "location": [
+    21.0,
+    -1.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_fl_trench",
+    "dust": 0.55
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 3828,
+   "verts": 1950,
+   "local_min": [
+    -0.591,
+    -0.425,
+    -0.006
+   ],
+   "local_max": [
+    0.511,
+    0.496,
+    0.142
+   ],
+   "size": [
+    1.102,
+    0.921,
+    0.148
+   ],
+   "islands": 20,
+   "materials": [
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_blue",
+    "GC_kit_lower",
+    "GC_glass",
+    "GC_kit_hazard_y",
+    "GC_hb_paper",
+    "GC_hb_case_w"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_floor_tools",
+   "mesh": "GCM_hb_floor_tools",
+   "mesh_users": 1,
+   "location": [
+    17.55,
+    2.25,
+    0.0
+   ],
+   "rotation_z_deg": -15.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_floor_tools",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 12128,
+   "verts": 6654,
+   "local_min": [
+    -3.021,
+    -0.85,
+    0.0
+   ],
+   "local_max": [
+    3.021,
+    0.803,
+    3.791
+   ],
+   "size": [
+    6.042,
+    1.653,
+    3.791
+   ],
+   "islands": 294,
+   "materials": [
+    "GC_hb_grey",
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_hb_galv",
+    "GC_kit_hazard_y",
+    "GC_kit_alu",
+    "GC_kit_led_warm",
+    "GC_kit_sign",
+    "GC_kit_acc_hgr",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_mezzanine",
+   "mesh": "GCM_hb_mezzanine",
+   "mesh_users": 1,
+   "location": [
+    28.98,
+    1.28,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_mezzanine",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 156,
+   "verts": 98,
+   "local_min": [
+    -1.55,
+    -2.3,
+    0.0
+   ],
+   "local_max": [
+    1.55,
+    2.3,
+    0.002
+   ],
+   "size": [
+    3.1,
+    4.6,
+    0.002
+   ],
+   "islands": 10,
+   "materials": [
+    "GC_kit_hazard_y",
+    "GC_white"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_mk_bay",
+   "mesh": "GCM_hb_mk_bay",
+   "mesh_users": 1,
+   "location": [
+    20.2,
+    2.95,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_mk_bay",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 188,
+   "verts": 122,
+   "local_min": [
+    -2.0,
+    -0.15,
+    0.0
+   ],
+   "local_max": [
+    2.0,
+    0.15,
+    0.002
+   ],
+   "size": [
+    4.0,
+    0.3,
+    0.002
+   ],
+   "islands": 12,
+   "materials": [
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_mk_hazard",
+   "mesh": "GCM_hb_mk_hazard",
+   "mesh_users": 4,
+   "location": [
+    22.0,
+    -1.6,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_mk_hazard",
+    "dust": 0.55
+   },
+   "instances_of_name": 4
+  },
+  {
+   "tris": 140,
+   "verts": 92,
+   "local_min": [
+    -1.0,
+    -0.075,
+    0.0
+   ],
+   "local_max": [
+    1.0,
+    0.075,
+    0.002
+   ],
+   "size": [
+    2.0,
+    0.15,
+    0.002
+   ],
+   "islands": 10,
+   "materials": [
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_mk_hazard_s",
+   "mesh": "GCM_hb_mk_hazard_s",
+   "mesh_users": 1,
+   "location": [
+    27.72,
+    0.33,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_mk_hazard_s",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 164,
+   "verts": 96,
+   "local_min": [
+    -0.5,
+    -0.35,
+    0.0
+   ],
+   "local_max": [
+    0.5,
+    0.35,
+    0.002
+   ],
+   "size": [
+    1.0,
+    0.7,
+    0.002
+   ],
+   "islands": 9,
+   "materials": [
+    "GC_white",
+    "GC_red"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_mk_keep",
+   "mesh": "GCM_hb_mk_keep",
+   "mesh_users": 2,
+   "location": [
+    23.25,
+    7.3,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_mk_keep",
+    "dust": 0.55
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 12,
+   "verts": 8,
+   "local_min": [
+    -0.5,
+    -0.04,
+    0.0
+   ],
+   "local_max": [
+    0.5,
+    0.04,
+    0.002
+   ],
+   "size": [
+    1.0,
+    0.08,
+    0.002
+   ],
+   "islands": 1,
+   "materials": [
+    "GC_kit_hazard_y"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_mk_line",
+   "mesh": "GCM_hb_mk_line",
+   "mesh_users": 4,
+   "location": [
+    17.05,
+    5.45,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    2.7,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_mk_line",
+    "dust": 0.55
+   },
+   "instances_of_name": 4
+  },
+  {
+   "tris": 1368,
+   "verts": 696,
+   "local_min": [
+    -0.22,
+    -0.052,
+    -0.0
+   ],
+   "local_max": [
+    0.384,
+    0.272,
+    0.104
+   ],
+   "size": [
+    0.604,
+    0.324,
+    0.105
+   ],
+   "islands": 6,
+   "materials": [
+    "GC_kit_alu",
+    "GC_white",
+    "GC_hb_case_w"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_o2_bottle",
+   "mesh": "GCM_hb_o2_bottle",
+   "mesh_users": 1,
+   "location": [
+    15.55,
+    3.35,
+    0.0
+   ],
+   "rotation_z_deg": -40.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_o2_bottle",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 9780,
+   "verts": 5504,
+   "local_min": [
+    -0.915,
+    -0.305,
+    0.0
+   ],
+   "local_max": [
+    0.915,
+    0.305,
+    2.13
+   ],
+   "size": [
+    1.83,
+    0.61,
+    2.13
+   ],
+   "islands": 307,
+   "materials": [
+    "GC_hb_grey",
+    "GC_kit_seam",
+    "GC_hb_galv",
+    "GC_blue",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_hazard_y",
+    "GC_hb_case_or",
+    "GC_steel",
+    "GC_steel_dk",
+    "GC_hb_case_tan",
+    "GC_kit_lower",
+    "GC_hb_case_w"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_parts_rack",
+   "mesh": "GCM_hb_parts_rack",
+   "mesh_users": 1,
+   "location": [
+    29.5,
+    5.1,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_parts_rack",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 6864,
+   "verts": 3880,
+   "local_min": [
+    -0.915,
+    -0.25,
+    0.0
+   ],
+   "local_max": [
+    0.915,
+    0.25,
+    1.505
+   ],
+   "size": [
+    1.83,
+    0.5,
+    1.505
+   ],
+   "islands": 224,
+   "materials": [
+    "GC_hb_grey",
+    "GC_kit_seam",
+    "GC_hb_galv",
+    "GC_blue",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_hazard_y",
+    "GC_hb_case_or",
+    "GC_steel",
+    "GC_steel_dk",
+    "GC_hb_case_tan",
+    "GC_kit_lower"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_parts_rack_lo",
+   "mesh": "GCM_hb_parts_rack_lo",
+   "mesh_users": 1,
+   "location": [
+    29.5,
+    3.0,
+    2.7
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_parts_rack_lo",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 4888,
+   "verts": 2520,
+   "local_min": [
+    -0.813,
+    -0.815,
+    0.0
+   ],
+   "local_max": [
+    0.813,
+    0.25,
+    2.17
+   ],
+   "size": [
+    1.625,
+    1.065,
+    2.17
+   ],
+   "islands": 46,
+   "materials": [
+    "GC_kit_frame",
+    "GC_orange",
+    "GC_orange_dk",
+    "GC_white",
+    "GC_steel",
+    "GC_kit_sign",
+    "GC_kit_acc_hgr",
+    "GC_kit_ink",
+    "GC_red",
+    "GC_fabric_gr",
+    "GC_kit_hazard_y"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_rescue_cab",
+   "mesh": "GCM_hb_rescue_cab",
+   "mesh_users": 1,
+   "location": [
+    14.47,
+    2.95,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_rescue_cab",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 8072,
+   "verts": 4200,
+   "local_min": [
+    -0.76,
+    -0.518,
+    0.0
+   ],
+   "local_max": [
+    0.794,
+    0.285,
+    1.695
+   ],
+   "size": [
+    1.554,
+    0.803,
+    1.695
+   ],
+   "islands": 82,
+   "materials": [
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_red",
+    "GC_rubber",
+    "GC_hb_tool_red",
+    "GC_kit_rubber",
+    "GC_kit_alu",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_rollcab",
+   "mesh": "GCM_hb_rollcab",
+   "mesh_users": 1,
+   "location": [
+    29.53,
+    1.46,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_rollcab",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 57804,
+   "verts": 29594,
+   "local_min": [
+    -1.107,
+    -2.268,
+    -0.008
+   ],
+   "local_max": [
+    1.106,
+    2.14,
+    2.4
+   ],
+   "size": [
+    2.213,
+    4.408,
+    2.408
+   ],
+   "islands": 346,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_alu",
+    "GC_kit_lower",
+    "GC_hb_mesh",
+    "GC_steel",
+    "GC_gunmetal",
+    "GC_kit_hazard_y",
+    "GC_red",
+    "GC_white",
+    "GC_glass",
+    "GC_orange",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_seam",
+    "GC_kit_fl_plate",
+    "GC_scr_amber",
+    "GC_black",
+    "GC_hb_webbing",
+    "GC_red_dk",
+    "GC_kit_rubber",
+    "GC_steel_dk"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_rover",
+   "mesh": "GCM_hb_rover",
+   "mesh_users": 1,
+   "location": [
+    20.2,
+    3.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_rover",
+    "dust": 1.0
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 288,
+   "verts": 160,
+   "local_min": [
+    -0.18,
+    -0.01,
+    0.0
+   ],
+   "local_max": [
+    0.18,
+    0.0,
+    0.11
+   ],
+   "size": [
+    0.36,
+    0.01,
+    0.11
+   ],
+   "islands": 8,
+   "materials": [
+    "GC_kit_sign",
+    "GC_kit_acc_hab",
+    "GC_kit_ink",
+    "GC_kit_alu"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_sign",
+   "mesh": "GCM_hb_sign",
+   "mesh_users": 10,
+   "location": [
+    12.05,
+    5.828,
+    1.52
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Crew Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_sign",
+    "dust": 0.25
+   },
+   "instances_of_name": 10
+  },
+  {
+   "tris": 7348,
+   "verts": 3714,
+   "local_min": [
+    -0.312,
+    -1.05,
+    -0.017
+   ],
+   "local_max": [
+    0.61,
+    1.062,
+    0.223
+   ],
+   "size": [
+    0.922,
+    2.112,
+    0.24
+   ],
+   "islands": 21,
+   "materials": [
+    "GC_hb_case_or",
+    "GC_kit_alu",
+    "GC_kit_frame",
+    "GC_hb_webbing",
+    "GC_steel",
+    "GC_orange"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_stretcher",
+   "mesh": "GCM_hb_stretcher",
+   "mesh_users": 1,
+   "location": [
+    18.35,
+    2.4,
+    0.0
+   ],
+   "rotation_z_deg": 6.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_stretcher",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 2740,
+   "verts": 1390,
+   "local_min": [
+    -0.3,
+    -0.3,
+    0.003
+   ],
+   "local_max": [
+    0.3,
+    0.177,
+    0.342
+   ],
+   "size": [
+    0.6,
+    0.477,
+    0.339
+   ],
+   "islands": 10,
+   "materials": [
+    "GC_fabric_or",
+    "GC_white",
+    "GC_hb_webbing",
+    "GC_blue",
+    "GC_hb_case_w"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_trauma_bag",
+   "mesh": "GCM_hb_trauma_bag",
+   "mesh_users": 1,
+   "location": [
+    15.25,
+    2.55,
+    0.0
+   ],
+   "rotation_z_deg": 30.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_trauma_bag",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 5560,
+   "verts": 2900,
+   "local_min": [
+    -1.002,
+    -0.478,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.674,
+    4.72
+   ],
+   "islands": 60,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_hb_led5k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_we_flood",
+   "mesh": "GCM_hb_we_flood",
+   "mesh_users": 1,
+   "location": [
+    30.0,
+    1.0,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_we_flood",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 4928,
+   "verts": 2556,
+   "local_min": [
+    -1.002,
+    -0.196,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.392,
+    4.72
+   ],
+   "islands": 46,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_we_plain",
+   "mesh": "GCM_hb_we_plain",
+   "mesh_users": 2,
+   "location": [
+    30.0,
+    -1.0,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_we_plain",
+    "dust": 0.55
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 6552,
+   "verts": 3404,
+   "local_min": [
+    -1.002,
+    -0.422,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.618,
+    4.72
+   ],
+   "islands": 64,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_we_tray",
+   "mesh": "GCM_hb_we_tray",
+   "mesh_users": 1,
+   "location": [
+    30.0,
+    5.0,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_we_tray",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 12102,
+   "verts": 6193,
+   "local_min": [
+    -0.28,
+    -0.512,
+    0.0
+   ],
+   "local_max": [
+    0.38,
+    0.48,
+    1.212
+   ],
+   "size": [
+    0.66,
+    0.992,
+    1.212
+   ],
+   "islands": 71,
+   "materials": [
+    "GC_kit_frame",
+    "GC_rubber",
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_kit_lower",
+    "GC_teal_dk",
+    "GC_gold",
+    "GC_black",
+    "GC_hb_paper",
+    "GC_kit_ink",
+    "GC_hb_galv",
+    "GC_blue",
+    "GC_scr_amber",
+    "GC_kit_seam",
+    "GC_kit_sign",
+    "GC_hb_copper",
+    "GC_glass"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_welder",
+   "mesh": "GCM_hb_welder",
+   "mesh_users": 1,
+   "location": [
+    25.0,
+    0.4,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_welder",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7064,
+   "verts": 3692,
+   "local_min": [
+    -0.995,
+    -0.305,
+    0.0
+   ],
+   "local_max": [
+    0.995,
+    0.305,
+    2.02
+   ],
+   "size": [
+    1.99,
+    0.61,
+    2.02
+   ],
+   "islands": 83,
+   "materials": [
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_rubber",
+    "GC_black",
+    "GC_hb_board",
+    "GC_blue",
+    "GC_red",
+    "GC_kit_lower",
+    "GC_kit_ink",
+    "GC_hb_paper"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_whiteboard",
+   "mesh": "GCM_hb_whiteboard",
+   "mesh_users": 1,
+   "location": [
+    16.35,
+    3.3,
+    0.0
+   ],
+   "rotation_z_deg": 70.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_whiteboard",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 10912,
+   "verts": 5628,
+   "local_min": [
+    -1.002,
+    -0.422,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.618,
+    4.72
+   ],
+   "islands": 86,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_kit_ink",
+    "GC_hb_copper",
+    "GC_glass",
+    "GC_white",
+    "GC_gold",
+    "GC_kit_hazard_y",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_wn_air",
+   "mesh": "GCM_hb_wn_air",
+   "mesh_users": 1,
+   "location": [
+    19.0,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_wn_air",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 8448,
+   "verts": 4398,
+   "local_min": [
+    -1.002,
+    -0.422,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.618,
+    4.72
+   ],
+   "islands": 87,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_kit_ink",
+    "GC_hb_grey",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_wn_elec",
+   "mesh": "GCM_hb_wn_elec",
+   "mesh_users": 1,
+   "location": [
+    23.0,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_wn_elec",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7460,
+   "verts": 3892,
+   "local_min": [
+    -1.002,
+    -0.478,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.674,
+    4.72
+   ],
+   "islands": 81,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_kit_ink",
+    "GC_hb_led5k",
+    "GC_green",
+    "GC_white"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_wn_gas",
+   "mesh": "GCM_hb_wn_gas",
+   "mesh_users": 1,
+   "location": [
+    21.0,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_wn_gas",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7784,
+   "verts": 4056,
+   "local_min": [
+    -1.002,
+    -0.478,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.674,
+    4.72
+   ],
+   "islands": 82,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_kit_led",
+    "GC_kit_ink",
+    "GC_hb_led5k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_wn_light",
+   "mesh": "GCM_hb_wn_light",
+   "mesh_users": 1,
+   "location": [
+    29.0,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_wn_light",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 6552,
+   "verts": 3404,
+   "local_min": [
+    -1.002,
+    -0.422,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.618,
+    4.72
+   ],
+   "islands": 64,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_wn_plain",
+   "mesh": "GCM_hb_wn_plain",
+   "mesh_users": 1,
+   "location": [
+    15.0,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_wn_plain",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 38612,
+   "verts": 23764,
+   "local_min": [
+    -0.917,
+    -0.548,
+    0.0
+   ],
+   "local_max": [
+    0.917,
+    0.38,
+    1.98
+   ],
+   "size": [
+    1.833,
+    0.928,
+    1.98
+   ],
+   "islands": 2229,
+   "materials": [
+    "GC_hb_grey",
+    "GC_kit_rubber",
+    "GC_steel_dk",
+    "GC_kit_alu",
+    "GC_kit_seam",
+    "GC_kit_led",
+    "GC_steel",
+    "GC_red",
+    "GC_kit_hazard_y",
+    "GC_blue",
+    "GC_kit_lower",
+    "GC_kit_sign",
+    "GC_kit_frame",
+    "GC_hb_pcb",
+    "GC_black",
+    "GC_scr_green"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_workbench",
+   "mesh": "GCM_hb_workbench",
+   "mesh_users": 1,
+   "location": [
+    29.45,
+    3.25,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_workbench",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7184,
+   "verts": 3748,
+   "local_min": [
+    -1.002,
+    -0.478,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.674,
+    4.72
+   ],
+   "islands": 78,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng",
+    "GC_kit_ink",
+    "GC_hb_led5k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_ws_flood",
+   "mesh": "GCM_hb_ws_flood",
+   "mesh_users": 1,
+   "location": [
+    27.0,
+    -2.0,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_ws_flood",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 4928,
+   "verts": 2556,
+   "local_min": [
+    -1.002,
+    -0.196,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.392,
+    4.72
+   ],
+   "islands": 46,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_eng"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_ws_plain",
+   "mesh": "GCM_hb_ws_plain",
+   "mesh_users": 1,
+   "location": [
+    29.0,
+    -2.0,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_ws_plain",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 8216,
+   "verts": 4260,
+   "local_min": [
+    -1.002,
+    -0.422,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.618,
+    4.72
+   ],
+   "islands": 76,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_agri",
+    "GC_kit_ink",
+    "GC_kit_acc_eng",
+    "GC_red",
+    "GC_black",
+    "GC_hb_paper",
+    "GC_white"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_ww_fire",
+   "mesh": "GCM_hb_ww_fire",
+   "mesh_users": 1,
+   "location": [
+    14.0,
+    -1.0,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_ww_fire",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7184,
+   "verts": 3748,
+   "local_min": [
+    -1.002,
+    -0.478,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.674,
+    4.72
+   ],
+   "islands": 78,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_hab",
+    "GC_kit_ink",
+    "GC_kit_acc_eng",
+    "GC_hb_led5k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_ww_flood",
+   "mesh": "GCM_hb_ww_flood",
+   "mesh_users": 1,
+   "location": [
+    14.0,
+    1.0,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_ww_flood",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7320,
+   "verts": 3808,
+   "local_min": [
+    -1.002,
+    -0.422,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.618,
+    4.72
+   ],
+   "islands": 74,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_hab",
+    "GC_kit_led",
+    "GC_kit_ink",
+    "GC_kit_acc_eng",
+    "GC_kit_sign"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_ww_light",
+   "mesh": "GCM_hb_ww_light",
+   "mesh_users": 1,
+   "location": [
+    14.0,
+    3.0,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_ww_light",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 7524,
+   "verts": 3900,
+   "local_min": [
+    -1.002,
+    -0.422,
+    0.0
+   ],
+   "local_max": [
+    1.002,
+    0.196,
+    4.72
+   ],
+   "size": [
+    2.003,
+    0.618,
+    4.72
+   ],
+   "islands": 78,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_acc_hab",
+    "GC_kit_ink",
+    "GC_kit_acc_eng"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hb_ww_vent",
+   "mesh": "GCM_hb_ww_vent",
+   "mesh_users": 1,
+   "location": [
+    14.0,
+    7.0,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hb_ww_vent",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 20104,
+   "verts": 10564,
+   "local_min": [
+    -2.082,
+    -0.88,
+    0.0
+   ],
+   "local_max": [
+    2.082,
+    0.88,
+    3.505
+   ],
+   "size": [
+    4.164,
+    1.76,
+    3.505
+   ],
+   "islands": 256,
+   "materials": [
+    "GC_kit_alu",
+    "GC_steel_dk",
+    "GC_steel",
+    "GC_red",
+    "GC_rubber",
+    "GC_kit_seam",
+    "GC_kit_hazard_y",
+    "GC_kit_sign",
+    "GC_kit_acc_hgr",
+    "GC_kit_ink",
+    "GC_kit_frame",
+    "GC_hb_galv",
+    "GC_hb_webbing"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hg_crane",
+   "mesh": "GCM_hg_crane",
+   "mesh_users": 1,
+   "location": [
+    26.15,
+    2.9,
+    0.0
+   ],
+   "rotation_z_deg": 90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hg_crane",
+    "dust": 0.55
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "doors": [
+  {
+   "tris": 17716,
+   "verts": 9090,
+   "local_min": [
+    -1.85,
+    -0.28,
+    0.0
+   ],
+   "local_max": [
+    1.85,
+    0.172,
+    2.66
+   ],
+   "size": [
+    3.7,
+    0.452,
+    2.66
+   ],
+   "islands": 125,
+   "materials": [
+    "GC_bp_steel",
+    "GC_kit_hazard_k",
+    "GC_kit_hazard_y",
+    "GC_kit_rubber",
+    "GC_bp_chrome",
+    "GC_kit_sign",
+    "GC_kit_acc_eng",
+    "GC_kit_ink",
+    "GC_kit_frame",
+    "GC_kit_led_amb",
+    "GC_kit_led_grn",
+    "GC_orange_dk",
+    "GC_red_dk"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "bp_door_collar",
+   "mesh": "GCM_bp_door_collar",
+   "mesh_users": 1,
+   "location": [
+    26.0,
+    8.4,
+    0.0
+   ],
+   "rotation_z_deg": -180.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Blast-door Passage"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "bp_door_collar",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 4414,
+   "verts": 2258,
+   "local_min": [
+    -0.22,
+    -0.188,
+    0.98
+   ],
+   "local_max": [
+    0.22,
+    0.0,
+    2.94
+   ],
+   "size": [
+    0.44,
+    0.188,
+    1.96
+   ],
+   "islands": 31,
+   "materials": [
+    "GC_kit_hazard_k",
+    "GC_kit_hazard_y",
+    "GC_cr_steel_lt",
+    "GC_kit_frame",
+    "GC_scr_green",
+    "GC_kit_led_grn",
+    "GC_red",
+    "GC_bp_chrome",
+    "GC_kit_seam",
+    "GC_kit_sign",
+    "GC_kit_alu",
+    "GC_kit_acc_eng",
+    "GC_kit_ink"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "bp_door_ctrl",
+   "mesh": "GCM_bp_door_ctrl",
+   "mesh_users": 1,
+   "location": [
+    27.828,
+    8.95,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Blast-door Passage"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "bp_door_ctrl",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 8584,
+   "verts": 4488,
+   "local_min": [
+    -1.002,
+    -0.206,
+    -0.004
+   ],
+   "local_max": [
+    1.002,
+    0.206,
+    3.02
+   ],
+   "size": [
+    2.003,
+    0.412,
+    3.024
+   ],
+   "islands": 98,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_cmd",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_led_grn",
+    "GC_sh_steel"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "cmw_door",
+   "mesh": "GCM_cmw_door",
+   "mesh_users": 5,
+   "location": [
+    31.0,
+    18.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Command Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "cmw_door",
+    "dust": 0.14
+   },
+   "instances_of_name": 5
+  },
+  {
+   "tris": 3048,
+   "verts": 1552,
+   "local_min": [
+    -0.25,
+    -0.028,
+    0.003
+   ],
+   "local_max": [
+    0.253,
+    0.028,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.056,
+    2.142
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_kit_alu",
+    "GC_kit_panel_lt",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_cmd"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "cmw_door_leaf",
+   "mesh": "GCM_cmw_door_leaf",
+   "mesh_users": 5,
+   "location": [
+    30.75,
+    18.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Command Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "cmw_door_leaf",
+    "dust": 0.14,
+    "door_id": 10,
+    "door_slide": -0.5
+   },
+   "instances_of_name": 5
+  },
+  {
+   "tris": 3048,
+   "verts": 1552,
+   "local_min": [
+    -0.253,
+    -0.028,
+    0.003
+   ],
+   "local_max": [
+    0.25,
+    0.028,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.056,
+    2.142
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_kit_alu",
+    "GC_kit_panel_lt",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_cmd"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "cmw_door_r_leaf",
+   "mesh": "GCM_cmw_door_r_leaf",
+   "mesh_users": 5,
+   "location": [
+    31.25,
+    18.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Command Room"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "cmw_door_r_leaf",
+    "dust": 0.14,
+    "door_id": 10,
+    "door_slide": 0.5
+   },
+   "instances_of_name": 5
+  },
+  {
+   "tris": 10980,
+   "verts": 5580,
+   "local_min": [
+    -1.62,
+    -1.781,
+    -0.003
+   ],
+   "local_max": [
+    1.62,
+    1.215,
+    3.11
+   ],
+   "size": [
+    3.24,
+    2.997,
+    3.113
+   ],
+   "islands": 62,
+   "materials": [
+    "GC_gd_panel",
+    "GC_steel",
+    "GC_orange",
+    "GC_steel_dk",
+    "GC_lamp_warm",
+    "GC_lamp_white",
+    "GC_kit_frame",
+    "GC_kit_led_amb",
+    "GC_kit_led_grn",
+    "GC_scr_green",
+    "GC_kit_sign",
+    "GC_kit_acc_agri",
+    "GC_kit_ink",
+    "GC_kit_alu",
+    "GC_kit_rubber",
+    "GC_gunmetal",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_airlock",
+   "mesh": "GCM_gd_airlock",
+   "mesh_users": 1,
+   "location": [
+    42.35,
+    -27.0,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_airlock",
+    "dust": 0.75
+   },
+   "instances_of_name": 1
+  },
+  {
+   "tris": 10616,
+   "verts": 5506,
+   "local_min": [
+    -2.001,
+    -0.279,
+    -0.004
+   ],
+   "local_max": [
+    2.001,
+    0.279,
+    4.34
+   ],
+   "size": [
+    4.003,
+    0.558,
+    4.344
+   ],
+   "islands": 118,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_led_amb",
+    "GC_kit_led_grn",
+    "GC_kit_fl_plate"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door",
+   "mesh": "GCM_hgw_door",
+   "mesh_users": 2,
+   "location": [
+    26.0,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door",
+    "dust": 0.55
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 4040,
+   "verts": 2080,
+   "local_min": [
+    -0.34,
+    -0.067,
+    0.003
+   ],
+   "local_max": [
+    0.343,
+    0.007,
+    2.395
+   ],
+   "size": [
+    0.683,
+    0.074,
+    2.392
+   ],
+   "islands": 42,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door_leaf_l",
+   "mesh": "GCM_hgw_door_leaf_l",
+   "mesh_users": 2,
+   "location": [
+    25.66,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door_leaf_l",
+    "dust": 0.55,
+    "door_id": 2,
+    "door_slide": -1.32
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 4040,
+   "verts": 2080,
+   "local_min": [
+    -0.34,
+    -0.007,
+    0.003
+   ],
+   "local_max": [
+    0.343,
+    0.067,
+    2.395
+   ],
+   "size": [
+    0.683,
+    0.074,
+    2.392
+   ],
+   "islands": 42,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door_leaf_l2",
+   "mesh": "GCM_hgw_door_leaf_l2",
+   "mesh_users": 2,
+   "location": [
+    25.02,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door_leaf_l2",
+    "dust": 0.55,
+    "door_id": 2,
+    "door_slide": -0.68
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 4040,
+   "verts": 2080,
+   "local_min": [
+    -0.343,
+    -0.067,
+    0.003
+   ],
+   "local_max": [
+    0.34,
+    0.007,
+    2.395
+   ],
+   "size": [
+    0.683,
+    0.074,
+    2.392
+   ],
+   "islands": 42,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door_leaf_r",
+   "mesh": "GCM_hgw_door_leaf_r",
+   "mesh_users": 2,
+   "location": [
+    26.34,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door_leaf_r",
+    "dust": 0.55,
+    "door_id": 2,
+    "door_slide": 1.32
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 4040,
+   "verts": 2080,
+   "local_min": [
+    -0.343,
+    -0.007,
+    0.003
+   ],
+   "local_max": [
+    0.34,
+    0.067,
+    2.395
+   ],
+   "size": [
+    0.683,
+    0.074,
+    2.392
+   ],
+   "islands": 42,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door_leaf_r2",
+   "mesh": "GCM_hgw_door_leaf_r2",
+   "mesh_users": 2,
+   "location": [
+    26.98,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door_leaf_r2",
+    "dust": 0.55,
+    "door_id": 2,
+    "door_slide": 0.68
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 10612,
+   "verts": 5554,
+   "local_min": [
+    -1.002,
+    -0.279,
+    -0.004
+   ],
+   "local_max": [
+    1.002,
+    0.279,
+    4.34
+   ],
+   "size": [
+    2.003,
+    0.558,
+    4.344
+   ],
+   "islands": 132,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_led_amb",
+    "GC_kit_led_grn",
+    "GC_kit_fl_plate"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door_small",
+   "mesh": "GCM_hgw_door_small",
+   "mesh_users": 4,
+   "location": [
+    17.0,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door_small",
+    "dust": 0.55
+   },
+   "instances_of_name": 4
+  },
+  {
+   "tris": 3836,
+   "verts": 1976,
+   "local_min": [
+    -0.25,
+    -0.037,
+    0.003
+   ],
+   "local_max": [
+    0.253,
+    0.037,
+    2.195
+   ],
+   "size": [
+    0.503,
+    0.074,
+    2.192
+   ],
+   "islands": 40,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door_small_leaf",
+   "mesh": "GCM_hgw_door_small_leaf",
+   "mesh_users": 4,
+   "location": [
+    16.75,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door_small_leaf",
+    "dust": 0.55,
+    "door_id": 1,
+    "door_slide": -0.5
+   },
+   "instances_of_name": 4
+  },
+  {
+   "tris": 3836,
+   "verts": 1976,
+   "local_min": [
+    -0.253,
+    -0.037,
+    0.003
+   ],
+   "local_max": [
+    0.25,
+    0.037,
+    2.195
+   ],
+   "size": [
+    0.503,
+    0.074,
+    2.192
+   ],
+   "islands": 40,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hgr",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "hgw_door_small_r_leaf",
+   "mesh": "GCM_hgw_door_small_r_leaf",
+   "mesh_users": 4,
+   "location": [
+    17.25,
+    8.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Hangar"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "hgw_door_small_r_leaf",
+    "dust": 0.55,
+    "door_id": 1,
+    "door_slide": 0.5
+   },
+   "instances_of_name": 4
+  },
+  {
+   "tris": 8584,
+   "verts": 4488,
+   "local_min": [
+    -1.002,
+    -0.206,
+    -0.004
+   ],
+   "local_max": [
+    1.002,
+    0.206,
+    3.02
+   ],
+   "size": [
+    2.003,
+    0.412,
+    3.024
+   ],
+   "islands": 98,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hab",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_led_grn",
+    "GC_sh_steel"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "msw_door",
+   "mesh": "GCM_msw_door",
+   "mesh_users": 8,
+   "location": [
+    3.0,
+    18.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Mess Hall"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "msw_door",
+    "dust": 0.14
+   },
+   "instances_of_name": 8
+  },
+  {
+   "tris": 3048,
+   "verts": 1552,
+   "local_min": [
+    -0.25,
+    -0.028,
+    0.003
+   ],
+   "local_max": [
+    0.253,
+    0.028,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.056,
+    2.142
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_kit_alu",
+    "GC_kit_panel_lt",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hab"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "msw_door_leaf",
+   "mesh": "GCM_msw_door_leaf",
+   "mesh_users": 8,
+   "location": [
+    2.75,
+    18.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Mess Hall"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "msw_door_leaf",
+    "dust": 0.14,
+    "door_id": 6,
+    "door_slide": -0.5
+   },
+   "instances_of_name": 8
+  },
+  {
+   "tris": 3048,
+   "verts": 1552,
+   "local_min": [
+    -0.253,
+    -0.028,
+    0.003
+   ],
+   "local_max": [
+    0.25,
+    0.028,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.056,
+    2.142
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_kit_alu",
+    "GC_kit_panel_lt",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hab"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "msw_door_r_leaf",
+   "mesh": "GCM_msw_door_r_leaf",
+   "mesh_users": 8,
+   "location": [
+    3.25,
+    18.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Mess Hall"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "msw_door_r_leaf",
+    "dust": 0.14,
+    "door_id": 6,
+    "door_slide": 0.5
+   },
+   "instances_of_name": 8
+  },
+  {
+   "tris": 8584,
+   "verts": 4488,
+   "local_min": [
+    -1.002,
+    -0.206,
+    -0.004
+   ],
+   "local_max": [
+    1.002,
+    0.206,
+    3.02
+   ],
+   "size": [
+    2.003,
+    0.412,
+    3.024
+   ],
+   "islands": 98,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_hab",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_led_grn",
+    "GC_sh_steel"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "qtw_door",
+   "mesh": "GCM_qtw_door",
+   "mesh_users": 2,
+   "location": [
+    13.0,
+    6.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Crew Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "qtw_door",
+    "dust": 0.25
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 3048,
+   "verts": 1552,
+   "local_min": [
+    -0.25,
+    -0.028,
+    0.003
+   ],
+   "local_max": [
+    0.253,
+    0.028,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.056,
+    2.142
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_kit_alu",
+    "GC_kit_panel_lt",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hab"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "qtw_door_leaf",
+   "mesh": "GCM_qtw_door_leaf",
+   "mesh_users": 2,
+   "location": [
+    12.75,
+    6.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Crew Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "qtw_door_leaf",
+    "dust": 0.25,
+    "door_id": 5,
+    "door_slide": -0.5
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 3048,
+   "verts": 1552,
+   "local_min": [
+    -0.253,
+    -0.028,
+    0.003
+   ],
+   "local_max": [
+    0.25,
+    0.028,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.056,
+    2.142
+   ],
+   "islands": 18,
+   "materials": [
+    "GC_kit_alu",
+    "GC_kit_panel_lt",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_hab"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "qtw_door_r_leaf",
+   "mesh": "GCM_qtw_door_r_leaf",
+   "mesh_users": 2,
+   "location": [
+    13.25,
+    6.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Crew Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "qtw_door_r_leaf",
+    "dust": 0.25,
+    "door_id": 5,
+    "door_slide": 0.5
+   },
+   "instances_of_name": 2
+  },
+  {
+   "tris": 10140,
+   "verts": 5314,
+   "local_min": [
+    -1.002,
+    -0.279,
+    -0.004
+   ],
+   "local_max": [
+    1.002,
+    0.279,
+    3.02
+   ],
+   "size": [
+    2.003,
+    0.558,
+    3.024
+   ],
+   "islands": 128,
+   "materials": [
+    "GC_kit_seam",
+    "GC_kit_frame",
+    "GC_kit_rubber",
+    "GC_kit_lower",
+    "GC_kit_panel",
+    "GC_kit_alu",
+    "GC_kit_acc_eng",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k",
+    "GC_kit_sign",
+    "GC_kit_ink",
+    "GC_kit_led_amb",
+    "GC_kit_led_grn",
+    "GC_kit_fl_plate"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "stw_door",
+   "mesh": "GCM_stw_door",
+   "mesh_users": 3,
+   "location": [
+    34.0,
+    3.0,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Service Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "stw_door",
+    "dust": 0.35
+   },
+   "instances_of_name": 3
+  },
+  {
+   "tris": 3816,
+   "verts": 1968,
+   "local_min": [
+    -0.25,
+    -0.037,
+    0.003
+   ],
+   "local_max": [
+    0.253,
+    0.037,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.074,
+    2.142
+   ],
+   "islands": 40,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_eng",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "stw_door_leaf",
+   "mesh": "GCM_stw_door_leaf",
+   "mesh_users": 3,
+   "location": [
+    34.0,
+    3.25,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Service Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "stw_door_leaf",
+    "dust": 0.35,
+    "door_id": 16,
+    "door_slide": -0.5
+   },
+   "instances_of_name": 3
+  },
+  {
+   "tris": 3816,
+   "verts": 1968,
+   "local_min": [
+    -0.253,
+    -0.037,
+    0.003
+   ],
+   "local_max": [
+    0.25,
+    0.037,
+    2.145
+   ],
+   "size": [
+    0.503,
+    0.074,
+    2.142
+   ],
+   "islands": 40,
+   "materials": [
+    "GC_kit_frame",
+    "GC_kit_lower",
+    "GC_glass_clear",
+    "GC_kit_rubber",
+    "GC_sh_steel",
+    "GC_kit_acc_eng",
+    "GC_kit_hazard_y",
+    "GC_kit_hazard_k"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "stw_door_r_leaf",
+   "mesh": "GCM_stw_door_r_leaf",
+   "mesh_users": 3,
+   "location": [
+    34.0,
+    2.75,
+    0.0
+   ],
+   "rotation_z_deg": -90.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Service Corridor"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "stw_door_r_leaf",
+    "dust": 0.35,
+    "door_id": 16,
+    "door_slide": 0.5
+   },
+   "instances_of_name": 3
+  }
+ ],
+ "glass": [
+  {
+   "tris": 193582,
+   "verts": 99690,
+   "local_min": [
+    -7.713,
+    -7.954,
+    0.67
+   ],
+   "local_max": [
+    7.954,
+    7.954,
+    8.754
+   ],
+   "size": [
+    15.667,
+    15.908,
+    8.084
+   ],
+   "islands": 1470,
+   "materials": [
+    "GC_white",
+    "GC_offwhite",
+    "GC_steel",
+    "GC_glass_gd"
+   ],
+   "uv_layers": 0,
+   "vertex_groups": 0,
+   "shape_keys": false,
+   "object": "gd_shell",
+   "mesh": "GCM_gd_shell",
+   "mesh_users": 1,
+   "location": [
+    50.0,
+    -27.0,
+    0.0
+   ],
+   "rotation_z_deg": 0.0,
+   "scale": [
+    1.0,
+    1.0,
+    1.0
+   ],
+   "collections": [
+    "Garden Dome"
+   ],
+   "parent": null,
+   "modifiers": [],
+   "props": {
+    "gc_asset": "gd_shell",
+    "dust": 0.3
+   },
+   "instances_of_name": 1
+  }
+ ],
+ "_interactables": [
+  {
+   "object": "al_suit_rack",
+   "inter": "suits",
+   "location": [
+    16.4,
+    -9.55,
+    0.0
+   ],
+   "collections": [
+    "Airlock"
+   ]
+  },
+  {
+   "object": "cm_colony_computer",
+   "inter": "computer",
+   "location": [
+    27.0,
+    17.25,
+    0.0
+   ],
+   "collections": [
+    "Command Room"
+   ]
+  },
+  {
+   "object": "cm_comms_console",
+   "inter": "comms",
+   "location": [
+    33.4,
+    15.6,
+    0.0
+   ],
+   "collections": [
+    "Command Room"
+   ]
+  },
+  {
+   "object": "gh_console",
+   "inter": "food",
+   "location": [
+    4.6,
+    -0.6,
+    0.0
+   ],
+   "collections": [
+    "Greenhouse"
+   ]
+  },
+  {
+   "object": "it_transceiver",
+   "inter": "board",
+   "location": [
+    23.6,
+    -0.9,
+    0.745
+   ],
+   "collections": [
+    "Hangar"
+   ]
+  },
+  {
+   "object": "ls_console",
+   "inter": "lifesupport",
+   "location": [
+    38.1,
+    2.2,
+    0.0
+   ],
+   "collections": [
+    "Life Support"
+   ]
+  },
+  {
+   "object": "md_heal_station",
+   "inter": "heal",
+   "location": [
+    -5.0,
+    17.5,
+    0.0
+   ],
+   "collections": [
+    "Med Bay"
+   ]
+  },
+  {
+   "object": "md_survivor",
+   "inter": "survivor",
+   "location": [
+    -9.0,
+    16.7,
+    0.7
+   ],
+   "collections": [
+    "Med Bay"
+   ]
+  },
+  {
+   "object": "pw_panel",
+   "inter": "power",
+   "location": [
+    30.0,
+    -9.45,
+    0.0
+   ],
+   "collections": [
+    "Power Room"
+   ]
+  }
+ ],
+ "_doors": {
+  "count": 52,
+  "ids": [
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19,
+   20,
+   21,
+   22,
+   23,
+   24
+  ],
+  "sample": [
+   {
+    "object": "cmw_door_leaf",
+    "door_id": 10,
+    "slide": -0.5,
+    "location": [
+     30.75,
+     18.0,
+     0.0
+    ]
+   },
+   {
+    "object": "cmw_door_leaf.001",
+    "door_id": 11,
+    "slide": -0.5,
+    "location": [
+     24.0,
+     12.75,
+     0.0
+    ]
+   },
+   {
+    "object": "cmw_door_leaf.002",
+    "door_id": 12,
+    "slide": -0.5,
+    "location": [
+     34.0,
+     11.25,
+     0.0
+    ]
+   },
+   {
+    "object": "cmw_door_leaf.003",
+    "door_id": 13,
+    "slide": -0.5,
+    "location": [
+     27.25,
+     10.0,
+     0.0
+    ]
+   },
+   {
+    "object": "cmw_door_leaf.004",
+    "door_id": 15,
+    "slide": -0.5,
+    "location": [
+     37.25,
+     10.0,
+     0.0
+    ]
+   },
+   {
+    "object": "cmw_door_r_leaf",
+    "door_id": 10,
+    "slide": 0.5,
+    "location": [
+     31.25,
+     18.0,
+     0.0
+    ]
+   },
+   {
+    "object": "cmw_door_r_leaf.001",
+    "door_id": 11,
+    "slide": 0.5,
+    "location": [
+     24.0,
+     13.25,
+     0.0
+    ]
+   },
+   {
+    "object": "cmw_door_r_leaf.002",
+    "door_id": 12,
+    "slide": 0.5,
+    "location": [
+     34.0,
+     10.75,
+     0.0
+    ]
+   }
+  ]
+ },
+ "_gn_modifiers": [
+  {
+   "object": "Terrain_00_00",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_00_01",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_00_02",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_00_03",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_00_04",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_01_00",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_01_01",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_01_02",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_01_03",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_01_04",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_02_00",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_02_01",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_02_02",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_02_03",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_02_04",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_03_00",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_03_01",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_03_02",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_03_03",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_03_04",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_04_00",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_04_01",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_04_02",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_04_03",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_04_04",
+   "group": "GC_gravel",
+   "collections": [
+    "Terrain"
+   ]
+  },
+  {
+   "object": "Terrain_rocks",
+   "group": "GC_rock_instancer",
+   "collections": [
+    "Terrain"
+   ]
+  }
+ ],
+ "_dust_values": {
+  "0.3": 432,
+  "0.14": 382,
+  "0.35": 208,
+  "0.55": 192,
+  "0.16": 182,
+  "0.05": 126,
+  "0.75": 109,
+  "0.25": 102,
+  "1.0": 68,
+  "0.06": 31,
+  "0.4": 30,
+  "0.6": 25
+ },
+ "_lights_named": {
+  "FX_rf_tile_lt_lamp": 46,
+  "FX_rf_tile_lt_warm": 28,
+  "FX_rf_tile_grow": 20,
+  "FX_rf_tile_eng_lamp": 19,
+  "FX_rf_tile_eng_amb": 18,
+  "FX_rf_tile_dk_lamp": 16,
+  "FX_sf_landing_pad": 16,
+  "FX_gr_rack": 15,
+  "FX_sf_light_mast": 12,
+  "FX_rf_tile_lt_dim": 9,
+  "FX_hgw_door_small": 8,
+  "FX_gd_airlock": 7,
+  "FX_sf_rover": 7,
+  "FX_SFX_tunnel_inside": 7,
+  "FX_stw_pillar": 7,
+  "FX_ak_wn": 6,
+  "FX_stw_door": 6,
+  "FX_ak_ws": 4,
+  "FX_co_wall_n": 4,
+  "FX_gr_seedling_rack": 4,
+  "FX_gr_w_light": 4,
+  "FX_hg_floodlight": 4,
+  "FX_hgw_door": 4,
+  "FX_wb_wall_e": 4,
+  "FX_co_pendant": 3,
+  "FX_co_wall_e": 3,
+  "FX_eq_wall_lt": 3,
+  "FX_gd_gantry": 3,
+  "FX_gd_hydro": 3,
+  "FX_gr_w_hab_light": 3,
+  "FX_lv_wall_light": 3,
+  "FX_msw_pillar": 3,
+  "FX_pr_light": 3,
+  "FX_sf_print_garage": 3,
+  "FX_SFX_tunnel_shell": 3,
+  "FX_xc_egress": 3,
+  "P_corr": 3,
+  "FX_ak_we": 2,
+  "FX_bp_door_collar": 2,
+  "FX_co_floor_lamp": 2,
+  "FX_co_planter": 2,
+  "FX_co_wall_w": 2,
+  "FX_cr_console": 2,
+  "FX_eq_desk": 2,
+  "FX_eq_reading_light": 2,
+  "FX_gr_straw_gutter": 2,
+  "FX_gr_w_header_lt": 2,
+  "FX_hb_mezzanine": 2,
+  "FX_hb_wn_light": 2,
+  "FX_mb_headwall": 2,
+  "FX_mb_wall_light": 2,
+  "FX_ms_bunk_blue": 2,
+  "FX_pg_rack_s": 2,
+  "FX_pr_wall_amb": 2,
+  "FX_pr_wall_vent": 2,
+  "FX_qt_bunk_mixed": 2,
+  "FX_qt_bunk_orange": 2,
+  "FX_rk_wall_cab": 2,
+  "FX_rk_wall_s": 2,
+  "FX_sc_e_light": 2
+ }
+}

@@ -1,0 +1,112 @@
+{
+    "glb_sha256":  "3720085afb2ecd90546a8984b79e70b1324b5242038d2bdbf920744b60e4c11a",
+    "run":  "final01",
+    "summary":  "Reviewed all 32 final01 Workbench stills through four front/side crew/suit contact sheets, plus the full-size jump side image. Also inspected six images rendered after importing the actual GLB: carry, sprint and seated, side view, both crew and suit. No exploded weights, detached suit pieces or obvious limb-through-torso penetration was observed at these sampled poses. This is not an exhaustive animation collision test.",
+    "reviewed_pose_count":  32,
+    "reviewed_reimport_pose_count":  6,
+    "defects":  [
+                    "Rigid suit joints and convex mitten gloves are visibly stylized; pressure liners show through outer-shell gaps at hips, knees and ankles.",
+                    "The coverall, shoulder patch and hair cap retain hard shading or polygon seams; the boots are deliberately simple rounded forms.",
+                    "The original outer suit shell alone does not enclose all body vertices: torso 0.743%, arms 0.047%, legs 13.465% outside. Exported pressure liners bring the complete-suit measurements to 0% in all three regions.",
+                    "Seated feet are approximately 10 mm above ground. The pose targets an approximately 0.45 m seat; exact seat contact was not numerically certified.",
+                    "Only representative stills were visually inspected. Full-motion self-collision and Godot rendering, transparency and gameplay were not tested; Godot was not run.",
+                    "The body bundle README states CC0, while its separate embedded License names the Rain Rig under CC BY 4.0. Both exact texts are recorded; the colony suit licence was not established."
+                ],
+    "exported_glb_validation":  {
+                                    "glb_sha256":  "3720085afb2ecd90546a8984b79e70b1324b5242038d2bdbf920744b60e4c11a",
+                                    "weights":  {
+                                                    "Body_Arms":  {
+                                                                      "unweighted":  0,
+                                                                      "maximum_influences":  4,
+                                                                      "maximum_sum_error":  8.1956386566162109E-08
+                                                                  },
+                                                    "Body_Head":  {
+                                                                      "unweighted":  0,
+                                                                      "maximum_influences":  4,
+                                                                      "maximum_sum_error":  1.0989606380462646E-07
+                                                                  },
+                                                    "Body_Legs":  {
+                                                                      "unweighted":  0,
+                                                                      "maximum_influences":  4,
+                                                                      "maximum_sum_error":  8.1956386566162109E-08
+                                                                  },
+                                                    "Body_Torso":  {
+                                                                       "unweighted":  0,
+                                                                       "maximum_influences":  4,
+                                                                       "maximum_sum_error":  1.0430812835693359E-07
+                                                                   },
+                                                    "Suit_Arms":  {
+                                                                      "unweighted":  0,
+                                                                      "maximum_influences":  1,
+                                                                      "maximum_sum_error":  0.0
+                                                                  },
+                                                    "Suit_Helmet":  {
+                                                                        "unweighted":  0,
+                                                                        "maximum_influences":  1,
+                                                                        "maximum_sum_error":  0.0
+                                                                    },
+                                                    "Suit_Legs":  {
+                                                                      "unweighted":  0,
+                                                                      "maximum_influences":  1,
+                                                                      "maximum_sum_error":  0.0
+                                                                  },
+                                                    "Suit_Torso":  {
+                                                                       "unweighted":  0,
+                                                                       "maximum_influences":  1,
+                                                                       "maximum_sum_error":  0.0
+                                                                   }
+                                                },
+                                    "animated_ground":  {
+                                                            "carry":  {
+                                                                          "minimum_world_z":  9.979395690606907E-05,
+                                                                          "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                          "seconds":  2.0
+                                                                      },
+                                                            "idle":  {
+                                                                         "minimum_world_z":  9.979395690606907E-05,
+                                                                         "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                         "seconds":  4.0
+                                                                     },
+                                                            "jump":  {
+                                                                         "minimum_world_z":  9.9731936643365771E-05,
+                                                                         "maximum_hips_horizontal_offset":  2.738283821912546E-09,
+                                                                         "seconds":  0.4
+                                                                     },
+                                                            "land":  {
+                                                                         "minimum_world_z":  9.979395690606907E-05,
+                                                                         "maximum_hips_horizontal_offset":  2.738283821912546E-09,
+                                                                         "seconds":  0.4
+                                                                     },
+                                                            "seated":  {
+                                                                           "minimum_world_z":  0.009999511763453484,
+                                                                           "maximum_hips_horizontal_offset":  1.3862566206057636E-08,
+                                                                           "seconds":  0.03333333333333333
+                                                                       },
+                                                            "sprint":  {
+                                                                           "minimum_world_z":  9.9793076515197754E-05,
+                                                                           "maximum_hips_horizontal_offset":  7.1589328909382743E-10,
+                                                                           "seconds":  0.7
+                                                                       },
+                                                            "suit":  {
+                                                                         "minimum_world_z":  9.979395690606907E-05,
+                                                                         "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                         "seconds":  1.0
+                                                                     },
+                                                            "use":  {
+                                                                        "minimum_world_z":  9.979395690606907E-05,
+                                                                        "maximum_hips_horizontal_offset":  3.4234234370933425E-12,
+                                                                        "seconds":  1.0
+                                                                    },
+                                                            "walk":  {
+                                                                         "minimum_world_z":  9.979395690606907E-05,
+                                                                         "maximum_hips_horizontal_offset":  7.1845990268215587E-10,
+                                                                         "seconds":  1.0
+                                                                     }
+                                                        },
+                                    "passed":  true
+                                },
+    "reimport_triangle_totals":  {
+                                     "suit":  42313,
+                                     "body":  14089
+                                 }
+}

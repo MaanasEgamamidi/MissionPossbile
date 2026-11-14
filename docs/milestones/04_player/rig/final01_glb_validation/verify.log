@@ -1,0 +1,14 @@
+carry checked
+idle checked
+jump checked
+land checked
+seated checked
+sprint checked
+suit checked
+use checked
+walk checked
+Traceback (most recent call last):
+  File "G:\nasa app\mars_colony_godot\tools\blender\character\verify_exported_character.py", line 33, in <module>
+    scene.display.shading.light='STUDIO';scene.display.shading.color_type='MATERIAL';scene.display.shading.show_shadows=True;scene.display.shading.show_cavity=True;scene.display.shading.background_type='WORLD';scene.world.color=(.11,.13,.16)
+                                                                                                                                                                                                                  ^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'color' and no __dict__ for setting new attributes

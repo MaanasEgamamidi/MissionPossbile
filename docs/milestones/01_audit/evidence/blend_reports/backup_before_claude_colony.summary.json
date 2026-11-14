@@ -1,0 +1,153 @@
+{
+ "report": "G:\\nasa app\\docs\\milestones\\01_audit\\evidence\\blend_reports\\backup_before_claude_colony.json",
+ "file": {
+  "filepath": "G:\\nasa app\\backup_before_claude_colony.blend",
+  "bytes": 495216,
+  "saved_with_version": [
+   5,
+   2,
+   45
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": false
+ },
+ "counts": {
+  "scenes": 1,
+  "objects": 752,
+  "meshes": 188,
+  "curves": 0,
+  "materials": 50,
+  "textures": 0,
+  "images": 2,
+  "cameras": 6,
+  "lights": 35,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 16,
+  "node_groups": 1,
+  "worlds": 1,
+  "libraries": 0,
+  "texts": 0,
+  "lightprobes": 0,
+  "volumes": 0,
+  "shape_keys": 0,
+  "grease_pencils": 0
+ },
+ "scenes": [
+  [
+   "Scene",
+   752,
+   "BLENDER_EEVEE",
+   "Cam_Library",
+   "AgX",
+   0.0
+  ]
+ ],
+ "mesh_totals": {
+  "unique_meshes": 188,
+  "unique_verts": 16768,
+  "unique_polys": 12497,
+  "unique_tris": 27892,
+  "meshes_with_color_attributes": 0,
+  "meshes_with_uvs": 0
+ },
+ "objects_by_type": {
+  "CAMERA": 6,
+  "MESH": 711,
+  "LIGHT": 35
+ },
+ "instanced_scene_tris": 90008,
+ "meshes_shared": 178,
+ "collection_instances": 0,
+ "modifiers": {
+  "BEVEL": 497
+ },
+ "custom_property_keys": {
+  "gc_asset": 711
+ },
+ "cameras": [
+  "Cam_Hangar_1",
+  "Cam_Hangar_2",
+  "Cam_Hangar_3",
+  "Cam_Hangar_4",
+  "Cam_Library",
+  "Cam_Overview"
+ ],
+ "lights": {
+  "AREA": 6,
+  "POINT": 28,
+  "SUN": 1
+ },
+ "armatures": [],
+ "actions": [],
+ "skinned_meshes": 0,
+ "materials_summary": {
+  "count": 50,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 0,
+  "using_vertex_color_or_attribute": 0,
+  "with_volume": 0,
+  "transmissive_or_glass": 0,
+  "alpha_below_one": 0,
+  "emissive": 8,
+  "render_methods": {
+   "DITHERED": 50
+  }
+ },
+ "images": 2,
+ "missing_files": [],
+ "libraries": [],
+ "category_hits": {
+  "rover_vehicle": [
+   18,
+   6888
+  ],
+  "human_body": [
+   4,
+   400
+  ],
+  "suit": [
+   2,
+   368
+  ],
+  "spaceship": [
+   0,
+   0
+  ],
+  "crops_plants": [
+   7,
+   1388
+  ],
+  "energy": [
+   2,
+   1032
+  ],
+  "life_support": [
+   11,
+   2582
+  ],
+  "comms": [
+   3,
+   228
+  ],
+  "doors_glass": [
+   33,
+   5204
+  ],
+  "terrain_rock": [
+   0,
+   0
+  ],
+  "salvage_fab": [
+   40,
+   3416
+  ],
+  "science": [
+   7,
+   264
+  ]
+ },
+ "is_dirty_after_audit": false
+}

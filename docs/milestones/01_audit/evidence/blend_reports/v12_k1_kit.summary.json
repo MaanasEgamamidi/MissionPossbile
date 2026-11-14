@@ -1,0 +1,148 @@
+{
+ "report": "G:\\nasa app\\docs\\milestones\\01_audit\\evidence\\blend_reports\\v12_k1_kit.json",
+ "file": {
+  "filepath": "G:\\nasa app\\grand_colony\\work\\_v12\\k1\\kit.blend",
+  "bytes": 575531,
+  "saved_with_version": [
+   5,
+   2,
+   45
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": false
+ },
+ "counts": {
+  "scenes": 1,
+  "objects": 87,
+  "meshes": 15,
+  "curves": 0,
+  "materials": 20,
+  "textures": 0,
+  "images": 2,
+  "cameras": 3,
+  "lights": 9,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 4,
+  "node_groups": 1,
+  "worlds": 1,
+  "libraries": 0,
+  "texts": 0,
+  "lightprobes": 0,
+  "volumes": 0,
+  "shape_keys": 0,
+  "grease_pencils": 0
+ },
+ "scenes": [
+  [
+   "Scene",
+   87,
+   "BLENDER_EEVEE",
+   "cam3",
+   "AgX",
+   0.0
+  ]
+ ],
+ "mesh_totals": {
+  "unique_meshes": 15,
+  "unique_verts": 13976,
+  "unique_polys": 12886,
+  "unique_tris": 26764,
+  "meshes_with_color_attributes": 0,
+  "meshes_with_uvs": 0
+ },
+ "objects_by_type": {
+  "CAMERA": 3,
+  "MESH": 35,
+  "LIGHT": 49
+ },
+ "instanced_scene_tris": 75868,
+ "meshes_shared": 4,
+ "collection_instances": 0,
+ "modifiers": {},
+ "custom_property_keys": {
+  "gc_asset": 34,
+  "dust": 34
+ },
+ "cameras": [
+  "cam1",
+  "cam2",
+  "cam3"
+ ],
+ "lights": {
+  "AREA": 48,
+  "SUN": 1
+ },
+ "armatures": [],
+ "actions": [],
+ "skinned_meshes": 0,
+ "materials_summary": {
+  "count": 20,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 18,
+  "using_vertex_color_or_attribute": 20,
+  "with_volume": 0,
+  "transmissive_or_glass": 2,
+  "alpha_below_one": 0,
+  "emissive": 0,
+  "render_methods": {
+   "DITHERED": 20
+  }
+ },
+ "images": 2,
+ "missing_files": [],
+ "libraries": [],
+ "category_hits": {
+  "rover_vehicle": [
+   0,
+   0
+  ],
+  "human_body": [
+   0,
+   0
+  ],
+  "suit": [
+   0,
+   0
+  ],
+  "spaceship": [
+   0,
+   0
+  ],
+  "crops_plants": [
+   2,
+   752
+  ],
+  "energy": [
+   1,
+   2884
+  ],
+  "life_support": [
+   0,
+   0
+  ],
+  "comms": [
+   0,
+   0
+  ],
+  "doors_glass": [
+   2,
+   8080
+  ],
+  "terrain_rock": [
+   0,
+   0
+  ],
+  "salvage_fab": [
+   0,
+   0
+  ],
+  "science": [
+   0,
+   0
+  ]
+ },
+ "is_dirty_after_audit": false
+}

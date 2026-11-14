@@ -1,0 +1,6 @@
+{
+ "S1_spot_all": {"fixtures.mode": "spot", "fixtures.spot_energy_scale": 0.03},
+ "S2_spot_all_sdfgi2": {"fixtures.mode": "spot", "fixtures.spot_energy_scale": 0.03, "gi.sdfgi_energy": 2.0},
+ "S3_mixed_area_ge_1m2": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.spot_energy_scale": 0.03},
+ "S4_area_emission_x3": {"materials.emission_scale": 3.0}
+}

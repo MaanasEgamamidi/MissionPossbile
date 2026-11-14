@@ -2,7 +2,7 @@ param([Parameter(Mandatory=$true)][string]$PoseDirectory)
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..'))
-$allowed = [IO.Path]::GetFullPath((Join-Path $root 'docs\milestones\04_player\rig')) + [IO.Path]::DirectorySeparatorChar
+$allowed = [IO.Path]::GetFullPath((Join-Path $root 'mars_colony_godot\docs\milestones\04_player\rig')) + [IO.Path]::DirectorySeparatorChar
 $poses = [IO.Path]::GetFullPath($PoseDirectory)
 if (-not $poses.StartsWith($allowed,[StringComparison]::OrdinalIgnoreCase)) { throw 'Pose directory must be under the allowed rig folder' }
 $clips = @('idle','walk','sprint','jump','carry','use','suit','seated')

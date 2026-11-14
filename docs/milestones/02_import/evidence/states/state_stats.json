@@ -1,0 +1,65 @@
+{
+ "greenhouse powered": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3\\Shot_11_Greenhouse.png",
+  "mean_lum": 0.31558,
+  "p99_luma": 0.9577,
+  "max_luma": 1.0,
+  "bright_share": 0.53105
+ },
+ "greenhouse unpowered": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\greenhouse_off\\Shot_11_Greenhouse.png",
+  "mean_lum": 0.0012,
+  "p99_luma": 0.1337,
+  "max_luma": 0.6646,
+  "bright_share": 0.0
+ },
+ "mess hall powered day": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3\\Shot_02_MessHall.png",
+  "mean_lum": 0.16327,
+  "p99_luma": 0.9411,
+  "max_luma": 1.0,
+  "bright_share": 0.24192
+ },
+ "mess hall, greenhouse off": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\greenhouse_off\\Shot_02_MessHall.png",
+  "mean_lum": 0.16332,
+  "p99_luma": 0.9411,
+  "max_luma": 1.0,
+  "bright_share": 0.2421
+ },
+ "mess hall powered night": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\night\\Shot_02_MessHall.png",
+  "mean_lum": 0.16279,
+  "p99_luma": 0.9411,
+  "max_luma": 1.0,
+  "bright_share": 0.24085
+ },
+ "exterior wide day": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3\\Shot_14_Exterior_Wide.png",
+  "mean_lum": 0.04083,
+  "p99_luma": 0.4612,
+  "max_luma": 1.0,
+  "bright_share": 0.00289
+ },
+ "exterior wide night": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\night\\Shot_14_Exterior_Wide.png",
+  "mean_lum": 0.00258,
+  "p99_luma": 0.2272,
+  "max_luma": 1.0,
+  "bright_share": 0.00169
+ },
+ "exterior airlock day": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass3\\Shot_13_Exterior_Airlock.png",
+  "mean_lum": 0.05199,
+  "p99_luma": 0.6024,
+  "max_luma": 1.0,
+  "bright_share": 0.01989
+ },
+ "exterior airlock night": {
+  "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\night\\Shot_13_Exterior_Airlock.png",
+  "mean_lum": 0.01381,
+  "p99_luma": 0.582,
+  "max_luma": 1.0,
+  "bright_share": 0.01586
+ }
+}

@@ -1,0 +1,275 @@
+{
+ "R1_amb_0p5": {
+  "overrides": {
+   "fixtures.mode": "mixed",
+   "fixtures.area_min_m2": 1.0,
+   "fixtures.area_energy_scale": 0.016,
+   "fixtures.spot_energy_scale": 0.06,
+   "fixtures.spot_angle_attenuation": 0.6,
+   "gi.sdfgi": false,
+   "probes.ambient_mode": "color",
+   "probes.ambient_energy": 0.5,
+   "sun.energy_scale": 0.11,
+   "sky.energy": 0.45
+  },
+  "views": {
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.89,
+    "ev": {
+     "all": 0.57,
+     "top": 1.28,
+     "mid": 0.63,
+     "bot": 0.09
+    },
+    "rg_shift": 0.844,
+    "bg_shift": 1.223,
+    "contrast": [
+     0.176,
+     0.142
+    ]
+   },
+   "Shot_05_Hangar": {
+    "gpu_ms": 6.75,
+    "ev": {
+     "all": 0.43,
+     "top": 0.69,
+     "mid": 0.45,
+     "bot": 0.29
+    },
+    "rg_shift": 0.883,
+    "bg_shift": 1.07,
+    "contrast": [
+     0.208,
+     0.192
+    ]
+   },
+   "Shot_11_Greenhouse": {
+    "gpu_ms": 7.99,
+    "ev": {
+     "all": 0.44,
+     "top": 0.54,
+     "mid": 0.49,
+     "bot": 0.34
+    },
+    "rg_shift": 0.892,
+    "bg_shift": 1.035,
+    "contrast": [
+     0.235,
+     0.192
+    ]
+   },
+   "Shot_09_Command": {
+    "gpu_ms": 4.14,
+    "ev": {
+     "all": 0.95,
+     "top": 1.81,
+     "mid": 0.85,
+     "bot": 0.42
+    },
+    "rg_shift": 0.879,
+    "bg_shift": 1.068,
+    "contrast": [
+     0.183,
+     0.174
+    ]
+   },
+   "Shot_01_MedBay": {
+    "gpu_ms": 4.02,
+    "ev": {
+     "all": 0.67,
+     "top": 0.92,
+     "mid": 0.83,
+     "bot": 0.4
+    },
+    "rg_shift": 0.984,
+    "bg_shift": 1.045,
+    "contrast": [
+     0.175,
+     0.159
+    ]
+   }
+  }
+ },
+ "R2_amb_1p0": {
+  "overrides": {
+   "fixtures.mode": "mixed",
+   "fixtures.area_min_m2": 1.0,
+   "fixtures.area_energy_scale": 0.016,
+   "fixtures.spot_energy_scale": 0.06,
+   "fixtures.spot_angle_attenuation": 0.6,
+   "gi.sdfgi": false,
+   "probes.ambient_mode": "color",
+   "probes.ambient_energy": 1.0,
+   "sun.energy_scale": 0.11,
+   "sky.energy": 0.45
+  },
+  "views": {
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.89,
+    "ev": {
+     "all": 0.96,
+     "top": 1.95,
+     "mid": 0.96,
+     "bot": 0.27
+    },
+    "rg_shift": 0.819,
+    "bg_shift": 1.287,
+    "contrast": [
+     0.176,
+     0.145
+    ]
+   },
+   "Shot_05_Hangar": {
+    "gpu_ms": 6.52,
+    "ev": {
+     "all": 0.61,
+     "top": 0.87,
+     "mid": 0.64,
+     "bot": 0.45
+    },
+    "rg_shift": 0.868,
+    "bg_shift": 1.086,
+    "contrast": [
+     0.208,
+     0.193
+    ]
+   },
+   "Shot_11_Greenhouse": {
+    "gpu_ms": 7.99,
+    "ev": {
+     "all": 0.68,
+     "top": 0.99,
+     "mid": 0.72,
+     "bot": 0.44
+    },
+    "rg_shift": 0.863,
+    "bg_shift": 1.037,
+    "contrast": [
+     0.235,
+     0.172
+    ]
+   },
+   "Shot_09_Command": {
+    "gpu_ms": 4.18,
+    "ev": {
+     "all": 1.32,
+     "top": 2.48,
+     "mid": 1.09,
+     "bot": 0.55
+    },
+    "rg_shift": 0.878,
+    "bg_shift": 1.073,
+    "contrast": [
+     0.183,
+     0.192
+    ]
+   },
+   "Shot_01_MedBay": {
+    "gpu_ms": 4.03,
+    "ev": {
+     "all": 1.02,
+     "top": 1.61,
+     "mid": 1.16,
+     "bot": 0.55
+    },
+    "rg_shift": 0.975,
+    "bg_shift": 1.061,
+    "contrast": [
+     0.175,
+     0.155
+    ]
+   }
+  }
+ },
+ "R3_amb_0p3_spot_0p05": {
+  "overrides": {
+   "fixtures.mode": "mixed",
+   "fixtures.area_min_m2": 1.0,
+   "fixtures.area_energy_scale": 0.014,
+   "fixtures.spot_energy_scale": 0.05,
+   "fixtures.spot_angle_attenuation": 0.6,
+   "gi.sdfgi": false,
+   "probes.ambient_mode": "color",
+   "probes.ambient_energy": 0.3,
+   "sun.energy_scale": 0.11,
+   "sky.energy": 0.45
+  },
+  "views": {
+   "Shot_02_MessHall": {
+    "gpu_ms": 5.91,
+    "ev": {
+     "all": 0.2,
+     "top": 0.7,
+     "mid": 0.3,
+     "bot": -0.21
+    },
+    "rg_shift": 0.863,
+    "bg_shift": 1.175,
+    "contrast": [
+     0.176,
+     0.147
+    ]
+   },
+   "Shot_05_Hangar": {
+    "gpu_ms": 6.77,
+    "ev": {
+     "all": 0.21,
+     "top": 0.49,
+     "mid": 0.22,
+     "bot": 0.06
+    },
+    "rg_shift": 0.897,
+    "bg_shift": 1.053,
+    "contrast": [
+     0.208,
+     0.191
+    ]
+   },
+   "Shot_11_Greenhouse": {
+    "gpu_ms": 8.03,
+    "ev": {
+     "all": 0.21,
+     "top": 0.17,
+     "mid": 0.26,
+     "bot": 0.18
+    },
+    "rg_shift": 0.917,
+    "bg_shift": 1.035,
+    "contrast": [
+     0.235,
+     0.207
+    ]
+   },
+   "Shot_09_Command": {
+    "gpu_ms": 4.14,
+    "ev": {
+     "all": 0.59,
+     "top": 1.24,
+     "mid": 0.6,
+     "bot": 0.12
+    },
+    "rg_shift": 0.877,
+    "bg_shift": 1.067,
+    "contrast": [
+     0.183,
+     0.166
+    ]
+   },
+   "Shot_01_MedBay": {
+    "gpu_ms": 3.99,
+    "ev": {
+     "all": 0.34,
+     "top": 0.31,
+     "mid": 0.51,
+     "bot": 0.18
+    },
+    "rg_shift": 0.99,
+    "bg_shift": 1.032,
+    "contrast": [
+     0.175,
+     0.165
+    ]
+   }
+  }
+ }
+}

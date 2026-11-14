@@ -1,0 +1,232 @@
+{
+ "report": "G:\\nasa app\\docs\\milestones\\01_audit\\evidence\\blend_reports\\grand_colony__blend1.json",
+ "file": {
+  "filepath": "G:\\nasa app\\grand_colony\\grand_colony.blend1",
+  "bytes": 219964569,
+  "saved_with_version": [
+   5,
+   2,
+   45
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": true
+ },
+ "counts": {
+  "scenes": 1,
+  "objects": 2644,
+  "meshes": 695,
+  "curves": 0,
+  "materials": 256,
+  "textures": 0,
+  "images": 2,
+  "cameras": 184,
+  "lights": 251,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 39,
+  "node_groups": 3,
+  "worlds": 1,
+  "libraries": 0,
+  "texts": 0,
+  "lightprobes": 30,
+  "volumes": 0,
+  "shape_keys": 0,
+  "grease_pencils": 0
+ },
+ "scenes": [
+  [
+   "Scene",
+   2618,
+   "CYCLES",
+   "Shot_15_GardenDome",
+   "AgX",
+   -0.45
+  ]
+ ],
+ "mesh_totals": {
+  "unique_meshes": 695,
+  "unique_verts": 5823993,
+  "unique_polys": 5615742,
+  "unique_tris": 11330275,
+  "meshes_with_color_attributes": 25,
+  "meshes_with_uvs": 7
+ },
+ "objects_by_type": {
+  "MESH": 1959,
+  "CAMERA": 184,
+  "LIGHT": 471,
+  "LIGHT_PROBE": 30
+ },
+ "instanced_scene_tris": 16577823,
+ "meshes_shared": 205,
+ "collection_instances": 0,
+ "modifiers": {
+  "NODES": 26
+ },
+ "custom_property_keys": {
+  "dust": 1905,
+  "gc_asset": 1857,
+  "door_id": 52,
+  "door_slide": 52,
+  "inter": 9
+ },
+ "cameras": [
+  "Cam_Hangar_1",
+  "Cam_Hangar_2",
+  "Cam_Hangar_3",
+  "Cam_Hangar_4",
+  "Cam_Library",
+  "Cam_Overview",
+  "Rv_a01_medbay_cu_bed3",
+  "Rv_a01_medbay_cu_cart",
+  "Rv_a01_medbay_cu_ct",
+  "Rv_a01_medbay_cu_desk",
+  "Rv_a01_medbay_cu_exam",
+  "Rv_a01_medbay_cu_iv",
+  "Rv_a01_medbay_cu_lab",
+  "Rv_a01_medbay_cu_monitor",
+  "Rv_a01_medbay_cu_sink",
+  "Rv_a01_medbay_cu_survivor",
+  "Rv_a01_medbay_heal",
+  "Rv_a01_medbay_spawn",
+  "Rv_a02_commons_cu_chair",
+  "Rv_a02_commons_cu_crew",
+  "Rv_a02_commons_cu_lounge",
+  "Rv_a02_commons_cu_pass",
+  "Rv_a02_commons_cu_table",
+  "Rv_a03_rec_kitchen_cu_ared",
+  "Rv_a03_rec_kitchen_cu_galley",
+  "Rv_a03_rec_kitchen_cu_game",
+  "Rv_a03_rec_kitchen_cu_gym",
+  "Rv_a03_rec_kitchen_cu_lounge",
+  "Rv_a03_rec_kitchen_cu_rehyd",
+  "Rv_a04_pipe_gallery_cu_east",
+  "Rv_a04_pipe_gallery_cu_riser",
+  "Rv_a04_pipe_gallery_cu_valves",
+  "Rv_a04_pipe_gallery_cu_west",
+  "Rv_a04_pipe_gallery_overview",
+  "Rv_a05_hangar_bench",
+  "Rv_a05_hangar_crane",
+  "Rv_a05_hangar_lift",
+  "Rv_a05_hangar_mezz",
+  "Rv_a05_hangar_rescue",
+  "Rv_a05_hangar_rover",
+  "Rv_a05_hangar_rover_rear",
+  "Rv_a05_hangar_service",
+  "Rv_a05_hangar_stretcher",
+  "Rv_a06_service_corridor_corridor",
+  "Rv_a06_service_corridor_cu_cart",
+  "Rv_a06_service_corridor_cu_note",
+  "Rv_a07_airlock_dust",
+  "Rv_a07_airlock_east",
+  "Rv_a07_airlock_glove",
+  "Rv_a07_airlock_inner",
+  "Rv_a07_airlock_suits",
+  "Rv_a07_airlock_tunnel",
+  "Rv_a08_power_aisle",
+  "Rv_a08_power_cu_burnt",
+  "Rv_a08_power_cu_console",
+  "Rv_a08_power_cu_panel",
+  "Rv_a08_power_cu_rack",
+  "Rv_a09_lifesupport_cu_console",
+  "Rv_a09_lifesupport_cu_filter",
+  "Rv_a09_lifesupport_cu_gas",
+  "Rv_a09_lifesupport_cu_manifold",
+  "Rv_a09_lifesupport_cu_moxie",
+  "Rv_a09_lifesupport_cu_pump",
+  "Rv_a09_lifesupport_cu_racks",
+  "Rv_a10_east_quarters_bay_n",
+  "Rv_a10_east_quarters_bay_s",
+  "Rv_a10_east_quarters_bed",
+  "Rv_a10_east_quarters_chess",
+  "Rv_a10_east_quarters_desk",
+  "Rv_a10_east_quarters_lounge",
+  "Rv_a11_command_backrow",
+  "Rv_a11_command_chair",
+  "Rv_a11_command_coffee",
+  "Rv_a11_command_comms",
+  "Rv_a11_command_computer",
+  "Rv_a11_command_racks",
+  "Rv_a11_command_status",
+  "Rv_a11_command_table",
+  "Rv_a12_blast_passage_ctrl",
+  "Rv_a12_blast_passage_door"
+ ],
+ "lights": {
+  "AREA": 431,
+  "SUN": 2,
+  "POINT": 38
+ },
+ "armatures": [],
+ "actions": [],
+ "skinned_meshes": 0,
+ "materials_summary": {
+  "count": 256,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 238,
+  "using_vertex_color_or_attribute": 242,
+  "with_volume": 10,
+  "transmissive_or_glass": 8,
+  "alpha_below_one": 0,
+  "emissive": 1,
+  "render_methods": {
+   "DITHERED": 256
+  }
+ },
+ "images": 2,
+ "missing_files": [],
+ "libraries": [],
+ "category_hits": {
+  "rover_vehicle": [
+   19,
+   180904
+  ],
+  "human_body": [
+   70,
+   432952
+  ],
+  "suit": [
+   12,
+   473034
+  ],
+  "spaceship": [
+   3,
+   100994
+  ],
+  "crops_plants": [
+   161,
+   3410024
+  ],
+  "energy": [
+   20,
+   214496
+  ],
+  "life_support": [
+   31,
+   198146
+  ],
+  "comms": [
+   41,
+   110046
+  ],
+  "doors_glass": [
+   163,
+   455112
+  ],
+  "terrain_rock": [
+   42,
+   2813114
+  ],
+  "salvage_fab": [
+   47,
+   200342
+  ],
+  "science": [
+   43,
+   31406
+  ]
+ },
+ "is_dirty_after_audit": true
+}

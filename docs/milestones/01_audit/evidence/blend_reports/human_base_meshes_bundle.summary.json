@@ -1,0 +1,177 @@
+{
+ "report": "G:\\nasa app\\docs\\milestones\\01_audit\\evidence\\blend_reports\\human_base_meshes_bundle.json",
+ "file": {
+  "filepath": "G:\\nasa app\\grand_colony\\work\\_downloads\\human_base_meshes\\extracted\\human-base-meshes-bundle-v1.4.1\\human_base_meshes_bundle.blend",
+  "bytes": 49420489,
+  "saved_with_version": [
+   4,
+   2,
+   67
+  ],
+  "opened_with": "5.3.0",
+  "opened_build": "02f0899d78e3 2026-11-10",
+  "background": true,
+  "is_dirty_at_audit": false
+ },
+ "counts": {
+  "scenes": 1,
+  "objects": 407,
+  "meshes": 227,
+  "curves": 0,
+  "materials": 0,
+  "textures": 0,
+  "images": 1,
+  "cameras": 25,
+  "lights": 0,
+  "armatures": 0,
+  "actions": 0,
+  "collections": 19,
+  "node_groups": 0,
+  "worlds": 1,
+  "libraries": 0,
+  "texts": 2,
+  "lightprobes": 0,
+  "volumes": 0,
+  "shape_keys": 1,
+  "grease_pencils": 0
+ },
+ "scenes": [
+  [
+   "Scene",
+   407,
+   "CYCLES",
+   "realisitc_skeleton",
+   "Standard",
+   0.0
+  ]
+ ],
+ "mesh_totals": {
+  "unique_meshes": 227,
+  "unique_verts": 134756,
+  "unique_polys": 133784,
+  "unique_tris": 267254,
+  "meshes_with_color_attributes": 0,
+  "meshes_with_uvs": 227
+ },
+ "objects_by_type": {
+  "MESH": 382,
+  "CAMERA": 25
+ },
+ "instanced_scene_tris": 299790,
+ "meshes_shared": 145,
+ "collection_instances": 0,
+ "modifiers": {
+  "MULTIRES": 8,
+  "SUBSURF": 347,
+  "MIRROR": 32
+ },
+ "custom_property_keys": {
+  "conform_object": 407,
+  "cycles": 396,
+  "MM": 20,
+  "M3": 20,
+  "cycles_visibility": 15,
+  "Character": 13,
+  "Weight_Paint_Body": 13,
+  "id_keys": 13,
+  "vs": 13,
+  "mesh_data_transfer_object": 7,
+  "GData": 2
+ },
+ "cameras": [
+  "planar_head",
+  "planar_skull",
+  "primitive_body_female_realistic",
+  "primitive_body_female_stylized",
+  "primitive_body_male_realistic",
+  "primitive_body_male_stylized",
+  "primitive_head_generic",
+  "primitive_head_realistic",
+  "realisitc_skeleton",
+  "realistic_body_emale",
+  "realistic_body_male",
+  "realistic_eye",
+  "realistic_foot",
+  "realistic_hand",
+  "realistic_head_animation",
+  "realistic_head_sculpting",
+  "realistic_jaw",
+  "realistic_skull",
+  "stylized_body_female",
+  "stylized_body_male",
+  "stylized_eye",
+  "stylized_foot",
+  "stylized_hand",
+  "stylized_head",
+  "stylized_jaw"
+ ],
+ "lights": {},
+ "armatures": [],
+ "actions": [],
+ "skinned_meshes": 0,
+ "materials_summary": {
+  "count": 0,
+  "with_image_textures": 0,
+  "with_procedural_texture_nodes": 0,
+  "using_vertex_color_or_attribute": 0,
+  "with_volume": 0,
+  "transmissive_or_glass": 0,
+  "alpha_below_one": 0,
+  "emissive": 0,
+  "render_methods": {}
+ },
+ "images": 1,
+ "missing_files": [],
+ "libraries": [],
+ "category_hits": {
+  "rover_vehicle": [
+   1,
+   632
+  ],
+  "human_body": [
+   106,
+   155626
+  ],
+  "suit": [
+   0,
+   0
+  ],
+  "spaceship": [
+   0,
+   0
+  ],
+  "crops_plants": [
+   0,
+   0
+  ],
+  "energy": [
+   0,
+   0
+  ],
+  "life_support": [
+   0,
+   0
+  ],
+  "comms": [
+   0,
+   0
+  ],
+  "doors_glass": [
+   0,
+   0
+  ],
+  "terrain_rock": [
+   0,
+   0
+  ],
+  "salvage_fab": [
+   0,
+   0
+  ],
+  "science": [
+   0,
+   0
+  ]
+ },
+ "is_dirty_after_audit": false
+}

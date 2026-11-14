@@ -1,6 +1,6 @@
 import bpy,json,sys
 from pathlib import Path
-r=Path(sys.argv[sys.argv.index('--')+1]);out=r/'docs/milestones/04_player/rig/body_sections.json'
+r=Path(sys.argv[sys.argv.index('--')+1]);out=r/'mars_colony_godot/docs/milestones/04_player/rig/body_sections.json'
 with bpy.data.libraries.load(str(r/'mars_colony_godot/assets_src/characters/attempt01/astronaut.blend'),link=False) as (a,b):b.objects=['Body_Head','Body_Torso','Body_Arms','Body_Legs']
 rows={}
 for o in b.objects:

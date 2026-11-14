@@ -1,0 +1,220 @@
+{
+ "authored": {
+  "sky_energy": 0.45,
+  "sun_energy": 0.468
+ },
+ "day": {
+  "sky_energy": 0.45,
+  "sun_energy": 0.468,
+  "sun_visible": true
+ },
+ "failed": [],
+ "lightmap_nodes": 0,
+ "night": {
+  "sky_energy": 0.009,
+  "sun_energy": 0.0,
+  "sun_visible": false
+ },
+ "ok": true,
+ "saved_environment_untouched": true,
+ "zones": [
+  {
+   "ambient_off": -1.0,
+   "ambient_on": -1.0,
+   "fixtures": 54,
+   "glowing_meshes": 15,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Exterior"
+  },
+  {
+   "ambient_off": -1.0,
+   "ambient_on": -1.0,
+   "fixtures": 25,
+   "glowing_meshes": 26,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Dome plaza"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.3213,
+   "fixtures": 76,
+   "glowing_meshes": 77,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Greenhouse"
+  },
+  {
+   "ambient_off": -1.0,
+   "ambient_on": -1.0,
+   "fixtures": 14,
+   "glowing_meshes": 4,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Garden dome"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.1404,
+   "fixtures": 33,
+   "glowing_meshes": 34,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Hangar bay"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.0893,
+   "fixtures": 22,
+   "glowing_meshes": 20,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Airlock"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.2172,
+   "fixtures": 18,
+   "glowing_meshes": 28,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Med Bay"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.2141,
+   "fixtures": 19,
+   "glowing_meshes": 15,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "West bunk room"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.0833,
+   "fixtures": 17,
+   "glowing_meshes": 14,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Crew corridor"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.1777,
+   "fixtures": 23,
+   "glowing_meshes": 28,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Mess hall"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.1888,
+   "fixtures": 16,
+   "glowing_meshes": 22,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "East quarters"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.2415,
+   "fixtures": 14,
+   "glowing_meshes": 25,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Rec kitchen"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.1614,
+   "fixtures": 17,
+   "glowing_meshes": 28,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Command Room"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.0681,
+   "fixtures": 25,
+   "glowing_meshes": 42,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Power Room"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.0915,
+   "fixtures": 15,
+   "glowing_meshes": 13,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Service corridor"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.1214,
+   "fixtures": 18,
+   "glowing_meshes": 29,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Life Support"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.0819,
+   "fixtures": 4,
+   "glowing_meshes": 4,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Blast-door passage"
+  },
+  {
+   "ambient_off": 0.0,
+   "ambient_on": 0.0364,
+   "fixtures": 7,
+   "glowing_meshes": 8,
+   "glowing_when_off": 0,
+   "lights_visible_when_off": 0,
+   "ok": true,
+   "restored": true,
+   "zone": "Pipe gallery"
+  }
+ ]
+}

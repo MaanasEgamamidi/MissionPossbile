@@ -1,0 +1,1070 @@
+{
+ "note": "Rehearsal pairs on the CURRENT map. The improved map has not been supplied; these are not acceptance pairs.",
+ "pairs": [
+  {
+   "camera": "Shot_01_MedBay",
+   "blender_matrix_world": [
+    [
+     0.654931,
+     -0.056944,
+     0.75354,
+     -1.0
+    ],
+    [
+     0.755689,
+     0.049352,
+     -0.653069,
+     9.0
+    ],
+    [
+     0.0,
+     0.997157,
+     0.075354,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 20.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.46563,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_01_MedBay.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_01_MedBay.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 9.9,
+    "draw_calls": 2653
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_01_MedBay.jpg"
+  },
+  {
+   "camera": "Shot_02_MessHall",
+   "blender_matrix_world": [
+    [
+     0.626557,
+     -0.04459,
+     0.778099,
+     13.2
+    ],
+    [
+     0.779376,
+     0.035847,
+     -0.625531,
+     6.8
+    ],
+    [
+     -0.0,
+     0.998362,
+     0.057213,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 18.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.570796,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_02_MessHall.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_02_MessHall.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 13.19,
+    "draw_calls": 6141
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_02_MessHall.jpg"
+  },
+  {
+   "camera": "Shot_03_RecKitchen",
+   "blender_matrix_world": [
+    [
+     0.663035,
+     0.059849,
+     -0.746192,
+     15.0
+    ],
+    [
+     -0.748588,
+     0.053009,
+     -0.660913,
+     12.8
+    ],
+    [
+     0.0,
+     0.996799,
+     0.079949,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 18.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.570796,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_03_RecKitchen.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_03_RecKitchen.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 10.05,
+    "draw_calls": 4781
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_03_RecKitchen.jpg"
+  },
+  {
+   "camera": "Shot_04_CrewCorridor",
+   "blender_matrix_world": [
+    [
+     -0.0,
+     0.035411,
+     -0.999373,
+     0.8
+    ],
+    [
+     -1.0,
+     -0.0,
+     0.0,
+     3.0
+    ],
+    [
+     -0.0,
+     0.999373,
+     0.035411,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 18.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.570796,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_04_CrewCorridor.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_04_CrewCorridor.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 17.21,
+    "draw_calls": 11858
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_04_CrewCorridor.jpg"
+  },
+  {
+   "camera": "Shot_05_Hangar",
+   "blender_matrix_world": [
+    [
+     0.514496,
+     0.085358,
+     -0.853234,
+     15.0
+    ],
+    [
+     -0.857493,
+     0.051215,
+     -0.51194,
+     -1.2
+    ],
+    [
+     0.0,
+     0.995033,
+     0.099544,
+     2.2
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_05_Hangar.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_05_Hangar.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 17.14,
+    "draw_calls": 8697
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_05_Hangar.jpg"
+  },
+  {
+   "camera": "Shot_06_Airlock",
+   "blender_matrix_world": [
+    [
+     -0.538561,
+     -0.058412,
+     0.84056,
+     25.200001
+    ],
+    [
+     0.842587,
+     -0.037335,
+     0.537265,
+     -2.8
+    ],
+    [
+     0.0,
+     0.997594,
+     0.069324,
+     1.7
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_06_Airlock.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_06_Airlock.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 16.89,
+    "draw_calls": 6516
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_06_Airlock.jpg"
+  },
+  {
+   "camera": "Shot_07_PowerRoom",
+   "blender_matrix_world": [
+    [
+     -0.425136,
+     0.052666,
+     -0.903596,
+     26.799999
+    ],
+    [
+     -0.905129,
+     -0.024737,
+     0.424416,
+     -2.8
+    ],
+    [
+     0.0,
+     0.998306,
+     0.058186,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_07_PowerRoom.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_07_PowerRoom.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 11.78,
+    "draw_calls": 5278
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_07_PowerRoom.jpg"
+  },
+  {
+   "camera": "Shot_08_LifeSupport",
+   "blender_matrix_world": [
+    [
+     0.854522,
+     0.032572,
+     -0.518393,
+     34.799999
+    ],
+    [
+     -0.519415,
+     0.053586,
+     -0.85284,
+     -1.2
+    ],
+    [
+     0.0,
+     0.998032,
+     0.062709,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_08_LifeSupport.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_08_LifeSupport.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 11.12,
+    "draw_calls": 3709
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_08_LifeSupport.jpg"
+  },
+  {
+   "camera": "Shot_09_Command",
+   "blender_matrix_world": [
+    [
+     0.615271,
+     0.056692,
+     -0.786275,
+     24.799999
+    ],
+    [
+     -0.788316,
+     0.044247,
+     -0.613678,
+     10.8
+    ],
+    [
+     -0.0,
+     0.997411,
+     0.071915,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_09_Command.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_09_Command.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 10.56,
+    "draw_calls": 2047
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_09_Command.jpg"
+  },
+  {
+   "camera": "Shot_10_EastQuarters",
+   "blender_matrix_world": [
+    [
+     0.774378,
+     0.044702,
+     -0.631142,
+     34.799999
+    ],
+    [
+     -0.632724,
+     0.05471,
+     -0.772443,
+     10.8
+    ],
+    [
+     0.0,
+     0.997501,
+     0.07065,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_10_EastQuarters.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_10_EastQuarters.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 9.02,
+    "draw_calls": 1175
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_10_EastQuarters.jpg"
+  },
+  {
+   "camera": "Shot_11_Greenhouse",
+   "blender_matrix_world": [
+    [
+     -0.43356,
+     -0.030625,
+     0.900604,
+     13.2
+    ],
+    [
+     0.901125,
+     -0.014734,
+     0.433309,
+     -0.8
+    ],
+    [
+     -0.0,
+     0.999422,
+     0.033985,
+     1.7
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_11_Greenhouse.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_11_Greenhouse.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 23.9,
+    "draw_calls": 2958
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_11_Greenhouse.jpg"
+  },
+  {
+   "camera": "Shot_12_WestBunk",
+   "blender_matrix_world": [
+    [
+     0.603108,
+     -0.05804,
+     0.795545,
+     -0.8
+    ],
+    [
+     0.797659,
+     0.043884,
+     -0.60151,
+     0.8
+    ],
+    [
+     0.0,
+     0.997349,
+     0.072763,
+     1.65
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 16.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.688308,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_12_WestBunk.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_12_WestBunk.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 11.87,
+    "draw_calls": 5240
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_12_WestBunk.jpg"
+  },
+  {
+   "camera": "Shot_13_Exterior_Airlock",
+   "blender_matrix_world": [
+    [
+     0.936329,
+     0.022556,
+     0.350398,
+     30.0
+    ],
+    [
+     0.351124,
+     -0.06015,
+     -0.934395,
+     -40.0
+    ],
+    [
+     0.0,
+     0.997935,
+     -0.06424,
+     1.8
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 24.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.287002,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_13_Exterior_Airlock.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_13_Exterior_Airlock.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 28.0,
+    "draw_calls": 11938
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_13_Exterior_Airlock.jpg"
+  },
+  {
+   "camera": "Shot_14_Exterior_Wide",
+   "blender_matrix_world": [
+    [
+     0.791053,
+     0.184551,
+     -0.583246,
+     -40.0
+    ],
+    [
+     -0.611748,
+     0.238644,
+     -0.754197,
+     -75.0
+    ],
+    [
+     -0.0,
+     0.95341,
+     0.301679,
+     32.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 26.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.211089,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_14_Exterior_Wide.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_14_Exterior_Wide.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 15.16,
+    "draw_calls": 9564
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_14_Exterior_Wide.jpg"
+  },
+  {
+   "camera": "Shot_15_GardenDome",
+   "blender_matrix_world": [
+    [
+     0.734803,
+     -0.019162,
+     -0.678009,
+     38.0
+    ],
+    [
+     -0.67828,
+     -0.020759,
+     -0.73451,
+     -40.0
+    ],
+    [
+     -0.0,
+     0.999601,
+     -0.02825,
+     2.0
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "lens_mm": 24.0,
+   "sensor_width_mm": 36.0,
+   "sensor_fit": "AUTO",
+   "horizontal_fov_rad": 1.287002,
+   "clip_start_m": 0.05,
+   "clip_end_m": 3000.0,
+   "reference": {
+    "file": "grand_colony_drive/beauty_shots_cycles_1080p.zip:Shot_15_GardenDome.png",
+    "renderer": "Cycles (Blender 5.2 era file, rendered 2026-11-08)",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "view_transform": "AgX",
+    "look": "AgX - Punchy",
+    "exposure_ev": -0.45,
+    "compositor": "as saved in the scene (bloom, dispersion, colour balance, vignette); its on/off state was not recorded with the renders",
+    "geometry": "render detail level, procedural materials",
+    "state": "day, all fixtures powered",
+    "historical": true
+   },
+   "godot": {
+    "file": "docs/milestones/02_import/evidence/pairs/pass3/Shot_15_GardenDome.png",
+    "engine": "4.7.2-stable (official)",
+    "adapter": "NVIDIA GeForce RTX 4060 Ti",
+    "resolution": [
+     1920,
+     1080
+    ],
+    "msaa": "4x",
+    "frames_before_capture": 100,
+    "ui_and_debug_overlays": "none (off-screen SubViewport)",
+    "tonemap": "AgX",
+    "exposure": 0.732,
+    "preset": "reference_day_powered",
+    "pass": 3,
+    "geometry": "game detail level, flat palette materials with shader dust",
+    "state": "day, all fixtures powered",
+    "render_gpu_ms": 9.33,
+    "draw_calls": 1212
+   },
+   "sheet": "docs/milestones/02_import/evidence/pairs/sheets_pass3/Shot_15_GardenDome.jpg"
+  }
+ ]
+}

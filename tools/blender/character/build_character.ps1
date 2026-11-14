@@ -4,7 +4,7 @@
 param([string]$RunName = '', [string]$ReuseRun = '')
 $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..\..'))
-$rigRoot = Join-Path $root 'docs\milestones\04_player\rig'
+$rigRoot = Join-Path $root 'mars_colony_godot\docs\milestones\04_player\rig'
 $sourceRoot = Join-Path $root 'mars_colony_godot\assets_src\characters'
 $assetRoot = Join-Path $root 'mars_colony_godot\assets\characters'
 function Write-NewText([string]$Path,[string]$Text) {

@@ -1,0 +1,18 @@
+Factory-scene create-only build rebuild_check01
+Appending realistic body
+Appending and separating qt_spacesuit
+Measuring body containment in per-bone suit shells
+Measuring body containment in per-bone suit shells
+Building nine actions, with per-frame foot-ground correction
+Rendering pose evidence
+Rendered idle
+Rendered walk
+Rendered sprint
+Rendered jump
+Rendered carry
+Rendered use
+Rendered suit
+Rendered seated
+Saving new derivative .blend and exporting glTF NLA tracks
+Importing exported GLB into an empty factory scene
+built_pending_visual_review

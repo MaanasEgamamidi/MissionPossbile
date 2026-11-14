@@ -3,7 +3,7 @@ import bpy,json,sys,traceback,hashlib
 from pathlib import Path
 from mathutils import Vector
 root=Path(sys.argv[sys.argv.index('--')+1]);tag=sys.argv[sys.argv.index('--')+2]
-glb=root/'mars_colony_godot/assets/characters'/tag/'astronaut.glb';out=root/'docs/milestones/04_player/rig'/(tag+'_glb_validation')
+glb=root/'mars_colony_godot/assets/characters'/tag/'astronaut.glb';out=root/'mars_colony_godot/docs/milestones/04_player/rig'/(tag+'_glb_validation')
 if out.exists():raise FileExistsError(out)
 out.mkdir();log=(out/'verify.log').open('x');r={'glb_sha256':hashlib.sha256(glb.read_bytes()).hexdigest()}
 try:

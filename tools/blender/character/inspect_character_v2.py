@@ -1,6 +1,6 @@
 import bpy, sys, json, traceback
 from pathlib import Path
-root = Path(sys.argv[sys.argv.index('--')+1]); out = root/'docs/milestones/04_player/rig'
+root = Path(sys.argv[sys.argv.index('--')+1]); out = root/'mars_colony_godot/docs/milestones/04_player/rig'
 r = {'version': bpy.app.version_string}
 with (out/'inspect_v2.log').open('x', encoding='utf8') as log:
     try:

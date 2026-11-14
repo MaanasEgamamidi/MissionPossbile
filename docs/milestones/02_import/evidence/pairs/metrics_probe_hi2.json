@@ -1,0 +1,317 @@
+{
+ "summary": {
+  "tag": "probe_hi2",
+  "pairs": 6,
+  "missing": [
+   "Shot_01_MedBay",
+   "Shot_03_RecKitchen",
+   "Shot_04_CrewCorridor",
+   "Shot_06_Airlock",
+   "Shot_07_PowerRoom",
+   "Shot_08_LifeSupport",
+   "Shot_10_EastQuarters",
+   "Shot_12_WestBunk",
+   "Shot_15_GardenDome"
+  ],
+  "mean_ssim": 0.7426,
+  "mean_abs_ev": 0.132,
+  "mean_de76": 11.72,
+  "settings": "960x540 Lanczos; SSIM on sRGB luma, Gaussian 11x11 sigma 1.5, K1 0.01 K2 0.03; dE76 at 480x270"
+ },
+ "pairs": [
+  {
+   "camera": "Shot_01_MedBay",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_02_MessHall",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.8774,
+   "lum_ref": 0.1726,
+   "lum_godot": 0.1537,
+   "lum_ratio": 0.891,
+   "ev_diff": -0.17,
+   "de76_mean": 8.75,
+   "rg_shift": 1.044,
+   "bg_shift": 0.959,
+   "contrast_ref": 0.1765,
+   "contrast_godot": 0.1777,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0003,
+   "clip_lo_ref": 0.0024,
+   "clip_lo_godot": 0.0055,
+   "grid_ev": [
+    [
+     -0.21,
+     -0.3,
+     -0.39
+    ],
+    [
+     0.15,
+     0.07,
+     -0.0
+    ],
+    [
+     -0.42,
+     -0.08,
+     -0.49
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_03_RecKitchen",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_04_CrewCorridor",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_05_Hangar",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.7451,
+   "lum_ref": 0.2336,
+   "lum_godot": 0.2097,
+   "lum_ratio": 0.898,
+   "ev_diff": -0.16,
+   "de76_mean": 12.23,
+   "rg_shift": 0.982,
+   "bg_shift": 0.971,
+   "contrast_ref": 0.2094,
+   "contrast_godot": 0.2176,
+   "clip_hi_ref": 0.0001,
+   "clip_hi_godot": 0.0004,
+   "clip_lo_ref": 0.0005,
+   "clip_lo_godot": 0.0042,
+   "grid_ev": [
+    [
+     -0.12,
+     -0.03,
+     -0.33
+    ],
+    [
+     -0.06,
+     0.03,
+     -0.19
+    ],
+    [
+     -0.29,
+     -0.08,
+     -0.28
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_06_Airlock",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_07_PowerRoom",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_08_LifeSupport",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_09_Command",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.6559,
+   "lum_ref": 0.0975,
+   "lum_godot": 0.1206,
+   "lum_ratio": 1.237,
+   "ev_diff": 0.31,
+   "de76_mean": 12.72,
+   "rg_shift": 0.993,
+   "bg_shift": 0.968,
+   "contrast_ref": 0.1829,
+   "contrast_godot": 0.1705,
+   "clip_hi_ref": 0.0005,
+   "clip_hi_godot": 0.0014,
+   "clip_lo_ref": 0.0419,
+   "clip_lo_godot": 0.0091,
+   "grid_ev": [
+    [
+     0.98,
+     1.39,
+     0.13
+    ],
+    [
+     0.57,
+     0.97,
+     0.29
+    ],
+    [
+     -0.2,
+     -0.27,
+     -0.22
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_10_EastQuarters",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_11_Greenhouse",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.8223,
+   "lum_ref": 0.2821,
+   "lum_godot": 0.2832,
+   "lum_ratio": 1.004,
+   "ev_diff": 0.01,
+   "de76_mean": 11.99,
+   "rg_shift": 1.021,
+   "bg_shift": 0.993,
+   "contrast_ref": 0.2351,
+   "contrast_godot": 0.2217,
+   "clip_hi_ref": 0.0001,
+   "clip_hi_godot": 0.0005,
+   "clip_lo_ref": 0.0002,
+   "clip_lo_godot": 0.004,
+   "grid_ev": [
+    [
+     -0.19,
+     -0.32,
+     -0.31
+    ],
+    [
+     0.39,
+     0.23,
+     0.07
+    ],
+    [
+     -0.3,
+     -0.05,
+     1.27
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_12_WestBunk",
+   "status": "no Godot capture"
+  },
+  {
+   "camera": "Shot_13_Exterior_Airlock",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.5918,
+   "lum_ref": 0.0472,
+   "lum_godot": 0.0473,
+   "lum_ratio": 1.001,
+   "ev_diff": 0.0,
+   "de76_mean": 14.29,
+   "rg_shift": 1.013,
+   "bg_shift": 1.337,
+   "contrast_ref": 0.0995,
+   "contrast_godot": 0.118,
+   "clip_hi_ref": 0.0001,
+   "clip_hi_godot": 0.0001,
+   "clip_lo_ref": 0.0209,
+   "clip_lo_godot": 0.0168,
+   "grid_ev": [
+    [
+     -0.71,
+     -0.93,
+     -1.66
+    ],
+    [
+     0.43,
+     0.0,
+     -0.1
+    ],
+    [
+     0.25,
+     0.33,
+     0.7
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_14_Exterior_Wide",
+   "status": "ok",
+   "ref_size": [
+    1920,
+    1080
+   ],
+   "godot_size": [
+    1920,
+    1080
+   ],
+   "ssim": 0.7631,
+   "lum_ref": 0.0383,
+   "lum_godot": 0.0348,
+   "lum_ratio": 0.908,
+   "ev_diff": -0.14,
+   "de76_mean": 10.32,
+   "rg_shift": 0.929,
+   "bg_shift": 1.404,
+   "contrast_ref": 0.104,
+   "contrast_godot": 0.0957,
+   "clip_hi_ref": 0.0,
+   "clip_hi_godot": 0.0001,
+   "clip_lo_ref": 0.0438,
+   "clip_lo_godot": 0.0766,
+   "grid_ev": [
+    [
+     -0.42,
+     -0.43,
+     -0.22
+    ],
+    [
+     -0.27,
+     0.85,
+     0.0
+    ],
+    [
+     -0.57,
+     -0.05,
+     0.33
+    ]
+   ]
+  },
+  {
+   "camera": "Shot_15_GardenDome",
+   "status": "no Godot capture"
+  }
+ ]
+}

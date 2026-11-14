@@ -2,7 +2,7 @@
 from pathlib import Path
 import sys,traceback
 root=Path(sys.argv[sys.argv.index('--')+1])
-out=root/'docs/milestones/04_player/rig'
+out=root/'mars_colony_godot/docs/milestones/04_player/rig'
 with (out/'prepare_final.log').open('x',encoding='utf8') as log:
     try:
         source=Path(__file__).with_name('pipeline_resolved_v6.py').read_text(encoding='utf8')

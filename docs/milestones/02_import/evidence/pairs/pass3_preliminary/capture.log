@@ -1,0 +1,26 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+Vulkan 1.4.341 - Forward+ - Using Device #0: NVIDIA - NVIDIA GeForce RTX 4060 Ti
+
+captured Shot_01_MedBay gpu_ms=9.94
+captured Shot_02_MessHall gpu_ms=13.67
+captured Shot_03_RecKitchen gpu_ms=10.14
+captured Shot_04_CrewCorridor gpu_ms=17.55
+captured Shot_05_Hangar gpu_ms=17.18
+captured Shot_06_Airlock gpu_ms=16.3
+captured Shot_07_PowerRoom gpu_ms=12.03
+captured Shot_08_LifeSupport gpu_ms=11.4
+captured Shot_09_Command gpu_ms=10.31
+captured Shot_10_EastQuarters gpu_ms=8.88
+captured Shot_11_Greenhouse gpu_ms=23.9
+captured Shot_12_WestBunk gpu_ms=11.67
+captured Shot_13_Exterior_Airlock gpu_ms=28.95
+captured Shot_14_Exterior_Wide gpu_ms=15.87
+captured Shot_15_GardenDome gpu_ms=9.48
+Godot_v4.7.2-stable_win64_console.exe : WARNING: 7 RIDs of type "Texture" were leaked.
+At G:\nasa app\mars_colony_godot\tools\capture.ps1:11 char:1
++ & $Godot @a *> "$Out\capture.log"
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: 7 RIDs...e" were leaked.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   at: finalize (servers/rendering/rendering_device.cpp:8900)

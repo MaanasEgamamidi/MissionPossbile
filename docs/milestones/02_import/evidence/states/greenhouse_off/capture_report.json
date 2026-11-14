@@ -1,0 +1,31 @@
+{
+ "adapter": "NVIDIA GeForce RTX 4060 Ti",
+ "frames_per_view": 90,
+ "godot": "4.7.2-stable (official)",
+ "night": false,
+ "off": "greenhouse",
+ "pass": 3,
+ "preset": "reference_day_powered",
+ "size": [
+  1920,
+  1080
+ ],
+ "views": [
+  {
+   "camera": "Shot_02_MessHall",
+   "draw_calls": 6193,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\greenhouse_off/Shot_02_MessHall.png",
+   "primitives": 7996196,
+   "render_cpu_ms": 4.3,
+   "render_gpu_ms": 12.31
+  },
+  {
+   "camera": "Shot_11_Greenhouse",
+   "draw_calls": 6086,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\states\\greenhouse_off/Shot_11_Greenhouse.png",
+   "primitives": 7282865,
+   "render_cpu_ms": 5.31,
+   "render_gpu_ms": 10.07
+  }
+ ]
+}

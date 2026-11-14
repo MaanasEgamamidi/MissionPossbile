@@ -2,7 +2,7 @@
 #   & "G:\nasa app\mars_colony_godot\tools\export_from_blender.ps1" [-Blend <path>] [-Report <dir>]
 param([string]$Blend = "G:\nasa app\grand_colony\grand_colony.blend",
       [string]$Project = "G:\nasa app\mars_colony_godot",
-      [string]$Report = "G:\nasa app\docs\milestones\02_import\evidence\export")
+      [string]$Report = "G:\nasa app\mars_colony_godot\docs\milestones\02_import\evidence\export")
 $launcher = "$env:LOCALAPPDATA\Microsoft\WindowsApps\blender-launcher.exe"   # the Store build only starts through this alias
 $script = Join-Path $Project "tools\blender\export_colony_glb.py"
 New-Item -ItemType Directory -Force $Report | Out-Null

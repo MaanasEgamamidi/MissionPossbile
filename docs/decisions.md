@@ -1,0 +1,76 @@
+# Change decisions and overrides (cumulative)
+
+Started in Prompt 01 on 2026-11-11. Three kinds of entry are kept apart: what the owner said, what the pack records the owner as having decided earlier, and routine choices the executor made. An executor choice never overrides an owner decision.
+
+## 1. Owner instructions given in the Prompt 01 session (2026-11-11)
+
+| ID | Instruction (owner's words, shortened) | How it was applied |
+| --- | --- | --- |
+| D-01 | "Read and execute only till page 12." | Only Prompt 01 was executed. See E-01 for how page 12 was located. **What was actually read:** the file has no stored page layout, so its text was first extracted and read up to its twelfth forced page break, which is the end of Prompt 08; only afterwards did the layout estimate show that rendered page 12 ends with Prompt 01. Prompts 02 to 08 were therefore read but not executed. A scan for page markers also showed the first one or two lines of each later section (the titles of Prompts 09 to 17 and of the closing reference sections, including the first entry of each reference list). Nothing else after Prompt 08 was read. |
+| D-02 | "All the resources shall be within this folder." (`G:\nasa app`) | All outputs were written under `G:\nasa app\docs\`. Inputs were looked for in the workspace first. Two things lie outside it and were only read: the prompt pack in Downloads, and the Godot editor project the MCP server exposes (C-03). |
+| D-04 | "page 12 starts prrompt 2, finish prompt 2 asw" (second instruction, same day) | Prompt 02 was executed. This corrects E-01: the owner's viewer puts Prompt 02 on page 12. Blender and Godot access were rechecked first. |
+| D-03 | "Make sure you have access to Blender and Godot before doing anything. If don't have access … quit." | Work stopped twice while one or both connections were down. It began only after the Blender MCP and the Godot MCP both answered. |
+| D-05 | "dont bake textures, do other options, make it looks impressive and like the blender one as much as possible" (during Prompt 02) | No texture was baked. Graphics pass 4 switched to render-detail meshes and run-time ports of the Blender procedural materials. Still in force. |
+| D-06 | "also, do the next 2 prompts" | Prompts 03 and 04 were executed in this session, each with its own handoff. |
+| D-07 | "stop worrying about graphics for now, move onto mechanics and actual game stuff other than the looks only" | Graphics pass 4 was stopped where it stood, in a state that builds, imports and verifies (issue I-36). No further visual tuning was done; Prompt 03 and 04 work concentrated on mechanics. The player body is a stand-in for the same reason. |
+| D-08 | "use codex cli's astra model … split the work more, make as many subagents as needed … use astra on fast mode" | Codex CLI 0.167.1 was checked first (model `gpt-6-astra`, fast service tier, sandbox `workspace-write`). Five workers ran in parallel, four in their own copies of the project, one (the rig) in the workspace with a write list. Project code and file paths were sent to that service as the instruction requires; no personal details were put in the briefs. See E-16. |
+| D-09 | "push to github" (2026-11-12), then chose "move docs into the game repo" | The game repository was already up to date on GitHub (`JoseVGerald/mars_colony_godot`). The records folder was moved into it and pushed (E-25). |
+
+## 2. Owner decisions recorded by the pack (pages 2 to 11)
+
+The pack says its shared brief preserves decisions made in an earlier conversation, and that an explicit owner decision overrides a conflicting document requirement. That conversation and the three governing documents are not available, so **which brief rules are overrides of the documents, and which simply repeat them, cannot be told apart yet.** Every rule is carried as a confirmed requirement in `requirements_matrix.md`.
+
+Rules the pack itself marks as changing earlier behaviour or documents:
+
+| Rule in the brief or prompts | What it replaces |
+| --- | --- |
+| The browser game and Godot port are implementation evidence, not authority; their survivor story and old tutorial are not the new design. | Browser demo story and tutorial. |
+| Tab toggles first and third person; M opens the blueprint; F5 has no gameplay binding. | Earlier key bindings. |
+| Mars gravity everywhere; jump retuned. | "the old Earth-gravity jump". |
+| A client's connection loss carries no penalty. | An explicit exception to the ordinary incident penalty. |
+| Video and cutscene implementation is ignored. | Any cinematic scope in the documents. |
+| Old demo power figures are not NASA specifications. | Any reading of 90, 128 or 140 kW as measured values. |
+
+## 3. Executor decisions in Prompt 01
+
+| ID | Decision | Reason | Reversible? |
+| --- | --- | --- | --- |
+| E-01 | "Page 12" was taken to be the rendered page that holds Prompt 01. | The DOCX stores no page layout (its metadata says one page) and no Word-compatible renderer is installed. Laying the text out at the file's own page size, margins, fonts and spacing put Prompt 01 on page 12. Scaling every line height by −7% and +7% moved page 12 to Prompt 02 and to the Common execution instruction. Counting only forced page breaks would have put Prompt 08 there, but the shared brief alone needs about five pages, so that reading does not match any rendering. The estimate also matches the pack's own rule to execute one milestone at a time. | Yes. If the owner's viewer shows Prompt 02 on page 12, Prompt 02 is the next step anyway and it is blocked on the improved map. |
+| E-02 | Project documentation lives in `G:\nasa app\docs\`. | No game project with a documentation folder exists; the workspace root is the only place common to all inputs. | Yes: move the folder when a game project is created. |
+| E-03 | Blender files were inspected in a separate background Blender process, not in the live Blender window. | Opening a file in the live instance would replace whatever is loaded there. The background process was started with `--factory-startup --disable-autoexec` and never saves. | n/a |
+| E-04 | The Godot MCP was used read-only. | Its project is outside the workspace (C-03). | n/a |
+| E-05 | No historical Cycles render was repeated and no new render was made. | Prompt 01 says fresh final-map renders belong to Prompt 02 and warns against expensive re-rendering that cannot establish parity for the forthcoming map. | n/a |
+| E-06 | The register uses its own ids (S, T, L) with the pack's ids shown as inferred. | The pack's id definitions are after page 12 (C-14). | Yes. |
+| E-07 | A launch entry `colony-game-audit` on port 8790 was added to `.claude\launch.json`. | The existing `colony-game` entry uses port 8765, which the Godot MCP server occupies (C-20). The existing entries were not changed. | Yes: delete the entry. |
+| E-08 | Nothing was committed to the `grand_colony` git repository. | Committing was not asked for. | n/a |
+
+### Executor decisions in Prompt 02
+
+| ID | Decision | Reason | Reversible? |
+| --- | --- | --- | --- |
+| E-09 | A new Godot project was created at `G:\nasa app\mars_colony_godot`. | There is no port to extend (C-01) and the owner wants all resources in the workspace. | Yes: it is a self-contained folder. |
+| E-10 | Prompt 02 was run on the current map as a rehearsal. | The improved map is missing, and the prompt says to complete independent preparation and flag the dependency. Every output is labelled as not accepted for the final map. | Yes: re-run the pipeline on the improved map. |
+| E-11 | The 15 Cycles beauty shots of 2026-11-08 were used as references; nothing was re-rendered in Cycles. | Final-map references cannot be rendered without the map, and Prompt 01 found the saved scene identical in content to the one those shots came from. | Yes. |
+| E-12 | The derivative uses the game detail level and flat palette materials, with the dust layer approximated in a shader. No textures were baked. | The saved scene is 16.6 M triangles with no UVs; the build scripts already produce a 0.55 M-triangle version. Baking needs UVs and an owner decision (I-30). | Yes: a bake step can replace the material generator. |
+| E-13 | Lighting uses spot lights for small panels and AreaLight3D for panels of 1 m² or more, SDFGI off, a per-room ambient as the stand-in for bounce, and one render layer per room to stop unshadowed lights crossing walls. | Measured in Prompt 02: area lights cost about twice as much and gave SDFGI nothing; SDFGI let sky light into closed rooms. | Yes: all of it is in `lighting_preset.json` and two scripts. |
+| E-14 | The Godot project was driven through the Godot command line, not the MCP-connected editor. | That editor has a project outside the workspace open (C-03). | n/a |
+| E-15 | Rubric scores were given by the executor. Pass 3 was captured more than once to correct faults found in review; no fourth calibration pass was run. | The prompt asks for three passes and an honest list of what remains. | Owner review can replace the scores. |
+
+### Executor decisions in Prompts 03 and 04
+
+| ID | Decision | Reason | Reversible? |
+| --- | --- | --- | --- |
+| E-16 | Parallel work was split by file ownership against one written interface specification (`milestones\03_simulation\workers\SPEC.md`); the executor wrote the shared types, clock and tick model first, then reviewed, merged and re-tested every worker result in the real project. | Workers cannot see each other; a contract plus disjoint file lists is what makes their output mergeable. A worker's own test report is not proof, so all suites were re-run after merging. | n/a |
+| E-17 | `GameServices` is a node the game scene adds, not an autoload. | An autoload would also start inside the command-line build, capture and test tools. | Yes |
+| E-18 | Run-time saves go to `user://saves` as the pack requires, which on Windows is outside `G:\nasa app`. Everything the project or its tests write stays inside the folder. | The pack's contract names `user://`; D-02 asks for all resources in the folder. A player's save games are not project resources. **Owner to confirm.** | Yes: `GameConfig.save_dir` |
+| E-19 | The colony model in Prompt 03 is a small placeholder (power, oxygen, water, food, crew condition) with tuning numbers chosen only to exercise ticks, bookkeeping, validation and saving. | Prompt 03 asks for the foundation; Prompts 07 and 08 define the real model. | Yes |
+| E-20 | Every save stores a checksum of the text a reader will reconstruct, not of the in-memory values. | Godot 4.7.2's JSON parser does not read every very small number back exactly, so any scheme that re-prints parsed numbers a second time can disagree with itself (found in the end-to-end run). | n/a |
+| E-21 | Jump height 0.5 m (take-off 1.93 m/s, about 1.0 s in the air), walk 3.0 m/s, sprint × 1.6, step height 0.25 m, slope limit 40°. | The worker's 0.22 m hop hid the low gravity; 0.5 m shows it and still lands in about a second. All are designer tuning in `PlayerTuning`. | Yes |
+| E-22 | The sampled terrain is raised to ground level (−0.05 m) under and within 2 m of every room. | The terrain mesh is cut 0.5 m down under the base; on a 1 m grid that pit left a step in front of all four outside doors that the player could not climb. The terrain under a floor is never walked on. | Yes: `tools\godot\heightmap_level_rooms.gd` |
+| E-23 | Until a crew screen exists, keys 1 to 4 ask to take that crew member (the host still applies the hub rule), and the power panel opens a plain list of zone switches. | Makes the switching and power rules playable now. Both are interim presentation. | Yes |
+| E-24 | The map's 162 `dynamic` props are fixed colliders for now; three rehearsal crates near the hub are the only objects that can be carried. | Turning map props into physics bodies needs per-prop decisions that belong with stations and cargo (Prompt 05, 07). | Yes |
+| E-25 | The records moved from `G:\nasa app\docs` to `G:\nasa app\mars_colony_godot\docs` so code and records share one repository. Live scripts and instructions were repointed; evidence files that recorded an absolute output path at the time (capture and audit JSON reports) keep the old path as written. `docs\.gdignore` keeps Godot from importing the record images. | Owner's choice (D-09). E-02 had foreseen moving the folder once a game project existed. | Yes |
+
+## 4. Decisions waiting for the owner
+
+See `issues.md`. The ones that gate later milestones are I-01 (governing documents), I-02 (improved map), I-30 (materials: palette plus shader, or baked) and I-04 and I-05 (approved character and rover assets).

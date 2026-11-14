@@ -1,7 +1,7 @@
 import bpy, sys, json
 from pathlib import Path
 from mathutils import Vector
-root=Path(sys.argv[sys.argv.index('--')+1]);out=root/'docs/milestones/04_player/rig'
+root=Path(sys.argv[sys.argv.index('--')+1]);out=root/'mars_colony_godot/docs/milestones/04_player/rig'
 for n in ['suit_parts.json','source_suit_front.png','source_suit_side.png','parts.log']:
     if (out/n).exists(): raise RuntimeError('Existing output: '+n)
 log=(out/'parts.log').open('x');log.write('Starting\n');log.flush()

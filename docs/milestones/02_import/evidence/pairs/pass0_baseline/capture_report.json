@@ -1,0 +1,135 @@
+{
+ "adapter": "NVIDIA GeForce RTX 4060 Ti",
+ "frames_per_view": 90,
+ "godot": "4.7.2-stable (official)",
+ "night": false,
+ "off": "",
+ "pass": 0,
+ "preset": "reference_day_powered",
+ "size": [
+  1920,
+  1080
+ ],
+ "views": [
+  {
+   "camera": "Shot_01_MedBay",
+   "draw_calls": 2639,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_01_MedBay.png",
+   "primitives": 6661446,
+   "render_cpu_ms": 2.31,
+   "render_gpu_ms": 16.29
+  },
+  {
+   "camera": "Shot_02_MessHall",
+   "draw_calls": 6125,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_02_MessHall.png",
+   "primitives": 7996196,
+   "render_cpu_ms": 5.35,
+   "render_gpu_ms": 24.08
+  },
+  {
+   "camera": "Shot_03_RecKitchen",
+   "draw_calls": 2917,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_03_RecKitchen.png",
+   "primitives": 5568486,
+   "render_cpu_ms": 3.29,
+   "render_gpu_ms": 18.4
+  },
+  {
+   "camera": "Shot_04_CrewCorridor",
+   "draw_calls": 8982,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_04_CrewCorridor.png",
+   "primitives": 6814142,
+   "render_cpu_ms": 9.79,
+   "render_gpu_ms": 32.81
+  },
+  {
+   "camera": "Shot_05_Hangar",
+   "draw_calls": 5838,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_05_Hangar.png",
+   "primitives": 5830066,
+   "render_cpu_ms": 6.78,
+   "render_gpu_ms": 27.54
+  },
+  {
+   "camera": "Shot_06_Airlock",
+   "draw_calls": 3663,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_06_Airlock.png",
+   "primitives": 5452450,
+   "render_cpu_ms": 4.08,
+   "render_gpu_ms": 28.15
+  },
+  {
+   "camera": "Shot_07_PowerRoom",
+   "draw_calls": 2435,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_07_PowerRoom.png",
+   "primitives": 4614487,
+   "render_cpu_ms": 2.99,
+   "render_gpu_ms": 20.6
+  },
+  {
+   "camera": "Shot_08_LifeSupport",
+   "draw_calls": 2708,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_08_LifeSupport.png",
+   "primitives": 5214194,
+   "render_cpu_ms": 2.81,
+   "render_gpu_ms": 19.75
+  },
+  {
+   "camera": "Shot_09_Command",
+   "draw_calls": 2042,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_09_Command.png",
+   "primitives": 5096372,
+   "render_cpu_ms": 2.54,
+   "render_gpu_ms": 17.3
+  },
+  {
+   "camera": "Shot_10_EastQuarters",
+   "draw_calls": 1172,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_10_EastQuarters.png",
+   "primitives": 4817502,
+   "render_cpu_ms": 1.71,
+   "render_gpu_ms": 14.69
+  },
+  {
+   "camera": "Shot_11_Greenhouse",
+   "draw_calls": 2950,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_11_Greenhouse.png",
+   "primitives": 5295434,
+   "render_cpu_ms": 3.35,
+   "render_gpu_ms": 34.86
+  },
+  {
+   "camera": "Shot_12_WestBunk",
+   "draw_calls": 5220,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_12_WestBunk.png",
+   "primitives": 7456923,
+   "render_cpu_ms": 4.17,
+   "render_gpu_ms": 23.8
+  },
+  {
+   "camera": "Shot_13_Exterior_Airlock",
+   "draw_calls": 11906,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_13_Exterior_Airlock.png",
+   "primitives": 6828094,
+   "render_cpu_ms": 14.3,
+   "render_gpu_ms": 39.17
+  },
+  {
+   "camera": "Shot_14_Exterior_Wide",
+   "draw_calls": 9542,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_14_Exterior_Wide.png",
+   "primitives": 3604628,
+   "render_cpu_ms": 12.86,
+   "render_gpu_ms": 26.95
+  },
+  {
+   "camera": "Shot_15_GardenDome",
+   "draw_calls": 1215,
+   "file": "G:\\nasa app\\docs\\milestones\\02_import\\evidence\\pairs\\pass0_baseline/Shot_15_GardenDome.png",
+   "primitives": 4421823,
+   "render_cpu_ms": 1.59,
+   "render_gpu_ms": 15.77
+  }
+ ]
+}

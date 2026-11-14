@@ -1,0 +1,195 @@
+﻿== scene settings
+{"name": "Scene", "engine": "BLENDER_EEVEE", "resolution": [1920, 1080, 100], "fps": 24, "frame_range": [1, 250, 115], "active_camera": "Shot_15_GardenDome", "units": {"system": "METRIC", "scale_length": 1.0, "length_unit": "METERS"}, "color_management": {"display_device": "sRGB", "view_transform": "AgX", "look": "AgX - Punchy", "exposure": -0.45, "gamma": 1.0, "use_curve_mapping": false}, "gravity": [0.0, 0.0, -9.81], "cycles": {"samples": 128, "preview_samples": 64, "use_denoising": true, "max_bounces": 10, "device": "GPU", "use_adaptive_sampling": true, "adaptive_threshold": 0.019999999552965164, "volume_bounces": 1, "film_exposure": 1.0}, "eevee": {"taa_render_samples": 64, "use_raytracing": true, "use_shadows": true, "use_volumetric_shadows": true, "volumetric_tile_size": "4", "gi_diffuse_bounces": 3, "shadow_ray_count": 2, "shadow_step_count": 12}, "compositor_nodes": {"CompositorNodeRLayers": 1, "CompositorNodeGlare": 1, "CompositorNodeLensdist": 1, "CompositorNodeColorBalance": 1, "CompositorNodeEllipseMask": 1, "CompositorNodeBlur": 1, "ShaderNodeMath": 1, "ShaderNodeMix": 1, "NodeGroupOutput": 1}}
+== worlds [{"name": "GC_World", "node_kinds": {"ShaderNodeOutputWorld": 1, "ShaderNodeTexCoord": 1, "ShaderNodeSeparateXYZ": 1, "ShaderNodeValToRGB": 1, "ShaderNodeMapRange": 1, "ShaderNodeVectorMath": 1, "ShaderNodeMath": 2, "ShaderNodeMix": 1, "ShaderNodeBackground": 1}, "backgrounds": [{"strength": 1.0, "strength_linked": false, "color": [0.8, 0.8, 0.8, 1.0], "color_linked": true}]}]
+== scene bbox {"Scene": {"min": [-2397.0, -2407.0, -120.0], "max": [2403.0, 2393.0, 420.0], "size": [4800.0, 4800.0, 540.0]}}
+== collection tree
+Scene Collection  [direct=0 all=2618 tris=16,522,905]
+  Colony (colour)  [direct=0 all=1910 tris=12,949,985]
+    Lights  [direct=53 all=53 tris=0]
+    Hangar  [direct=131 all=131 tris=589,954]
+    Crew Corridor  [direct=63 all=63 tris=474,940]
+    Mess Hall  [direct=130 all=130 tris=514,831]
+    Rec Kitchen  [direct=72 all=72 tris=291,568]
+    Med Bay  [direct=92 all=92 tris=719,610]
+    Command Room  [direct=84 all=84 tris=309,508]
+    Blast-door Passage  [direct=7 all=7 tris=53,080]
+    West Bunk Room  [direct=52 all=52 tris=384,274]
+    East Quarters  [direct=80 all=80 tris=266,876]
+    Service Corridor  [direct=29 all=29 tris=221,136]
+    Greenhouse  [direct=184 all=184 tris=2,205,440]
+    Airlock  [direct=69 all=69 tris=771,576]
+    Power Room  [direct=120 all=120 tris=618,242]
+    Life Support  [direct=58 all=58 tris=264,957]
+    Pipe gallery  [direct=19 all=19 tris=177,478]
+    Dome plaza  [direct=42 all=42 tris=833,572]
+    Exterior  [direct=63 all=63 tris=912,466]
+    Garden Dome  [direct=52 all=52 tris=2,104,949]
+    Roofs  [direct=510 all=510 tris=1,235,528]
+  Environment (Blender only)  [direct=0 all=85 tris=3,572,908]
+    Exterior env  [direct=0 all=58 tris=805,388]
+      Glass hall  [direct=30 all=30 tris=772,336]
+      Exterior decals  [direct=7 all=7 tris=4,456]
+      Exterior drifts  [direct=1 all=1 tris=16,064]
+      Exterior atmosphere  [direct=9 all=9 tris=636]
+      Exterior motes  [direct=1 all=1 tris=11,896]
+      Exterior env lights  [direct=10 all=10 tris=0]
+    Terrain  [direct=27 all=27 tris=2,767,520]
+  Render Lights  [direct=1 all=438 tris=0]
+    Fixture Lights  [direct=407 all=407 tris=0]
+    Light Probes  [direct=30 all=30 tris=0]
+  Atmosphere  [direct=1 all=1 tris=12]
+  Cameras  [direct=6 all=6 tris=0]
+  Beauty Shots  [direct=15 all=15 tris=0]
+  Review Cameras  [direct=163 all=163 tris=0]
+== collection bboxes (top level)
+   Scene/Colony (colour): size=[105.884, 86.742, 30.268] min=[-44.328, -65.342, -1.291] max=[61.555, 21.4, 28.977]
+   Scene/Environment (Blender only): size=[4800.0, 4800.0, 238.266] min=[-2397.0, -2407.0, -22.863] max=[2403.0, 2393.0, 215.403]
+   Scene/Atmosphere: size=[2400.0, 2400.0, 540.0] min=[-1185.0, -1196.0, -120.0] max=[1215.0, 1204.0, 420.0]
+== objects misc {'parented': 0, 'hidden_in_render': 0, 'lod_like_name_tokens': {'_low': 1, '_game': 5, '_lo': 1}, 'non_unit_scale_objects': 81, 'negative_scale_objects': 0, 'meshes_used_once': 490, 'meshes_shared': 205, 'mesh_objects': 1959}
+== name prefixes {'rf_tile': 430, 'FX_rf': 156, 'Rv_a': 131, 'gr_floor': 72, 'FX_sf': 46, 'co_floor': 44, 'hb_fl': 40, 'rf_slab': 36, 'FX_gr': 35, 'co_chair': 33, 'pr_floor': 32, 'Rv_x': 32, 'gr_w': 31, 'mb_floor': 30, 'pr_bat': 30, 'SFX_hall': 28, 'xc_floor': 27, 'Terrain_': 25, 'ak_fl': 24, 'lv_floor': 24, 'msw_door': 24, 'hgw_door': 22, 'eq_floor': 21, 'cr_floor': 20, 'rk_floor': 20, 'wb_floor': 20, 'gd_ring': 19, 'gr_tray': 18, 'mb_wall': 18, 'co_wall': 16, 'FX_co': 16, 'cmw_door': 15, 'rf_fascia': 15, 'rf_vent': 15, 'Shot_': 15, 'cr_wall': 14, 'FX_gd': 14, 'FX_xc': 14, 'hg_crate': 14, 'rf_hvac': 14, 'rk_wall': 14, 'rv_': 14, 'eq_wall': 13, 'FX_ak': 13, 'FX_stw': 13, 'FX_hgw': 12, 'hb_mk': 12, 'pv_': 12, 'sf_solar': 12, 'pr_wall': 11, 'FX_hb': 10, 'FX_SFX': 10, 'hb_sign': 10, 'pg_floor': 10, 'sc_floor': 10, 'FX_pr': 9, 'sf_crash': 9, 'stw_door': 9, 'FX_rk': 8, 'pr_swgr': 8, 'FX_eq': 7, 'FX_mb': 7, 'FX_qt': 7, 'lv_wall': 7, 'qt_locker': 7, 'sf_cable': 7, 'stw_pillar': 7, 'FX_cr': 6, 'FX_lv': 6, 'FX_sc': 6, 'gd_crop': 6, 'gd_planter': 6, 'gr_crate': 6, 'gr_rack': 6, 'qtw_door': 6, 'wb_wall': 6, 'xc_wall': 6, 'cr_mug': 5, 'cr_sign': 5, 'gd_pot': 5}
+== top shared meshes [['GCM_rf_tile_lt', 183, 2560], ['GCM_gr_floor', 53, 56], ['GCM_rf_tile_dk', 46, 2376], ['GCM_rf_tile_lt_lamp', 46, 2972], ['GCM_rf_tile_eng', 39, 2656], ['GCM_co_floor', 35, 68], ['GCM_hb_fl', 34, 56], ['GCM_co_chair', 32, 6008], ['GCM_pr_floor', 32, 56], ['GCM_mb_floor', 30, 68], ['GCM_rf_tile_lt_warm', 28, 2972], ['GCM_rf_slab_lt', 27, 22], ['GCM_lv_floor', 24, 68], ['GCM_xc_floor', 21, 12844], ['GCM_cr_floor', 20, 716], ['GCM_eq_floor', 20, 716], ['GCM_rf_tile_grow', 20, 3844], ['GCM_wb_floor', 20, 716], ['GCM_rf_tile_eng_lamp', 19, 3288], ['GCM_rf_tile_eng_amb', 18, 2872], ['GCM_rk_floor', 17, 716], ['GCM_ak_fl_rub', 16, 12844], ['GCM_gr_floor_spine', 16, 92], ['GCM_rf_tile_dk_lamp', 16, 2948], ['GCM_pr_bat_rack', 15, 17072]]
+== top meshes by tris
+   Terrain_02_02: tris=524,288 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   Terrain_02_01: tris=493,568 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   GCM_gd_crop_tomato: tris=358,668 users=1 mats=12 uv=0 colattr=[]
+   GCM_gd_crop_lettuce: tris=334,656 users=1 mats=8 uv=0 colattr=[]
+   GCM_md_survivor: tris=315,396 users=1 mats=14 uv=0 colattr=[]
+   Terrain_01_02: tris=303,104 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   GCM_gd_crop_corn: tris=281,562 users=1 mats=9 uv=0 colattr=[]
+   GCM_al_suit_rack: tris=270,602 users=1 mats=26 uv=0 colattr=[]
+   GCM_gd_crop_carrot: tris=268,950 users=1 mats=8 uv=0 colattr=[]
+   GCM_gd_crop_beet: tris=264,320 users=1 mats=8 uv=0 colattr=[]
+   Terrain_01_01: tris=235,520 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   Terrain_03_02: tris=204,800 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   Terrain_03_01: tris=198,656 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   GCM_gd_shell: tris=193,582 users=1 mats=4 uv=0 colattr=[]
+   GCM_gd_crop_chard: tris=172,984 users=1 mats=10 uv=0 colattr=[]
+   GCM_gr_wheat_bed: tris=138,616 users=1 mats=14 uv=0 colattr=[]
+   GCM_gr_straw_gutter: tris=134,022 users=2 mats=16 uv=0 colattr=[]
+   GCM_gr_potato_bed: tris=131,202 users=1 mats=15 uv=0 colattr=[]
+   GCM_gh_tree: tris=121,630 users=4 mats=5 uv=0 colattr=[]
+   Terrain_01_03: tris=106,496 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   Terrain_02_03: tris=106,496 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   GCM_ex_lander: tris=100,994 users=1 mats=14 uv=0 colattr=[]
+   Terrain_03_03: tris=100,352 users=1 mats=1 uv=0 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk']
+   GCM_gr_pepper_row: tris=100,112 users=1 mats=15 uv=0 colattr=[]
+   GCE_hall_curb: tris=91,372 users=1 mats=2 uv=0 colattr=[]
+== meshes with color attributes
+   Terrain_02_02: tris=524,288 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_02_01: tris=493,568 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_01_02: tris=303,104 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_01_01: tris=235,520 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_03_02: tris=204,800 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_03_01: tris=198,656 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_01_03: tris=106,496 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_02_03: tris=106,496 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_03_03: tris=100,352 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_01_00: tris=78,022 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_00_02: tris=77,800 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_02_00: tris=65,620 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_03_00: tris=59,782 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_00_03: tris=58,482 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_00_01: tris=47,166 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_00_00: tris=28,686 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_04_02: tris=14,836 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_04_01: tris=14,588 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_04_03: tris=14,328 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_04_00: tris=10,046 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_02_04: tris=6,854 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_03_04: tris=6,464 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_01_04: tris=6,462 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_00_04: tris=4,102 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+   Terrain_04_04: tris=716 colattr=['gc_alb', 'gc_ma', 'gc_mb', 'gc_trk'] mats=1
+== materials: node kinds {'ShaderNodeMath': 6089, 'ShaderNodeMapRange': 1720, 'ShaderNodeMix': 1422, 'ShaderNodeTexNoise': 1295, 'ShaderNodeAttribute': 735, 'ShaderNodeVectorMath': 458, 'ShaderNodeCombineXYZ': 294, 'ShaderNodeTexCoord': 263, 'ShaderNodeSeparateXYZ': 262, 'ShaderNodeOutputMaterial': 256, 'ShaderNodeNewGeometry': 255, 'ShaderNodeBsdfPrincipled': 246, 'ShaderNodeObjectInfo': 242, 'ShaderNodeBump': 211, 'ShaderNodeAmbientOcclusion': 210, 'ShaderNodeHueSaturation': 67, 'ShaderNodeTexWave': 67, 'ShaderNodeTexWhiteNoise': 36, 'ShaderNodeMapping': 27, 'ShaderNodeBsdfTranslucent': 22, 'ShaderNodeMixShader': 22, 'ShaderNodeTexVoronoi': 19, 'ShaderNodeLightPath': 14, 'ShaderNodeTangent': 13, 'ShaderNodeVolumePrincipled': 10, 'ShaderNodeTexBrick': 6, 'ShaderNodeSeparateColor': 4, 'ShaderNodeValToRGB': 4, 'ShaderNodeCombineColor': 4, 'ShaderNodeVectorTransform': 2, 'ShaderNodeUVMap': 2}
+== glass/transmissive ['GC_en_water', 'GC_gd_water', 'GC_glass', 'GC_glass_clear', 'GC_glass_gd', 'GC_glass_mb_bag', 'GC_glass_pp_bubble', 'GC_sf_hall_glass']
+== emissive ['SFX_motes']
+== volume materials ['GC_Atmosphere', 'SFX_devil_0', 'SFX_devil_1', 'SFX_devil_2', 'SFX_dust_sheet_0', 'SFX_dust_sheet_1', 'SFX_dust_sheet_2', 'SFX_dust_sheet_3', 'SFX_dust_sheet_4', 'SFX_ground_dust']
+== node groups [{'name': 'GC_Comp', 'type': 'CompositorNodeTree', 'nodes': 9, 'users': 1}, {'name': 'GC_gravel', 'type': 'GeometryNodeTree', 'nodes': 14, 'users': 25}, {'name': 'GC_rock_instancer', 'type': 'GeometryNodeTree', 'nodes': 7, 'users': 1}]
+== images [{'name': 'Render Result', 'size': [0, 0], 'source': 'VIEWER', 'filepath': '', 'packed': False, 'users': 1, 'colorspace': ''}, {'name': 'Viewer Node', 'size': [256, 256], 'source': 'VIEWER', 'filepath': '', 'packed': False, 'users': 1, 'colorspace': ''}]
+== lights summary {"by_type": {"AREA": 431, "SUN": 2, "POINT": 38}, "energy_sum_by_type": {"AREA": 53086.03, "SUN": 2.95, "POINT": 5530.0}, "unique_light_datablocks": 251, "light_objects": 471}
+== lights by collection {'Fixture Lights': 407, 'Lights': 53, 'Exterior env lights': 10, 'Render Lights': 1}
+== light name prefixes {'FX': 417, 'P': 38, 'L': 14, 'GC': 1, 'Sun': 1}
+== light shapes {"('AREA', 'RECTANGLE')": 431, "('SUN', None)": 2, "('POINT', None)": 38}
+== strongest lights [('FX_SFX_tunnel_inside.002', 'AREA', 1158.749, 2.4, 0.52), ('FX_SFX_tunnel_inside.003', 'AREA', 1158.749, 2.4, 0.52), ('FX_SFX_tunnel_inside.004', 'AREA', 1158.749, 2.4, 0.52), ('FX_SFX_tunnel_inside.005', 'AREA', 1158.749, 2.4, 0.52), ('L_garden_dome', 'AREA', 950.0, 12.0, 12.0), ('L_hangar', 'AREA', 900.0, 16.0, 10.0), ('L_mess', 'AREA', 700.0, 14.0, 12.0), ('L_greenhouse', 'AREA', 650.0, 24.0, 12.0)]
+== suns [('GC_MarsSun', 2.6, [1.0, 0.93, 0.84], 0.0157, [15.0, 4.0, 60.0], ['Render Lights']), ('Sun_key', 0.35, [1.0, 0.88, 0.75], 0.1745, [0.0, 0.0, 0.0], ['Lights'])]
+== lights with temperature/exposure/normalize keys sample {'exposure': 0.0, 'temperature': 6500.0, 'use_temperature': False, 'normalize': True, 'use_custom_distance': False, 'cutoff_distance': 40.0}
+== lightprobes Counter({'SPHERE': 15, 'VOLUME': 15}) [{'name': 'SP_Airlock', 'type': 'SPHERE', 'location': [20.0, -6.0, 1.6], 'scale': [1.0, 1.0, 1.0]}, {'name': 'SP_Blast-door passage', 'type': 'SPHERE', 'location': [26.0, 9.0, 1.48], 'scale': [1.0, 1.0, 1.0]}, {'name': 'SP_Command Room', 'type': 'SPHERE', 'location': [29.0, 14.0, 1.48], 'scale': [1.0, 1.0, 1.0]}]
+== cameras 184 {'Cam': 6, 'Rv': 163, 'Shot': 15}
+== camera lens/sensor {(30.0, 36.0, 'AUTO', 'PERSP'): 30, (24.0, 36.0, 'AUTO', 'PERSP'): 23, (35.0, 36.0, 'AUTO', 'PERSP'): 20, (18.0, 36.0, 'AUTO', 'PERSP'): 17, (26.0, 36.0, 'AUTO', 'PERSP'): 14, (32.0, 36.0, 'AUTO', 'PERSP'): 13, (28.0, 36.0, 'AUTO', 'PERSP'): 12, (22.0, 36.0, 'AUTO', 'PERSP'): 12, (16.0, 36.0, 'AUTO', 'PERSP'): 10, (40.0, 36.0, 'AUTO', 'PERSP'): 9, (50.0, 36.0, 'AUTO', 'PERSP'): 9, (20.0, 36.0, 'AUTO', 'PERSP'): 7}
+== camera clip {(0.05, 2000.0): 168, (0.05, 3000.0): 15, (0.05, 600.0): 1} dof on: 0 animated: 0
+   Shot_01_MedBay: loc=[-1.0, 9.0, 1.65] rot=[85.678, -0.0, 49.086] lens=20.0 fovx=83.974 coll=['Beauty Shots']
+   Shot_02_MessHall: loc=[13.2, 6.8, 1.65] rot=[86.72, 0.0, 51.203] lens=18.0 fovx=90.0 coll=['Beauty Shots']
+   Shot_03_RecKitchen: loc=[15.0, 12.8, 1.65] rot=[85.414, -0.0, -48.468] lens=18.0 fovx=90.0 coll=['Beauty Shots']
+   Shot_04_CrewCorridor: loc=[0.8, 3.0, 1.65] rot=[87.971, 0.0, -90.0] lens=18.0 fovx=90.0 coll=['Beauty Shots']
+   Shot_05_Hangar: loc=[15.0, -1.2, 2.2] rot=[84.287, -0.0, -59.036] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_06_Airlock: loc=[25.2, -2.8, 1.7] rot=[86.025, -0.0, 122.586] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_07_PowerRoom: loc=[26.8, -2.8, 1.65] rot=[86.664, -0.0, -115.159] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_08_LifeSupport: loc=[34.8, -1.2, 1.65] rot=[86.405, -0.0, -31.293] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_09_Command: loc=[24.8, 10.8, 1.65] rot=[85.876, 0.0, -52.028] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_10_EastQuarters: loc=[34.8, 10.8, 1.65] rot=[85.949, -0.0, -39.251] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_11_Greenhouse: loc=[13.2, -0.8, 1.7] rot=[88.052, 0.0, 115.694] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_12_WestBunk: loc=[-0.8, 0.8, 1.65] rot=[85.827, -0.0, 52.907] lens=16.0 fovx=96.733 coll=['Beauty Shots']
+   Shot_13_Exterior_Airlock: loc=[30.0, -40.0, 1.8] rot=[93.683, -0.0, 20.556] lens=24.0 fovx=73.74 coll=['Beauty Shots']
+   Shot_14_Exterior_Wide: loc=[-40.0, -75.0, 32.0] rot=[72.442, 0.0, -37.716] lens=26.0 fovx=69.39 coll=['Beauty Shots']
+   Shot_15_GardenDome: loc=[38.0, -40.0, 2.0] rot=[91.619, 0.0, -42.709] lens=24.0 fovx=73.74 coll=['Beauty Shots']
+== category search
+ - rover_vehicle: hits=19 tris=180,904 types={'LIGHT': 7, 'MESH': 8, 'CAMERA': 4} colls=[]
+     roots=[['FX_sf_rover', 1], ['FX_sf_rover.001', 1], ['FX_sf_rover.002', 1], ['FX_sf_rover.003', 1], ['FX_sf_rover.004', 1], ['FX_sf_rover.005', 1], ['FX_sf_rover.006', 1], ['hb_rover', 1]]
+     names=['FX_sf_rover', 'FX_sf_rover.001', 'FX_sf_rover.002', 'FX_sf_rover.003', 'FX_sf_rover.004', 'FX_sf_rover.005', 'FX_sf_rover.006', 'Rv_a01_medbay_cu_cart', 'Rv_a05_hangar_rover', 'Rv_a05_hangar_rover_rear', 'Rv_a06_service_corridor_cu_cart', 'hb_rover', 'hg_cart_tray', 'hg_gas_cart', 'hg_stair_cart', 'mb_cart_spot', 'mb_crash_cart', 'sc_cart', 'sf_rover']
+ - human_body: hits=70 tris=432,952 types={'MESH': 16, 'LIGHT': 34, 'CAMERA': 16, 'LIGHT_PROBE': 4} colls=[['Command Room', 84], ['Crew Corridor', 63]]
+     roots=[['co_crew_wall', 1], ['cr_headset', 1], ['FX_cr_console_alarm', 1], ['FX_gr_w_header_lt', 1], ['FX_gr_w_header_lt.001', 1], ['FX_mb_headwall', 1], ['FX_mb_headwall.001', 1], ['FX_mb_headwall_off', 1]]
+     names=['FX_cr_console_alarm', 'FX_gr_w_header_lt', 'FX_gr_w_header_lt.001', 'FX_mb_headwall', 'FX_mb_headwall.001', 'FX_mb_headwall_off', 'FX_rf_tile_lt_warm', 'FX_rf_tile_lt_warm.001', 'FX_rf_tile_lt_warm.002', 'FX_rf_tile_lt_warm.003', 'FX_rf_tile_lt_warm.004', 'FX_rf_tile_lt_warm.005', 'FX_rf_tile_lt_warm.006', 'FX_rf_tile_lt_warm.007', 'FX_rf_tile_lt_warm.008', 'FX_rf_tile_lt_warm.009', 'FX_rf_tile_lt_warm.010', 'FX_rf_tile_lt_warm.011', 'FX_rf_tile_lt_warm.012', 'FX_rf_tile_lt_warm.013', 'FX_rf_tile_lt_warm.014', 'FX_rf_tile_lt_warm.015', 'FX_rf_tile_lt_warm.016', 'FX_rf_tile_lt_warm.017']
+ - suit: hits=12 tris=473,034 types={'MESH': 9, 'LIGHT': 1, 'CAMERA': 2} colls=[]
+     roots=[['ak_boot_brush', 1], ['ak_suit_shelf', 1], ['al_suit_rack', 1], ['FX_ak_suit_shelf', 1], ['mb_glovebox', 1], ['mb_glovebox.001', 1], ['pp_glove_torn', 1], ['pp_helmet', 1]]
+     names=['FX_ak_suit_shelf', 'Rv_a07_airlock_glove', 'Rv_a07_airlock_suits', 'ak_boot_brush', 'ak_suit_shelf', 'al_suit_rack', 'mb_glovebox', 'mb_glovebox.001', 'pp_glove_torn', 'pp_helmet', 'qt_spacesuit', 'qt_spacesuit.001']
+ - spaceship: hits=3 tris=100,994 types={'MESH': 1, 'CAMERA': 2} colls=[]
+     roots=[['ex_lander', 1], ['Rv_a13_exterior_close_lander', 1], ['Rv_a13_exterior_close_orbiter', 1]]
+     names=['Rv_a13_exterior_close_lander', 'Rv_a13_exterior_close_orbiter', 'ex_lander']
+ - crops_plants: hits=161 tris=3,410,024 types={'MESH': 127, 'LIGHT': 30, 'CAMERA': 4} colls=[]
+     roots=[['cmw_door_leaf', 1], ['cmw_door_leaf.001', 1], ['cmw_door_leaf.002', 1], ['cmw_door_leaf.003', 1], ['cmw_door_leaf.004', 1], ['cmw_door_r_leaf', 1], ['cmw_door_r_leaf.001', 1], ['cmw_door_r_leaf.002', 1]]
+     names=['FX_co_planter', 'FX_co_planter.001', 'FX_gd_hydro', 'FX_gd_hydro.001', 'FX_gd_hydro.002', 'FX_gr_seedling_rack', 'FX_gr_seedling_rack.001', 'FX_gr_seedling_rack.002', 'FX_gr_seedling_rack.003', 'FX_rf_tile_grow', 'FX_rf_tile_grow.001', 'FX_rf_tile_grow.002', 'FX_rf_tile_grow.003', 'FX_rf_tile_grow.004', 'FX_rf_tile_grow.005', 'FX_rf_tile_grow.006', 'FX_rf_tile_grow.007', 'FX_rf_tile_grow.008', 'FX_rf_tile_grow.009', 'FX_rf_tile_grow.010', 'FX_rf_tile_grow.011', 'FX_rf_tile_grow.012', 'FX_rf_tile_grow.013', 'FX_rf_tile_grow.014']
+ - energy: hits=20 tris=214,496 types={'LIGHT': 1, 'MESH': 17, 'CAMERA': 2} colls=[]
+     roots=[['FX_sc_e_panel', 1], ['mb_code_panel', 1], ['pr_panelboard', 1], ['pr_panelboard.001', 1], ['pw_panel', 1], ['Rv_a08_power_cu_panel', 1], ['Rv_a13_exterior_close_solar', 1], ['sc_e_panel', 1]]
+     names=['FX_sc_e_panel', 'Rv_a08_power_cu_panel', 'Rv_a13_exterior_close_solar', 'mb_code_panel', 'pr_panelboard', 'pr_panelboard.001', 'pw_panel', 'sc_e_panel', 'sf_solar_tracker', 'sf_solar_tracker.001', 'sf_solar_tracker.002', 'sf_solar_tracker.003', 'sf_solar_tracker.004', 'sf_solar_tracker.005', 'sf_solar_tracker.006', 'sf_solar_tracker.007', 'sf_solar_tracker.008', 'sf_solar_tracker.009', 'sf_solar_tracker.010', 'sf_solar_tracker.011']
+ - life_support: hits=31 tris=198,146 types={'MESH': 27, 'LIGHT': 1, 'CAMERA': 3} colls=[]
+     roots=[['co_recycle', 1], ['eq_water_cooler', 1], ['gd_tank', 1], ['gd_watering_can', 1], ['gh_water_tank', 1], ['gh_water_tank.001', 1], ['gh_water_tank.002', 1], ['gh_water_tank.003', 1]]
+     names=['P_ls_moxie', 'Rv_a09_lifesupport_cu_moxie', 'Rv_a09_lifesupport_cu_pump', 'Rv_a14_greenhouse_water', 'co_recycle', 'eq_water_cooler', 'gd_tank', 'gd_watering_can', 'gh_water_tank', 'gh_water_tank.001', 'gh_water_tank.002', 'gh_water_tank.003', 'gr_co2_rack', 'gr_water_tank', 'hb_o2_bottle', 'hg_tank_hose', 'hg_tank_hose.001', 'hg_tank_tall', 'hg_tank_tall.001', 'ls_moxie', 'ls_moxie_b', 'ls_o2_tank', 'ls_o2_tank.001', 'ls_pump_skid']
+ - comms: hits=41 tris=110,046 types={'MESH': 10, 'LIGHT': 13, 'CAMERA': 16, 'LIGHT_PROBE': 2} colls=[['Command Room', 84]]
+     roots=[['cm_comms_console', 1], ['cm_radio', 1], ['FX_sf_antenna_mast', 1], ['FX_sf_light_mast', 1], ['FX_sf_light_mast.001', 1], ['FX_sf_light_mast.002', 1], ['FX_sf_light_mast.003', 1], ['FX_sf_light_mast.004', 1]]
+     names=['FX_sf_antenna_mast', 'FX_sf_light_mast', 'FX_sf_light_mast.001', 'FX_sf_light_mast.002', 'FX_sf_light_mast.003', 'FX_sf_light_mast.004', 'FX_sf_light_mast.005', 'FX_sf_light_mast.006', 'FX_sf_light_mast.007', 'FX_sf_light_mast.008', 'FX_sf_light_mast.009', 'FX_sf_light_mast.010', 'FX_sf_light_mast.011', 'Rv_a02_commons_cu_chair', 'Rv_a02_commons_cu_crew', 'Rv_a02_commons_cu_lounge', 'Rv_a02_commons_cu_pass', 'Rv_a02_commons_cu_table', 'Rv_a11_command_backrow', 'Rv_a11_command_chair', 'Rv_a11_command_coffee', 'Rv_a11_command_comms', 'Rv_a11_command_computer', 'Rv_a11_command_racks']
+ - doors_glass: hits=163 tris=455,112 types={'MESH': 85, 'LIGHT': 32, 'CAMERA': 42, 'LIGHT_PROBE': 4} colls=[['Airlock', 69], ['Blast-door Passage', 7], ['Dome plaza', 42], ['Garden Dome', 52], ['Glass hall', 30]]
+     roots=[['bp_door_collar', 1], ['bp_door_ctrl', 1], ['cmw_door', 1], ['cmw_door.001', 1], ['cmw_door.002', 1], ['cmw_door.003', 1], ['cmw_door.004', 1], ['cmw_door_leaf', 1]]
+     names=['FX_bp_door_collar', 'FX_bp_door_collar.001', 'FX_gd_airlock', 'FX_gd_airlock.001', 'FX_gd_airlock.002', 'FX_gd_airlock.003', 'FX_gd_airlock.004', 'FX_gd_airlock.005', 'FX_gd_airlock.006', 'FX_hgw_door', 'FX_hgw_door.001', 'FX_hgw_door.002', 'FX_hgw_door.003', 'FX_hgw_door_small', 'FX_hgw_door_small.001', 'FX_hgw_door_small.002', 'FX_hgw_door_small.003', 'FX_hgw_door_small.004', 'FX_hgw_door_small.005', 'FX_hgw_door_small.006', 'FX_hgw_door_small.007', 'FX_stw_door', 'FX_stw_door.001', 'FX_stw_door.002']
+ - terrain_rock: hits=42 tris=2,813,114 types={'MESH': 42} colls=[['Terrain', 27], ['Terrain pebble variants', 12], ['Terrain rock variants', 14]]
+     roots=[['rv_00_rock_v00', 1], ['rv_01_rock_v01', 1], ['rv_02_rock_v02', 1], ['rv_03_rock_v03', 1], ['rv_04_rock_v04', 1], ['rv_05_rock_v05', 1], ['rv_06_rock_v06', 1], ['rv_07_rock_v07', 1]]
+     names=['SFX_ground_dust', 'Terrain_00_00', 'Terrain_00_01', 'Terrain_00_02', 'Terrain_00_03', 'Terrain_00_04', 'Terrain_01_00', 'Terrain_01_01', 'Terrain_01_02', 'Terrain_01_03', 'Terrain_01_04', 'Terrain_02_00', 'Terrain_02_01', 'Terrain_02_02', 'Terrain_02_03', 'Terrain_02_04', 'Terrain_03_00', 'Terrain_03_01', 'Terrain_03_02', 'Terrain_03_03', 'Terrain_03_04', 'Terrain_04_00', 'Terrain_04_01', 'Terrain_04_02']
+ - salvage_fab: hits=47 tris=200,342 types={'MESH': 42, 'LIGHT': 1, 'CAMERA': 4} colls=[]
+     roots=[['ak_crate_open', 1], ['ak_crate_white', 1], ['ak_crate_white.001', 1], ['ak_crate_white.002', 1], ['cm_crate_gray', 1], ['cm_crate_gray.001', 1], ['FX_hb_workbench', 1], ['gd_harvest_crate', 1]]
+     names=['FX_hb_workbench', 'Rv_a13_exterior_close_crash', 'Rv_a13_exterior_eye_crash', 'Rv_a13_exterior_eye_crash_back', 'Rv_a15_garden_dome_cu_crate', 'SFX_scorch_wreck', 'ak_crate_open', 'ak_crate_white', 'ak_crate_white.001', 'ak_crate_white.002', 'cm_crate_gray', 'cm_crate_gray.001', 'gd_harvest_crate', 'gr_crate', 'gr_crate.001', 'gr_crate.002', 'gr_crate_half', 'gr_crate_shelf', 'gr_crate_stack', 'hb_workbench', 'hg_crate_dark', 'hg_crate_dark.001', 'hg_crate_dark.002', 'hg_crate_dark.003']
+ - science: hits=43 tris=31,406 types={'LIGHT': 5, 'MESH': 37, 'CAMERA': 1} colls=[]
+     roots=[['FX_mb_lab_bench', 1], ['L_lab', 1], ['mb_lab_bench', 1], ['P_lab_-2_9', 1], ['P_lab_-5_11', 1], ['P_lab_-8_15', 1], ['rf_slab_dk', 1], ['rf_slab_dk.001', 1]]
+     names=['FX_mb_lab_bench', 'L_lab', 'P_lab_-2_9', 'P_lab_-5_11', 'P_lab_-8_15', 'Rv_a01_medbay_cu_lab', 'mb_lab_bench', 'rf_slab_dk', 'rf_slab_dk.001', 'rf_slab_dk.002', 'rf_slab_dk.003', 'rf_slab_dk.004', 'rf_slab_dk.005', 'rf_slab_dk.006', 'rf_slab_dk.007', 'rf_slab_dk.008', 'rf_slab_lt', 'rf_slab_lt.001', 'rf_slab_lt.002', 'rf_slab_lt.003', 'rf_slab_lt.004', 'rf_slab_lt.005', 'rf_slab_lt.006', 'rf_slab_lt.007']
+== DIFF grand_colony__current vs grand_colony__blend1
+   same: counts
+   same: mesh_totals
+   scene diff: {"engine": ["BLENDER_EEVEE", "CYCLES"], "frame_range": [[1, 250, 115], [1, 250, 1]]}
+   cameras only in A: [] only in B: []
+   cameras with different transform/lens: 0 []
+   lights only in A: [] only in B: []
+   lights with different energy/colour/position/size: 0 []
+   light keys that differ anywhere: []
+   materials differing: 0 [] only A: [] only B: []
+   worlds same: True
+   objects block same: True | collection trees same: True | bbox same: True
+== DIFF grand_colony__current vs grand_colony_drive__v12
+   same: counts
+   same: mesh_totals
+   scene diff: {"engine": ["BLENDER_EEVEE", "CYCLES"], "frame_range": [[1, 250, 115], [1, 250, 1]]}
+   cameras only in A: [] only in B: []
+   cameras with different transform/lens: 0 []
+   lights only in A: [] only in B: []
+   lights with different energy/colour/position/size: 0 []
+   light keys that differ anywhere: []
+   materials differing: 0 [] only A: [] only B: []
+   worlds same: True
+   objects block same: True | collection trees same: True | bbox same: True

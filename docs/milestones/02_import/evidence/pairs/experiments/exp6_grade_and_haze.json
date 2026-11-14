@@ -1,0 +1,7 @@
+{
+ "X0_pass2a": {},
+ "X1_fog": {"fog.enabled": true, "fog.density": 0.0012, "fog.sky_affect": 0.2},
+ "X2_fog_sat": {"fog.enabled": true, "fog.density": 0.0012, "fog.sky_affect": 0.2, "adjustment.enabled": true, "adjustment.saturation": 1.15},
+ "X3_fog_contrast": {"fog.enabled": true, "fog.density": 0.0012, "fog.sky_affect": 0.2, "tonemap.agx_contrast": 1.45, "sun.energy_scale": 0.16},
+ "X4_warm_sun_less_sky": {"fog.enabled": true, "fog.density": 0.002, "fog.sky_affect": 0.2, "sky.energy": 0.3, "sun.energy_scale": 0.17, "adjustment.enabled": true, "adjustment.saturation": 1.1}
+}

@@ -1,0 +1,5 @@
+{
+ "P1a": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.052, "gi.sdfgi_energy": 1.6, "gi.sdfgi_bounce_feedback": 0.7, "sun.energy_scale": 0.12, "sky.energy": 0.45},
+ "P1b": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.06, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi_energy": 2.0, "gi.sdfgi_bounce_feedback": 0.7, "sun.energy_scale": 0.10, "sky.energy": 0.4},
+ "P1c": {"fixtures.mode": "mixed", "fixtures.area_min_m2": 1.0, "fixtures.area_energy_scale": 0.016, "fixtures.spot_energy_scale": 0.045, "fixtures.spot_angle_attenuation": 0.6, "gi.sdfgi_energy": 2.5, "gi.sdfgi_bounce_feedback": 0.8, "sun.energy_scale": 0.13, "sky.energy": 0.3}
+}

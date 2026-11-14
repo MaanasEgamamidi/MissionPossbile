@@ -96,7 +96,7 @@ The first command opens the source `.blend` in a background Blender, never saves
 ```
 
 ```powershell
-& "G:\nasa app\mars_colony_godot\tools\capture.ps1" -Out "G:\nasa app\docs\milestones\02_import\evidence\pairs\pass3" -Cams beauty
+& "G:\nasa app\mars_colony_godot\tools\capture.ps1" -Out "G:\nasa app\mars_colony_godot\docs\milestones\02_import\evidence\pairs\pass3" -Cams beauty
 ```
 
-Records: `G:\nasa app\docs\milestones\02_import\`.
+Records: `G:\nasa app\mars_colony_godot\docs\milestones\02_import\`.
