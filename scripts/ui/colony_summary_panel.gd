@@ -54,6 +54,7 @@ func setup(p_services: GameServices) -> void:
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
+	header.add_child(ExplainButton.make("stamina_vs_electricity"))
 	_close = Button.new()
 	_close.name = "Close"
 	_close.text = "Close"
@@ -105,6 +106,8 @@ func setup(p_services: GameServices) -> void:
 			cause.theme_type_variation = UiTheme.MUTED
 			cause.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			content.add_child(cause)
+			if String(f[0]) == "cabin":
+				cause.hide()
 			_cause_labels[f[0]] = cause
 		if String(f[0]) == "oxygen":
 			var made := Label.new()
@@ -121,19 +124,13 @@ func setup(p_services: GameServices) -> void:
 		content.add_child(row)
 		_time_rows[s.key] = row
 
-	# ---- two ideas that are easy to mix up
-	_idea_box(content, "Stock or flow? A stock is an amount kept in store, like the kWh in the battery or the litres of water in the tank. A flow is how fast it changes right now, like kW or litres per sol.",
-		"stock_vs_flow")
-	_idea_box(content, "Body energy or electricity? Body energy (stamina) is how fresh your crew member feels; resting brings it back. Colony electricity is the power in the battery that runs the rooms.",
-		"stamina_vs_electricity")
-
 	# ---- rooms
 	_heading(content, "Rooms with power")
 	var note_row := HBoxContainer.new()
 	note_row.name = "RoomsNoteRow"
 	var note := Label.new()
 	note.name = "RoomsNote"
-	note.text = "Read only. Switch rooms on and off at the power panel in the Power Room."
+	note.text = "Manage rooms at the Power Room panel."
 	note.theme_type_variation = UiTheme.MUTED
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.size_flags_horizontal = Control.SIZE_EXPAND_FILL

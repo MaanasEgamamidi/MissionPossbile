@@ -81,7 +81,7 @@ func setup(p_config: GameConfig, p_tuning: PlayerTuning, p_character: CharacterS
 	_collider = collider
 	_visual = PlayerVisual.new()
 	add_child(_visual)
-	_visual.set_suit(character.suit_on)
+	_visual.set_suit(character.suit_on, character.suit_slot)
 	_rig = PlayerCameraRig.new()
 	add_child(_rig)
 	_rig.pitch_limit_degrees = tuning.pitch_limit_degrees
@@ -304,7 +304,7 @@ func _physics_process(delta: float) -> void:
 		_air_time += delta
 	_was_on_floor = is_on_floor()
 	_visual.rotation.y = _rig.yaw()
-	_visual.set_suit(character.suit_on)
+	_visual.set_suit(character.suit_on, character.suit_slot)
 	_rig.set_fill_layers(_visual.zone_layers())
 	var in_air := not is_on_floor() and (_jumped or _air_time >= MIN_AIR_TIME_S)
 	_locomotion = _pick_locomotion(ground_speed, axis.is_zero_approx())

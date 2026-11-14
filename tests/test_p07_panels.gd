@@ -316,8 +316,8 @@ func _test_water_sliders() -> void:
 	_tick()
 	panel.refresh()
 	var all := _all_text(panel)
-	_check("life support: drinking comes first and the protected reserve is stated", all.contains("Drinking water always comes first")
-		and all.contains("%s L stays in the tank" % StationPanel.num(services.balance.water_reserve_l, 0)) and panel.cause_text().contains("Water allocation"),
+	_check("life support: protected reserve is stated and allocation changes are confirmed", all.contains("Drinking reserve: %s L" % StationPanel.num(services.balance.water_reserve_l, 0))
+		and panel.cause_text().contains("Water allocation"),
 		panel.cause_text())
 	_set_allocation(0.0, 0.0)
 	await _close(panel)
@@ -387,7 +387,7 @@ func _test_cabin_air() -> void:
 	_check("cabin air: raising CO2 changes the level and the word (High, then Dangerous)", warn_level == &"warn" and warn_text.contains("High")
 		and co2.level == &"urgent" and co2.value_label.text.contains("Dangerous") and co2.mark_label.text == "✖", "%s / %s" % [warn_text, co2.value_label.text])
 	_check("cabin air: the CO2 alert appears at the top in words", alert_seen, "\n".join(panel.alert_texts()))
-	_check("cabin air: says the room air is not the oxygen in the tanks", _all_text(panel).contains("Safe air in the rooms is not the same as the oxygen in the tanks"))
+	_check("cabin air: room air is explained in help", String(Explanations.get_entry("cabin_air").long).contains("tank"))
 	st.cabin_co2_kg = saved
 	_tick()
 	await _close(panel)
@@ -458,8 +458,8 @@ func _test_suit_rack() -> void:
 	_check("suit rack: fill sends one refill_suit; the reserve falls by exactly what the tank gains", services.sent_of(&"refill_suit").size() == 1 and services.sent.size() == 1
 		and absf(gained - taken) < 1e-9 and absf(gained - 0.6 * bal.suit_o2_capacity_kg) < 1e-9 and me.suit_charge == 100.0,
 		"gained %.6f kg, taken %.6f kg" % [gained, taken])
-	_check("suit rack: says how much oxygen it takes and that this is the only way to fill a tank",
-		note.contains("Filling takes %s kg of oxygen from the colony reserve" % StationPanel.num(0.6 * bal.suit_o2_capacity_kg, 3)) and note.contains("only way to fill a tank"), note)
+	_check("suit rack: shows the oxygen cost and explains refilling in help",
+		note.contains("Filling takes %s kg of oxygen from the colony reserve" % StationPanel.num(0.6 * bal.suit_o2_capacity_kg, 3)) and String(Explanations.get_entry("suit_refill").long).contains("does not fill the tank"), note)
 	panel.refresh()
 	_check("suit rack: a full tank disables the fill button with the reason", panel.fill_button.disabled and panel.fill_note_text().contains("already full"), panel.fill_note_text())
 

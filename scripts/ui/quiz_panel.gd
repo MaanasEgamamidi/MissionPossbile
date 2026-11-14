@@ -196,16 +196,11 @@ func _build() -> void:
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
-	header.add_child(ExplainButton.make("upgrades"))
+	header.add_child(ExplainButton.make("upgrades", "Answer to unlock upgrade cards. A right answer counts for the whole colony. A wrong answer is fine: read why, then try the new version. Nobody loses health."))
 	_close_button = Button.new()
 	_close_button.text = "Close"
 	_close_button.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(_close_button)
-	var intro := Label.new()
-	intro.text = "Answer to unlock upgrade cards. A right answer counts for the whole colony. A wrong answer is fine: read why, then try the new version. Nobody loses health."
-	intro.theme_type_variation = UiTheme.MUTED
-	intro.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	column.add_child(intro)
 
 	_scroll = ScrollContainer.new()
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED

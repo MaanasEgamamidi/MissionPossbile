@@ -36,3 +36,7 @@ docs/milestones/04_player/crew_v2/crew_looks/ingame3/*
 assets_src/characters/crew_v2/variants_work/
 # weather test output
 _test_weather/
+.mcp/
+
+# Temporary Godot native-library backups
+/addons/twovoip/libs/~*

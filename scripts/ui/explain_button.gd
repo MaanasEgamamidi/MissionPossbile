@@ -17,6 +17,10 @@ var explanation_id := "":
 ## The source register this button last asked to open (kept so tests and callers can check it).
 var last_register: SourceRegisterPanel
 
+## Additional guidance specific to the control or screen.
+var extra_text := ""
+var custom_title := ""
+
 var _popup: PopupPanel
 var _scroll: ScrollContainer
 var _content: VBoxContainer
@@ -25,9 +29,11 @@ var _close_button: Button
 
 
 ## A "?" button for one explanation id.
-static func make(id: String) -> ExplainButton:
+static func make(id: String, extra: String = "", title: String = "") -> ExplainButton:
 	var b := ExplainButton.new()
 	b.explanation_id = id
+	b.extra_text = extra
+	b.custom_title = title
 	return b
 
 
@@ -80,7 +86,7 @@ func open_popup() -> void:
 	_fill_popup()
 	_popup.popup_centered(Vector2i(_popup_width(), 0))
 	_fit_popup.call_deferred()
-	_sources_button.grab_focus.call_deferred()
+	(_sources_button if _sources_button.visible else _close_button).grab_focus.call_deferred()
 
 
 ## Closes the popup and gives focus back to the "?" button.
@@ -147,8 +153,9 @@ func _fill_popup() -> void:
 		child.queue_free()
 	var e := entry()
 	if e.is_empty():
-		_add_label("No explanation yet", UiTheme.HEADING)
-		_add_label("This help text has not been written yet.", &"")
+		_add_label(custom_title if custom_title != "" else "Help", UiTheme.HEADING)
+		if extra_text == "":
+			_add_label("This help text has not been written yet.", &"")
 	else:
 		_add_label(String(e.title), UiTheme.HEADING)
 		_add_label(String(e.long), &"")
@@ -161,6 +168,8 @@ func _fill_popup() -> void:
 					continue
 				var mark := "!" if SourceLibrary.is_unsourced(c) else "•"
 				_add_label("%s %s: %s" % [mark, String(c.get("title", cid)), SourceLibrary.claim_category_text(c)], &"")
+	if extra_text != "":
+		_add_label(extra_text, &"")
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_END
 	_sources_button = Button.new()
@@ -169,6 +178,7 @@ func _fill_popup() -> void:
 	_sources_button.tooltip_text = "Open the source register at this topic."
 	_sources_button.pressed.connect(request_sources)
 	row.add_child(_sources_button)
+	_sources_button.visible = not e.is_empty()
 	_close_button = Button.new()
 	_close_button.name = "CloseButton"
 	_close_button.text = "Close"
