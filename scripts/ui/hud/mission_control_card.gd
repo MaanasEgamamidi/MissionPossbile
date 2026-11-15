@@ -89,7 +89,7 @@ func _init() -> void:
 	more.add_theme_constant_override(&"separation", 6)
 	more.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	more.modulate.a = 0.75
-	more.add_child(HudKit.key_cap(_key(&"power_view", "P"), 14.0, "MoreKey"))
+	more.add_child(HudKit.key_cap(_key(&"power_view", "O"), 14.0, "MoreKey"))
 	more.add_child(HudKit.Txt.new("More", 16.0, AstraStyle.TEXT_3, "MoreWord"))
 	actions.add_child(more)
 	_more = more

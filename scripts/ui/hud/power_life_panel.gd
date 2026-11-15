@@ -88,7 +88,7 @@ func setup(p_services: GameServices) -> void:
 	_close.draw.connect(func() -> void:
 		var s := minf(_close.size.x, _close.size.y) * 0.4
 		HudKit.draw_icon(_close, &"close", Rect2((_close.size - Vector2(s, s)) * 0.5, Vector2(s, s)), UiTheme.palette().text))
-	_close.tooltip_text = "Close (Esc or %s)" % _key(&"power_view", "P")
+	_close.tooltip_text = "Close (Esc or %s)" % _key(&"power_view", "O")
 	_close.accessibility_name = "Close"
 	_close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_close.pressed.connect(func() -> void: close_requested.emit())

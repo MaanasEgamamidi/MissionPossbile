@@ -37,7 +37,7 @@ const GoalsBigPanelScript := preload("res://scripts/ui/hud/goals_big_panel.gd")
 const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
 const PuzzleKit := preload("res://scripts/tasks/puzzles/kit.gd")
 ## The dock's keys, left to right: [name, pictogram (HudKit), action, fallback key].
-const DOCK := [["Build", &"build", &"build", "B"], ["Power", &"power", &"power_view", "P"], ["Cargo", &"cargo", &"inventory", "I"],
+const DOCK := [["Build", &"build", &"build", "B"], ["Power", &"power", &"power_view", "O"], ["Cargo", &"cargo", &"inventory", "I"],
 	["Crew", &"crew", &"crew", "C"], ["Science", &"science", &"vitals_help", "F1"]]
 ## Owner 2026-11-15: H shows the gold sparkle line to what matters now; the "Press H for help" pop-up.
 const HelpKeyScript := preload("res://scripts/guide/help_key.gd")
@@ -461,7 +461,7 @@ func _check_low() -> void:
 			continue
 		_low_said[key] = now
 		# UI overhaul: two short sentences; the Power drawer (P) has the why and the station to fix it at.
-		var words := "Down to %s. Press %s to see why." % [String(r.value), GameHud._key(&"power_view", "P")]
+		var words := "Down to %s. Press %s to see why." % [String(r.value), GameHud._key(&"power_view", "O")]
 		mission_control.say("%s is very low" % String(r.name), words, &"danger", null, "Colony radio", words,
 			StringName(GameHud.READING_ICONS.get(r.key, &"danger")))
 

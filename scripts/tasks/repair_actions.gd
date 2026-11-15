@@ -3,6 +3,64 @@ extends RefCounted
 ## Additive actions; completion has no client-callable action or boolean parameter.
 
 static func register(service: ActionService) -> void:
+	# Demo cheat (mouse back button): every tutorial repair finished as if its mini-game was solved.
+	var demo := ActionService.Definition.new()
+	demo.id = &"demo_fix_repairs"
+	demo.host_only = true
+	demo.needs_actor = false
+	demo.check_distance = false
+	demo.allowed_while_paused = true
+	demo.important = true
+	demo.check = func(ctx: ActionService.Context) -> ActionResult:
+		return null if ctx.state != null else ActionResult.failure(ctx.request.request_id, &"no_game")
+	demo.apply = func(ctx: ActionService.Context) -> Dictionary:
+		var fixed := 0
+		for task_id: String in TutorialSystem.required_fixes():
+			if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
+				fixed += 1
+		TutorialSystem.advance_tutorial(ctx.state, ctx.balance, ctx.session.events)
+		return {"fixed": fixed, "text": "Demo: all %d tutorial repairs fixed." % TutorialSystem.required_fixes().size()}
+	service.register(demo)
+	# Demo cheat (P): Communication track to its top level and every radio card installed. With "summon", the other
+	# human player's character is moved 1 m behind and 1 m left of the host (the client takes the host's pose through
+	# the replicated character_recovered event, flagged demo_teleport).
+	var comms := ActionService.Definition.new()
+	comms.id = &"demo_max_comms"
+	comms.host_only = true
+	comms.needs_actor = false
+	comms.check_distance = false
+	comms.allowed_while_paused = true
+	comms.important = true
+	comms.params = {"summon": {"type": TYPE_BOOL}}
+	comms.check = func(ctx: ActionService.Context) -> ActionResult:
+		return null if ctx.state != null else ActionResult.failure(ctx.request.request_id, &"no_game")
+	comms.apply = func(ctx: ActionService.Context) -> Dictionary:
+		var st := ctx.state
+		st.levels["command"] = AreaLevels.levels_of("command")
+		for card: String in CommsStage.CARD_IDS:
+			if not st.has_upgrade(card):
+				st.upgrades[card] = {"installed": true, "by": "demo", "at_hours": st.sim_hours, "parts": 0,
+					"station": CommsStage.INSTALL_STATION, "sector": "energy"}
+		var text := "Demo: radio communication maxed out."
+		if bool(ctx.request.params.get("summon", false)):
+			var me := st.character_of_peer(ctx.request.peer_id)
+			var other: CharacterState = null
+			for c: CharacterState in st.active_characters():
+				if me != null and c.id != me.id and c.owner_peer > 0 and c.owner_peer != ctx.request.peer_id:
+					other = c
+					break
+			if me == null or other == null:
+				text += " No other player to bring over."
+			else:
+				other.position = me.position + Basis(Vector3.UP, me.yaw) * Vector3(-1.0, 0.0, 1.0)
+				other.yaw = me.yaw
+				other.outside = me.outside
+				if ctx.session.events != null:
+					ctx.session.events.character_recovered.emit(other.id, {"demo_teleport": true})
+				text += " %s is behind you." % other.display_name
+				return {"text": text, "summoned": true}
+		return {"text": text}
+	service.register(comms)
 	for id: StringName in [&"task_claim", &"task_resume", &"task_move", &"task_release"]:
 		var definition := ActionService.Definition.new()
 		definition.id = id

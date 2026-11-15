@@ -74,6 +74,7 @@ var _sun_timer := 0.0
 var _layer_timer := 0.0
 var _zone_now := ""
 var _playing := false
+var _demo_summoned := false  ## P demo cheat: the other player was already brought over once.
 var _main_menu: MainMenu
 var _confirm_new := false
 
@@ -730,10 +731,40 @@ func _process(_delta: float) -> void:
 # ---------------------------------------------------------------- input that belongs to the whole game
 
 ## Pitch/demo shortcut. Handle before panel shortcuts; held keys never repeat the grant.
+## Mouse side buttons (demo cheats): forward = every cassette found and played, back = every tutorial repair fixed.
 func _input(event: InputEvent) -> void:
-	if not _playing or not event is InputEventKey:
+	if not _playing:
+		return
+	if event is InputEventMouseButton:
+		var mb := event as InputEventMouseButton
+		if not mb.pressed or mb.button_index not in [MOUSE_BUTTON_XBUTTON1, MOUSE_BUTTON_XBUTTON2]:
+			return
+		get_viewport().set_input_as_handled()
+		if not services.is_authority():
+			hud.show_message("Only the host can use the demo mouse buttons.", 4.0)
+			return
+		var action := &"demo_play_cassettes" if mb.button_index == MOUSE_BUTTON_XBUTTON2 else &"demo_fix_repairs"
+		var res := services.request(action)
+		hud.show_message(String(res.changes.get("text", res.message)), 5.0)
+		return
+	if not event is InputEventKey:
 		return
 	var key := event as InputEventKey
+	# P (any case): radio communication maxed; the first press also brings the other player behind-left of you.
+	if key.pressed and not key.echo and not key.ctrl_pressed and not key.alt_pressed and not key.meta_pressed \
+			and (key.keycode == KEY_P or key.physical_keycode == KEY_P):
+		var focus := get_viewport().gui_get_focus_owner()
+		if focus is LineEdit or focus is TextEdit:
+			return
+		get_viewport().set_input_as_handled()
+		if not services.is_authority():
+			hud.show_message("Only the host can use the P demo cheat.", 4.0)
+			return
+		var res_p := services.request(&"demo_max_comms", &"", {"summon": not _demo_summoned})
+		if bool(res_p.changes.get("summoned", false)):
+			_demo_summoned = true
+		hud.show_message(String(res_p.changes.get("text", res_p.message)), 5.0)
+		return
 	if not key.pressed or key.echo or not key.ctrl_pressed or key.alt_pressed or key.shift_pressed or key.meta_pressed:
 		return
 	if key.keycode != KEY_M and key.physical_keycode != KEY_M:
@@ -796,6 +827,8 @@ func _on_character_recovered(character_id: StringName, info: Dictionary) -> void
 	var mine := _local_character()
 	if mine != null and mine.id == character_id and player != null:
 		player.teleport(mine.position + Vector3(0.0, 0.05, 0.0), mine.yaw)
+	if bool(info.get("demo_teleport", false)):
+		return
 	# Radiation isolation (2026-11-15) reuses this event to move the crewmate to their Med Bay bed.
 	if bool(info.get("isolation", false)):
 		ui.show_subtitle("%s is sick from radiation and is in isolation in the Med Bay." % services.state().character(character_id).display_name, 8.0, "Mission Control", true)

@@ -14,7 +14,7 @@ const ACTIONS: Dictionary = {
 	# Scout update (mission-control HUD, remappable): power drawer, build drawer at the solar field, fold the supplies,
 	# fold the goals, close a Mission Control message, the science behind the numbers.
 	# Owner 2026-11-15 (upgrade plan §1.6): folding the supplies moved from H to U; H is the help key below.
-	&"power_view": [KEY_P], &"build": [KEY_B], &"hud_details": [KEY_U], &"goals": [KEY_J], &"advisor_ok": [KEY_K],
+	&"power_view": [KEY_O], &"build": [KEY_B], &"hud_details": [KEY_U], &"goals": [KEY_J], &"advisor_ok": [KEY_K],
 	&"vitals_help": [KEY_F1],
 	# Added in Prompt 12 (remappable): a tutorial hint on request (N) and the colony journal / story log (L). U and J are the mission HUD's folds.
 	&"tutorial_hint": [KEY_N], &"journal": [KEY_L],

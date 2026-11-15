@@ -125,6 +125,22 @@ func apply(ctx: ActionService.Context) -> Dictionary:
 	return {"task_id": task_id, "progress": task.progress, "first_completion": first_completion,
 		"generation": int(task.fault_generation)}
 
+## Demo cheat only (host): finishes `task_id` exactly like a solved puzzle. Returns true when it changed anything.
+func force_complete(session: SessionService, task_id: String) -> bool:
+	var task: Dictionary = session.state.repair.tasks.get(task_id, {})
+	if task.is_empty() or (bool(task.first_completed) and not bool(task.get("broken", false))):
+		return false
+	task.progress = 1.0
+	task.puzzle_state = {}
+	task.first_completed = true
+	task.broken = false
+	task.maintenance_fault = false
+	task.condition = 1.0
+	locks.erase(task_id)
+	session.wear_runtime.on_task_repaired(session, task_id)
+	_update_room(session.state, String(task.room_id))
+	return true
+
 ## Future host deterioration systems call this, never a client action. Achievements and shot history survive wear.
 func begin_fault(state: ColonyState, task_id: String, puzzle_seed: int, condition: float = 0.0) -> bool:
 	if not state.repair.tasks.has(task_id):
