@@ -1,0 +1,38 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS night: solar is exactly 0 kW at 3003 night phases (sunset and sunrise included), V1 and V4, tracking upgrade, trackers on and off
+PASS day: the same panels give power just after sunrise (33.82 kW)
+PASS night in the session: 0 kWh of solar offered and solar_kw 0 for the whole 12.33 h night
+PASS night: the battery falls by the load each hour (23.1 kW -> ["23.100", "23.100", "23.100"] kWh per hour)
+PASS night: the arrival night load is the documented 23.1 kW (285 kWh per 12.33 h night)
+PASS night: one arrival night takes 41 % of the 700 kWh battery (visible: at least 40 %), 3.3 % per game hour
+PASS careful night from a 40 % battery (280 kWh): 8.9 kW, survives to sunrise with 170 kWh, nothing shed
+PASS wasteful night from the same battery: 27.3 kW, runs flat 10.2 h after sunset, 2.1 h before sunrise; the first thing cut is room lights
+PASS wasteful night: the outlook warned at sunset that the battery runs out before sunrise; the careful one did not
+PASS wasteful night: running flat sheds power but harms nobody within the night (life support is cut last)
+PASS from a full battery both survive one night (careful ends at 84 %, wasteful at 52 %): the danger is a battery the day did not refill
+PASS empty battery at night: every group is cut, in the priority order lights first, control and heating last (lights, greenhouse, co2_unit, electrolyser, recycler, trackers, cleaner, scrubber, cabin_fans, base)
+PASS empty battery: outlook text says so ('Night: no sun. Battery empty: machines are switched off, lowest priority first. Sunrise in 9 h.')
+PASS battery low alert names the order power is cut ('room lights, greenhouse lights, CO2-oxygen unit, electrolyser, water recycler, sun trackers, panel cleaner, CO2 scrubber, cabin fans, and last control and heating')
+PASS outlook: every contract field is there
+PASS outlook at night: sun down, 0 kW solar, load 23.1 kW, net = -load, hours left = battery / load (18.78 h), sunrise in 11.09 h
+PASS outlook night text: 'Night: no sun. Battery 62 %, falling 23.1 kW, about 19 h left, sunrise in 11 h.'
+PASS outlook: a battery that empties before sunrise is flagged ('Night: no sun. Battery 21 %, falling 23.1 kW, about 6 h left, sunrise in 11 h. It runs out before sunrise: switch off lights and machines you do not need.')
+PASS outlook: 'hours left' 6.48 h matches the simulation running flat at 6.49 h (within 2 %)
+PASS outlook at noon with clean panels: sun up, charging, hours left INF, text 'Day: the sun gives 100.1 kW, the colony uses 8.9 kW. Battery 14 %, charging 91.2 kW, sunset in 6 h.'
+PASS outlook solar matches the model's solar this tick (100.079 vs 100.080 kW)
+PASS energy.solar_factor multiplies noon solar (V2..V4 ratios ["1.25", "1.50", "1.80"])
+PASS life_support.scrubber_factor: the scrubber removes 0.400 kg/h at V1 and 0.800 kg/h at V4 (x2.00)
+PASS life_support.o2_production_factor: electrolyser 0.200 -> 0.300 kg/h, CO2-oxygen unit 0.150 -> 0.225 kg/h (x1.50), power asked x1.50
+PASS life_support.recycler_factor: the recycler cleans 3.00 L/h at V1 and 4.05 L/h at V4 (x1.35)
+PASS garden.plant_o2_kg_per_hour: V1 plants give 0 kg; V4 plants give 0.070 kg O2 in 2 h (0.035 kg/h) and take up 0.096 kg CO2
+PASS garden plants with a full cabin: 0.0350 kg banked in the oxygen reserve, cabin stays at its set point
+PASS NASA (S20): one crew member uses 0.895 kg of oxygen in 24 game hours (BVAD 0.895 per day) and 0.9196 in one sol (BVAD x 1.0275 = 0.9196)
+PASS NASA (S20): one crew member uses 1.085 kg of CO2 in 24 game hours (BVAD 1.085 per day) and 1.1148 in one sol (BVAD x 1.0275 = 1.1148)
+PASS NASA (S20): one crew member uses 4.480 L of water in 24 game hours (BVAD 4.480 per day) and 4.6032 in one sol (BVAD x 1.0275 = 4.6032)
+PASS NASA (S20): one crew member uses 12.778 MJ of food energy in 24 game hours (BVAD 12.778 per day) and 13.1293 in one sol (BVAD x 1.0275 = 13.1293)
+PASS NASA (S20): one crew member uses 1.560 kg of food eaten in 24 game hours (BVAD 1.560 per day) and 1.6029 in one sol (BVAD x 1.0275 = 1.6029)
+PASS NASA (S20): the BVAD values in the code are the published ones (0.895 O2, 1.085 CO2, 4.48 water, 12.778 MJ, 1.56 kg food)
+PASS NASA (S20): a meal holds 1046 kcal and 0.534 kg; 3 meals per sol are 3138 kcal (BVAD 3,054 kcal per day x 1.0275)
+PASS time base: rates are NASA per day / 24 per GAME hour; a sol is 24.6598 game hours whether it lasts 5 or 120 real minutes (0.0822 vs 0.0034 game h per real s)
+RESULT 35/35

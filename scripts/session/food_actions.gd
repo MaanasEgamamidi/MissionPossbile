@@ -12,7 +12,8 @@ extends RefCounted
 ##   set_bed_water (bed, on)           opens (and flushes) or closes the bed's drip line
 ##   set_grow_lights (food, on)        the grow lights: the Greenhouse lighting circuit
 ##   set_greenhouse_water (food, L/h)  shortcut to the greenhouse water allocation (the life-support console has it too)
-##   harvest (bed)                     ready crops only: adds meals to food_meals once and clears the bed
+##   harvest (bed)                     ready crops only: adds meals to food_meals once and clears the bed (meals x the
+##                                     greenhouse racks' yield factor: CropSystem.harvest_meals)
 ##   apply_nutrient_result (food, id)  needs sci_evidence_settings: applies a lab nutrient setting to every bed
 ##
 ## Diagnosis: inspecting a bed with a symptom starts a trial. Changing exactly one input of that bed (water,
@@ -189,7 +190,8 @@ static func _apply(ctx: ActionService.Context) -> Dictionary:
 			changes["water_allocation"] = ctx.state.water_allocation.duplicate()
 		&"harvest":
 			var c := FoodBalance.crop(String(b.crop))
-			var meals := float(c.get("meals", 0.0))
+			# more grow layers in the greenhouse racks = more food per harvest (CropSystem.harvest_meals, food track)
+			var meals := CropSystem.harvest_meals(ctx.state, String(b.crop))
 			var added := ctx.state.add_to_store(&"food_meals", meals)
 			ctx.state.ledger["meals_harvested"] = float(ctx.state.ledger.get("meals_harvested", 0.0)) + added
 			var fresh := CropSystem.new_bed()
@@ -198,6 +200,9 @@ static func _apply(ctx: ActionService.Context) -> Dictionary:
 			fresh["flow"] = float(b.get("flow", 1.0))
 			crops.beds[id] = fresh
 			text = "%s: harvested the %s: %s meals into the food store." % [name, String(c.get("name", "crop")).to_lower(), _num(added)]
+			var racks := CropSystem.yield_words(ctx.state)
+			if racks != "":
+				text += " " + racks
 			if added < meals - 1e-9:
 				text += " The food store is full, so %s meals did not fit." % _num(meals - added)
 			changes["meals"] = added

@@ -5,9 +5,14 @@ extends RefCounted
 ## Water stores: clean water (`water_l`) and wastewater. Ledger identity (L):
 ##   clean + waste + body loss + overflow + brine + electrolysis water + recovery water = clean and waste at start
 ## Oxygen reserve (`oxygen_kg`, stored tanks, not the cabin air):
-##   reserve now = start + electrolysis O2 + CO2-unit O2 - regulator O2 - suit refills
-## Cabin air (kg):  O2 now = start + regulator O2 - breathed - airlock loss
-##                  N2 now = start + regulator N2 - airlock loss          CO2 now = start + exhaled - scrubbed - airlock loss
+##   reserve now = start + electrolysis O2 + CO2-unit O2 + plant O2 banked - regulator O2 - suit refills
+## Cabin air (kg):  O2 now = start + regulator O2 + plant O2 - plant O2 banked - breathed - airlock loss
+##                  N2 now = start + regulator N2 - airlock loss
+##                  CO2 now = start + exhaled - scrubbed - plant CO2 - airlock loss
+## (plant_o2_kg, plant_co2_kg and plant_o2_banked_kg are 0 until the Garden dome is upgraded past V1.)
+## Crew rates are NASA per-day values / 24 per game hour (GameBalance, source S20). Area levels (2026-11-14): the
+## life_support track's scrubber_factor, o2_production_factor and recycler_factor scale those machines, and the
+## garden track's plant_o2_kg_per_hour adds plant oxygen to the cabin air (read with AreaLevels.effectf).
 ## Nitrogen reserve: now = start - regulator N2.   Suits: tanks now = start + refills - suit O2 used.
 ## Upgrades (Prompt 08, numbers in ProgressionBalance): ls_water_reliability (recycler +1 L/h, condition floor 0.8),
 ## ls_electrolysis and ls_co2_processing (more oxygen per hour at the same kWh per kg), ls_oxygen_monitoring (earlier,
@@ -154,22 +159,42 @@ static func apply_condition_floors(state: ColonyState) -> void:
 		e["condition"] = maxf(float(e.get("condition", 0.0)), floor_value)
 
 
-## Wastewater the recycler can clean per game hour (ls_water_reliability adds to it).
+## Wastewater the recycler can clean per game hour (ls_water_reliability adds to it; the life_support area level's
+## recycler_factor multiplies the total).
 static func recycler_l_per_hour(state: ColonyState, balance: GameBalance) -> float:
 	var bonus := ProgressionBalance.shared().recycler_bonus_l_per_hour if state.has_upgrade("ls_water_reliability") else 0.0
-	return balance.recycler_l_per_hour + bonus
+	return (balance.recycler_l_per_hour + bonus) * level_factor(state, "recycler_factor")
 
 
-## Top oxygen output of the electrolyser per game hour (ls_electrolysis raises it; kWh per kg stays the same).
+## Top oxygen output of the electrolyser per game hour (ls_electrolysis and the life_support area level's
+## o2_production_factor raise it; kWh per kg stays the same, so the power it asks for rises with it).
 static func electrolysis_o2_kg_per_hour(state: ColonyState, balance: GameBalance) -> float:
 	var factor := ProgressionBalance.shared().electrolysis_output_factor if state.has_upgrade("ls_electrolysis") else 1.0
-	return balance.electrolysis_o2_kg_per_hour * factor
+	return balance.electrolysis_o2_kg_per_hour * factor * level_factor(state, "o2_production_factor")
 
 
-## Top oxygen output of the CO2-oxygen unit per game hour (ls_co2_processing raises it; kWh per kg stays the same).
+## Top oxygen output of the CO2-oxygen unit per game hour (ls_co2_processing and the life_support area level's
+## o2_production_factor raise it; kWh per kg stays the same).
 static func co2_unit_o2_kg_per_hour(state: ColonyState, balance: GameBalance) -> float:
 	var factor := ProgressionBalance.shared().co2_unit_output_factor if state.has_upgrade("ls_co2_processing") else 1.0
-	return balance.co2_unit_o2_kg_per_hour * factor
+	return balance.co2_unit_o2_kg_per_hour * factor * level_factor(state, "o2_production_factor")
+
+
+## Most CO2 the scrubber removes per game hour with the cabin fans running (the life_support area level's
+## scrubber_factor adds scrubber beds).
+static func scrubber_co2_kg_per_hour(state: ColonyState, balance: GameBalance) -> float:
+	return balance.scrubber_co2_kg_per_hour * level_factor(state, "scrubber_factor")
+
+
+## A life_support area-level effect (data/area_levels.json), 1.0 at V1 or when the key is missing.
+static func level_factor(state: ColonyState, key: String) -> float:
+	return maxf(0.0, AreaLevels.effectf(state, "life_support", key, 1.0))
+
+
+## Oxygen the Garden dome plants give off per game hour (garden.plant_o2_kg_per_hour, 0 at V1). A sol average: S20
+## Table 4-91 rates are per day over the crop's life.
+static func plant_o2_kg_per_hour(state: ColonyState) -> float:
+	return maxf(0.0, AreaLevels.effectf(state, "garden", "plant_o2_kg_per_hour", 0.0))
 
 
 static func recycler_working(state: ColonyState, balance: GameBalance) -> bool:
@@ -215,11 +240,26 @@ static func run_cabin(state: ColonyState, balance: GameBalance, inside: int, dt:
 	state.ledger["co2_exhaled_kg"] += exhaled
 	# CO2 scrubber (S08 mechanism: molecular sieves). Without the fans it gets only part of the air.
 	if scrubber_working(state, balance):
-		var cap := balance.scrubber_co2_kg_per_hour * dt * (1.0 if fans_working(state, balance) else balance.fans_off_scrubber_share)
+		var cap := scrubber_co2_kg_per_hour(state, balance) * dt * (1.0 if fans_working(state, balance) else balance.fans_off_scrubber_share)
 		var floor_kg := balance.gas_kg_for_kpa(balance.scrubber_floor_kpa, GameBalance.MOLAR_CO2)
 		var removed := clampf(state.cabin_co2_kg - floor_kg, 0.0, cap)
 		state.cabin_co2_kg -= removed
 		state.ledger["co2_scrubbed_kg"] += removed
+	# Garden dome plants (garden.plant_o2_kg_per_hour): they give O2 to the cabin air and take up CO2 (44 g per 32 g O2).
+	# With too little CO2 they make less. O2 they push above the set point is banked in the oxygen reserve.
+	var plant_want := plant_o2_kg_per_hour(state) * dt
+	if plant_want > 0.0:
+		var co2_take := minf(plant_want * GameBalance.PLANT_CO2_KG_PER_KG_O2, maxf(0.0, state.cabin_co2_kg))
+		var plant_o2 := co2_take / GameBalance.PLANT_CO2_KG_PER_KG_O2
+		state.cabin_co2_kg -= co2_take
+		state.cabin_o2_kg += plant_o2
+		_ledger_add(state, "plant_o2_kg", plant_o2)
+		_ledger_add(state, "plant_co2_kg", co2_take)
+		var excess := minf(plant_o2, state.cabin_o2_kg - balance.gas_kg_for_kpa(balance.o2_setpoint_kpa, GameBalance.MOLAR_O2))
+		if excess > 0.0:
+			var banked := state.add_to_store(&"oxygen_kg", excess)
+			state.cabin_o2_kg -= banked
+			_ledger_add(state, "plant_o2_banked_kg", banked)
 	# regulator: back to the set points from the reserves, at a limited flow
 	var o2_want := clampf(balance.gas_kg_for_kpa(balance.o2_setpoint_kpa, GameBalance.MOLAR_O2) - state.cabin_o2_kg, 0.0, balance.regulator_kg_per_hour * dt)
 	var o2_got := -state.add_to_store(&"oxygen_kg", -o2_want)
@@ -231,6 +271,11 @@ static func run_cabin(state: ColonyState, balance: GameBalance, inside: int, dt:
 	state.ledger["regulator_n2_kg"] += n2_got
 	update_pressures(state, balance)
 	return need - got
+
+
+## Adds to a ledger total that ColonyState may not list yet (the plant entries, 2026-11-14); saves keep any key.
+static func _ledger_add(state: ColonyState, key: String, amount: float) -> void:
+	state.ledger[key] = float(state.ledger.get(key, 0.0)) + amount
 
 
 ## Suit air for one active character outside. Returns the share of air it did not get (0..1).

@@ -1,0 +1,121 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS part without its glb is skipped  ["T02", "T12", "T11"]
+PASS broken at start: broken model shown, intact rack hidden
+PASS intact object keeps its node (collision and station target untouched)
+PASS broken model on its room's render layers
+PASS no transition at start
+PASS tunnel lining never hidden
+PASS door 901's intact leaves hidden while broken
+PASS door 901 still opens while broken (its own hidden leaves slide)  (-1.75, 0.0, 0.0)
+PASS broken leaves slide with door 901  (-1.75, 0.0, 0.0) (1.75, 0.0, 0.0)
+PASS vapour stays at the gap
+PASS broken leaves close again
+PASS dusty hangar while broken  0.85 of 0.85, levels [1.0, 0.75, 1.0, 0.75, 0.5, 1.0]
+PASS dust patches shown while broken
+PASS T11 state cleans the west area first  0.0 / 0.85
+PASS cleaned area's dust patch goes
+PASS dust levels from patch records  [0.0, 0.5, 1.0]
+PASS T11 rule start: every area dusty
+PASS T11 rule state: cleaned back-left area loses its dust, back-right keeps it  0.0 / 0.85 (want 0.85)
+PASS T11 rule: completed task reads all clean
+PASS broken spot names its fault  [E] Fix the wires
+PASS broken prompt uses the data file's words
+PASS task without a broken part: plain Use prompt  [E] Use elements station
+PASS other stations unchanged  [E] Use power panel
+PASS station name in words
+PASS prompt T01 names the problem  [e] fix the radio signal
+PASS prompt T02 names the problem  [e] fix the wires
+PASS prompt T03 names the problem  [e] fix the power dials
+PASS prompt T04 names the problem  [e] repair the power circuit
+PASS prompt T06 names the problem  [e] fix the broken pipe
+PASS prompt T08 names the problem  [e] repair the broken glass
+PASS prompt T09 names the problem  [e] fix the test-tube rack
+PASS prompt T10 names the problem  [e] fix the unplugged equipment
+PASS prompt T11 names the problem  [e] clean the dusty hangar
+PASS prompt T12 names the problem  [e] repair the air leak
+PASS client starts broken too
+PASS no transition from a local answer
+PASS host rule completes T02  ok / ok
+PASS transition starts on the host from the state change
+PASS sparkle burst: 60-120 stars
+PASS sparkle burst on the room's layers  33
+PASS sparkle burst over the part's bounds
+PASS GPU particles outside the Low preset
+PASS client waits for the replicated state
+PASS warm glow and shrinking before the swap
+PASS broken model still there at 0.2 s
+PASS at 0.35 s: intact back, broken gone, effects stopped
+PASS transition ends after about 1 s, glow removed
+PASS client plays the transition from the replicated change
+PASS client ends intact
+PASS fixed hangar: clean materials and no dust
+PASS Low preset uses CPU particles
+PASS CPU stars on the room's layers
+PASS sealed: vapour stops and the intact leaves are back
+PASS fixed door 901 opens with its own leaves
+PASS save/load: completed parts load intact
+PASS save/load: no sparkles on load
+PASS older save without repair records loads broken
+PASS older save without completion flags loads broken
+PASS late join: fixed parts intact, no sparkles
+PASS data file lists parts  10
+PASS data entry T09 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS data entry T10 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS data entry T02 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS real part T02 loads on its room's layers
+PASS data entry T01 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS data entry T08 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS data entry T03 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS data entry T04 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS data entry T12 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256", "door", "door_leaves"]
+PASS real T12 model: both broken leaves slide with door 901  ["tunnel_door_inner_leaf_L__broken", "tunnel_door_inner_leaf_R__broken"]
+PASS real part T12 loads on its room's layers
+PASS data entry T06 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256"]
+PASS data entry T11 has task, zone and prompt  ["task_id", "part", "glb", "zone", "room_id", "station_id", "hide_objects", "hide_nodes", "effect_nodes", "model_nodes", "bounds", "model_bounds", "spot", "prompt", "special", "nodes", "source_blend", "source_sha256", "dust", "dust_region", "dust_nodes"]
+PASS real part T11 loads on its room's layers
+NOTE 3 real broken models loaded.
+PASS T05 has no puzzle, never broken
+PASS T07 has no puzzle, never broken
+PASS installed puzzle T01: new colony starts broken
+PASS installed puzzle T01: fixed after completion
+PASS installed puzzle T02: new colony starts broken
+PASS installed puzzle T02: fixed after completion
+PASS installed puzzle T03: new colony starts broken
+PASS installed puzzle T03: fixed after completion
+PASS installed puzzle T04: new colony starts broken
+PASS installed puzzle T04: fixed after completion
+PASS installed puzzle T06: new colony starts broken
+PASS installed puzzle T06: fixed after completion
+PASS installed puzzle T08: new colony starts broken
+PASS installed puzzle T08: fixed after completion
+PASS installed puzzle T09: new colony starts broken
+PASS installed puzzle T09: fixed after completion
+PASS installed puzzle T10: new colony starts broken
+PASS installed puzzle T10: fixed after completion
+PASS installed puzzle T11: new colony starts broken
+PASS installed puzzle T11: fixed after completion
+PASS installed puzzle T12: new colony starts broken
+PASS installed puzzle T12: fixed after completion
+PASS T07 keeps the plain prompt  [E] Use pipes station
+RESULT 97/97
+ERROR: 7 RID allocations of type 'N13RendererDummy9DummyMeshE' were leaked at exit.
+ERROR: 7 RID allocations of type 'N17RendererSceneCull8InstanceE' were leaked at exit.
+ERROR: Pages in use exist at exit in PagedAllocator: N20RasterizerSceneDummy21GeometryInstanceDummyE
+   at: ~PagedAllocator (./core/templates/paged_allocator.h:170)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: Leaked instance dependency: Bug - did not call instance_notify_deleted when freeing.
+   at: ~Dependency (servers/rendering/storage/utilities.cpp:56)
+WARNING: 17 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)

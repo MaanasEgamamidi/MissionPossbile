@@ -1,0 +1,15 @@
+test_game_services exit=0 RESULT 25/25 script_errors=0
+test_survival exit=0 RESULT 118/118 script_errors=0
+test_death_reasons exit=0 RESULT 111/111 script_errors=0
+test_tutorial exit=0 RESULT 59/59 script_errors=0
+test_survival_hud exit=0 RESULT 65/65 script_errors=0
+test_cassette_assets exit=1 RESULT 56/57 script_errors=0
+test_session exit=0 RESULT 91/91 script_errors=0
+test_saves exit=0 RESULT 56/56 script_errors=0
+test_puzzle_t12 exit=0 RESULT 62/62 script_errors=0
+test_broken_parts exit=0 RESULT 97/97 script_errors=0
+test_net_game exit=0 RESULT 21/21 script_errors=0
+test_survival_net exit=0 RESULT 28/28 script_errors=0
+DONE
+test_tutorial_start exit=0 RESULT 36/36 script_errors=0
+check_compile exit=0 COMPILE OK 345 scripts

@@ -2,6 +2,9 @@
 extends RefCounted
 ## Validates actions and remembers each peer's recent answers.
 
+## Tutorial mode (2026-11-14): only tapes and broken spots work until the base is fixed.
+const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
+
 ## Rules and callbacks for one action.
 class Definition extends RefCounted:
 	## Stable action name.
@@ -136,6 +139,9 @@ func _resolve_new(session: SessionService, request: ActionRequest) -> ActionResu
 			ctx.has_target_position = false
 		if ctx.has_target_position:
 			ctx.target_position = CharacterState._v3(ctx.target.position)
+		var locked := TutorialLock.refusal(ctx)
+		if locked != null:
+			return locked
 	if d.check_distance and ctx.actor != null and ctx.has_target_position and ctx.actor.position.distance_to(ctx.target_position) > ctx.config.interact_distance_m:
 		return ActionResult.failure(request.request_id, &"too_far")
 	var specialty := d.specialty

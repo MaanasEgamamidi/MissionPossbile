@@ -1,0 +1,869 @@
+{
+ "ok": true,
+ "started": "2026-11-14 19:27:28",
+ "part": "BP06",
+ "source": {
+  "blend": "G:\\nasa app\\broken_parts\\BP06_circle_electrical.blend",
+  "sha256": "392018D8AEFA8AD01EA0A848A7547515B22EF29573688147A52049E6F942CED3",
+  "bytes": 1344030,
+  "exported_with_blender": "5.3.0"
+ },
+ "skipped": [],
+ "splits": [],
+ "nodes": [
+  {
+   "name": "pr_swgr_003__broken",
+   "parent": null,
+   "kind": "model",
+   "source_object": "pr_swgr.003__broken",
+   "map_object": "pr_swgr.003",
+   "tris": 23148,
+   "origin_godot": [
+    34.725,
+    0.0,
+    9.348
+   ],
+   "aabb_min": [
+    33.6557,
+    -0.0,
+    8.1532
+   ],
+   "aabb_max": [
+    35.1694,
+    2.499,
+    9.827
+   ],
+   "roles": [
+    "black",
+    "blue",
+    "bp_led_red",
+    "en_galv",
+    "en_grey",
+    "en_red",
+    "green",
+    "kit_frame",
+    "kit_hazard_y",
+    "kit_ink",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "kit_sign",
+    "scr_red"
+   ]
+  },
+  {
+   "name": "pr_swgr_004__broken",
+   "parent": null,
+   "kind": "model",
+   "source_object": "pr_swgr.004__broken",
+   "map_object": "pr_swgr.004",
+   "tris": 22812,
+   "origin_godot": [
+    35.475,
+    0.0,
+    9.348
+   ],
+   "aabb_min": [
+    34.6463,
+    -0.0054,
+    8.2503
+   ],
+   "aabb_max": [
+    35.9281,
+    2.499,
+    9.827
+   ],
+   "roles": [
+    "black",
+    "blue",
+    "bp_led_red",
+    "en_galv",
+    "en_grey",
+    "en_red",
+    "kit_hazard_y",
+    "kit_ink",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "kit_sign",
+    "scr_red"
+   ]
+  },
+  {
+   "name": "pr_inverter__broken",
+   "parent": null,
+   "kind": "model",
+   "source_object": "pr_inverter__broken",
+   "map_object": "pr_inverter",
+   "tris": 7664,
+   "origin_godot": [
+    38.3,
+    0.0,
+    9.523
+   ],
+   "aabb_min": [
+    37.7401,
+    -0.0,
+    8.4128
+   ],
+   "aabb_max": [
+    38.709,
+    2.2086,
+    9.8052
+   ],
+   "roles": [
+    "black",
+    "blue",
+    "bp_led_red",
+    "en_galv",
+    "en_rack",
+    "en_red",
+    "kit_frame",
+    "kit_hazard_y",
+    "kit_ink",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "kit_sign"
+   ]
+  },
+  {
+   "name": "pr_inverter_001__broken",
+   "parent": null,
+   "kind": "model",
+   "source_object": "pr_inverter.001__broken",
+   "map_object": "pr_inverter.001",
+   "tris": 7664,
+   "origin_godot": [
+    39.12,
+    0.0,
+    9.523
+   ],
+   "aabb_min": [
+    38.594,
+    -0.0,
+    8.4932
+   ],
+   "aabb_max": [
+    39.5233,
+    2.1977,
+    9.8127
+   ],
+   "roles": [
+    "black",
+    "blue",
+    "bp_led_red",
+    "en_galv",
+    "en_rack",
+    "en_red",
+    "kit_frame",
+    "kit_hazard_y",
+    "kit_ink",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "kit_sign"
+   ]
+  }
+ ],
+ "bounds": {
+  "center": [
+   36.5895,
+   1.2468,
+   8.9901
+  ],
+  "size": [
+   5.8676,
+   2.5045,
+   1.6738
+  ],
+  "min": [
+   33.6557,
+   -0.0054,
+   8.1532
+  ],
+  "max": [
+   39.5233,
+   2.499,
+   9.827
+  ]
+ },
+ "palette": {
+  "black": {
+   "rgb_linear": [
+    0.011612,
+    0.011612,
+    0.013702
+   ],
+   "hex": "#1c1c1f",
+   "emission": 0,
+   "roughness": 0.7,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "plastic",
+   "base_linear": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.494,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.18,
+   "grime": 0.3,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "en_grey": {
+   "rgb_linear": [
+    0.366253,
+    0.391572,
+    0.401978
+   ],
+   "hex": "#a3a8aa",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.366253,
+    0.391572,
+    0.401978
+   ],
+   "rough0": 0.4,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.25,
+   "grime": 0.3,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_seam": {
+   "rgb_linear": [
+    0.009134,
+    0.009721,
+    0.01096
+   ],
+   "hex": "#18191b",
+   "emission": 0,
+   "roughness": 0.8,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "rubber",
+   "base_linear": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.8,
+   "metal0": 0.0,
+   "var": 0.04,
+   "wear": 0.0,
+   "grime": 0.25,
+   "bump": 0.03,
+   "bscale": 520.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "en_galv": {
+   "rgb_linear": [
+    0.341914,
+    0.361307,
+    0.381326
+   ],
+   "hex": "#9ea2a6",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 1.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "metal",
+   "base_linear": [
+    0.62,
+    0.63,
+    0.64
+   ],
+   "rough0": 0.46,
+   "metal0": 1.0,
+   "var": 0.14,
+   "wear": 0.25,
+   "grime": 0.45,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": true,
+   "render_rgb_linear": [
+    0.62,
+    0.63,
+    0.64
+   ]
+  },
+  "kit_lower": {
+   "rgb_linear": [
+    0.045186,
+    0.046665,
+    0.051269
+   ],
+   "hex": "#3c3d40",
+   "emission": 0,
+   "roughness": 0.6,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.045186,
+    0.046665,
+    0.051269
+   ],
+   "rough0": 0.492,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.45,
+   "grime": 0.45,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_hazard_y": {
+   "rgb_linear": [
+    0.806952,
+    0.456411,
+    0.003677
+   ],
+   "hex": "#e8b40c",
+   "emission": 0,
+   "roughness": 0.55,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.806952,
+    0.456411,
+    0.02
+   ],
+   "rough0": 0.471,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.5,
+   "grime": 0.4,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_led_red": {
+   "rgb_linear": [
+    1.0,
+    0.017642,
+    0.006995
+   ],
+   "hex": "#ff2414",
+   "emission": 3.0,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glow",
+   "base_linear": [
+    0.85,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "scr_red": {
+   "rgb_linear": [
+    1.0,
+    0.068478,
+    0.023153
+   ],
+   "hex": "#ff4a2a",
+   "emission": 4.0,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "screen",
+   "base_linear": [
+    0.85,
+    0.068478,
+    0.023153
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_sign": {
+   "rgb_linear": [
+    0.863157,
+    0.854993,
+    0.814847
+   ],
+   "hex": "#efeee9",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "plastic",
+   "base_linear": [
+    0.85,
+    0.85,
+    0.814847
+   ],
+   "rough0": 0.389,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.1,
+   "grime": 0.3,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "green": {
+   "rgb_linear": [
+    0.078187,
+    0.194618,
+    0.102242
+   ],
+   "hex": "#4f7a5a",
+   "emission": 0,
+   "roughness": 0.6,
+   "metallic": 0.05,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.078187,
+    0.194618,
+    0.102242
+   ],
+   "rough0": 0.492,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.35,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_ink": {
+   "rgb_linear": [
+    0.016807,
+    0.017642,
+    0.019382
+   ],
+   "hex": "#232426",
+   "emission": 0,
+   "roughness": 0.5,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.45,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.0,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_frame": {
+   "rgb_linear": [
+    0.025187,
+    0.027321,
+    0.030713
+   ],
+   "hex": "#2c2e31",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.6,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "metal",
+   "base_linear": [
+    0.06,
+    0.065,
+    0.07
+   ],
+   "rough0": 0.36,
+   "metal0": 1.0,
+   "var": 0.05,
+   "wear": 0.35,
+   "grime": 0.4,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": true,
+   "render_rgb_linear": [
+    0.06,
+    0.065,
+    0.07
+   ]
+  },
+  "en_red": {
+   "rgb_linear": [
+    0.391572,
+    0.019382,
+    0.011612
+   ],
+   "hex": "#a8261c",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.391572,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.38,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.35,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_rubber": {
+   "rgb_linear": [
+    0.011612,
+    0.011612,
+    0.012286
+   ],
+   "hex": "#1c1c1d",
+   "emission": 0,
+   "roughness": 0.85,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "rubber",
+   "base_linear": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.82,
+   "metal0": 0.0,
+   "var": 0.04,
+   "wear": 0.1,
+   "grime": 0.25,
+   "bump": 0.03,
+   "bscale": 520.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "blue": {
+   "rgb_linear": [
+    0.049707,
+    0.171441,
+    0.391572
+   ],
+   "hex": "#3f73a8",
+   "emission": 0,
+   "roughness": 0.6,
+   "metallic": 0.05,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.049707,
+    0.171441,
+    0.391572
+   ],
+   "rough0": 0.492,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.35,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "en_rack": {
+   "rgb_linear": [
+    0.043735,
+    0.048172,
+    0.05448
+   ],
+   "hex": "#3b3e42",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.043735,
+    0.048172,
+    0.05448
+   ],
+   "rough0": 0.42,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.3,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  }
+ },
+ "unmapped_materials": {},
+ "lights": [],
+ "export": {
+  "path": "G:\\nasa app\\mars_colony_revisions_wt\\assets\\broken_parts\\BP06.glb",
+  "result": [
+   "FINISHED"
+  ],
+  "bytes": 1902968,
+  "sha256": "04C9ABB9C2C5DA1598C990A26D402C0B1D92A1DFACF92A5975F717A153E0FDA7",
+  "tris": 61288
+ },
+ "secs": 0.5
+}

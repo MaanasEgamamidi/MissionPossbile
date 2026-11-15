@@ -46,8 +46,13 @@ func answer(pending: ActionResult) -> ActionResult:
 
 func _run() -> void:
 	var host := machine("SurvivalHost")
+	# S01-S04 exposure needs unsuited crew from the Med Bay, not the tutorial start (suited, outside).
+	host.config.tutorial_start_outside = false
+	host.config.tutorial_start_suited = false
 	host.start_new_game(1842)
 	host.set_process(false)
+	# The door-cycle checks below are about a sealed airlock: the broken T12 seal of a new game would keep it leaking.
+	host.state().repair.tasks.T12.first_completed = true
 	var inner := DoorController.new()
 	inner.door_id = 901
 	var outer := DoorController.new()
@@ -121,6 +126,8 @@ func _run() -> void:
 	# Close while the start is still pending: the ordered cancel must reach the host
 	# even before the panel has received any replicated job or acknowledgement.
 	host.state().repair.tasks.T03.condition = 0.8
+	# T03 is a broken part at the start, so E would open its puzzle; this check is about the maintenance panel.
+	host.state().repair.tasks.T03.first_completed = true
 	host.events.state_changed.emit(&"maintenance_fixture")
 	await until(func() -> bool: return is_equal_approx(float(client.state().repair.tasks.T03.condition), 0.8))
 	var pending_panel := StationPanels.for_station(&"repair_t03", client) as MaintenanceStationPanel

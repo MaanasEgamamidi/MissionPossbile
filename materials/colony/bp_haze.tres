@@ -1,0 +1,13 @@
+[gd_resource type="ShaderMaterial" load_steps=2 format=3]
+
+[ext_resource type="Shader" path="res://materials/colony_glass.gdshader" id="1"]
+
+[resource]
+resource_name = "bp_haze"
+shader = ExtResource("1")
+shader_parameter/albedo = Color(0.98271, 0.9888, 0.99115, 1)
+shader_parameter/opacity = 0.45
+shader_parameter/roughness = 0.45
+shader_parameter/edge_opacity = 0.7
+shader_parameter/dust_k = 0.2
+shader_parameter/dust_color = Color(0.63425, 0.44297, 0.30353, 1)

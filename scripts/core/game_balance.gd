@@ -7,10 +7,16 @@ extends Resource
 ##   S09      MOXIE on Mars (NASA JPL release): oxygen from Mars CO2, best 12 g/h, 98 % purity.
 ##            A colony-size unit is FICTION SCALED FROM S09, not a NASA figure.
 ##   S01/S02  Mars gravity and the length of a sol (see GameConfig)
+##   S20      NASA Life Support Baseline Values and Assumptions Document (BVAD), NASA/TP-2015-218570/REV2, Feb 2022.
+##            Crew use per crew member per day (kg/CM-d) and ISS power and battery reference values.
 ##   balance  game tuning with no source. NEVER present a balance number as a NASA figure.
-## The same categories are listed per field in data/model_sources.json.
+## The same categories are listed per field in data/model_sources.json; S20 is in docs/source_register.md section 11.
 ## Resource rates are per GAME hour (one sol = GameConfig.SOL_HOURS game hours), so the real length of a sol never
 ## changes resource use per sol. Equipment maintenance explicitly uses unpaused REAL seconds instead.
+## Time base: one game hour is one hour of colony time (an Earth hour, the unit NASA uses). A sol holds 24.6598 game
+## hours (S02), so a NASA per-day figure becomes a per-game-hour rate by dividing by 24, and one sol uses
+## 24.6598 / 24 = 1.0275 NASA days. With the default 20-minute sol, one game hour passes in 48.7 real seconds, but no
+## resource rate is ever per real second (S01 suit exposure is the separate real-second rule in SessionService).
 ## kW is a rate of energy use, kWh an amount; they are never mixed.
 
 # ---- physics constants (not tuning)
@@ -26,12 +32,42 @@ const GAS_R := 8.314
 const MOLAR_O2 := 0.032
 const MOLAR_N2 := 0.028
 const MOLAR_CO2 := 0.044
+## Hours in the day NASA's per-day crew figures use. (definition)
+const HOURS_PER_DAY := 24.0
+## Food energy units. (physics)
+const KJ_PER_KCAL := 4.184
+## Plants: CO2 + H2O -> CH2O + O2, so 44 g of CO2 is taken up for every 32 g of O2 given off. (physics; S20 Table 4-91
+## lettuce 10.70 g CO2 per 7.78 g O2 per m2 per day agrees)
+const PLANT_CO2_KG_PER_KG_O2 := 44.0 / 32.0
+
+# ---- NASA per crew member per day (S20 BVAD Rev2, 82 kg reference crew member). The game rates below derive from these.
+## NASA: S20 Table 3-31 oxygen consumed 0.895 kg/CM-d
+const NASA_O2_KG_PER_CREW_DAY := 0.895
+## NASA: S20 Table 3-31 carbon dioxide load 1.085 kg/CM-d
+const NASA_CO2_KG_PER_CREW_DAY := 1.085
+## NASA: S20 Table 4-20 Early Planetary Base total water consumption 4.48 kg/CM-d = drinking 2.00 + food rehydration
+## 0.50 + urinal flush 0.50 + personal hygiene 0.40 + hand wash 1.08 (1 kg of water = 1 L)
+const NASA_WATER_KG_PER_CREW_DAY := 4.48
+## NASA: S20 Table 3-31 food consumed, energy content 12.778 MJ/CM-d (3,054 kcal)
+const NASA_FOOD_MJ_PER_CREW_DAY := 12.778
+## NASA: S20 section 3.3.5 (Table 3-31 notes) 1.56 kg/CM-d of food eaten at 48.7 % water
+const NASA_FOOD_KG_PER_CREW_DAY := 1.56
+## NASA: S20 Table 3-31 food solids 0.800 kg/CM-d (dry, without packaging)
+const NASA_FOOD_DRY_KG_PER_CREW_DAY := 0.8
+## NASA: S20 Table 3-2 average ECLSS power on the International Space Station 5.31 kW (whole station crew). A
+## cross-check for the game's life-support loads, not a game value.
+const NASA_ISS_ECLSS_KW := 5.31
 
 @export_group("Starting stores")
-## balance: fiction 2080 battery bank.
-@export var battery_kwh_start := 560.0
-## balance: fiction 2080 battery bank.
-@export var battery_kwh_capacity := 800.0
+## balance: fiction 2080 battery bank, 90 % charged at arrival.
+@export var battery_kwh_start := 630.0
+## balance (sized with S20): usable energy of the fiction 2080 battery bank. Sized so the battery visibly falls at
+## night (the arrival loads of 23.1 kW take 41 % of it in one 12.3 h night) and a colony that leaves every light on
+## and never cleans the panels runs it flat on its fifth night, while a careful one (about 9 kW at night) uses 16 %.
+## A restored colony with every light on still gains over a sol from 300 kWh (it must hold 300 + 50 + one 337 kWh
+## wasteful night). For scale: 700 kWh usable is 1,167 kWh of lithium-ion cells used to the 60 % depth of discharge
+## per cycle (S20 Table 3-17, 1,500 cycles), about 7.8 t of cells at 150 Wh/kg (Table 3-17: 100 to 150 Wh/kg).
+@export var battery_kwh_capacity := 700.0
 ## balance
 @export var water_l_start := 900.0
 ## balance
@@ -57,7 +93,9 @@ const MOLAR_CO2 := 0.044
 
 @export_group("Solar (12 sun trackers)")
 ## balance (fiction 2080 array): output of all 12 trackers together at noon, clean, tracking, default sky. Each tracker
-## has 1/12 of it.
+## has 1/12 of it. For scale only: sunlight above Mars is 586.2 W/m2 (S01), so 100 kW needs several hundred square
+## metres of panels. Solar gives exactly 0 kW from sunset to sunrise (PowerModel.sun_term); the night is half a sol,
+## 12.33 game hours (S02 sol length / 2, the equator at equinox), 10 real minutes at the default 20-minute sol.
 @export var solar_kw_peak := 100.0
 ## balance: dust in the air at the start (optical depth). The weather milestone will drive state.dust_tau.
 @export var dust_tau_default := 0.5
@@ -81,6 +119,12 @@ const MOLAR_CO2 := 0.044
 @export_range(0.0, 1.0) var battery_warn_fraction := 0.3
 
 @export_group("Power loads (kW)")
+## Night loads at arrival (every room on, oxygen machines off): base 4 + critical room lights 1.2 + other room lights
+## 5.2 + greenhouse lights 9 + trackers 0.6 + recycler 1 + scrubber 1.5 + fans 0.6 = 23.1 kW, 285 kWh per night.
+## Careful night (only the critical room lights, greenhouse lights off): 8.9 kW, 110 kWh per night.
+## Life-support machines (scrubber, fans, recycler, electrolyser at full rate) come to 4.3 kW for 4 crew, about
+## 1.1 kW per crew member; ISS ECLSS averages 5.31 kW (S20 Table 3-2) for its larger crew, so the scale is realistic.
+## The individual numbers stay balance.
 ## balance: control and heating; stays on whatever the room switches say.
 @export var base_load_kw := 4.0
 ## balance: lights of each zone when its switch is on. Unknown zones use `zone_load_default_kw`.
@@ -104,9 +148,12 @@ const MOLAR_CO2 := 0.044
 @export_range(0.0, 1.0) var equipment_min_condition := 0.5
 
 @export_group("Water")
-## balance: drinking and washing per active astronaut.
-@export var water_l_per_hour := 0.25
-## balance: share of used water that returns as wastewater; the rest leaves in breath and sweat.
+## NASA: S20 Table 4-20 4.48 kg/CM-d (Early Planetary Base: drinking, food rehydration, flush, hygiene, hand wash)
+## / 24 h = 0.1867 L per active astronaut per game hour, 4.60 L per sol. Was 0.25 L/h (balance).
+@export var water_l_per_hour := NASA_WATER_KG_PER_CREW_DAY / HOURS_PER_DAY
+## NASA-derived (S20): share of used water that returns as wastewater; the rest leaves in breath, sweat and solid
+## waste. S20 Table 4-21 ISS column: 3.77 kg/CM-d of wastewater for 4.45 kg/CM-d of water in (Table 4-20 ISS 3.20 drink,
+## food water, flush and hygiene + Table 3-31 water in food 0.76 + metabolic water 0.49): 3.77 / 4.45 = 0.85.
 @export_range(0.0, 1.0) var water_to_wastewater := 0.85
 ## balance: clean water kept for drinking; allocations never take the store below it.
 @export var water_reserve_l := 100.0
@@ -168,11 +215,13 @@ const MOLAR_CO2 := 0.044
 @export var n2_reserve_warn_kg := 15.0
 
 @export_group("Per active astronaut")
-## balance: oxygen breathed per hour.
-@export var oxygen_kg_per_hour := 0.035
-## balance: CO2 breathed out per hour.
-@export var co2_kg_per_hour := 0.042
-## balance
+## NASA: S20 Table 3-31 oxygen consumed 0.895 kg/CM-d / 24 h = 0.03729 kg per game hour (was 0.035, balance).
+## Breathed from the cabin indoors and from the suit tank outside, never both in the same tick.
+@export var oxygen_kg_per_hour := NASA_O2_KG_PER_CREW_DAY / HOURS_PER_DAY
+## NASA: S20 Table 3-31 carbon dioxide load 1.085 kg/CM-d / 24 h = 0.04521 kg per game hour (was 0.042, balance).
+@export var co2_kg_per_hour := NASA_CO2_KG_PER_CREW_DAY / HOURS_PER_DAY
+## balance (game unit): meals eaten per sol. What a meal holds comes from NASA: see meal_mj() and meal_kg(); 3 meals
+## per sol are S20's 12.778 MJ and 1.56 kg per day times 24.6598 / 24, so each meal is 4.38 MJ (1,046 kcal), 0.53 kg.
 @export var meals_per_sol := 3.0
 ## balance: suit tank size (suit_charge is 0..100 % of this).
 @export var suit_o2_capacity_kg := 0.4
@@ -212,6 +261,26 @@ const MOLAR_CO2 := 0.044
 
 func load_of_zone(zone: String) -> float:
 	return float(zone_load_kw.get(zone, zone_load_default_kw))
+
+
+## A NASA per-day amount turned into what one crew member uses in one sol (24.6598 / 24 = 1.0275 days).
+static func per_sol_from_per_day(per_day: float) -> float:
+	return per_day * GameConfig.SOL_HOURS / HOURS_PER_DAY
+
+
+## Food energy in one meal, MJ: one sol of S20's 12.778 MJ/CM-d split into meals_per_sol meals.
+func meal_mj() -> float:
+	return per_sol_from_per_day(NASA_FOOD_MJ_PER_CREW_DAY) / maxf(meals_per_sol, 1e-9)
+
+
+## Food energy in one meal, kcal (about 1,046 with 3 meals per sol).
+func meal_kcal() -> float:
+	return meal_mj() * 1000.0 / KJ_PER_KCAL
+
+
+## Food eaten in one meal, kg as eaten (S20: 1.56 kg/CM-d, 48.7 % water).
+func meal_kg() -> float:
+	return per_sol_from_per_day(NASA_FOOD_KG_PER_CREW_DAY) / maxf(meals_per_sol, 1e-9)
 
 
 ## Kilograms of a gas that give `kpa` in the cabin (ideal gas law, physics).

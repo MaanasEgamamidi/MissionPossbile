@@ -1,0 +1,28 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fresh start: no save is a defined result  no_save
+PASS new game: four crew, host controls crew_1
+PASS new game: 21 base stations from the map (9 tagged + 12 sun trackers) plus those added by data files  21 base, 86 in all
+PASS new game: 18 zones, all powered  18
+PASS new game: saved at once
+PASS new game: starts at the configured time of day
+PASS action through the session works
+PASS ten real seconds = 50 ticks  50
+PASS manual save
+PASS continue: status ok  ok
+PASS continue: state identical to what was saved
+PASS continue: no clock jump
+PASS continue: host is the same crew member and still carries the crate
+PASS continue: nothing duplicated or broken  []
+PASS continue: random sequence carries on where it stopped
+PASS no offline deterioration: real time while closed changes nothing
+PASS important transaction saves right away  [&"set_sol_minutes"]
+PASS ordinary action does not force a save  []
+PASS interval autosave  [&"autosave"]
+PASS paused: no ticks and no autosave  0 []
+PASS repeated save: state unchanged by saving  1
+PASS repeated save: one main file and two backups only  ["colony.bak1.json", "colony.bak2.json", "colony.json"]
+PASS damaged newest save: recovered from backup  recovered_from_backup ["G:/nasa app/mars_colony_revisions_wt/_test_saves/services/colony.json: Invalid JSON: Expected key"]
+PASS save from a newer game: refused, no game started  unsupported_schema
+PASS orderly quit writes a save  [&"quit"]
+RESULT 25/25

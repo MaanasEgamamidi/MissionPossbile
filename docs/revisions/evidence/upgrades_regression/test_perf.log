@@ -1,0 +1,109 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS PerfSettings autoload is present
+PASS PerfRig attached at the start of play
+PASS 17 zones: 15 rooms, the dome plaza, the garden dome (17)
+PASS 28 doors: 24 manifest + tunnel pair + garden pair (28)
+PASS windows found between zones (7)
+PASS Hangar bay neighbours by door/window: ["Airlock", "Blast-door passage", "Crew corridor", "Pipe gallery", "Service corridor"]
+PASS door leaves with glass panels are transparent (26 of 28)
+DOOR Door_1 a=Hangar bay b=Pipe gallery outside=false glass=true window=false
+DOOR Door_2 a=Hangar bay b=Blast-door passage outside=false glass=true window=false
+DOOR Door_3 a=Hangar bay b=Crew corridor outside=false glass=true window=false
+DOOR Door_4 a=Hangar bay b=Service corridor outside=false glass=true window=false
+DOOR Door_5 a=Crew corridor b=Mess hall outside=false glass=true window=false
+DOOR Door_6 a=Mess hall b=Dome plaza outside=false glass=true window=false
+DOOR Door_7 a=Mess hall b=Med Bay outside=false glass=true window=false
+DOOR Door_8 a=Mess hall b=Rec kitchen outside=false glass=true window=false
+DOOR Door_9 a=Rec kitchen b=Pipe gallery outside=false glass=true window=false
+DOOR Door_10 a=Command Room b=Dome plaza outside=false glass=true window=false
+DOOR Door_11 a=Command Room b=Rec kitchen outside=false glass=true window=false
+DOOR Door_12 a=Command Room b=East quarters outside=false glass=true window=false
+DOOR Door_13 a=Command Room b=Blast-door passage outside=false glass=true window=false
+DOOR Door_14 a=West bunk room b=Crew corridor outside=false glass=true window=false
+DOOR Door_15 a=East quarters b=Life Support outside=false glass=true window=false
+DOOR Door_16 a=Service corridor b=Life Support outside=false glass=true window=false
+DOOR Door_17 a=Service corridor b=Power Room outside=false glass=true window=false
+DOOR Door_18 a=Greenhouse b=West bunk room outside=false glass=true window=false
+DOOR Door_19 a=Greenhouse b=Crew corridor outside=false glass=true window=false
+DOOR Door_20 a=Greenhouse b=Dome plaza outside=false glass=true window=false
+DOOR Door_21 a=Greenhouse b=Airlock outside=false glass=true window=false
+DOOR Door_22 a=Airlock b=Hangar bay outside=false glass=true window=false
+DOOR Door_23 a=Airlock b=Power Room outside=false glass=true window=false
+DOOR Door_24 a=Power Room b=Dome plaza outside=false glass=true window=false
+DOOR Door_901 a=Dome plaza b=Airlock outside=false glass=true window=false
+DOOR Door_902 a=Dome plaza b=- outside=true glass=true window=false
+DOOR Door_911 a=Garden dome b=- outside=false glass=false window=false
+DOOR Door_912 a=Garden dome b=- outside=true glass=false window=false
+DOOR Window_command_room_blast_door_passage a=Command Room b=Blast-door passage outside=false glass=true window=true
+DOOR Window_hangar_bay_pipe_gallery a=Hangar bay b=Pipe gallery outside=false glass=true window=true
+DOOR Window_service_corridor_life_support a=Service corridor b=Life Support outside=false glass=true window=true
+DOOR Window_med_bay_dome_plaza a=Med Bay b=Dome plaza outside=false glass=true window=true
+DOOR Window_mess_hall_rec_kitchen a=Mess hall b=Rec kitchen outside=false glass=true window=true
+DOOR Window_power_room_dome_plaza a=Power Room b=Dome plaza outside=false glass=true window=true
+DOOR Window_dome_plaza_garden_dome a=Dome plaza b=Garden dome outside=false glass=true window=true
+PASS two exterior doors (tunnel and garden outer doors), each with its inner zone
+GRAPH ["Hangar bay:[\"Pipe gallery\", \"Blast-door passage\", \"Crew corridor\", \"Service corridor\", \"Airlock\"]", "Crew corridor:[\"Hangar bay\", \"Mess hall\", \"West bunk room\", \"Greenhouse\"]", "Mess hall:[\"Crew corridor\", \"Dome plaza\", \"Med Bay\", \"Rec kitchen\"]", "Rec kitchen:[\"Mess hall\", \"Pipe gallery\", \"Command Room\"]", "Med Bay:[\"Mess hall\", \"Dome plaza\"]", "Command Room:[\"Dome plaza\", \"Rec kitchen\", \"East quarters\", \"Blast-door passage\"]", "Blast-door passage:[\"Hangar bay\", \"Command Room\"]", "West bunk room:[\"Crew corridor\", \"Greenhouse\"]", "East quarters:[\"Command Room\", \"Life Support\"]", "Service corridor:[\"Hangar bay\", \"Life Support\", \"Power Room\"]", "Greenhouse:[\"West bunk room\", \"Crew corridor\", \"Dome plaza\", \"Airlock\"]", "Airlock:[\"Greenhouse\", \"Hangar bay\", \"Power Room\", \"Dome plaza\"]", "Power Room:[\"Service corridor\", \"Airlock\", \"Dome plaza\"]", "Life Support:[\"East quarters\", \"Service corridor\"]", "Pipe gallery:[\"Hangar bay\", \"Rec kitchen\"]", "Dome plaza:[\"Mess hall\", \"Command Room\", \"Greenhouse\", \"Power Room\", \"Airlock\", \"Med Bay\", \"Garden dome\"]", "Garden dome:[\"Dome plaza\"]"]
+PERF-ROOM Hangar bay | current=Hangar bay | drawn 14 cold 3 ["Med Bay", "East quarters", "Garden dome"] | mars shown | mask=720623
+PASS Hangar bay: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Crew corridor | current=Crew corridor | drawn 15 cold 2 ["East quarters", "Life Support"] | mars shown | mask=777983
+PASS Crew corridor: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Mess hall | current=Mess hall | drawn 13 cold 4 ["Blast-door passage", "East quarters", "Service corridor", "Life Support"] | mars shown | mask=777407
+PASS Mess hall: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Rec kitchen | current=Rec kitchen | drawn 10 cold 7 ["West bunk room", "Service corridor", "Greenhouse", "Airlock", "Power Room", "Life Support", "Garden dome"] | mars shown | mask=704895
+PASS Rec kitchen: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Med Bay | current=Med Bay | drawn 10 cold 7 ["Hangar bay", "Blast-door passage", "West bunk room", "East quarters", "Service corridor", "Life Support", "Pipe gallery"] | mars shown | mask=760894
+PASS Med Bay: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Command Room | current=Command Room | drawn 14 cold 3 ["Crew corridor", "West bunk room", "Service corridor"] | mars shown | mask=785789
+PASS Command Room: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Blast-door passage | current=Blast-door passage | drawn 17 cold 0 [] | mars shown | mask=786431
+PASS Blast-door passage: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM West bunk room | current=West bunk room | drawn 11 cold 6 ["Rec kitchen", "Blast-door passage", "East quarters", "Service corridor", "Life Support", "Pipe gallery"] | mars shown | mask=761015
+PASS West bunk room: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM East quarters | current=East quarters | drawn 7 cold 10 ["Hangar bay", "Crew corridor", "Mess hall", "Med Bay", "West bunk room", "Greenhouse", "Airlock", "Power Room", "Pipe gallery", "Garden dome"] | mars shown | mask=697192
+PASS East quarters: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Service corridor | current=Service corridor | drawn 11 cold 6 ["Mess hall", "Rec kitchen", "Med Bay", "West bunk room", "Greenhouse", "Garden dome"] | mars shown | mask=719715
+PASS Service corridor: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Greenhouse | current=Greenhouse | drawn 11 cold 6 ["Rec kitchen", "Blast-door passage", "East quarters", "Service corridor", "Life Support", "Pipe gallery"] | mars shown | mask=761015
+PASS Greenhouse: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Airlock | current=Airlock | drawn 14 cold 3 ["Rec kitchen", "East quarters", "Life Support"] | mars shown | mask=777975
+PASS Airlock: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Power Room | current=Power Room | drawn 11 cold 6 ["Crew corridor", "Rec kitchen", "Blast-door passage", "West bunk room", "East quarters", "Pipe gallery"] | mars shown | mask=769589
+PASS Power Room: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Life Support | current=Life Support | drawn 6 cold 11 ["Crew corridor", "Mess hall", "Rec kitchen", "Med Bay", "Blast-door passage", "West bunk room", "Greenhouse", "Airlock", "Pipe gallery", "Dome plaza", "Garden dome"] | mars shown | mask=668449
+PASS Life Support: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Pipe gallery | current=Pipe gallery | drawn 16 cold 1 ["Garden dome"] | mars shown | mask=720895
+PASS Pipe gallery: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Dome plaza | current=Dome plaza | drawn 15 cold 2 ["Life Support", "Pipe gallery"] | mars shown | mask=761855
+PASS Dome plaza: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PERF-ROOM Garden dome | current=Garden dome | drawn 8 cold 9 ["Hangar bay", "Crew corridor", "Rec kitchen", "Blast-door passage", "West bunk room", "East quarters", "Service corridor", "Life Support", "Pipe gallery"] | mars shown | mask=760884
+PASS Garden dome: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states
+PASS Mars hidden in: []
+PASS Hangar bay (COLD): fixtures off while asleep
+PASS Hangar bay woken while unpowered: still dark
+PASS Hangar bay powered again while awake: lights on
+PASS from the garden dome, Hangar bay is COLD
+PASS Hangar bay COLD: the sun, every fixture light and every probe stay inside the camera mask
+PASS teleport into Hangar bay: snapped within the next frame, nothing queued
+PASS DoorController.opening_started opens its ZoneDoor at once
+PASS DoorController.closed_fully closes it again
+PASS outside on Mars: player_outside and Mars shown
+PASS outside: the glass dome plaza is still drawn
+PERF-OUTSIDE at (0, -60): 15 rooms not drawn, mask=753664
+PASS the other crew's models are view-gated (3)
+PASS all switches off: camera mask is the rig's own (786431)
+PASS all switches off: every fixture light follows power only
+PASS all switches off: Mars visible
+PASS all switches off: no colony mesh has a visibility parent
+PASS all switches off: every view-gated model processes
+PASS visibility range plan: 39 unranged scenery nodes, authored rock ranges left alone
+PASS ranges on: SFX_scorch_gouge ends at 2100 m
+PASS ranges off: restored
+PASS colony LOD on: proxies wired
+PASS colony LOD off: proxies hidden
+PASS zones back on: snapped to the outside state
+RESULT 48/48
+WARNING: 123 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 28 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

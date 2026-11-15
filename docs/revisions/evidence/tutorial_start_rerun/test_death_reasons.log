@@ -1,0 +1,114 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS catalog record no_suit_outside
+PASS catalog record suit_oxygen_out
+PASS catalog record suit_damaged
+PASS catalog record airlock_pressure
+PASS catalog record cabin_air
+PASS catalog record low_oxygen
+PASS catalog record co2
+PASS catalog record starvation
+PASS catalog record dehydration
+PASS catalog record cold
+PASS catalog record injury
+PASS catalog record unknown
+PASS unknown ids fall back to the unknown record and still count
+PASS no-suit words match the brief
+PASS no suit outside: alive at 3.98 s, dead by 4.02 s
+PASS no suit outside: record cause no_suit_outside
+PASS no suit outside: area words and time stamp
+PASS no suit outside: respawn after the record, in the Med Bay
+PASS broken suit seal: alive at 3.98 s, dead by 4.02 s
+PASS broken suit seal: record cause suit_damaged
+PASS empty suit tank outside: alive at 3.98 s, dead by 4.02 s
+PASS empty suit tank outside: record cause suit_oxygen_out
+PASS exit tunnel with the outer door open: alive at 3.98 s, dead by 4.02 s
+PASS exit tunnel with the outer door open: record cause airlock_pressure
+PASS airlock record names the vestibule
+PASS exit tunnel with a seal leak: alive at 3.98 s, dead by 4.02 s
+PASS exit tunnel with a seal leak: record cause airlock_pressure
+PASS base air pressure too low: alive at 3.98 s, dead by 4.02 s
+PASS base air pressure too low: record cause cabin_air
+PASS cabin record names the room
+PASS cabin oxygen too low: alive at 3.98 s, dead by 4.02 s
+PASS cabin oxygen too low: record cause low_oxygen
+PASS too much carbon dioxide: alive at 3.98 s, dead by 4.02 s
+PASS too much carbon dioxide: record cause co2
+PASS simulation health loss (water out, food ok) -> dehydration
+PASS simulation health loss (water out, food ok): not an air death
+PASS simulation health loss (water ok, food out) -> starvation
+PASS simulation health loss (water ok, food out): not an air death
+PASS simulation health loss (water out, food out) -> dehydration
+PASS simulation health loss (water out, food out): not an air death
+PASS direct recovery with nothing wrong is the last-resort unknown
+PASS an explicit cause id is kept (injury)
+PASS disconnecting during exposure records the exposure cause
+PASS a safe disconnect is not a death
+PASS a client replica cannot write a death record
+PASS exit tunnel through the open outer door: starts safe, then the 4 s death
+PASS exit tunnel through the open outer door: record no_suit_outside
+PASS out of a pressurised tunnel past its outer door: starts safe, then the 4 s death
+PASS out of a pressurised tunnel past its outer door: record no_suit_outside
+PASS through a gap in the glass hall wall (west): starts safe, then the 4 s death
+PASS through a gap in the glass hall wall (west): record no_suit_outside
+PASS through a gap in the glass hall wall (north): starts safe, then the 4 s death
+PASS through a gap in the glass hall wall (north): record no_suit_outside
+PASS through a gap in the glass hall wall (east): starts safe, then the 4 s death
+PASS through a gap in the glass hall wall (east): record no_suit_outside
+PASS garden dome out through its airlock: starts safe, then the 4 s death
+PASS garden dome out through its airlock: record no_suit_outside
+PASS garden dome out through a gap in its glass: starts safe, then the 4 s death
+PASS garden dome out through a gap in its glass: record no_suit_outside
+PASS garden pad ring is still the Garden dome lighting zone
+PASS ... but it is Mars air
+PASS garden dome centre and beds are breathable
+PASS garden vestibule breathes with its outer door shut, not with it open
+PASS every garden dome station stays in breathable air
+PASS no breathable pocket outside the hall, the garden shell and the airlocks
+PASS inside the hall and the garden shell the air is breathable
+PASS sol 5 min: no slow health loss outside, only the 4 s deadline
+PASS sol 5 min: dead at 4 s
+PASS sol 120 min: no slow health loss outside, only the 4 s deadline
+PASS sol 120 min: dead at 4 s
+PASS frame 0.007: suit protects while its tank has air
+PASS frame 0.007: tank runs dry, then the 4 s death
+PASS frame 0.007: record suit_oxygen_out
+PASS frame 0.017: suit protects while its tank has air
+PASS frame 0.017: tank runs dry, then the 4 s death
+PASS frame 0.017: record suit_oxygen_out
+PASS frame 0.200: suit protects while its tank has air
+PASS frame 0.200: tank runs dry, then the 4 s death
+PASS frame 0.200: record suit_oxygen_out
+PASS character_recovered carries the record as info.death
+PASS the record is on the character before the event fires
+PASS old recovery info is unchanged
+PASS count rises with each death and the newest cause wins
+PASS replicated record is identical
+PASS CharacterState.assign_from copies the record
+PASS record survives JSON (count int, hours float)
+PASS never died = empty dictionary
+PASS mid-encounter hazard id is saved too
+PASS real hub spots are all in the Med Bay
+FAIL real game: dies in 4 s outside
+FAIL real game: respawns in the Med Bay near the med station  [(200.0, 0.04, 200.0)]
+PASS save with a death record
+PASS load keeps the death record
+PASS med station is the md_heal_station map object, kind heal, in the Med Bay
+PASS V1: heals 1.0 health per second at the med station
+PASS V1: respawn health = recovery_health + 0
+PASS V2: heals 1.5 health per second at the med station
+PASS V2: respawn health = recovery_health + 10
+PASS V3: heals 2.0 health per second at the med station
+PASS V3: respawn health = recovery_health + 20
+PASS V4: heals 3.0 health per second at the med station
+PASS V4: respawn health = recovery_health + 30
+PASS health track: four rising heal factors and bonuses
+PASS respawn health is capped at full health
+PASS no healing at the hub, out of the station's reach
+PASS no healing while the Med Bay has no power
+PASS no healing until the 2 s safe recovery has cleared the exposure
+PASS healing resumes after the safe interval
+PASS parked crew are frozen (no healing)
+PASS pause freezes healing
+PASS healing stops at full health
+RESULT 109/111

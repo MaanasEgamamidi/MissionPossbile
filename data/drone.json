@@ -1,0 +1,30 @@
+{
+	"_about": "Scout drone (2026-11-14 upgrade paths): flight rules shared by every level. What changes with the level (speed, flight time, survey radius, autopilot, waypoints) is in data/area_levels.json (track scout_drone) and the radio range in the command track (command.drone_range_m). Every number here and there is DESIGNER BALANCE chosen for pacing and fun for ages 9-12, never a NASA figure. The drone's look takes cues from NASA's Ingenuity Mars helicopter (illustrative only, no number is taken from it). Positions are Godot metres.",
+	"pad_station": "drone_pad",
+	"pad_yaw_deg": 180.0,
+	"dock_height_m": 0.085,
+	"climb_mps": 3.0,
+	"accel_mps2": 8.0,
+	"min_clearance_m": 0.6,
+	"max_altitude_m": 40.0,
+	"cruise_altitude_m": 12.0,
+	"lift_off_m": 1.2,
+	"arrive_m": 1.5,
+	"survey_hover_s": 5.0,
+	"charge_per_s": 0.0111,
+	"launch_min_battery": 0.2,
+	"battery_reserve": 0.05,
+	"empty_return_speed_factor": 0.5,
+	"range_warn_fraction": 0.9,
+	"input_timeout_s": 0.6,
+	"turn_rate_rad_s": 1.2,
+	"_notes": {
+		"charge_per_s": "designer balance: about 90 real seconds from empty to full on the pad charger (the charger is not counted in the colony power budget).",
+		"launch_min_battery": "designer balance: the drone will not take off with less than 20 % battery.",
+		"battery_reserve": "designer balance: the drone turns home by itself when its battery holds only the trip home plus 5 %.",
+		"empty_return_speed_factor": "designer balance: with an empty battery the drone limps home at half speed on its emergency cell.",
+		"range_warn_fraction": "designer balance: a warning at 90 % of the command room's radio range; the drone stops at the edge.",
+		"cruise_altitude_m": "designer balance: the autopilot flies 12 m above the ground.",
+		"survey_hover_s": "designer balance: the autopilot hovers 5 s over each waypoint to film it with the survey camera."
+	}
+}

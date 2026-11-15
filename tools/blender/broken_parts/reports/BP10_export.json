@@ -1,0 +1,1469 @@
+{
+ "ok": true,
+ "started": "2026-11-14 19:42:51",
+ "part": "BP10",
+ "source": {
+  "blend": "G:\\nasa app\\broken_parts\\BP10_hangar_dust.blend",
+  "sha256": "D520CAFEF7E446D940B866C827044BEFEC7934A6D8CCDAEE2801985A71BEDEA5",
+  "bytes": 8023128,
+  "exported_with_blender": "5.3.0"
+ },
+ "skipped": [
+  {
+   "name": "hb_fl__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.002__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.003__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.004__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.005__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.006__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.007__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.008__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.009__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.010__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.011__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.012__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.013__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.014__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl_trench__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.015__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.016__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.017__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.018__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl_trench.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.019__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.020__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.021__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.022__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.023__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl_plate__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl_plate.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.024__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.025__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.026__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl_plate.002__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl_plate.003__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.027__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.028__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.029__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.030__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.031__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.032__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fl.033__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_wn_plain__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small_leaf__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small_r_leaf__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_wn_air__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_wn_gas__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_wn_elec__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_leaf_l__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_leaf_r__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_leaf_l2__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_leaf_r2__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_wn_light__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_ww_fire__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_ww_flood__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_ww_light__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small_leaf.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small_r_leaf.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_ww_vent__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_we_plain__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_we_flood__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_we_plain.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_we_tray__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small.002__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small_leaf.002__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_door_small_r_leaf.002__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_ws_flood__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_ws_plain__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_pillar__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_pillar.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_pillar.002__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_pillar.003__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_bay__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_hazard__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_hazard.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_hazard_s__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_keep__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_keep.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_line__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_line.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_line.002__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mk_line.003__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_pad_marker__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_rover__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_charger_a__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_charge_cable__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_chocks__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_chocks.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_floodlight__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_floodlight.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_cart_tray__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_stretcher__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_floor_tools__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "pp_emergency_blanket__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_rescue_cab__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_trauma_bag__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_o2_bottle__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_whiteboard__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_stairs_platform__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_canister__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_canister.001__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_control_board__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_kiosk_dark__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_scissor_table__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "it_transceiver__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_tank_hose__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_charger_b__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_crate_orange__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_crate_tan__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_drone_small__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_gas_cart__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_crane__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_fixture_table__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_engine_hoist__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_welder__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_mezzanine__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hgw_ladder__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_cabinet_tall__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_rollcab__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_workbench__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_parts_rack__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_parts_rack_lo__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_terminal_tall__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_crate_orange_sm__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_crate_white__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_compressor__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_cyl_rack__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_tank_tall__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hb_drum_cradle__broken",
+   "why": "BP10 exports only the dust mesh"
+  },
+  {
+   "name": "hg_stair_cart__broken",
+   "why": "BP10 exports only the dust mesh"
+  }
+ ],
+ "splits": [],
+ "grid": {
+  "host": "hg_dust__broken",
+  "cols": 12,
+  "rows": 2,
+  "region_godot": {
+   "min": [
+    13.0845,
+    0.0,
+    -9.2817
+   ],
+   "max": [
+    30.9842,
+    0.0,
+    3.2157
+   ]
+  },
+  "patches": [
+   {
+    "node": "hg_dust__broken_r0c00",
+    "row": 0,
+    "col": 0,
+    "faces": 225
+   },
+   {
+    "node": "hg_dust__broken_r0c01",
+    "row": 0,
+    "col": 1,
+    "faces": 483
+   },
+   {
+    "node": "hg_dust__broken_r0c02",
+    "row": 0,
+    "col": 2,
+    "faces": 613
+   },
+   {
+    "node": "hg_dust__broken_r0c03",
+    "row": 0,
+    "col": 3,
+    "faces": 546
+   },
+   {
+    "node": "hg_dust__broken_r0c04",
+    "row": 0,
+    "col": 4,
+    "faces": 383
+   },
+   {
+    "node": "hg_dust__broken_r0c05",
+    "row": 0,
+    "col": 5,
+    "faces": 472
+   },
+   {
+    "node": "hg_dust__broken_r0c06",
+    "row": 0,
+    "col": 6,
+    "faces": 650
+   },
+   {
+    "node": "hg_dust__broken_r0c07",
+    "row": 0,
+    "col": 7,
+    "faces": 1538
+   },
+   {
+    "node": "hg_dust__broken_r0c08",
+    "row": 0,
+    "col": 8,
+    "faces": 1851
+   },
+   {
+    "node": "hg_dust__broken_r0c09",
+    "row": 0,
+    "col": 9,
+    "faces": 3860
+   },
+   {
+    "node": "hg_dust__broken_r0c10",
+    "row": 0,
+    "col": 10,
+    "faces": 3088
+   },
+   {
+    "node": "hg_dust__broken_r0c11",
+    "row": 0,
+    "col": 11,
+    "faces": 376
+   },
+   {
+    "node": "hg_dust__broken_r1c00",
+    "row": 1,
+    "col": 0,
+    "faces": 273
+   },
+   {
+    "node": "hg_dust__broken_r1c01",
+    "row": 1,
+    "col": 1,
+    "faces": 1000
+   },
+   {
+    "node": "hg_dust__broken_r1c02",
+    "row": 1,
+    "col": 2,
+    "faces": 634
+   },
+   {
+    "node": "hg_dust__broken_r1c03",
+    "row": 1,
+    "col": 3,
+    "faces": 274
+   },
+   {
+    "node": "hg_dust__broken_r1c04",
+    "row": 1,
+    "col": 4,
+    "faces": 889
+   },
+   {
+    "node": "hg_dust__broken_r1c05",
+    "row": 1,
+    "col": 5,
+    "faces": 1868
+   },
+   {
+    "node": "hg_dust__broken_r1c06",
+    "row": 1,
+    "col": 6,
+    "faces": 714
+   },
+   {
+    "node": "hg_dust__broken_r1c07",
+    "row": 1,
+    "col": 7,
+    "faces": 557
+   },
+   {
+    "node": "hg_dust__broken_r1c08",
+    "row": 1,
+    "col": 8,
+    "faces": 605
+   },
+   {
+    "node": "hg_dust__broken_r1c09",
+    "row": 1,
+    "col": 9,
+    "faces": 320
+   },
+   {
+    "node": "hg_dust__broken_r1c10",
+    "row": 1,
+    "col": 10,
+    "faces": 651
+   },
+   {
+    "node": "hg_dust__broken_r1c11",
+    "row": 1,
+    "col": 11,
+    "faces": 328
+   }
+  ]
+ },
+ "nodes": [
+  {
+   "name": "hg_dust__broken_r0c00",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 486,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    13.0845,
+    -0.004,
+    -8.5169
+   ],
+   "aabb_max": [
+    14.9682,
+    0.6043,
+    -2.95
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c01",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1062,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    14.1646,
+    -0.004,
+    -9.1665
+   ],
+   "aabb_max": [
+    16.2261,
+    0.5777,
+    -2.95
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c02",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1670,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    15.9132,
+    -0.004,
+    -8.6758
+   ],
+   "aabb_max": [
+    17.6788,
+    0.5759,
+    -2.8932
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c03",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1188,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    17.4046,
+    -0.004,
+    -8.9172
+   ],
+   "aabb_max": [
+    19.2784,
+    0.5624,
+    -2.8607
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c04",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 814,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    18.9321,
+    -0.2177,
+    -9.2499
+   ],
+   "aabb_max": [
+    20.75,
+    0.4415,
+    -2.9989
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c05",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 880,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    20.404,
+    -0.2954,
+    -9.2817
+   ],
+   "aabb_max": [
+    22.167,
+    0.4586,
+    -4.5716
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c06",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1400,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    21.8854,
+    -0.2903,
+    -8.7604
+   ],
+   "aabb_max": [
+    23.6264,
+    0.3895,
+    -3.6233
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c07",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 2964,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    23.4405,
+    -0.3576,
+    -8.6384
+   ],
+   "aabb_max": [
+    25.1324,
+    0.2976,
+    -4.46
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c08",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 3998,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    24.8958,
+    -0.405,
+    -8.85
+   ],
+   "aabb_max": [
+    26.7397,
+    0.639,
+    -4.2364
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c09",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 7321,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    26.2828,
+    -0.405,
+    -8.85
+   ],
+   "aabb_max": [
+    28.2268,
+    0.6193,
+    -3.0625
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c10",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 5803,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    27.7908,
+    -0.3941,
+    -8.568
+   ],
+   "aabb_max": [
+    29.8314,
+    0.5027,
+    -3.0625
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r0c11",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 752,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    29.1576,
+    -0.2201,
+    -7.6
+   ],
+   "aabb_max": [
+    30.8249,
+    0.6541,
+    -2.9459
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c00",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 546,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    13.1715,
+    -0.004,
+    -2.95
+   ],
+   "aabb_max": [
+    14.897,
+    0.5452,
+    3.0802
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c01",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1936,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    14.3966,
+    -0.1992,
+    -2.95
+   ],
+   "aabb_max": [
+    16.2333,
+    0.448,
+    3.0556
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c02",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1204,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    15.8937,
+    -0.196,
+    -3.1425
+   ],
+   "aabb_max": [
+    17.7,
+    0.289,
+    2.9119
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c03",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 548,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    17.4018,
+    -0.2993,
+    -3.1029
+   ],
+   "aabb_max": [
+    19.2061,
+    0.3247,
+    3.1337
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c04",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1702,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    18.8429,
+    -0.4108,
+    -3.1154
+   ],
+   "aabb_max": [
+    20.7229,
+    0.3508,
+    3.2157
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c05",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 3364,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    20.4143,
+    -0.4108,
+    -1.4835
+   ],
+   "aabb_max": [
+    22.2135,
+    0.3508,
+    3.0115
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c06",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1484,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    21.8548,
+    -0.3466,
+    -2.4715
+   ],
+   "aabb_max": [
+    23.5901,
+    0.2866,
+    2.6327
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c07",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1234,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    23.4707,
+    -0.2071,
+    -1.7358
+   ],
+   "aabb_max": [
+    25.1076,
+    0.4339,
+    2.8209
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c08",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1318,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    24.8922,
+    -0.004,
+    -1.8978
+   ],
+   "aabb_max": [
+    26.6455,
+    0.4893,
+    2.9232
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c09",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 760,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    26.3236,
+    -0.004,
+    -3.0625
+   ],
+   "aabb_max": [
+    28.1627,
+    0.4719,
+    2.8395
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c10",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 1338,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    27.7804,
+    -0.004,
+    -3.25
+   ],
+   "aabb_max": [
+    29.8429,
+    0.5266,
+    2.7146
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  },
+  {
+   "name": "hg_dust__broken_r1c11",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "hg_dust__broken",
+   "map_object": null,
+   "tris": 656,
+   "origin_godot": [
+    0.0,
+    0.0,
+    -0.0
+   ],
+   "aabb_min": [
+    29.1455,
+    -0.004,
+    -3.25
+   ],
+   "aabb_max": [
+    30.9842,
+    0.6838,
+    1.86
+   ],
+   "roles": [
+    "bp_print",
+    "sf_drift"
+   ]
+  }
+ ],
+ "bounds": {
+  "center": [
+   22.0344,
+   0.1365,
+   -3.033
+  ],
+  "size": [
+   17.8997,
+   1.0946,
+   12.4975
+  ],
+  "min": [
+   13.0845,
+   -0.4108,
+   -9.2817
+  ],
+  "max": [
+   30.9842,
+   0.6838,
+   3.2157
+  ]
+ },
+ "palette": {
+  "sf_drift": {
+   "rgb_linear": [
+    0.434154,
+    0.194618,
+    0.097587
+   ],
+   "hex": "#b07a58",
+   "emission": 0,
+   "roughness": 0.95,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "rock",
+   "base_linear": [
+    0.434154,
+    0.194618,
+    0.097587
+   ],
+   "rough0": 0.97,
+   "metal0": 0.0,
+   "var": 0.06,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.02,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_print": {
+   "rgb_linear": [
+    0.111932,
+    0.046665,
+    0.024158
+   ],
+   "hex": "#5e3d2b",
+   "emission": 0,
+   "roughness": 0.9,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "soil",
+   "base_linear": [
+    0.111932,
+    0.046665,
+    0.024158
+   ],
+   "rough0": 0.92,
+   "metal0": 0.0,
+   "var": 0.1,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.03,
+   "bscale": 240.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  }
+ },
+ "unmapped_materials": {},
+ "lights": [],
+ "export": {
+  "path": "G:\\nasa app\\mars_colony_revisions_wt\\assets\\broken_parts\\BP10.glb",
+  "result": [
+   "FINISHED"
+  ],
+  "bytes": 1299080,
+  "sha256": "382C83084BE79239690A9228705401914F7F15E5369EEDF927FAD97980C86356",
+  "tris": 44428
+ },
+ "secs": 2.0
+}

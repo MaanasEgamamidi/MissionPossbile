@@ -1,0 +1,24 @@
+{
+  "note": "F06 reserved interactions. Coordinates were capsule/floor probed against the imported world. C01 collection, playback and task puzzles are intentionally deferred.",
+  "stations": [
+    {"id":"repair_t01","kind":"repair_task","room_id":"command_center","task_id":"T01","name":"T01 - Comms","symbol":"1","specialty":"","position":[31.55,0.04,-12.95]},
+    {"id":"repair_t02","kind":"repair_task","room_id":"command_center","task_id":"T02","name":"T02 - Wires","symbol":"2","specialty":"electrical_comms","position":[25.2,0.04,-15.9]},
+    {"id":"cassette_command_center","kind":"cassette_anchor","room_id":"command_center","cassette_id":"cassette_command_center","name":"Command Room cassette location","symbol":"T","position":[27,0.04,-14.8]},
+    {"id":"cassette_player_command_center","kind":"cassette_player_anchor","room_id":"command_center","name":"Command Room cassette player location","symbol":"P","position":[28.4,0.04,-13]},
+    {"id":"repair_t03","kind":"repair_task","room_id":"power_supply","task_id":"T03","name":"T03 - Rings","symbol":"3","specialty":"","position":[35.1,0.04,7.75]},
+    {"id":"repair_t04","kind":"repair_task","room_id":"power_supply","task_id":"T04","name":"T04 - Circuits","symbol":"4","specialty":"electrical_comms","position":[29.4,0.04,8.05]},
+    {"id":"cassette_power_supply","kind":"cassette_anchor","room_id":"power_supply","cassette_id":"cassette_power_supply","name":"Power Room cassette location","symbol":"T","position":[31,0.04,4]},
+    {"id":"repair_t05","kind":"repair_task","room_id":"greenhouse","task_id":"T05","name":"T05 - Elements","symbol":"5","specialty":"biology_food","position":[5,0.04,2]},
+    {"id":"repair_t06","kind":"repair_task","room_id":"greenhouse","task_id":"T06","name":"T06 - Water","symbol":"6","specialty":"","position":[1.9,0.042,9.8]},
+    {"id":"cassette_greenhouse","kind":"cassette_anchor","room_id":"greenhouse","cassette_id":"cassette_greenhouse","name":"Greenhouse cassette location","symbol":"T","position":[-5,0.042,2]},
+    {"id":"repair_t07","kind":"repair_task","room_id":"green_dome","task_id":"T07","name":"T07 - Pipes","symbol":"7","specialty":"field_engineering_geology","position":[47.3,0.045,23]},
+    {"id":"repair_t08","kind":"repair_task","room_id":"green_dome","task_id":"T08","name":"T08 - Glass","symbol":"8","specialty":"","position":[49.9,0.045,30.35]},
+    {"id":"cassette_green_dome","kind":"cassette_anchor","room_id":"green_dome","cassette_id":"cassette_green_dome","name":"Garden dome cassette location","symbol":"T","position":[50,0.045,23]},
+    {"id":"repair_t09","kind":"repair_task","room_id":"med_bay","task_id":"T09","name":"T09 - Mixture","symbol":"9","specialty":"medical_life_support","position":[-10.4,0.04,-12.45]},
+    {"id":"repair_t10","kind":"repair_task","room_id":"med_bay","task_id":"T10","name":"T10 - Equipment","symbol":"10","specialty":"","position":[-3.5,0.04,-16.3]},
+    {"id":"cassette_med_bay","kind":"cassette_anchor","room_id":"med_bay","cassette_id":"cassette_med_bay","name":"Med Bay cassette location","symbol":"T","position":[-8,0.04,-12]},
+    {"id":"repair_t11","kind":"repair_task","room_id":"hangar","task_id":"T11","name":"T11 - Dust","symbol":"11","specialty":"","position":[24,0.04,-4]},
+    {"id":"repair_t12","kind":"repair_task","room_id":"hangar","task_id":"T12","name":"T12 - Seal","symbol":"12","specialty":"field_engineering_geology","position":[22,0.04,9.3]},
+    {"id":"cassette_hangar","kind":"cassette_anchor","room_id":"hangar","cassette_id":"cassette_hangar","name":"Hangar cassette location","symbol":"T","position":[25,0.04,-1.3]}
+  ]
+}

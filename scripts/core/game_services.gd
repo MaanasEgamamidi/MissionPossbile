@@ -129,6 +129,7 @@ func start_new_game(seed_value := -1, host_character: StringName = &"crew_1") ->
 	if zones != null:
 		st.stations = StationCatalog.from_manifest(MANIFEST_PATH, zones)
 	_place_crew_at_hub(st, true)
+	_tutorial_start(st)
 	# REHEARSAL PROPS: three crates by the hub so carrying can be played before real cargo exists.
 	for i in 3:
 		var p := config.hub_position + Vector3(2.2 + 0.7 * float(i), 0.0, 1.5)
@@ -234,6 +235,31 @@ func _on_state_changed(reason: StringName) -> void:
 		_pending_save = reason
 
 
+## Tutorial mode start (owner rule, 2026-11-14): everyone suited, standing right outside the base's main doors. The
+## hub spots stay in the Med Bay (parking and respawn). Suit rack slots are assigned by SessionService.begin.
+func _tutorial_start(st: ColonyState) -> void:
+	var ids := st.characters.keys()
+	ids.sort_custom(func(a: Variant, b: Variant) -> bool: return String(a) < String(b))
+	for i in ids.size():
+		var c := st.characters[ids[i]] as CharacterState
+		if config.tutorial_start_suited:
+			c.suit_on = true
+			c.suit_charge = 100.0
+			c.suit_integrity = 1.0
+		if config.tutorial_start_outside:
+			var offset := config.tutorial_spawn_offsets[i] if i < config.tutorial_spawn_offsets.size() else Vector3(0.9 * float(i), 0.0, 1.0)
+			c.position = config.tutorial_spawn_position + offset
+			c.yaw = config.tutorial_spawn_yaw
+			# _place_crew_at_hub worked `outside` out at the Med Bay spot; the crew now stand on Mars.
+			if session.outside_test.is_valid():
+				c.outside = bool(session.outside_test.call(c.position))
+
+
+## Tutorial mode: a suited crew member nobody controls stays where the save left them (outside the base), not at the hub.
+func _stays_at_tutorial_start(st: ColonyState, c: CharacterState) -> bool:
+	return config.tutorial_start_outside and not TutorialSystem.is_tutorial_done(st) and session.survival.functional_suit(c)
+
+
 ## Parked crew wait at the hub. On a new game everyone starts there; on load only crew nobody will control are moved.
 func _place_crew_at_hub(st: ColonyState, everyone: bool, keep: StringName = &"") -> void:
 	var ids := st.characters.keys()
@@ -247,6 +273,8 @@ func _place_crew_at_hub(st: ColonyState, everyone: bool, keep: StringName = &"")
 		if everyone:
 			c.position = c.hub_spot
 			c.yaw = angle
+		elif c.id != keep and _stays_at_tutorial_start(st, c):
+			pass   # tutorial mode: suited crew keep their place outside the base (owner rule, 2026-11-14)
 		elif c.id != keep:
 			# A save may contain a remote astronaut in danger. Keep that encounter at its saved location
 			# until the astronaut is controlled again; loading must not supply a free rescue or reset.

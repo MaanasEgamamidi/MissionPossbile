@@ -4,7 +4,8 @@ extends CanvasLayer
 ##   top-left      sol and time with a sun or moon, then at most three urgent readings (or "Colony OK ✓")
 ##   top-right     your crew member: name, specialty symbol and colour, health, body energy, suit and tank (bars)
 ##   centre        crosshair (a ring appears when E would do something), under it what E does and the suit check bar
-##   top-centre    "PAUSED" while the game is paused, and messages (queued)
+##   top-centre    "PAUSED" while the game is paused, and messages (queued); after your own crew member died and the
+##                 med bay brought them back, a card says why (scripts/ui/hud/death_notice.gd)
 ##   bottom        a key hint strip that fades after 30 s, network status on the left; subtitles show above the strip
 ## It only reads state and listens to events; it never changes anything. It refreshes 4 times a second.
 
@@ -31,8 +32,16 @@ const STATION_NAMES := {
 }
 ## Seconds a colony system alert stays in the message line.
 const ALERT_SECONDS := 6.0
+## Upgrade update (2026-11-14): the "why you were brought back" card, top centre after a respawn in the med bay.
+const DeathNoticeScript := preload("res://scripts/ui/hud/death_notice.gd")
+## Broken parts (2026-11-14): the prompts of the ten broken spots (scripts/tasks/broken_part_presenter.gd).
+const BrokenParts := preload("res://scripts/tasks/broken_part_presenter.gd")
+## Tutorial mode (2026-11-14): stations other than tapes and broken spots show no "[E]" prompt.
+const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
 
 var services: GameServices
+## The death notice card (scripts/ui/hud/death_notice.gd).
+var death_notice: PanelContainer
 
 var _root: Control
 var _time: Label
@@ -102,6 +111,7 @@ func setup(p_services: GameServices) -> void:
 	services.events.pause_changed.connect(func(_paused: bool) -> void: refresh())
 	services.events.action_resolved.connect(_on_action_resolved)
 	services.events.system_alert.connect(_on_system_alert)
+	death_notice.setup(services)
 	refresh()
 
 
@@ -502,6 +512,12 @@ func _build() -> void:
 	_message.name = "Message"
 	_message_panel.add_child(_message)
 	_message_panel.visible = false
+	# Upgrade update: why you died, after the med bay brought you back. Its own place at the top centre; messages
+	# move under it while it shows.
+	death_notice = DeathNoticeScript.new()
+	_root.add_child(death_notice)
+	death_notice.connect(&"shown", func(_record: Dictionary) -> void: _place_messages())
+	death_notice.connect(&"dismissed", _place_messages)
 
 	# ---- bottom edge: session status on the left, the key hint strip in the middle. Subtitles (UiRoot) show above it.
 	var bottom_margin := MarginContainer.new()
@@ -763,9 +779,17 @@ func _update_cue() -> void:
 			body = "Suit check: %s" % ("take the suit off" if me != null and me.suit_on else "put the suit on")
 		elif station_kind == "survivor":
 			body = "Check on the patient"
+		elif station_kind == "repair_task":
+			body = repair_cue(services.state(), rec)
+		elif station_kind == "cassette_anchor":
+			body = "Pick up the tape"
+		elif station_kind in ["cassette_player_anchor", "cassette_player"]:
+			body = "Play tapes"
 		else:
 			var nm := String(STATION_NAMES.get(station_kind, "station"))
 			body = "Use" if nm == "" else "Use %s" % nm
+		if not TutorialLock.station_usable(services.state(), rec):
+			body = ""
 	elif kind == "ladder":
 		body = "Hold ladder; W/S climb, E or Space release"
 	elif _held != &"":
@@ -779,7 +803,29 @@ func _update_cue() -> void:
 	_cue.text = body
 	_cue_panel.visible = text != ""
 	# the crosshair grows a ring when E would do something with what you are looking at
-	_crosshair.active = kind in ["station", "item", "ladder"]
+	_crosshair.active = kind in ["station", "item", "ladder"] and body != ""
+
+
+## Broken parts (2026-11-14): what E does at a repair task's spot, without the key. While the spot is broken, the
+## part's own words from data/broken_parts.json ("Fix the wires"); otherwise a plain "Use comms station", named after
+## the station ("T01 - Comms").
+static func repair_cue(state: ColonyState, rec: Dictionary) -> String:
+	var task_id := String(rec.get("task_id", ""))
+	if BrokenParts.is_task_broken(state, task_id):
+		var prompt := BrokenParts.prompt_for(task_id)
+		if prompt != "":
+			return BrokenParts.prompt_body(prompt)
+	return "Use %s" % repair_station_name(rec)
+
+
+## A repair task station's plain name in words: "T01 - Comms" -> "comms station".
+static func repair_station_name(rec: Dictionary) -> String:
+	var words := String(rec.get("name", ""))
+	var dash := words.find(" - ")
+	if dash >= 0:
+		words = words.substr(dash + 3)
+	words = words.strip_edges().to_lower()
+	return "station" if words == "" else "%s station" % words
 
 
 func _hint_line() -> String:
@@ -805,6 +851,9 @@ func _on_action_resolved(result: ActionResult) -> void:
 
 
 func _on_system_alert(alert_id: StringName, level: StringName, text: String) -> void:
+	# Upgrade update: a level up reads "Greenhouse grow racks: V3: Three-layer rack with drip lines".
+	if String(alert_id).begins_with(MissionHud.LEVEL_ALERT_PREFIX) and services != null and services.has_game():
+		text = MissionHud.level_up_text(alert_id, text, services.state())
 	if alert_sink.is_valid():
 		last_alert_text = text.strip_edges().replace("CO2", "CO₂")
 		alert_sink.call(alert_id, level, text)
@@ -890,5 +939,11 @@ func _place_messages() -> void:
 	if gap < 360.0:
 		top = maxf(top, EDGE + maxf(left.y, right.y) + 12.0)
 		max_w = screen.x * 0.6
+	if death_notice != null and death_notice.visible:
+		var w := minf(maxf(max_w, 420.0), minf(760.0, screen.x - 2.0 * EDGE))
+		death_notice.custom_minimum_size.x = w
+		death_notice.size = Vector2(w, death_notice.get_combined_minimum_size().y)
+		death_notice.position = Vector2(roundf((screen.x - w) * 0.5), roundf(top))
+		top += death_notice.size.y + 10.0
 	_centre_margin.add_theme_constant_override(&"margin_top", roundi(top))
 	_fit_text(_message, max_w - 46.0)

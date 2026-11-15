@@ -97,6 +97,11 @@ var weather := {}
 var campaign := {}
 ## Scout update: the robotic scout rover, its surveys and the special ores collected (ScoutSystem, ScoutActions).
 var scout := {}
+## Visible upgrade paths (2026-11-14): track id -> level 1..4 (AreaLevels, AreaLevelActions). Missing = level 1.
+var levels := {}
+## Scout drone (2026-11-14): the flying scout, its battery, flight mode and route. Plain JSON; the field list is in the
+## header of scripts/drone/drone_system.gd (DroneSystem fills it on the first host tick).
+var drone := {}
 
 var data_snapshot_id := ""
 var weather_queue: Array = []
@@ -311,6 +316,7 @@ func to_dict() -> Dictionary:
 		"discoveries": discoveries.duplicate(true), "rover": rover.duplicate(true),
 		"crops": crops.duplicate(true), "science": science.duplicate(true), "progress": progress.duplicate(true), "weather": weather.duplicate(true),
 		"campaign": campaign.duplicate(true), "scout": scout.duplicate(true),
+		"levels": levels.duplicate(true), "drone": drone.duplicate(true),
 		"data_snapshot_id": data_snapshot_id, "weather_queue": weather_queue.duplicate(true), "event_queue": event_queue.duplicate(true),
 		"ledger": ledger.duplicate(true), "counters": counters.duplicate(true),
 		# 64-bit values go out as strings: JSON numbers are doubles and would lose the low bits
@@ -465,6 +471,10 @@ static func from_dict(d: Dictionary) -> ColonyState:
 	s.weather = (d.get("weather", {}) as Dictionary).duplicate(true)
 	s.campaign = (d.get("campaign", {}) as Dictionary).duplicate(true)
 	s.scout = (d.get("scout", {}) as Dictionary).duplicate(true)
+	s.levels = {}
+	for k in (d.get("levels", {}) as Dictionary):
+		s.levels[String(k)] = int(d.levels[k])
+	s.drone = (d.get("drone", {}) as Dictionary).duplicate(true)
 	s.event_queue = (d.get("event_queue", []) as Array).duplicate(true)
 	for k in (d.get("ledger", {}) as Dictionary):
 		s.ledger[String(k)] = float(d.ledger[k])

@@ -17,6 +17,8 @@ extends Node
 ## different library leaves the game playable with voice off and a plain message.
 
 const GROUP := &"voice_service"
+## Tutorial (2026-11-14): crew voice is off until the T01 radio is fixed (scripts/voice/comms_gate.gd).
+const CommsGate := preload("res://scripts/voice/comms_gate.gd")
 ## Opus encoder settings (engineering): 24 kbit/s, complexity 5, tuned for voice.
 const OPUS_BITRATE := 24000
 const OPUS_COMPLEXITY := 5
@@ -428,7 +430,7 @@ func _capture(now: float) -> void:
 		_start_mic(now)
 	elif _mic_active:
 		_stop_mic()
-	var talk := held and can_capture() and services != null and services.has_game() and services.local_character() != null
+	var talk := held and can_capture() and services != null and services.has_game() and services.local_character() != null and not comms_down()
 	if talk and not _transmitting:
 		_start_transmit()
 	var got_audio := false
@@ -514,7 +516,7 @@ func _on_voice_packet(from_peer: int, packet: PackedByteArray) -> void:
 	if h.is_empty():
 		counters.bad_packets += 1
 		return
-	if is_player_muted(from_peer):
+	if is_player_muted(from_peer) or comms_down():
 		return
 	var now := _now()
 	var stream := int(h.stream)
@@ -840,8 +842,15 @@ func _me_outside() -> bool:
 	return bool(_listener().outside)
 
 
+## Tutorial: true while the crew radio is down (no crew voice either way).
+func comms_down() -> bool:
+	return services != null and services.has_game() and CommsGate.voice_down(services.state())
+
+
 ## The local player's own line: what their voice does now (talking) or would do (idle).
 func own_line() -> String:
+	if comms_down():
+		return CommsGate.MESSAGE
 	var short := mic_short_text()
 	if short != "":
 		return short

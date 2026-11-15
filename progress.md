@@ -1,3 +1,13 @@
+## Current status (2026-11-14 evening, MissionPossbile branch `revisions`)
+
+This section replaces the stale snapshot below (that snapshot came from another machine and describes S01-S04 before they were committed; S01-S04 were pushed as bfd43e1 and 96ed685).
+
+- Upgrade paths V1-V4 for 8 areas, scout drone, survival, NASA rates, upgrade UI: `docs/revisions/UPGRADES_HANDOFF.md`.
+- Broken parts T01-T04, T06, T08-T12 with mini-games, gold specialist highlight, sparkle swap: `docs/revisions/BROKEN_PARTS_BRIEF.md`, evidence in `docs/revisions/evidence/broken_parts/` and `minigames/`.
+- Tutorial rebuilt to the owner's whiteboard flow (start suited outside, doors open, tapes, fix the base): `docs/revisions/TUTORIAL_FLOW.md`.
+- Unfinished when work was stopped: broken-parts final assembly (data rebuild, import, labelled renders), mini-game panel fit at 1280x720, cassette player model and floating-label removal, intro fly-in and beauty-shot tour.
+- Tests: the owner runs the suites. Compile check OK (354 scripts).
+
 # Mars Colony progress and handoff
 
 Snapshot refreshed on **2026-11-14 at approximately 4:22 PM America/Los_Angeles**. This is a working handoff, not a completion certificate. The main implementation chat was still active when this file was written; files and logs may advance after this snapshot. Recheck the working tree and newest complete logs before resuming. Do not start concurrent writers or duplicate test processes against the same fixtures.

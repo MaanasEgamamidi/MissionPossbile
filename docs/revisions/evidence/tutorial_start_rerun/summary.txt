@@ -1,0 +1,26 @@
+test_survival exit=1 RESULT 113/118 script_errors=0
+test_p07_panels exit=0 RESULT 54/54 script_errors=0
+test_station_panels exit=0 RESULT 200/200 script_errors=0
+test_upgrade_ui exit=0 RESULT 60/60 script_errors=0
+test_game_services exit=1 RESULT 23/25 script_errors=0
+test_saves exit=0 RESULT 56/56 script_errors=0
+test_session exit=0 RESULT 91/91 script_errors=0
+test_tutorial exit=1 RESULT 58/59 script_errors=0
+test_net exit=0 RESULT 56/56 script_errors=0
+test_net_game exit=1 RESULT 20/21 script_errors=0
+test_player exit=0 RESULT 112/112 script_errors=0
+test_crew_collision exit=0 RESULT 5/5 script_errors=0
+test_pdf_fixes exit=0 RESULT 42/42 script_errors=0
+test_rover_drive exit=0 RESULT 64/64 script_errors=0
+test_cassette_assets exit=1 RESULT 56/57 script_errors=0
+test_drone exit=0 RESULT 75/75 script_errors=0
+test_broken_parts exit=0 RESULT 97/97 script_errors=0
+test_death_reasons exit=1 RESULT 109/111 script_errors=0
+test_puzzle_t12 exit=0 RESULT 62/62 script_errors=0
+test_survival_hud exit=124 NO-RESULT script_errors=1
+test_survival_net exit=0 RESULT 28/28 script_errors=0
+test_hud_panels exit=0 RESULT 89/89 script_errors=0
+test_game_scene exit=1 RESULT 30/34 script_errors=0
+test_repair_anchors exit=1 RESULT 111/113 script_errors=0
+test_repair_foundations exit=0 RESULT 119/119 script_errors=0
+DONE

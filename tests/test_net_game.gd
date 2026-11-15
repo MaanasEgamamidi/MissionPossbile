@@ -55,6 +55,10 @@ func _run() -> void:
 	var host := _machine("HostMachine", dir.path_join("host"))
 	var client := _machine("ClientMachine", dir.path_join("client"))
 	host.services.saves.delete_all()
+	# These checks are about LAN play and ordinary door sensing from the Med Bay start, so the tutorial start (crew outside,
+	# every door held open) is switched off; tests/test_tutorial_start.gd checks it. Both machines share this config.
+	host.services.config.tutorial_start_outside = false
+	host.services.config.tutorial_doors_open = false
 	await _until(func() -> bool: return false, 0.3)
 
 	host._on_menu_host(PORT, false)

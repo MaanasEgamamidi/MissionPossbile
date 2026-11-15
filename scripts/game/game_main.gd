@@ -32,6 +32,13 @@ var mission_hud: MissionHud
 var voice: VoiceService
 ## Prompt 10: the shared four-seat rover (body, seats, driving, HUD widget, network pose).
 var rover: RoverPresenter
+## 2026-11-14: the scout drone (pad, flying model, manual control, follow camera, its HUD): scripts/drone/drone_presenter.gd.
+var drone: Node
+## Upgrade-path presenters by track id (AreaStages).
+var area_stages := {}
+## Tutorial mode doors (owner rule, 2026-11-14): every DoorController, found once, and the sync timer.
+var _tutorial_doors: Array[DoorController] = []
+var _door_timer := 0.0
 ## Prompt 12: tutorial tracker, hints, specialist cues and the colony journal.
 var tutorial: TutorialPresenter
 var player: PlayerController
@@ -161,7 +168,11 @@ func _begin_play() -> void:
 	airlock_hazard = AirlockHazardPresenter.new()
 	airlock_hazard.name = "AirlockHazardPresenter"
 	add_child(airlock_hazard)
-	airlock_hazard.setup(services, airlock_doors, world != null)
+	# The garden dome's outer door (912) also vents its vestibule (LocalPressure), so it is passed in too.
+	var hazard_doors: Array[DoorController] = []
+	hazard_doors.append_array(airlock_doors)
+	hazard_doors.append_array(garden_airlock_doors)
+	airlock_hazard.setup(services, hazard_doors, world != null)
 	# Prompt 12: tutorial tracker, hints, specialist cues and the colony journal (J).
 	tutorial = TutorialPresenter.new()
 	tutorial.name = "TutorialPresenter"
@@ -214,6 +225,16 @@ func _begin_play() -> void:
 	rover.name = "RoverPresenter"
 	add_child(rover)
 	rover.setup(world, services, self)
+	# 2026-11-14: the scout drone, loaded by path. Before the stages: the scout_drone stage rides on its body.
+	var drone_script: Variant = load("res://scripts/drone/drone_presenter.gd")
+	drone = drone_script.new()
+	add_child(drone)
+	drone.call(&"setup", world, services, self)
+	# 2026-11-14: visible upgrade paths. One presenter per track shows its V1..V4 stage (scripts/upgrades/stages/).
+	area_stages = AreaStages.attach_all(self, world, services, self)
+	# 2026-11-14: broken parts: broken models, the fix sparkle, T12 door leaves, T11 hangar dust (loaded by path).
+	load("res://scripts/tasks/broken_part_presenter.gd").call(&"attach", self, world, services, self)
+	load("res://scripts/cinematics/cinematics_presenter.gd").call(&"attach", self, world, services, self)   # 2026-11-14: new-game intro + "base operational" tour
 	if check_weather_updates and DisplayServer.get_name() != "headless":
 		var refresh := WeatherRefresh.new()
 		refresh.name = "WeatherRefresh"
@@ -494,6 +515,10 @@ func _submit(action: StringName, target: StringName, params: Dictionary) -> Acti
 		var record: Dictionary = services.state().stations.get(String(target), {})
 		if String(record.get("kind", "")) == "cassette_anchor":
 			return services.request(&"cassette_collect", target)
+		# Tutorial mode (owner whiteboard, 2026-11-14): a locked station opens nothing, not even for one frame.
+		if not ActionService.TutorialLock.station_usable(services.state(), record):
+			hud.show_message(ActionService.TutorialLock.message_for(services.state(), record), 4.0)
+			return ActionResult.failure("", ActionService.TutorialLock.REASON)
 		# Opening a station's surface changes nothing; every control on it is its own validated request.
 		var panel := StationPanels.for_station(target, services)
 		if panel != null:
@@ -522,6 +547,26 @@ func _apply_player_settings() -> void:
 
 func _identity_of(c: CharacterState) -> int:
 	return maxi(0, CharacterState.SPECIALTIES.find(c.specialty))
+
+
+## Tutorial mode (owner rule, 2026-11-14): while the colony's tutorial is not finished, every door is held open.
+## Each machine reads the replicated tutorial state, so host and clients agree.
+func tutorial_doors_open() -> bool:
+	return services != null and services.has_game() and services.config.tutorial_doors_open and not TutorialSystem.is_tutorial_done(services.state())
+
+
+func _sync_tutorial_doors() -> void:
+	if _tutorial_doors.is_empty():
+		for n in find_children("*", "DoorController", true, false):
+			_tutorial_doors.append(n as DoorController)
+		if world != null and not world.is_ancestor_of(self) and not is_ancestor_of(world):
+			for n in world.find_children("*", "DoorController", true, false):
+				if not _tutorial_doors.has(n):
+					_tutorial_doors.append(n as DoorController)
+	var hold := tutorial_doors_open()
+	for d: DoorController in _tutorial_doors:
+		if is_instance_valid(d):
+			d.held_open = hold
 
 
 func _layers_for(zone: String) -> int:
@@ -617,7 +662,8 @@ func _process(_delta: float) -> void:
 	if not _playing or not services.has_game():
 		return
 	if player != null:
-		player.input_enabled = ui.gameplay_has_focus()
+		# while flying the scout drone the walking body stands still (the drone presenter reads the keys)
+		player.input_enabled = ui.gameplay_has_focus() and not (drone != null and bool(drone.call(&"blocks_player_input")))
 		hud.set_held(player.held_item().item_id if player.held_item() != null else &"")
 	_update_sun()
 	_move_crew(_delta)
@@ -629,6 +675,10 @@ func _process(_delta: float) -> void:
 			player.visual().set_zone_layers(_layers_for(zone))
 	if hud != null and player != null:
 		hud.set_target(player.aimed_target())
+	_door_timer -= _delta
+	if _door_timer <= 0.0:
+		_door_timer = 0.5
+		_sync_tutorial_doors()
 	_layer_timer -= _delta
 	if _layer_timer <= 0.0 and services.zones != null:
 		_layer_timer = 0.5

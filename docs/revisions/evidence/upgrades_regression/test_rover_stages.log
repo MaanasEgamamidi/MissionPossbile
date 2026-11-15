@@ -1,0 +1,52 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS stock rover (every module 1, V1) adds no parts
+PASS speed: every level 2..5 shows more/different speed parts  L1=0 L2=1104 L3=1536 L4=2832 L5=3936
+PASS speed: its levels change only its own parts
+PASS torque: every level 2..5 shows more/different torque parts  L1=0 L2=1056 L3=1200 L4=2640 L5=3408
+PASS torque: its levels change only its own parts
+PASS range: every level 2..5 shows more/different range parts  L1=0 L2=256 L3=576 L4=832 L5=1088
+PASS range: its levels change only its own parts
+PASS cargo: every level 2..5 shows more/different cargo parts  L1=0 L2=296 L3=728 L4=848 L5=480
+PASS cargo: its levels change only its own parts
+PASS traction: every level 2..5 shows more/different traction parts  L1=0 L2=5040 L3=5328 L4=6912 L5=10128
+PASS traction: its levels change only its own parts
+PASS cargo 4 is racks with crates, cargo 5 closed pods  ["rover_crate", "rover_dark", "rover_steel", "rover_yellow"] / ["rover_dark", "rover_glow_amber", "rover_orange", "rover_paint", "rover_steel"]
+PASS a full build is ONE mesh with few surfaces (draw calls)  1 meshes, 11 surfaces
+PASS a full build has no collision shape or body
+PASS the parts stay close round the rover: under 1.8 m from the centre line (garage door is 1.9), lugs at most 12 cm into the ground  [P: (-1.795, -0.0985, -2.634), S: (3.59, 4.5335, 5.074)]
+PASS V mapping: stock V1, one step V2, 4 steps V2, 5 steps V3, 11 steps V3, 12 steps V4, all 5 V4
+PASS presenter level follows the modules (forced: V3)
+PASS rank bars: none at V1, more at each V level  [0, 72, 108, 144]
+PASS V3 adds the light bar and antenna mast (from V3 on)  [0, 0, 384, 384]
+PASS V4 adds dust guards and the roll cage (V4 only)  [0, 0, 0, 2448]
+PASS the rover's stage words name the V4 look  V4: Most modules high: dust guards and a full roll cage
+PASS [no map] game built the rover look presenter and the rover
+PASS [no map] the map rover mesh is drawn on the body (not expected)
+PASS [no map] stock rover: no parts on the body
+PASS [no map] parts appear on a module upgrade, at the derived V level
+PASS [no map] parts ride on the moving rover body
+PASS [no map] a module change that keeps V3 still rebuilds the parts  { "traction": 5040, "torque": 912, "speed": 1104, "range": 256, "cargo": 296, "rank": 108, "v3": 384 } -> { "traction": 5040, "torque": 912, "speed": 1104, "range": 576, "cargo": 296, "rank": 108, "v3": 384 }
+PASS [no map] no collision added to the rover body  4 -> 4
+PASS [no map] bigger parts change no mass (mass lives in RoverBalance)  1500.0 -> 1500.0 kg
+PASS [no map] parts follow the body when it moves and turns
+PASS [no map] parts are on the rover mesh's render layers  mask 2048
+PASS [no map] back to stock modules removes the parts
+PASS [with map] game built the rover look presenter and the rover
+PASS [with map] the map rover mesh is drawn on the body (expected)
+PASS [with map] stock rover: no parts on the body
+PASS [with map] parts appear on a module upgrade, at the derived V level
+PASS [with map] parts ride on the moving rover body
+PASS [with map] a module change that keeps V3 still rebuilds the parts  { "traction": 5040, "torque": 912, "speed": 1104, "range": 256, "cargo": 296, "rank": 108, "v3": 384 } -> { "traction": 5040, "torque": 912, "speed": 1104, "range": 576, "cargo": 296, "rank": 108, "v3": 384 }
+PASS [with map] no collision added to the rover body  4 -> 4
+PASS [with map] bigger parts change no mass (mass lives in RoverBalance)  1500.0 -> 1500.0 kg
+PASS [with map] parts follow the body when it moves and turns
+PASS [with map] parts are on the rover mesh's render layers  mask 655360
+PASS [with map] when the rover mesh changes layers (another zone) the parts follow  655360 -> 557056
+PASS [with map] back to stock modules removes the parts
+PASS clean run: the engine error log stayed empty
+RESULT 45/45
+WARNING: 214 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 28 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

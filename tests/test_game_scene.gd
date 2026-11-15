@@ -74,6 +74,13 @@ func _initialize() -> void:
 	for f in DirAccess.get_files_at(dir):
 		DirAccess.remove_absolute(dir.path_join(f))
 
+	# These checks walk, jump, suit up and use doors from the Med Bay hub, so the tutorial start (suited, outside, every
+	# door held open) is switched off on the shared config the scene's GameServices loads; tests/test_tutorial_start.gd
+	# checks the tutorial start in this same scene.
+	var cfg := load(GameServices.CONFIG_PATH) as GameConfig
+	cfg.tutorial_start_outside = false
+	cfg.tutorial_start_suited = false
+	cfg.tutorial_doors_open = false
 	main = (load("res://scenes/game.tscn") as PackedScene).instantiate() as GameMain
 	main.load_world = false
 	main.show_menu = false

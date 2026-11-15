@@ -1,0 +1,1163 @@
+{
+ "ok": true,
+ "started": "2026-11-14 18:35:08",
+ "part": "BP08",
+ "source": {
+  "blend": "G:\\nasa app\\broken_parts\\BP08_airlock_air_leak.blend",
+  "sha256": "A78C707ED2101AF34F1FD419FD7298137E3EBB34F751C7528814B3BDCB2329ED",
+  "bytes": 2023876,
+  "exported_with_blender": "5.3.0"
+ },
+ "skipped": [
+  {
+   "name": "tunnel_shell_ring__context",
+   "why": "context copy of an unchanged map piece"
+  },
+  {
+   "name": "door_alarm_glow__broken",
+   "why": "not a mesh (LIGHT)"
+  }
+ ],
+ "portal_diff": {
+  "faces": 1026,
+  "lifted": 109
+ },
+ "splits": [
+  {
+   "from": "tunnel_door_inner_leaf_L__broken",
+   "node": "tunnel_door_inner_seal_L__broken",
+   "faces": 54
+  },
+  {
+   "from": "tunnel_door_inner_leaf_R__broken",
+   "node": "tunnel_door_inner_seal_R__broken",
+   "faces": 378
+  }
+ ],
+ "nodes": [
+  {
+   "name": "tunnel_door_inner_leaf_L__broken",
+   "parent": null,
+   "kind": "model",
+   "source_object": "tunnel_door_inner_leaf_L__broken",
+   "map_object": null,
+   "tris": 16114,
+   "origin_godot": [
+    20.98,
+    0.0,
+    10.45
+   ],
+   "aabb_min": [
+    20.072,
+    0.0,
+    10.3097
+   ],
+   "aabb_max": [
+    21.9268,
+    3.0,
+    10.61
+   ],
+   "roles": [
+    "bp_frost",
+    "bp_red",
+    "glass",
+    "gunmetal",
+    "kit_alu",
+    "kit_fl_grate",
+    "kit_hazard_k",
+    "kit_hazard_y",
+    "kit_led",
+    "kit_led_grn",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "lamp_orange",
+    "steel",
+    "white",
+    "yellow"
+   ]
+  },
+  {
+   "name": "tunnel_door_inner_leaf_R__broken",
+   "parent": null,
+   "kind": "model",
+   "source_object": "tunnel_door_inner_leaf_R__broken",
+   "map_object": null,
+   "tris": 15066,
+   "origin_godot": [
+    23.2,
+    0.0,
+    10.45
+   ],
+   "aabb_min": [
+    22.2886,
+    -0.0617,
+    10.3066
+   ],
+   "aabb_max": [
+    24.306,
+    3.0552,
+    10.61
+   ],
+   "roles": [
+    "bp_frost",
+    "bp_red",
+    "glass",
+    "gunmetal",
+    "kit_alu",
+    "kit_fl_grate",
+    "kit_hazard_k",
+    "kit_hazard_y",
+    "kit_led",
+    "kit_led_grn",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "lamp_orange",
+    "steel",
+    "white",
+    "yellow"
+   ]
+  },
+  {
+   "name": "tunnel_door_inner_alarm__broken",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "tunnel_door_inner_portal__broken",
+   "map_object": null,
+   "tris": 2268,
+   "origin_godot": [
+    22.0,
+    0.0,
+    10.45
+   ],
+   "aabb_min": [
+    18.7804,
+    -0.0285,
+    8.588
+   ],
+   "aabb_max": [
+    25.0382,
+    3.65,
+    10.7124
+   ],
+   "roles": [
+    "bp_led_red",
+    "glass",
+    "gunmetal",
+    "kit_alu",
+    "kit_fl_grate",
+    "kit_frame",
+    "kit_hazard_k",
+    "kit_hazard_y",
+    "kit_led",
+    "kit_led_grn",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "steel",
+    "yellow"
+   ]
+  },
+  {
+   "name": "air_leak_vfx__broken",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "air_leak_vfx__broken",
+   "map_object": null,
+   "tris": 71192,
+   "origin_godot": [
+    22.0,
+    0.0,
+    10.45
+   ],
+   "aabb_min": [
+    19.2723,
+    -0.197,
+    7.6567
+   ],
+   "aabb_max": [
+    23.5544,
+    3.1557,
+    11.73
+   ],
+   "roles": [
+    "bp_frost",
+    "bp_vapour"
+   ]
+  },
+  {
+   "name": "tunnel_door_inner_seal_L__broken",
+   "parent": "tunnel_door_inner_leaf_L__broken",
+   "kind": "seal",
+   "source_object": "tunnel_door_inner_leaf_L__broken",
+   "map_object": null,
+   "tris": 108,
+   "origin_godot": [
+    20.98,
+    0.0,
+    10.45
+   ],
+   "aabb_min": [
+    21.83,
+    0.0,
+    10.37
+   ],
+   "aabb_max": [
+    21.88,
+    3.0,
+    10.53
+   ],
+   "roles": [
+    "bp_frost",
+    "bp_red",
+    "glass",
+    "gunmetal",
+    "kit_alu",
+    "kit_fl_grate",
+    "kit_hazard_k",
+    "kit_hazard_y",
+    "kit_led",
+    "kit_led_grn",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "lamp_orange",
+    "steel",
+    "white",
+    "yellow"
+   ]
+  },
+  {
+   "name": "tunnel_door_inner_seal_R__broken",
+   "parent": "tunnel_door_inner_leaf_R__broken",
+   "kind": "seal",
+   "source_object": "tunnel_door_inner_leaf_R__broken",
+   "map_object": null,
+   "tris": 756,
+   "origin_godot": [
+    23.2,
+    0.0,
+    10.45
+   ],
+   "aabb_min": [
+    21.7649,
+    0.0096,
+    9.8427
+   ],
+   "aabb_max": [
+    22.5608,
+    3.0549,
+    10.53
+   ],
+   "roles": [
+    "bp_frost",
+    "bp_red",
+    "glass",
+    "gunmetal",
+    "kit_alu",
+    "kit_fl_grate",
+    "kit_hazard_k",
+    "kit_hazard_y",
+    "kit_led",
+    "kit_led_grn",
+    "kit_lower",
+    "kit_rubber",
+    "kit_seam",
+    "lamp_orange",
+    "steel",
+    "white",
+    "yellow"
+   ]
+  }
+ ],
+ "bounds": {
+  "center": [
+   21.9093,
+   1.7265,
+   9.6934
+  ],
+  "size": [
+   6.2578,
+   3.847,
+   4.0733
+  ],
+  "min": [
+   18.7804,
+   -0.197,
+   7.6567
+  ],
+  "max": [
+   25.0382,
+   3.65,
+   11.73
+  ]
+ },
+ "palette": {
+  "kit_seam": {
+   "rgb_linear": [
+    0.009134,
+    0.009721,
+    0.01096
+   ],
+   "hex": "#18191b",
+   "emission": 0,
+   "roughness": 0.8,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "rubber",
+   "base_linear": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.8,
+   "metal0": 0.0,
+   "var": 0.04,
+   "wear": 0.0,
+   "grime": 0.25,
+   "bump": 0.03,
+   "bscale": 520.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_fl_grate": {
+   "rgb_linear": [
+    0.212231,
+    0.226966,
+    0.246201
+   ],
+   "hex": "#7f8388",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 1.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "metal",
+   "base_linear": [
+    0.55,
+    0.56,
+    0.56
+   ],
+   "rough0": 0.45,
+   "metal0": 1.0,
+   "var": 0.05,
+   "wear": 0.25,
+   "grime": 0.6,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": true,
+   "render_rgb_linear": [
+    0.55,
+    0.56,
+    0.56
+   ]
+  },
+  "kit_lower": {
+   "rgb_linear": [
+    0.045186,
+    0.046665,
+    0.051269
+   ],
+   "hex": "#3c3d40",
+   "emission": 0,
+   "roughness": 0.6,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.045186,
+    0.046665,
+    0.051269
+   ],
+   "rough0": 0.492,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.45,
+   "grime": 0.45,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "yellow": {
+   "rgb_linear": [
+    0.783538,
+    0.323143,
+    0.006049
+   ],
+   "hex": "#e59a12",
+   "emission": 0,
+   "roughness": 0.55,
+   "metallic": 0.15,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.783538,
+    0.323143,
+    0.02
+   ],
+   "rough0": 0.471,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.35,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "steel": {
+   "rgb_linear": [
+    0.226966,
+    0.238398,
+    0.262251
+   ],
+   "hex": "#83868c",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.4,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "metal",
+   "base_linear": [
+    0.56,
+    0.57,
+    0.58
+   ],
+   "rough0": 0.32,
+   "metal0": 1.0,
+   "var": 0.05,
+   "wear": 0.25,
+   "grime": 0.4,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": true,
+   "render_rgb_linear": [
+    0.56,
+    0.57,
+    0.58
+   ]
+  },
+  "kit_hazard_y": {
+   "rgb_linear": [
+    0.806952,
+    0.456411,
+    0.003677
+   ],
+   "hex": "#e8b40c",
+   "emission": 0,
+   "roughness": 0.55,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.806952,
+    0.456411,
+    0.02
+   ],
+   "rough0": 0.471,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.5,
+   "grime": 0.4,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_led": {
+   "rgb_linear": [
+    1.0,
+    0.871367,
+    0.715694
+   ],
+   "hex": "#fff0dc",
+   "emission": 7.0,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "glow",
+   "base_linear": [
+    0.85,
+    0.85,
+    0.715694
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_alu": {
+   "rgb_linear": [
+    0.391572,
+    0.412543,
+    0.439657
+   ],
+   "hex": "#a8acb1",
+   "emission": 0,
+   "roughness": 0.35,
+   "metallic": 0.9,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "metal",
+   "base_linear": [
+    0.78,
+    0.79,
+    0.81
+   ],
+   "rough0": 0.28,
+   "metal0": 1.0,
+   "var": 0.05,
+   "wear": 0.25,
+   "grime": 0.4,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": true,
+   "render_rgb_linear": [
+    0.78,
+    0.79,
+    0.81
+   ]
+  },
+  "gunmetal": {
+   "rgb_linear": [
+    0.035601,
+    0.036889,
+    0.043735
+   ],
+   "hex": "#35363b",
+   "emission": 0,
+   "roughness": 0.55,
+   "metallic": 0.3,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.035601,
+    0.036889,
+    0.043735
+   ],
+   "rough0": 0.471,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.45,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_hazard_k": {
+   "rgb_linear": [
+    0.012286,
+    0.012286,
+    0.012983
+   ],
+   "hex": "#1d1d1e",
+   "emission": 0,
+   "roughness": 0.6,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.492,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.5,
+   "grime": 0.4,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "lamp_orange": {
+   "rgb_linear": [
+    1.0,
+    0.254152,
+    0.023153
+   ],
+   "hex": "#ff8a2a",
+   "emission": 10.0,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "glow",
+   "base_linear": [
+    0.85,
+    0.254152,
+    0.023153
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "glass": {
+   "rgb_linear": [
+    0.023153,
+    0.045186,
+    0.057805
+   ],
+   "hex": "#2a3c44",
+   "emission": 0,
+   "roughness": 0.15,
+   "metallic": 0.2,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "glass",
+   "base_linear": [
+    0.023153,
+    0.045186,
+    0.057805
+   ],
+   "rough0": 0.04,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.6,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 0.35,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_rubber": {
+   "rgb_linear": [
+    0.011612,
+    0.011612,
+    0.012286
+   ],
+   "hex": "#1c1c1d",
+   "emission": 0,
+   "roughness": 0.85,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "rubber",
+   "base_linear": [
+    0.02,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.82,
+   "metal0": 0.0,
+   "var": 0.04,
+   "wear": 0.1,
+   "grime": 0.25,
+   "bump": 0.03,
+   "bscale": 520.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_led_grn": {
+   "rgb_linear": [
+    0.097587,
+    1.0,
+    0.262251
+   ],
+   "hex": "#58ff8c",
+   "emission": 5.0,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "glow",
+   "base_linear": [
+    0.097587,
+    0.85,
+    0.262251
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "white": {
+   "rgb_linear": [
+    0.693872,
+    0.679542,
+    0.64448
+   ],
+   "hex": "#d9d7d2",
+   "emission": 0,
+   "roughness": 0.55,
+   "metallic": 0.05,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.693872,
+    0.679542,
+    0.64448
+   ],
+   "rough0": 0.471,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.35,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_frost": {
+   "rgb_linear": [
+    0.768151,
+    0.879622,
+    0.955973
+   ],
+   "hex": "#e3f1fa",
+   "emission": 0,
+   "roughness": 0.55,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.768151,
+    0.85,
+    0.85
+   ],
+   "rough0": 0.55,
+   "metal0": 0.0,
+   "var": 0.08,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_red": {
+   "rgb_linear": [
+    0.658375,
+    0.016807,
+    0.01096
+   ],
+   "hex": "#d4231b",
+   "emission": 0,
+   "roughness": 0.35,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.658375,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.35,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.18,
+   "grime": 0.3,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_led_red": {
+   "rgb_linear": [
+    1.0,
+    0.017642,
+    0.006995
+   ],
+   "hex": "#ff2414",
+   "emission": 3.0,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glow",
+   "base_linear": [
+    0.85,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "kit_frame": {
+   "rgb_linear": [
+    0.025187,
+    0.027321,
+    0.030713
+   ],
+   "hex": "#2c2e31",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.6,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "metal",
+   "base_linear": [
+    0.06,
+    0.065,
+    0.07
+   ],
+   "rough0": 0.36,
+   "metal0": 1.0,
+   "var": 0.05,
+   "wear": 0.35,
+   "grime": 0.4,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": true,
+   "render_rgb_linear": [
+    0.06,
+    0.065,
+    0.07
+   ]
+  },
+  "bp_vapour": {
+   "rgb_linear": [
+    0.854993,
+    0.904661,
+    0.938686
+   ],
+   "hex": "#eef4f8",
+   "emission": 0.4,
+   "roughness": 0.5,
+   "metallic": 0.0,
+   "alpha": 0.72,
+   "alpha_source": "derivative default",
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glass",
+   "base_linear": [
+    0.85,
+    0.85,
+    0.85
+   ],
+   "rough0": 0.6,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  }
+ },
+ "unmapped_materials": {},
+ "lights": [
+  {
+   "name": "door_alarm_glow__broken",
+   "type": "POINT",
+   "energy_blender_w": 70.0,
+   "color": [
+    1.0,
+    0.12,
+    0.08
+   ],
+   "position_godot": [
+    22.0,
+    3.3,
+    9.7
+   ],
+   "note": "Red alarm glow of the warning bar (render light)."
+  }
+ ],
+ "export": {
+  "path": "G:\\nasa app\\mars_colony_revisions_wt\\assets\\broken_parts\\BP08.glb",
+  "result": [
+   "FINISHED"
+  ],
+  "bytes": 2522688,
+  "sha256": "C0D32A5BD6436B730212430A4904B9A5A5CD8555D7CFDAF6AD589C8436FB6D3E",
+  "tris": 105504
+ },
+ "secs": 0.6
+}

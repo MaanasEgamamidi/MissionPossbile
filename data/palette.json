@@ -10035,6 +10035,621 @@
    "ior": 1.5,
    "explicit_colour": false,
    "render_rgb_linear": null
+  },
+  "bp_spill": {
+   "rgb_linear": [
+    0.036889,
+    0.55834,
+    0.274677
+   ],
+   "hex": "#36c58f",
+   "emission": 0,
+   "roughness": 0.04,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "ceramic",
+   "base_linear": [
+    0.036889,
+    0.55834,
+    0.274677
+   ],
+   "rough0": 0.03,
+   "metal0": 0.0,
+   "var": 0.02,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.0,
+   "bscale": 200.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.9,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_pink": {
+   "rgb_linear": [
+    0.783538,
+    0.116971,
+    0.332452
+   ],
+   "hex": "#e5609c",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.783538,
+    0.116971,
+    0.332452
+   ],
+   "rough0": 0.45,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.18,
+   "grime": 0.3,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_copper": {
+   "rgb_linear": [
+    0.539479,
+    0.194618,
+    0.076185
+   ],
+   "hex": "#c27a4e",
+   "emission": 0,
+   "roughness": 0.3,
+   "metallic": 1.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "metal",
+   "base_linear": [
+    0.539479,
+    0.194618,
+    0.076185
+   ],
+   "rough0": 0.3,
+   "metal0": 1.0,
+   "var": 0.05,
+   "wear": 0.25,
+   "grime": 0.4,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_static_dk": {
+   "rgb_linear": [
+    0.093059,
+    0.116971,
+    0.144128
+   ],
+   "hex": "#56606a",
+   "emission": 0.9,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glow",
+   "base_linear": [
+    0.093059,
+    0.116971,
+    0.144128
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_static": {
+   "rgb_linear": [
+    0.545724,
+    0.603827,
+    0.658375
+   ],
+   "hex": "#c3ccd4",
+   "emission": 1.1,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glow",
+   "base_linear": [
+    0.545724,
+    0.603827,
+    0.658375
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_red": {
+   "rgb_linear": [
+    0.658375,
+    0.016807,
+    0.01096
+   ],
+   "hex": "#d4231b",
+   "emission": 0,
+   "roughness": 0.35,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.658375,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.35,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.18,
+   "grime": 0.3,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_crack": {
+   "rgb_linear": [
+    0.904661,
+    0.938686,
+    0.955973
+   ],
+   "hex": "#f4f8fa",
+   "emission": 0,
+   "roughness": 0.35,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.85,
+    0.85,
+    0.85
+   ],
+   "rough0": 0.35,
+   "metal0": 0.0,
+   "var": 0.02,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_haze": {
+   "rgb_linear": [
+    0.814847,
+    0.879622,
+    0.904661
+   ],
+   "hex": "#e9f1f4",
+   "emission": 0,
+   "roughness": 0.4,
+   "metallic": 0.0,
+   "alpha": 0.45,
+   "alpha_source": "derivative default",
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glass",
+   "base_linear": [
+    0.814847,
+    0.85,
+    0.85
+   ],
+   "rough0": 0.45,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.2,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 0.35,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_shard": {
+   "rgb_linear": [
+    0.62396,
+    0.814847,
+    0.879622
+   ],
+   "hex": "#cfe9f1",
+   "emission": 0,
+   "roughness": 0.08,
+   "metallic": 0.0,
+   "alpha": 0.35,
+   "alpha_source": "derivative default",
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glass",
+   "base_linear": [
+    0.62396,
+    0.814847,
+    0.85
+   ],
+   "rough0": 0.28,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 0.35,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_led_red": {
+   "rgb_linear": [
+    1.0,
+    0.017642,
+    0.006995
+   ],
+   "hex": "#ff2414",
+   "emission": 3.0,
+   "roughness": 0.3,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glow",
+   "base_linear": [
+    0.85,
+    0.02,
+    0.02
+   ],
+   "rough0": 0.3,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_vapour": {
+   "rgb_linear": [
+    0.854993,
+    0.904661,
+    0.938686
+   ],
+   "hex": "#eef4f8",
+   "emission": 0.4,
+   "roughness": 0.5,
+   "metallic": 0.0,
+   "alpha": 0.32,
+   "alpha_source": "derivative default",
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glass",
+   "base_linear": [
+    0.85,
+    0.85,
+    0.85
+   ],
+   "rough0": 0.6,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_gr_leaf_brn": {
+   "rgb_linear": [
+    0.194618,
+    0.102242,
+    0.025187
+   ],
+   "hex": "#7a5a2c",
+   "emission": 0,
+   "roughness": 0.7,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "alias of the colony library role gr_leaf_brn (not used by the map, so not in the colony palette)",
+   "mat_class": "leaf",
+   "base_linear": [
+    0.194618,
+    0.102242,
+    0.025187
+   ],
+   "rough0": 0.75,
+   "metal0": 0.0,
+   "var": 0.2,
+   "wear": 0.0,
+   "grime": 0.15,
+   "bump": 0.02,
+   "bscale": 140.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_water": {
+   "rgb_linear": [
+    0.274677,
+    0.64448,
+    0.887923
+   ],
+   "hex": "#8fd2f2",
+   "emission": 0,
+   "roughness": 0.06,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.274677,
+    0.64448,
+    0.85
+   ],
+   "rough0": 0.06,
+   "metal0": 0.0,
+   "var": 0.02,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 1.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_puddle": {
+   "rgb_linear": [
+    0.205079,
+    0.309469,
+    0.366253
+   ],
+   "hex": "#7d97a3",
+   "emission": 0,
+   "roughness": 0.03,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.205079,
+    0.309469,
+    0.366253
+   ],
+   "rough0": 0.03,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 1.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_print": {
+   "rgb_linear": [
+    0.111932,
+    0.046665,
+    0.024158
+   ],
+   "hex": "#5e3d2b",
+   "emission": 0,
+   "roughness": 0.9,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "soil",
+   "base_linear": [
+    0.111932,
+    0.046665,
+    0.024158
+   ],
+   "rough0": 0.92,
+   "metal0": 0.0,
+   "var": 0.1,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.03,
+   "bscale": 240.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
   }
  }
 }

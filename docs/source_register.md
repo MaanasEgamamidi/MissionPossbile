@@ -125,3 +125,47 @@ These are local test results on this machine with Godot 4.7.2 and the current ma
 | Earth–Mars light time | Prompt 11 | Range not verified on an opened page. |
 | Rover engineering principles for Mars | Prompt 10 | Lunar analog leads only. |
 | Old demo database text (for example "around −63 °C") | Prompt 05 | Must be re-sourced before reuse (C-15). |
+
+## 11. Crew use, night energy and life-support power (energy and NASA worker, 2026-11-14)
+
+Added by the energy and NASA worker of the upgrade batch. The id uses the prefix E so it does not collide with S ids
+that other workers may add at the same time; it is not yet in `data/sources.json` (the in-game source screen), which
+the integrator should add (or renumber it to the next free S id in both places).
+
+| ID | Pack ID | Source | Kind | Status | Values read | Evidence category | Supports |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| S20 | — | NASA, *Life Support Baseline Values and Assumptions Document*, NASA/TP-2015-218570/REV2, eds. M. K. Ewert, T. T. Chen, C. D. Powell, Johnson Space Center, February 2022. NTRS 20210024855. https://ntrs.nasa.gov/api/citations/20210024855/downloads/BVAD_2.15.22-final.pdf | Document (reference tables) | VERIFIED 2026-11-14 (PDF downloaded from NTRS and read) | Table 3-31 (82 kg reference crew member, respiratory quotient 0.86, daily exercise): oxygen consumed 0.895 kg/CM-d; carbon dioxide load 1.085 kg/CM-d; food solids 0.800 kg/CM-d; food energy 12.778 MJ/CM-d; potable water 3.217 kg/CM-d; water in food 0.760; metabolic water 0.490; respiration and perspiration water 2.946; urine water 1.420; fecal water 0.101 kg/CM-d. Notes to Table 3-31: 1.56 kg/CM-d of food eaten at 48.7 % water. Table 4-20, Early Planetary Base: drinking 2.00, food rehydration 0.50, urinal flush 0.50, personal hygiene 0.4, hand wash 1.08, total water consumption 4.48 kg/CM-d; ISS column total 3.20. Table 4-21, ISS: total wastewater 3.77 kg/CM-d. Table 3-2: ISS average ECLSS power 5.31 kW. Table 3-17: lithium-ion (liquid electrolyte) 100 to 150 Wh/kg, 1,500 cycles at 60 % depth of discharge. Table 4-91: lettuce 7.78 g O2 produced and 10.70 g CO2 taken up per m² per day. Section 4.3.3: ISS urine processor recovers about 85 % of urine water (US segment). | NASA design reference values (ISS analog and planning values; not measured on Mars) | GameBalance crew rates (oxygen, CO2, water, food energy per meal), wastewater share, battery sizing for scale, life-support power cross-check, Garden dome plant oxygen. |
+
+### Crew use per crew member: NASA per day and the game
+
+Time base: one game hour is one hour of colony time, so a NASA per-day value becomes a per-game-hour rate by
+dividing by 24. A sol is 24.6598 game hours (S02), so one sol uses 24.6598 / 24 = 1.0275 NASA days. At the default
+20-minute sol one game hour takes 48.7 real seconds; no resource rate is per real second. Suit oxygen is the same
+breathing rate taken from the suit tank instead of the cabin (only crew inside breathe cabin air), and the S01 suit
+exposure rule is a separate real-second rule that uses no oxygen, so nothing is counted twice.
+
+| Quantity | NASA per day (S20) | Game per game hour | Game per sol | Was (balance) |
+| --- | --- | --- | --- | --- |
+| Oxygen breathed | 0.895 kg (Table 3-31) | 0.03729 kg | 0.9196 kg | 0.035 kg/h |
+| CO2 breathed out | 1.085 kg (Table 3-31) | 0.04521 kg | 1.1148 kg | 0.042 kg/h |
+| Water (drink, food, flush, hygiene, hand wash) | 4.48 kg = 4.48 L (Table 4-20, Early Planetary Base) | 0.18667 L | 4.603 L | 0.25 L/h |
+| Share of used water returned as wastewater | 3.77 / 4.45 = 0.85 (Tables 4-20, 4-21, 3-31, ISS) | 0.85 | 0.85 | 0.85 (unlabelled) |
+| Food energy | 12.778 MJ = 3,054 kcal (Table 3-31) | 0.5324 MJ | 13.13 MJ = 3 meals of 1,046 kcal | 3 meals per sol, no energy |
+| Food eaten | 1.56 kg as eaten, 0.800 kg dry (Table 3-31) | 0.065 kg | 1.603 kg = 3 meals of 0.534 kg | — |
+
+A meal stays a game unit (3 per sol); GameBalance.meal_mj(), meal_kcal() and meal_kg() say what it holds. None of
+these real rates makes the game unwinnable for 4 crew (water 18.4 L per sol from 900 L with a 90 % recycler; oxygen
+3.68 kg per sol against a 60 kg reserve and 4.8 kg per day of electrolysis), so no scale factor is applied.
+
+### Night energy (balance, sized with S01, S02 and S20)
+
+| Number | Value | Evidence |
+| --- | --- | --- |
+| Night length | 12.33 game hours (sunset phase 0.75 to sunrise phase 0.25), 10 real minutes at the default sol | S02 sol length / 2 (equator at equinox) |
+| Solar at night | exactly 0 kW, at every tracker, upgrade and area level | model rule (PowerModel.sun_term) |
+| Night load at arrival (every room on) | 23.1 kW = 285 kWh per night, 41 % of the battery | balance loads |
+| Careful night load (critical lights only, greenhouse lights off) | 8.9 kW = 110 kWh per night, 16 % | balance loads |
+| Wasteful night load (every room, both oxygen machines) | 27.3 kW = 337 kWh per night: from a 40 % battery it runs flat about 2 h before sunrise | balance loads |
+| Battery | 700 kWh usable at V1 (875, 1,050, 1,400 at V2 to V4); 630 kWh at arrival | balance; for scale 1,167 kWh of Li-ion at 60 % depth of discharge, S20 Table 3-17 |
+| Life-support power cross-check | 4.3 kW for 4 crew in the game; ISS ECLSS 5.31 kW average | S20 Table 3-2 |
+| Garden dome plant oxygen | 0.010, 0.020, 0.035 kg/h at V2 to V4 (31, 62, 108 m² of leafy plants) | S20 Table 4-91 lettuce 7.78 g O2/m²/d; areas are balance |

@@ -1,0 +1,119 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS new game starts suited at the tutorial spawn outside the tunnel door (22.0, 0.077049, 16.8) suit true 100.0
+PASS safe parked feet crew_1 (-6.1, 0.04, -14.5)
+PASS safe parked feet crew_2 (-7.3, 0.04, -13.3)
+PASS safe parked feet crew_3 (-8.5, 0.04, -14.5)
+PASS safe parked feet crew_4 (-7.6, 0.04, -15.7)
+PASS Med Bay is still the hub: every hub spot is in the Med Bay at the switching point 
+PASS tutorial doors are held open 
+PASS switching point reachable on foot from the spawn with the tutorial doors open 137 grid steps of 0.4 m
+PASS Med Bay is still the respawn point (-7.3, 0.04, -13.3)
+PASS continue keeps host position 
+PASS continue upgrades old recovery spot (-7.6, 0.04, -15.7)
+PASS continue preserves remote exposure encounter 
+PASS continue adds all reserved anchors 
+PASS nineteen new locations 19
+PASS capsule clear repair_t01 (31.55, 0.04, -12.95)
+PASS correct zone repair_t01 Command Room
+PASS stable task anchor repair_t01 
+PASS walk and aim repair_t01 { "kind": "station", "id": &"repair_t01", "node": repair_t01:<Area3D#953516304680> }
+PASS broken task anchor opens its mini-game repair_t01 CommsPanel:<PanelContainer#4055288003410>
+PASS capsule clear repair_t02 (25.2, 0.04, -15.9)
+PASS correct zone repair_t02 Command Room
+PASS stable task anchor repair_t02 
+PASS walk and aim repair_t02 { "kind": "station", "id": &"repair_t02", "node": repair_t02:<Area3D#953633745199> }
+PASS broken task anchor opens its mini-game repair_t02 WiresPanel:<PanelContainer#4060623158098>
+PASS capsule clear cassette_command_center (27.0, 0.04, -14.8)
+PASS correct zone cassette_command_center Command Room
+PASS walk and aim cassette_command_center { "kind": "station", "id": &"cassette_command_center", "node": cassette_command_center:<Area3D#953751185718> }
+PASS E collects physical room cassette cassette_command_center 
+PASS collected cassette disappears from live world cassette_command_center 
+PASS capsule clear cassette_player_command_center (28.4, 0.04, -13.0)
+PASS correct zone cassette_player_command_center Command Room
+PASS walk and aim cassette_player_command_center { "kind": "station", "id": &"cassette_player_command_center", "node": cassette_player_command_center:<Area3D#953868626237> }
+PASS physical player opens host-authorized Command Room reader 
+PASS collected briefing and NASA photo appear at real player 
+PASS physical player authorizes next real page 
+PASS capsule clear repair_t03 (35.1, 0.04, 7.75)
+PASS correct zone repair_t03 Power Room
+PASS stable task anchor repair_t03 
+PASS walk and aim repair_t03 { "kind": "station", "id": &"repair_t03", "node": repair_t03:<Area3D#953986066756> }
+PASS broken task anchor opens its mini-game repair_t03 RingsPanel:<PanelContainer#4078105017378>
+PASS capsule clear repair_t04 (29.4, 0.04, 8.05)
+PASS correct zone repair_t04 Power Room
+PASS stable task anchor repair_t04 
+PASS walk and aim repair_t04 { "kind": "station", "id": &"repair_t04", "node": repair_t04:<Area3D#954103507275> }
+PASS broken task anchor opens its mini-game repair_t04 CircuitsPanel:<PanelContainer#4083926711327>
+PASS capsule clear cassette_power_supply (31.0, 0.04, 4.0)
+PASS correct zone cassette_power_supply Power Room
+PASS walk and aim cassette_power_supply { "kind": "station", "id": &"cassette_power_supply", "node": cassette_power_supply:<Area3D#954220947794> }
+PASS E collects physical room cassette cassette_power_supply 
+PASS collected cassette disappears from live world cassette_power_supply 
+PASS capsule clear repair_t05 (5.0, 0.04, 2.0)
+PASS correct zone repair_t05 Greenhouse
+PASS stable task anchor repair_t05 
+PASS walk and aim repair_t05 { "kind": "station", "id": &"repair_t05", "node": repair_t05:<Area3D#954338388313> }
+PASS task anchor station opens repair_t05 
+PASS capsule clear repair_t06 (1.9, 0.042, 9.8)
+PASS correct zone repair_t06 Greenhouse
+PASS stable task anchor repair_t06 
+PASS walk and aim repair_t06 { "kind": "station", "id": &"repair_t06", "node": repair_t06:<Area3D#954455828832> }
+PASS broken task anchor opens its mini-game repair_t06 T06WaterPanel:<PanelContainer#4103690271774>
+PASS capsule clear cassette_greenhouse (-5.0, 0.042, 2.0)
+PASS correct zone cassette_greenhouse Greenhouse
+PASS walk and aim cassette_greenhouse { "kind": "station", "id": &"cassette_greenhouse", "node": cassette_greenhouse:<Area3D#954573269351> }
+PASS E collects physical room cassette cassette_greenhouse 
+PASS collected cassette disappears from live world cassette_greenhouse 
+PASS capsule clear repair_t07 (47.3, 0.045, 23.0)
+PASS correct zone repair_t07 Garden dome
+PASS stable task anchor repair_t07 
+PASS walk and aim repair_t07 { "kind": "station", "id": &"repair_t07", "node": repair_t07:<Area3D#954690709870> }
+PASS task anchor station opens repair_t07 
+PASS capsule clear repair_t08 (49.9, 0.045, 30.35)
+PASS correct zone repair_t08 Garden dome
+PASS stable task anchor repair_t08 
+PASS walk and aim repair_t08 { "kind": "station", "id": &"repair_t08", "node": repair_t08:<Area3D#954808150389> }
+PASS broken task anchor opens its mini-game repair_t08 T08GlassPanel:<PanelContainer#4123873262625>
+PASS capsule clear cassette_green_dome (50.0, 0.045, 23.0)
+PASS correct zone cassette_green_dome Garden dome
+PASS walk and aim cassette_green_dome { "kind": "station", "id": &"cassette_green_dome", "node": cassette_green_dome:<Area3D#954925590908> }
+PASS E collects physical room cassette cassette_green_dome 
+PASS collected cassette disappears from live world cassette_green_dome 
+PASS capsule clear repair_t09 (-10.4, 0.04, -12.45)
+PASS correct zone repair_t09 Med Bay
+PASS stable task anchor repair_t09 
+PASS walk and aim repair_t09 { "kind": "station", "id": &"repair_t09", "node": repair_t09:<Area3D#955043031427> }
+PASS broken task anchor opens its mini-game repair_t09 T09MixturePanel:<PanelContainer#4133906035427>
+PASS capsule clear repair_t10 (-3.5, 0.04, -16.3)
+PASS correct zone repair_t10 Med Bay
+PASS stable task anchor repair_t10 
+PASS walk and aim repair_t10 { "kind": "station", "id": &"repair_t10", "node": repair_t10:<Area3D#955160471946> }
+PASS broken task anchor opens its mini-game repair_t10 T10EquipmentPanel:<PanelContainer#4139778063388>
+PASS capsule clear cassette_med_bay (-8.0, 0.04, -12.0)
+PASS correct zone cassette_med_bay Med Bay
+PASS walk and aim cassette_med_bay { "kind": "station", "id": &"cassette_med_bay", "node": cassette_med_bay:<Area3D#955277912465> }
+PASS E collects physical room cassette cassette_med_bay 
+PASS collected cassette disappears from live world cassette_med_bay 
+PASS capsule clear repair_t11 (24.0, 0.04, -4.0)
+PASS correct zone repair_t11 Hangar bay
+PASS stable task anchor repair_t11 
+PASS walk and aim repair_t11 { "kind": "station", "id": &"repair_t11", "node": repair_t11:<Area3D#955395352984> }
+PASS broken task anchor opens its mini-game repair_t11 T11DustPanel:<PanelContainer#4149290742472>
+PASS capsule clear repair_t12 (22.0, 0.04, 9.3)
+PASS correct zone repair_t12 Airlock
+PASS stable task anchor repair_t12 
+PASS walk and aim repair_t12 { "kind": "station", "id": &"repair_t12", "node": repair_t12:<Area3D#955512793503> }
+PASS broken task anchor opens its mini-game repair_t12 T12SealPanel:<PanelContainer#4155347317832>
+PASS capsule clear cassette_hangar (25.0, 0.04, -1.3)
+PASS correct zone cassette_hangar Hangar bay
+PASS walk and aim cassette_hangar { "kind": "station", "id": &"cassette_hangar", "node": cassette_hangar:<Area3D#955630234022> }
+PASS E collects physical room cassette cassette_hangar 
+PASS collected cassette disappears from live world cassette_hangar 
+PASS twelve task anchors and six distinct tapes 
+PASS greenhouse and dome cassette distinct 
+PASS player only in Command Room 
+PASS all six live room cassettes collected once 
+PASS all six collected props remain hidden in imported world 
+PASS direct station request away exposes no reader 
+RESULT 116/116

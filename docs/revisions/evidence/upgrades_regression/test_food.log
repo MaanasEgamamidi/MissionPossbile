@@ -1,0 +1,88 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS stations: the six garden-dome planters and the hydroponics unit are beds anyone may use
+PASS stations: the greenhouse console is the food station in the Greenhouse
+PASS map: the Greenhouse zone exists (the grow-light circuit)
+PASS crops: lettuce is ISS analog evidence, tomato is labelled 'plan, not yet grown on the ISS'
+PASS model_sources_food.json: all 16 FoodBalance fields and every crop number have a category
+PASS plant: anyone may plant (an electrical specialist here)
+PASS plant: refused while something grows
+PASS plant: unknown crop refused
+PASS plant: only at a bed
+PASS set_grow_lights: only at the greenhouse console
+PASS plant: too far refused
+PASS adjust_nutrients: level 0..1 only
+PASS adjust_nutrients: refused on an empty bed
+PASS set_greenhouse_water: the console shortcut sets the greenhouse allocation
+PASS set_grow_lights: switches the Greenhouse lighting circuit (its 9 kW load)
+PASS inspect_bed: records a measurement (water, nutrients, light, rate)
+PASS inspect_bed: a healthy bed records no evidence
+PASS invariants after the actions
+PASS growth: all inputs good grows at the full base rate (progress = rate x hours)
+PASS growth: low water alone slows growth (soil water 30 % -> 60 % of full speed)
+PASS growth: low nutrients alone slow growth (nutrients 20 % -> 57.5 % of full speed)
+PASS growth: a completely dry bed stops growing (but has not wilted yet)
+PASS growth: no light alone stops growth (3 h with the grow lights off: progress unchanged)
+PASS growth: the grow lights draw no power while off
+PASS growth: light back on, growth restarts
+PASS growth: grow lights that were shed for lack of power give no light
+PASS growth: nutrients fall as the plants grow (0.0406 used for 0.0676 growth)
+PASS cycle: lettuce goes seed -> sprout -> leafy -> ready in about 3 sols with good care (3.00 sols)
+PASS cycle: a ready crop waits (no more growth, progress 100 %)
+PASS harvest: refused on a bed with nothing ready
+PASS harvest: adds exactly the crop's meals (5) to food_meals and clears the bed
+PASS harvest: the repeated request is a duplicate and adds nothing
+PASS harvest: a new request on the cleared bed is refused and adds nothing
+PASS harvest: ledger meals_harvested counts it once
+PASS harvest: food ledger identity holds (now = start + harvested - eaten - recovery)
+PASS harvest: a nearly full store takes only what fits (4 of 12 meals), and the ledger books 4
+PASS water: with no greenhouse allocation no bed gains water (6 h)
+PASS water: beds take only the delivered greenhouse water (24.66 L absorbed of 24.66 L delivered in a sol)
+PASS water: every water and food ledger identity holds on every tick (worst 4.192202140984591e-13)
+PASS water: below the drinking reserve the greenhouse gets nothing and the beds absorb nothing
+PASS water: invariants hold
+PASS wilting: a dry bed is announced first ('will wilt'), and wilts a sol later (alert 17.9 h, wilted 42.6 h)
+PASS wilting: a wilted bed says so and must be replanted
+PASS wilting: water back before a full dry sol saves the plant (dry 22.2 h, then growing again)
+PASS automation: without upgrades the chores are real in 10 sols (drip lines clog and beds dry; nutrients drop below the good band)
+PASS automation: food_irrigation_reliability: no bed dries for 10 sols with water allocated, also in the last 2 sols (min soil water 61 %)
+PASS automation: food_nutrient_metering: nutrients stay in the good band for 10 sols with no action (min 60 %)
+PASS automation: food_scheduled_care: lights and watering with no player action for 10 sols (starts dark and dry-allocated)
+PASS automation: all three together keep every bed healthy for 10 sols and harvests keep coming (21 harvests)
+PASS evidence: changing an input before any inspection records nothing
+PASS evidence: inspecting yellow leaves records food_compare_symptom with the measurement
+PASS evidence: exactly one input changed on that bed records food_adjust_one_cause
+PASS evidence: the bed's growth rate rose afterwards, so food_observe_response is recorded (0.00487 -> 0.01352 per h)
+PASS evidence: recorded in the right order (compare, adjust one cause, observe response)
+PASS evidence: repeating the task on another bed adds nothing (each id once, same times, no new event)
+PASS evidence: two inputs changed on one bed makes the test 'mixed': no response is recorded although growth rose
+PASS evidence: changing the wrong input gives no response, and the test ends as 'no change' after a sol
+PASS lab setting: refused without the sci_evidence_settings upgrade
+PASS lab setting: a result that is not a nutrient setting is refused
+PASS lab setting: applies the lab value to every growing bed and records sci_apply_result
+PASS lab setting: the same result applies once only
+PASS save/load: mid-growth crops come back exactly as written to the file (beds, trial, totals)
+PASS save/load: growth after loading matches growth without the save, every number within 1e-9 (0.0428 progress)
+PASS panels: the hook scripts res://scripts/ui/stations/bed_ and food_station_panel.gd build the bed panel (titled by bed) and the console panel
+PASS bed panel: 'Plant tomato' asks the host to plant a tomato here
+PASS bed panel: says tomato is a plan, not yet grown on the ISS, and that time is squeezed ('about 6 sols here', months on Earth)
+PASS bed panel: crop, stage, growth, time to harvest and the three inputs with units
+PASS bed panel: a symptom is shown in words with its cause and the measurement that proves it
+PASS bed panel: Inspect and Set nutrients ask the host (inspect_bed, adjust_nutrients 0.65)
+PASS bed panel: the water switch asks set_bed_water and shows the real state
+PASS bed panel: Harvest is disabled until the crop is ready; the specialist symbol is on the panel
+PASS console: lists all 7 beds, with the tomato's stage
+PASS console: food store and meals per sol for the crew; stored meals cover the start
+PASS console: a '?' explains why light, water and nutrients matter
+PASS console: the grow-light switch asks set_grow_lights and the lights go off
+PASS console: the water shortcut asks set_greenhouse_water
+PASS console: a lab nutrient setting is shown but locked without the upgrade
+PASS console: with the upgrade the lab setting applies once and shows as applied; automation shows what is installed
+PASS layout Planter 3 (gd_planter.002) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Planter 3 (gd_planter.002): every control reachable by keyboard with a visible focus
+PASS layout Hydroponics unit (gd_hydro) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Hydroponics unit (gd_hydro): every control reachable by keyboard with a visible focus
+PASS layout Greenhouse console (gh_console) at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Greenhouse console (gh_console): every control reachable by keyboard with a visible focus
+PASS no script or engine errors during the test
+RESULT 85/85

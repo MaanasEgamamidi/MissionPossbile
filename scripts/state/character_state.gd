@@ -33,6 +33,11 @@ var exposure_active := false
 var exposure_protected := false
 var exposure_cause := ""
 var exposure_area := ""
+## Cause id (scripts/survival/death_reasons.gd) of the current or last air danger; cleared on recovery.
+var hazard_cause := ""
+## Why this crew member last died (contract in docs/revisions/UPGRADES_BRIEF.md): {"cause", "title", "text", "area",
+## "at_hours", "count"}. Empty = never died. Written by the host before the Med Bay respawn; saved and replicated.
+var last_death: Dictionary = {}
 ## Spatial hysteresis across the explicit airlock boundary; unrelated to lighting-zone membership.
 var in_airlock_pressure_volume := false
 var equipment: Array[StringName] = []
@@ -52,6 +57,7 @@ func to_dict() -> Dictionary:
 		"lethal_exposure_seconds": lethal_exposure_seconds,
 		"exposure_safe_seconds": exposure_safe_seconds, "exposure_active": exposure_active,
 		"exposure_protected": exposure_protected, "exposure_cause": exposure_cause, "exposure_area": exposure_area,
+		"hazard_cause": hazard_cause, "last_death": last_death.duplicate(true),
 		"in_airlock_pressure_volume": in_airlock_pressure_volume, "suit_integrity": suit_integrity,
 		"suit_rack": String(suit_rack), "suit_slot": suit_slot,
 		"equipment": equipment.map(func(e: StringName) -> String: return String(e)),
@@ -83,6 +89,8 @@ func assign_from(d: Dictionary, keep_pose := false) -> void:
 	exposure_protected = c.exposure_protected
 	exposure_cause = c.exposure_cause
 	exposure_area = c.exposure_area
+	hazard_cause = c.hazard_cause
+	last_death = c.last_death
 	in_airlock_pressure_volume = c.in_airlock_pressure_volume
 	suit_integrity = c.suit_integrity
 	equipment = c.equipment
@@ -111,6 +119,8 @@ static func from_dict(d: Dictionary) -> CharacterState:
 	c.exposure_protected = bool(d.get("exposure_protected", false))
 	c.exposure_cause = String(d.get("exposure_cause", ""))
 	c.exposure_area = String(d.get("exposure_area", ""))
+	c.hazard_cause = String(d.get("hazard_cause", ""))
+	c.last_death = _death(d.get("last_death", {}))
 	c.in_airlock_pressure_volume = bool(d.get("in_airlock_pressure_volume", false))
 	c.suit_integrity = clampf(float(d.get("suit_integrity", 1.0)), 0.0, 1.0)
 	for e in d.get("equipment", []):
@@ -118,6 +128,15 @@ static func from_dict(d: Dictionary) -> CharacterState:
 	for e in d.get("cargo", []):
 		c.cargo.append(StringName(String(e)))
 	return c
+
+
+## A saved or replicated death record in the contract's types; anything else becomes "never died".
+static func _death(v: Variant) -> Dictionary:
+	if not (v is Dictionary) or (v as Dictionary).is_empty():
+		return {}
+	var d: Dictionary = v
+	return {"cause": String(d.get("cause", "unknown")), "title": String(d.get("title", "")), "text": String(d.get("text", "")),
+		"area": String(d.get("area", "")), "at_hours": float(d.get("at_hours", 0.0)), "count": maxi(1, int(d.get("count", 1)))}
 
 
 static func _v3(a: Variant) -> Vector3:

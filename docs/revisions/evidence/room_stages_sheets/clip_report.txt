@@ -1,0 +1,26 @@
+command:3 surface 7 touches: cr_floor.019
+command:3 surface 19 touches: cr_console, cr_console.001, cr_console_alarm, cr_floor.009, cr_floor.013
+command:3 surface 21 touches: cr_console, cr_console.001
+command:3 surface 22 touches: cr_console_alarm
+command:3 surface 23 touches: cr_console_alarm
+command:4 surface 10 touches: cr_floor.019
+command:4 surface 22 touches: cr_console, cr_console.001, cr_console_alarm, cr_floor.009, cr_floor.013
+command:4 surface 35 touches: rf_slab_lt.016
+energy:2 surface 0 touches: pr_floor.002
+energy:3 surface 0 touches: pr_floor.002, pr_floor.003
+energy:3 surface 20 touches: sf_solar_tracker.004, sf_solar_tracker.005
+energy:4 surface 1 touches: pr_floor.002, pr_floor.003
+health:2 surface 0 touches: mb_headwall_off
+health:3 surface 0 touches: mb_headwall_off
+health:3 surface 19 touches: mb_floor.021, mb_floor.026
+health:4 surface 19 touches: mb_floor.021, mb_floor.026
+health:4 surface 40 touches: mb_floor.021, mb_floor.022, mb_floor.026, mb_floor.027
+life_support:2 surface 0 touches: lv_floor.015, lv_floor.021
+life_support:2 surface 11 touches: lv_floor.017
+life_support:3 surface 0 touches: lv_floor.015, lv_floor.021
+life_support:3 surface 11 touches: lv_floor.017
+life_support:3 surface 21 touches: lv_floor.004
+life_support:4 surface 0 touches: lv_floor.015, lv_floor.021
+life_support:4 surface 12 touches: lv_floor.017, lv_floor.023
+life_support:4 surface 23 touches: lv_floor.004, lv_floor.005
+life_support:4 surface 36 touches: lv_floor.015, lv_floor.021

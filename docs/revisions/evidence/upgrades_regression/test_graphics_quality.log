@@ -1,0 +1,26 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS world has its fixture lights with shadows (52 / 426)
+PASS High leaves the authored scene unchanged
+PASS High: 2x MSAA at full resolution
+PASS Low: no fixture shadows
+PASS Low: every fixture fades out with distance
+PASS Low: SSAO, SSIL, SSR and glow off
+PASS Low: no MSAA, FSR at 75 %
+PASS Low: shorter sun shadow distance
+PASS Medium: fixture shadows on, faded with distance
+PASS Medium: SSAO and glow only
+PASS Medium: FXAA instead of MSAA
+PASS Ultra: volumetric haze and finer reflections
+PASS Ultra: 4x MSAA and 8K shadow atlas
+PASS Ultra: longer sun shadow distance
+PASS Low then High restores the authored scene exactly
+PASS applied level is remembered
+PASS default preset is High
+PASS out of range clamps to Ultra
+PASS preset survives save and load
+PASS GameSettings.apply puts the preset into effect
+PASS Graphics tab offers four presets
+PASS panel shows the current preset
+PASS choosing Low in the panel applies it at once
+RESULT 23/23

@@ -15,8 +15,13 @@ extends RefCounted
 ## Upgrades (Prompt 08, numbers in ProgressionBalance): energy_solar_tracking (tracker drives use less power, tracking
 ## panels give more), energy_battery_reserve (lights cannot use the life-support reserve; its +25 % capacity is applied
 ## once at install by ProgressionActions). energy_cleaner_automation is run by ProgressionSystem.
+## Area level (2026-11-14): the energy track's `solar_factor` (data/area_levels.json) multiplies every tracker's output
+## (bigger solar wings). Its `battery_capacity_factor` is applied once by AreaLevelActions, never here.
+## Night (2026-11-14): from sunset to sunrise sun_term() is exactly 0, so solar is 0 kW whatever the trackers, the
+## upgrades or the level; the battery alone carries the loads and outlook() says how long it lasts.
 
-## Load groups in shedding order: the first one is shed first when supply is short.
+## Load groups in shedding order: the first one is shed first when supply is short. Life support (CO2 scrubber, cabin
+## fans) and control and heating are kept to the very end.
 const SHED_ORDER: Array[String] = ["lights", "greenhouse", "co2_unit", "electrolyser", "recycler", "trackers", "cleaner", "scrubber", "cabin_fans", "base"]
 ## Load groups that may not use the life-support battery reserve (energy_battery_reserve upgrade).
 const RESERVE_UNPROTECTED: Array[String] = ["lights", "greenhouse"]
@@ -67,10 +72,18 @@ static func trackers_can_track(state: ColonyState, balance: GameBalance) -> bool
 ## Output of one tracker in kW. With the energy_solar_tracking upgrade a tracking panel gives
 ## ProgressionBalance.tracking_output_factor times more.
 static func tracker_kw(state: ColonyState, balance: GameBalance, phase: float, tracking: bool, index: int) -> float:
+	var sun := sun_term(phase, tracking)
+	if sun <= 0.0:
+		return 0.0                                             # night: no minimum output, nothing from any factor
 	var dust := clampf(float(state.panel_dust[index]), 0.0, 1.0)
 	var upgrade := ProgressionBalance.shared().tracking_output_factor if tracking and state.has_upgrade("energy_solar_tracking") else 1.0
-	return balance.solar_kw_peak / float(ColonyState.TRACKER_COUNT) * sun_term(phase, tracking) * atmosphere_term(state, balance) \
-		* (1.0 - dust) * clampf(state.condition_of("trackers"), 0.0, 1.0) * upgrade
+	return balance.solar_kw_peak / float(ColonyState.TRACKER_COUNT) * sun * atmosphere_term(state, balance) \
+		* (1.0 - dust) * clampf(state.condition_of("trackers"), 0.0, 1.0) * upgrade * solar_level_factor(state)
+
+
+## Area level effect energy.solar_factor (1.0 at V1): bigger solar wings at higher levels.
+static func solar_level_factor(state: ColonyState) -> float:
+	return maxf(0.0, AreaLevels.effectf(state, "energy", "solar_factor", 1.0))
 
 
 ## Battery energy kept for life support (kWh): with the energy_battery_reserve upgrade, room and greenhouse lights may
@@ -238,13 +251,13 @@ static func alerts(state: ColonyState, balance: GameBalance, phase: float) -> Ar
 	var battery := state.store(&"battery_kwh")
 	var cap := float(state.capacities.get(&"battery_kwh", 0.0))
 	if cap > 0.0 and battery < balance.battery_warn_fraction * cap:
-		out.append(["battery_low", "warn", "Battery low: %.0f kWh left. Switch off lights and machines you do not need." % battery])
+		out.append(["battery_low", "warn", "Battery low: %.0f kWh left. Switch off lights and machines you do not need. If it runs out, power is cut in this order: %s." % [battery, shed_order_words()]])
 	var night := phase <= SUNRISE or phase >= SUNSET
 	if night and state.battery_kw < -1e-9 and battery > 0.0:
 		var to_sunrise := fposmod(SUNRISE - phase, 1.0) * GameConfig.SOL_HOURS
 		var lasts := battery / -state.battery_kw
 		if lasts < to_sunrise:
-			out.append(["battery_short_night", "warn", "Battery will run out about %.0f hours before sunrise at this rate. Switch off what you do not need." % (to_sunrise - lasts)])
+			out.append(["battery_short_night", "warn", "Battery will run out about %.0f hours before sunrise at this rate. Switch off what you do not need: room lights and greenhouse lights go first." % (to_sunrise - lasts)])
 	if state.condition_of("cleaner") < balance.equipment_min_condition:
 		out.append(["cleaner_failed", "warn", "Panel cleaner is broken. Dust stays on the panels, so they make less power. An electrical specialist can repair it at a sun tracker."])
 	elif not state.is_on("cleaner"):
@@ -257,3 +270,77 @@ static func alerts(state: ColonyState, balance: GameBalance, phase: float) -> Ar
 	elif state.condition_of("trackers") < balance.equipment_min_condition:
 		out.append(["trackers_broken", "warn", "Sun trackers are broken. The panels stay fixed and make less power."])
 	return out
+
+
+## The load groups in the order they lose power, in plain words: "room lights, greenhouse lights, ..., and last
+## control and heating".
+static func shed_order_words() -> String:
+	var words: PackedStringArray = []
+	for id in SHED_ORDER:
+		words.append(String(LABELS[id]).to_lower().replace("co2", "CO2"))
+	var last := words[words.size() - 1]
+	words.remove_at(words.size() - 1)
+	return "%s, and last %s" % [", ".join(words), last]
+
+
+## "5 h" / "less than 1 h" for player text.
+static func hours_words(hours: float) -> String:
+	if hours < 1.0:
+		return "less than 1 h"
+	return "%d h" % roundi(hours)
+
+
+## Energy outlook for the HUD (contract in docs/revisions/UPGRADES_BRIEF.md). Pure: reads the state, changes nothing.
+## `phase` is the time of day (0 = midnight, 0.25 = sunrise, 0.75 = sunset). Returns
+##   sun_up, solar_kw (0 at night), load_kw (everything switched on now), battery_kwh, battery_capacity_kwh,
+##   net_kw (solar - load; + charging, - falling), hours_left (INF when not falling), hours_to_sunrise, text,
+## plus hours_to_sunset, battery_percent, runs_out_before_sunrise, next_shed (the group that loses power first, "" if
+## none) and shed_order (plain words).
+static func outlook(state: ColonyState, balance: GameBalance, phase: float) -> Dictionary:
+	var p := fposmod(phase, 1.0)
+	var sun_up := p > SUNRISE and p < SUNSET
+	var tracking := trackers_can_track(state, balance) and not state.shed.has("trackers")
+	var solar := solar_kw(state, balance, p, tracking) if sun_up else 0.0
+	var process := {"electrolyser": float(state.unit("electrolyser").get("kw", 0.0)), "co2_unit": float(state.unit("co2_unit").get("kw", 0.0))}
+	var load := 0.0
+	var next_shed := ""
+	for g in demand_groups(state, balance, process):
+		load += float(g.kw)
+		if next_shed == "" and float(g.kw) > 0.0:
+			next_shed = String(g.id)
+	var battery := state.store(&"battery_kwh")
+	var cap := float(state.capacities.get(&"battery_kwh", 0.0))
+	var net := solar - load
+	var hours_left := INF
+	if net < -1e-9:
+		hours_left = battery / -net
+	var to_sunrise := fposmod(SUNRISE - p, 1.0) * GameConfig.SOL_HOURS
+	var to_sunset := fposmod(SUNSET - p, 1.0) * GameConfig.SOL_HOURS
+	var percent := roundi(100.0 * battery / cap) if cap > 0.0 else 0
+	var short := not sun_up and hours_left < to_sunrise
+	var text := ""
+	if not sun_up:
+		if battery <= 1e-6 and load > 0.0:
+			text = "Night: no sun. Battery empty: machines are switched off, lowest priority first. Sunrise in %s." % hours_words(to_sunrise)
+		elif net < -1e-9:
+			text = "Night: no sun. Battery %d %%, falling %.1f kW, about %s left, sunrise in %s." % [percent, -net, hours_words(hours_left), hours_words(to_sunrise)]
+			if short:
+				text += " It runs out before sunrise: switch off lights and machines you do not need."
+		else:
+			text = "Night: no sun. Battery %d %%, not falling, sunrise in %s." % [percent, hours_words(to_sunrise)]
+	else:
+		text = "Day: the sun gives %.1f kW, the colony uses %.1f kW." % [solar, load]
+		if net >= -1e-9:
+			if cap > 0.0 and battery >= cap - 1e-6:
+				text += " Battery full (%d %%)" % percent
+			else:
+				text += " Battery %d %%, charging %.1f kW" % [percent, net]
+		else:
+			text += " Battery %d %%, falling %.1f kW, about %s left" % [percent, -net, hours_words(hours_left)]
+		text += ", sunset in %s." % hours_words(to_sunset)
+	return {
+		"sun_up": sun_up, "solar_kw": solar, "load_kw": load, "battery_kwh": battery, "battery_capacity_kwh": cap,
+		"net_kw": net, "hours_left": hours_left, "hours_to_sunrise": to_sunrise, "text": text,
+		"hours_to_sunset": to_sunset, "battery_percent": percent, "runs_out_before_sunrise": short,
+		"next_shed": next_shed, "shed_order": shed_order_words(),
+	}

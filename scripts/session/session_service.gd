@@ -53,6 +53,8 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	actions = ActionService.new()
 	BuiltinActions.register(actions)
 	RepairActions.register(actions)
+	# Broken parts (2026-11-14): every installed T01-T12 puzzle rule (scripts/tasks/puzzles/) is the host validator.
+	PuzzleRegistry.register_all(repair_runtime)
 	CassetteActions.register(actions)
 	WearRuntime.register_actions(actions)
 	SystemActions.register(actions)
@@ -63,6 +65,13 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	WeatherActions.register(actions)
 	ScoutActions.register(actions)
 	RoverActions.register(actions)
+	# 2026-11-14: visible upgrade paths V1..V4 for every area, the scout drone and the rover.
+	AreaLevelActions.register(actions)
+	# 2026-11-14: the scout drone (scripts/drone/, loaded by path): its host actions and its real-time flight system.
+	var drone_actions: Variant = load("res://scripts/drone/drone_actions.gd")
+	drone_actions.register(actions)
+	var drone_system: Variant = load("res://scripts/drone/drone_system.gd")
+	sim.post_systems.append(drone_system.new(self))
 	# Prompt 12: tutorial, campaign and story. Registered last: it watches actions the parts above registered.
 	TutorialActions.register(actions)
 	sim.pre_systems.append(WeatherSystem.new())
@@ -122,7 +131,8 @@ func advance(real_delta: float) -> int:
 			var phase_before: float = clock.phase
 			var dt_hours: float = clock.advance(tick)
 			for id: StringName in sim.step(state, balance, phase_before, dt_hours):
-				recover_character(id)
+				# Simulation health loss: no water or no food (atmosphere harm is the real-time SurvivalRuntime's).
+				recover_character(id, SurvivalRuntime.DeathReasons.health_id(self, state.character(id)))
 			for rollover: int in clock.rolled_over:
 				events.sol_started.emit(clock.sol_index - clock.rolled_over + rollover + 1)
 			count += 1
@@ -203,13 +213,18 @@ func note_airlock_cycle() -> void:
 		state.pending_airlock_cycles += 1
 
 ## Recovers a downed character and leaves carried items at the incident.
-func recover_character(id: StringName) -> Dictionary:
+## `cause` is a death id (scripts/survival/death_reasons.gd); "" lets DeathReasons work it out. The death record is
+## written to `actor.last_death` here, before the respawn moves the actor, and is also sent as `info.death` with
+## GameEvents.character_recovered (the event the UI listens to for "why did I die").
+func recover_character(id: StringName, cause := "") -> Dictionary:
 	var info: Dictionary = {"meals": 0.0, "water_l": 0.0, "cache_id": "", "cache_position": []}
 	if state == null or not authoritative:
 		return info
 	var actor := state.character(id)
 	if actor == null:
 		return info
+	info.death = SurvivalRuntime.DeathReasons.record(self, actor, cause).duplicate()
+	info.cause = String(actor.last_death.cause)
 	repair_runtime.release_character(id)
 	cassette_runtime.release_character(id)
 	wear_runtime.release_character(id)
@@ -230,10 +245,14 @@ func recover_character(id: StringName) -> Dictionary:
 	info.water_l = -state.add_to_store(&"water_l", -config.recovery_cost_sols * balance.water_l_per_hour * GameConfig.SOL_HOURS)
 	state.ledger["recovery_meals"] += info.meals
 	state.ledger["recovery_water_l"] += info.water_l
+	# Respawn in the Med Bay: the crew member's own hub spot there (a never-placed record falls back to the hub).
+	if actor.hub_spot == Vector3.ZERO:
+		actor.hub_spot = config.hub_position
 	actor.position = actor.hub_spot
 	if outside_test.is_valid():
 		actor.outside = bool(outside_test.call(actor.position))
-	actor.health = balance.recovery_health
+	# balance.recovery_health plus the Med bay level's recovery_health_bonus, capped at full health.
+	actor.health = SurvivalRuntime.MedCare.recovery_health(self)
 	survival.reset_character(actor)
 	_cancel_suit_check(id)
 	events.character_recovered.emit(id, info)

@@ -1,0 +1,6 @@
+{
+ "_about": "Station of the scout drone (2026-11-14 upgrade paths). The drone pad stands outside, east of the scout rover bay, on open flat ground between the bay and the parked LTV and clear of the crew rover's lane out of the garage (z 21.5 to 24.5). Checked with tools/blender/drone/probe_pad_spot.gd: no map, rock or prop collision in a 3.4 x 2.4 x 3.4 m box, ground within 5 cm, slope under 1 %. The pad and drone models are assets/drone/*.glb (built by tools/blender/drone/build_drone.py); the map file is not changed.",
+ "stations": [
+  {"id": "drone_pad", "position": [23.5, 0.0, 18.0], "kind": "drone_pad", "name": "Drone pad", "short": "Drone pad", "symbol": "✈", "specialty": ""}
+ ]
+}

@@ -72,6 +72,9 @@ func _test_for_station() -> void:
 				ok = panel is LifeSupportStationPanel
 			"solar":
 				ok = panel is SolarStationPanel
+			"repair_task":
+				# Broken parts (2026-11-14): while a task's spot is broken, E opens its mini-game; otherwise maintenance.
+				ok = panel is TaskPanel if PuzzleRegistry.is_broken(st, String(st.stations[id].get("task_id", ""))) else panel is StationPanel
 			_:
 				ok = panel is StationPanel and not (panel is PowerStationPanel or panel is LifeSupportStationPanel
 					or panel is SolarStationPanel or panel is SuitRackPanel)

@@ -26,6 +26,15 @@ extends RefCounted
 ## greenhouse_water_l). That water is already booked to the wastewater tank (the plants give it back as condensate
 ## and drainage), so the beds create no water and the ledger identities are unchanged. A bed left completely dry for
 ## a sol wilts and must be replanted; an alert says so first.
+##
+## Upgrade paths (data/area_levels.json, owner request 2026-11-14). Both are read here and nowhere else:
+##   food (Greenhouse grow racks): every harvest gives the crop's meals x food.yield_factor (harvest_meals). The
+##     factor grows with the number of grow layers (food.grow_layers: 1, 2, 3, 4), a bit less than one extra crop per
+##     layer because the upper trays get less light. Designer balance, not a NASA figure.
+##   garden (Garden dome planting): the dome's plants add garden.meals_per_sol meals to the food store, a little every
+##     tick (host only, rate x game hours, so it is deterministic and the same at any game speed). The meals are booked
+##     as meals_harvested, so the food ledger identity holds, and their total is kept in crops.garden (saved and
+##     replicated with the rest of state.crops). Designer balance.
 
 ## Words for each stage.
 const STAGE_WORDS := {
@@ -89,7 +98,59 @@ func step(state: ColonyState, _balance: GameBalance, phase: float, dt_hours: flo
 	var totals: Dictionary = crops.totals
 	totals["delivered_l"] = float(totals.get("delivered_l", 0.0)) + delivered
 	totals["absorbed_l"] = float(totals.get("absorbed_l", 0.0)) + absorbed
+	_grow_garden(state, crops, dt_hours)
 	_update_alerts(state, fb, crops, lit, events)
+
+
+# ---------------------------------------------------------------- upgrade paths (food and garden tracks)
+
+## Harvest multiplier of the greenhouse grow racks at their current level (food.yield_factor, 1 at V1).
+static func yield_factor(state: ColonyState) -> float:
+	return maxf(0.0, AreaLevels.effectf(state, "food", "yield_factor", 1.0))
+
+
+## Grow layers in the greenhouse racks at their current level (food.grow_layers, 1 at V1).
+static func grow_layers(state: ColonyState) -> int:
+	return maxi(1, int(AreaLevels.effect(state, "food", "grow_layers", 1)))
+
+
+## THE place where the grow layers make more food: meals one harvest of `crop_id` gives now. FoodActions.harvest and
+## the panels both use it, so what a panel promises is what a harvest adds.
+static func harvest_meals(state: ColonyState, crop_id: String) -> float:
+	return float(FoodBalance.crop(crop_id).get("meals", 0.0)) * yield_factor(state)
+
+
+## Plain words about the racks for panels and harvest answers ("" at V1, where nothing is extra).
+static func yield_words(state: ColonyState) -> String:
+	var layers := grow_layers(state)
+	if layers <= 1:
+		return ""
+	return "The greenhouse racks have %d grow layers, so every harvest gives %s times the food." % [layers, _num(yield_factor(state), 1)]
+
+
+## Meals a sol the Garden dome's plants add now (garden.meals_per_sol, 0 at V1).
+static func garden_meals_per_sol(state: ColonyState) -> float:
+	return maxf(0.0, AreaLevels.effectf(state, "garden", "meals_per_sol", 0.0))
+
+
+## Meals the Garden dome has added to the food store since the game began.
+static func garden_meals_total(state: ColonyState) -> float:
+	var g: Variant = state.crops.get("garden", null)
+	return float((g as Dictionary).get("meals_total", 0.0)) if g is Dictionary else 0.0
+
+
+## The Garden dome's produce for this tick: rate x game hours into the food store (only what fits).
+static func _grow_garden(state: ColonyState, crops: Dictionary, dt_hours: float) -> void:
+	var per_sol := garden_meals_per_sol(state)
+	if per_sol <= 0.0 or dt_hours <= 0.0:
+		return
+	var added := state.add_to_store(&"food_meals", per_sol * dt_hours / GameConfig.SOL_HOURS)
+	state.ledger["meals_harvested"] = float(state.ledger.get("meals_harvested", 0.0)) + added
+	if not (crops.get("garden", null) is Dictionary):
+		crops["garden"] = {"meals_total": 0.0}
+	var g: Dictionary = crops.garden
+	g["meals_total"] = float(g.get("meals_total", 0.0)) + added
+	g["meals_per_sol"] = per_sol
 
 
 ## The beds' dictionary, created if missing: one bed for every station of kind "bed". Host only (it writes state).

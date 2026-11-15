@@ -54,6 +54,41 @@ class Reading extends HBoxContainer:
 				mark_label.theme_type_variation = UiTheme.GOOD
 
 
+## One upgrade path in the "Upgrades" part of a station panel (owner request 2026-11-14): the track's name and V1..V4
+## pips, the stage now, what the next level gives, its cost against the colony's parts, who can do it, the upgrade
+## button and why it is greyed out. StationPanel builds and refreshes it; it only shows.
+class UpgradeRow extends PanelContainer:
+	var track := ""
+	var name_label: Label
+	var pips: Array[Label] = []
+	var now_label: Label
+	var next_label: Label
+	var gives_label: Label
+	var cost_label: Label
+	var who_label: Label
+	var button: Button
+	var reason_label: Label
+	## True while an upgrade request waits for the host's answer.
+	var pending := false
+
+	## Every line shown now, top to bottom (for tests and the layout check).
+	func shown_lines() -> PackedStringArray:
+		var out := PackedStringArray([name_label.text, pips_text()])
+		for l: Label in [now_label, next_label, gives_label, cost_label, who_label, reason_label]:
+			if l.visible and l.text != "":
+				out.append(l.text)
+		if button.visible:
+			out.append("[%s]%s" % [button.text, " (greyed out)" if button.disabled else ""])
+		return out
+
+	## The pips as text: "● V1 ● V2 ○ V3 ○ V4".
+	func pips_text() -> String:
+		var parts := PackedStringArray()
+		for p: Label in pips:
+			parts.append(p.text)
+		return " ".join(parts)
+
+
 ## Shown on stations that have parts not built yet.
 const LATER_NOTE := "More controls arrive with the colony systems update."
 
@@ -67,6 +102,8 @@ var readings: Dictionary = {}
 var computer_buttons: Dictionary = {}
 ## Equipment switches by equipment id (power panel and life-support console).
 var equipment_switches: Dictionary = {}
+## The "Upgrades" rows by track id (AreaLevels), one per upgrade path this station serves.
+var upgrade_rows: Dictionary = {}
 
 var _built := false
 var _title: Label
@@ -98,6 +135,7 @@ func setup(p_services: GameServices) -> void:
 	theme_type_variation = UiTheme.PANEL
 	_build_frame()
 	_build_body()
+	_build_upgrades()
 	if _shows_later_note():
 		var later := Label.new()
 		later.text = LATER_NOTE
@@ -160,6 +198,7 @@ func refresh() -> void:
 		_power_label.theme_type_variation = UiTheme.URGENT
 	_refresh_equipment_switches(st)
 	_refresh_body(st)
+	_refresh_upgrades(st)
 
 
 # ---------------------------------------------------------------- shared helpers
@@ -641,7 +680,7 @@ func _add_equipment_switch(parent: Control, id: String, text := "") -> CheckButt
 	parent.add_child(row)
 	var button := CheckButton.new()
 	button.name = "Switch_%s" % id
-	button.text = text if text != "" else equipment_switch_text(services.balance, id)
+	button.text = text if text != "" else equipment_switch_text(services.balance, id, services.state())
 	button.set_pressed_no_signal(services.state().is_on(id))
 	button.toggled.connect(_on_equipment_toggled.bind(id))
 	row.add_child(button)
@@ -656,12 +695,15 @@ func _add_equipment_switch(parent: Control, id: String, text := "") -> CheckButt
 
 
 ## The text on an equipment switch: its name and the power it needs ("Water recycler · 1 kW").
-static func equipment_switch_text(balance: GameBalance, id: String) -> String:
+## With `state`, the oxygen machines show their output at the life-support level (life_support.o2_production_factor).
+static func equipment_switch_text(balance: GameBalance, id: String, state: ColonyState = null) -> String:
 	match id:
 		"electrolyser":
-			return "%s · up to %s kW" % [equipment_name(id), num(balance.electrolysis_o2_kg_per_hour * balance.electrolysis_kwh_per_kg_o2, 2)]
+			var e_kg := LifeSupportModel.electrolysis_o2_kg_per_hour(state, balance) if state != null else balance.electrolysis_o2_kg_per_hour
+			return "%s · up to %s kW" % [equipment_name(id), num(e_kg * balance.electrolysis_kwh_per_kg_o2, 2)]
 		"co2_unit":
-			return "%s · up to %s kW" % [equipment_name(id), num(balance.co2_unit_o2_kg_per_hour * balance.co2_unit_kwh_per_kg_o2, 2)]
+			var c_kg := LifeSupportModel.co2_unit_o2_kg_per_hour(state, balance) if state != null else balance.co2_unit_o2_kg_per_hour
+			return "%s · up to %s kW" % [equipment_name(id), num(c_kg * balance.co2_unit_kwh_per_kg_o2, 2)]
 		"trackers": return "%s · %s kW" % [equipment_name(id), num(balance.tracker_drive_kw, 2)]
 		"cleaner": return "%s · %s kW" % [equipment_name(id), num(balance.cleaner_kw, 2)]
 		"recycler": return "%s · %s kW" % [equipment_name(id), num(balance.recycler_kw, 2)]
@@ -756,6 +798,209 @@ static func _key_name(action: StringName, fallback: String) -> String:
 		return fallback
 	var text := PlayerInput.describe(action)
 	return text if not text.is_empty() else fallback
+
+
+# ---------------------------------------------------------------- upgrades (visible upgrade paths, 2026-11-14)
+
+## Upgrade paths (AreaLevels track ids) served at this station, in data file order. Empty for most stations.
+func upgrade_tracks() -> PackedStringArray:
+	if services == null or not services.has_game():
+		return PackedStringArray()
+	var record: Dictionary = services.state().stations.get(String(station_id), {})
+	if record.is_empty():
+		return PackedStringArray()
+	return AreaLevels.tracks_at(String(station_id), record)
+
+
+## The upgrade button of a track, or null when this station has none for it (the rover has a garage hint instead).
+func upgrade_button(track: String) -> Button:
+	var row := upgrade_rows.get(track) as UpgradeRow
+	return row.button if row != null and row.button.visible else null
+
+
+## Every line the upgrade row of `track` shows now (empty when the station has no such row).
+func upgrade_lines(track: String) -> PackedStringArray:
+	var row := upgrade_rows.get(track) as UpgradeRow
+	return row.shown_lines() if row != null else PackedStringArray()
+
+
+## What the next level of a track gives, in plain words: only the effects that change ("3 grow layers · 2.8× the
+## food of the first rack"). "" when nothing listed changes.
+static func upgrade_gives_text(track: String, next_level: int) -> String:
+	var effects: Dictionary = AreaLevels.track(track).get("effects", {})
+	var parts := PackedStringArray()
+	for key: String in effects:
+		var now: Variant = AreaLevels.effect_at(track, key, next_level - 1)
+		var then: Variant = AreaLevels.effect_at(track, key, next_level)
+		if then == null or (now != null and is_equal_approx(float(now), float(then))):
+			continue
+		parts.append(effect_words(track, key, then))
+	return " · ".join(parts)
+
+
+## One effect of an upgrade path in plain words, for a player of 9 to 12 ("solar panels make 1.5× the power").
+## Keys added later by other parts of the game fall back to their key in words.
+static func effect_words(track: String, key: String, value: Variant) -> String:
+	var f := float(value) if (value is float or value is int) else 0.0
+	match "%s.%s" % [track, key]:
+		"food.grow_layers": return "%d grow layers" % int(f)
+		"food.yield_factor": return "%s× the food of the first rack" % num(f, 2)
+		"garden.plant_o2_kg_per_hour": return "plants add %s kg of oxygen an hour" % num(f, 3)
+		"garden.meals_per_sol": return "%s extra meals each sol" % num(f, 1)
+		"energy.solar_factor": return "solar panels make %s× the power" % num(f, 2)
+		"energy.battery_capacity_factor": return "the battery holds %s× as much" % num(f, 2)
+		"life_support.scrubber_factor": return "the CO₂ scrubber cleans %s× as fast" % num(f, 2)
+		"life_support.o2_production_factor": return "oxygen is made %s× as fast" % num(f, 2)
+		"life_support.recycler_factor": return "the water recycler works %s× as well" % num(f, 2)
+		"health.heal_rate_factor": return "the crew heals %s× as fast" % num(f, 2)
+		"health.recovery_health_bonus": return "+%d health when the med bay brings you back" % int(f)
+		"command.drone_range_m": return "the scout drone can fly %d m from the base" % int(f)
+		"scout_drone.speed_mps": return "flies at %s m per second" % num(f, 1)
+		"scout_drone.flight_seconds": return "flies %s minutes on one charge" % num(f / 60.0, 1)
+		"scout_drone.survey_radius_m": return "scans %d m around it" % int(f)
+		"scout_drone.autopilot": return "flies to chosen places by itself" if f >= 1.0 else "you fly it by hand"
+		"scout_drone.max_waypoints": return "remembers %d stop%s on a route" % [int(f), "" if int(f) == 1 else "s"]
+	var shown := num(f, 2) if (value is float or value is int) else str(value)
+	return "%s: %s" % [key.replace("_", " "), shown]
+
+
+## Who may upgrade a track, in words ("the biology and food specialist", "anyone in the crew").
+static func upgrade_who_text(track: String) -> String:
+	var spec := StringName(String(AreaLevels.track(track).get("specialty", "")))
+	if spec == &"":
+		return "anyone in the crew"
+	return "the %s specialist" % String(StationPanels.SPECIALTY_WORDS.get(spec, String(spec))).to_lower()
+
+
+func _build_upgrades() -> void:
+	var tracks := upgrade_tracks()
+	# Only the station's own surface (StationPanels.for_station) has the strip, not a panel opened from it (the colony
+	# computer's "Scout rover" button opens the scout bay panel for the computer's id).
+	if tracks.is_empty() or not bool(get_meta(&"station_surface", false)):
+		return
+	var section := VBoxContainer.new()
+	section.name = "Upgrades"
+	_body.add_child(section)
+	_add_heading(section, "Upgrades")
+	for track: String in tracks:
+		var row := UpgradeRow.new()
+		row.name = "Upgrade_%s" % track
+		row.track = track
+		row.theme_type_variation = UiTheme.CARD
+		section.add_child(row)
+		var col := VBoxContainer.new()
+		row.add_child(col)
+		var top := HBoxContainer.new()
+		col.add_child(top)
+		row.name_label = Label.new()
+		row.name_label.name = "Track"
+		row.name_label.text = AreaLevels.track_name(track)
+		row.name_label.theme_type_variation = UiTheme.HEADING
+		row.name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		top.add_child(row.name_label)
+		var pip_row := HBoxContainer.new()
+		pip_row.name = "Pips"
+		top.add_child(pip_row)
+		for lvl in range(1, AreaLevels.max_level() + 1):
+			var pip := Label.new()
+			pip.name = "V%d" % lvl
+			pip_row.add_child(pip)
+			row.pips.append(pip)
+		row.now_label = _add_text(col, "")
+		row.now_label.name = "Now"
+		row.next_label = _add_text(col, "")
+		row.next_label.name = "Next"
+		row.gives_label = _add_text(col, "", UiTheme.MUTED)
+		row.gives_label.name = "Gives"
+		row.cost_label = _add_text(col, "")
+		row.cost_label.name = "Cost"
+		row.who_label = _add_text(col, "", UiTheme.MUTED)
+		row.who_label.name = "Who"
+		var buttons := HBoxContainer.new()
+		col.add_child(buttons)
+		row.button = Button.new()
+		row.button.name = "UpgradeButton"
+		row.button.theme_type_variation = UiTheme.PRIMARY_BUTTON
+		row.button.pressed.connect(_on_upgrade_pressed.bind(track))
+		buttons.add_child(row.button)
+		row.reason_label = _add_text(col, "", UiTheme.WARN)
+		row.reason_label.name = "Reason"
+		upgrade_rows[track] = row
+
+
+func _refresh_upgrades(st: ColonyState) -> void:
+	if upgrade_rows.is_empty():
+		return
+	var me := services.local_character()
+	for track: String in upgrade_rows:
+		var row := upgrade_rows[track] as UpgradeRow
+		var lvl := AreaLevels.level(st, track)
+		var top_level := AreaLevels.max_level()
+		for i in row.pips.size():
+			var reached := i + 1 <= lvl
+			row.pips[i].text = "%s V%d" % ["●" if reached else "○", i + 1]
+			row.pips[i].theme_type_variation = UiTheme.GOOD if reached else UiTheme.MUTED
+		row.now_label.text = "Now: %s" % AreaLevels.stage_text(track, lvl)
+		var derived := AreaLevels.is_derived(track)
+		var at_top := lvl >= top_level
+		var has_next := not derived and not at_top
+		row.next_label.visible = has_next
+		row.gives_label.visible = has_next
+		row.cost_label.visible = has_next
+		row.who_label.visible = has_next
+		row.button.visible = has_next
+		if derived:
+			row.reason_label.text = "Upgrade modules in the garage"
+			row.reason_label.theme_type_variation = UiTheme.MUTED
+			row.reason_label.visible = true
+			continue
+		if at_top:
+			row.reason_label.text = "✓ Fully upgraded (V%d)." % lvl
+			row.reason_label.theme_type_variation = UiTheme.GOOD
+			row.reason_label.visible = true
+			continue
+		var next := lvl + 1
+		row.next_label.text = "Next: %s" % AreaLevels.stage_text(track, next)
+		var gives := upgrade_gives_text(track, next)
+		row.gives_label.text = "It gives: %s" % gives
+		row.gives_label.visible = gives != ""
+		var cost := AreaLevels.cost_to_reach(track, next)
+		row.cost_label.text = "Costs %d spare part%s · the colony has %d" % [cost, "" if cost == 1 else "s", st.parts]
+		row.cost_label.theme_type_variation = UiTheme.GOOD if st.parts >= cost else UiTheme.WARN
+		var spec := StringName(String(AreaLevels.track(track).get("specialty", "")))
+		var mine := me != null and spec != &"" and me.specialty == spec
+		row.who_label.text = "Who can do it: %s%s" % [upgrade_who_text(track), " (you)" if mine else ""]
+		row.button.text = "Upgrade to V%d" % next
+		var blockers := AreaLevels.blockers(st, track, me)
+		row.button.disabled = row.pending or not blockers.is_empty()
+		var reasons := PackedStringArray()
+		for b: Dictionary in blockers:
+			reasons.append("✖ " + String(b.get("text", "")))
+		row.reason_label.text = "\n".join(reasons)
+		row.reason_label.theme_type_variation = UiTheme.WARN
+		row.reason_label.visible = not reasons.is_empty()
+
+
+func _on_upgrade_pressed(track: String) -> void:
+	var row := upgrade_rows.get(track) as UpgradeRow
+	if row == null or row.pending:
+		return
+	row.pending = true
+	row.button.disabled = true
+	_ask(&"upgrade_area", {"track": track}, _on_upgrade_answer.bind(track))
+
+
+func _on_upgrade_answer(result: ActionResult, track: String) -> void:
+	var row := upgrade_rows.get(track) as UpgradeRow
+	if row != null:
+		row.pending = false
+	if result.ok:
+		var text := answer_text(result)
+		_show_message("✓ " + (text if text != "" else "%s upgraded." % AreaLevels.track_name(track)), UiTheme.GOOD)
+	else:
+		_show_refusal(result)
+	refresh()
 
 
 # ---------------------------------------------------------------- size

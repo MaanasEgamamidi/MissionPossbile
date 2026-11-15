@@ -1,6 +1,10 @@
 class_name SurvivalRuntime
 extends RefCounted
 ## Host real-time exposure integration. Only authoritative session steps can advance or resolve a hazard.
+## Also runs med station healing (MedCare) and names each hazard for the death record (DeathReasons).
+
+const DeathReasons := preload("res://scripts/survival/death_reasons.gd")
+const MedCare := preload("res://scripts/survival/med_care.gd")
 
 var pressure := LocalPressure.new()
 var _session_ref: WeakRef
@@ -28,7 +32,7 @@ func status(character_id: StringName) -> Dictionary:
 		return {"active": false, "remaining_seconds": 0.0}
 	return {"active": actor.exposure_active, "remaining_seconds": maxf(0.0, session.config.exposure_lethal_seconds - actor.lethal_exposure_seconds),
 		"elapsed_seconds": actor.lethal_exposure_seconds, "deadline_seconds": session.config.exposure_lethal_seconds,
-		"cause": actor.exposure_cause, "area": actor.exposure_area, "protected": actor.exposure_protected,
+		"cause": actor.exposure_cause, "cause_id": actor.hazard_cause, "area": actor.exposure_area, "protected": actor.exposure_protected,
 		"safe_recovery_seconds": actor.exposure_safe_seconds, "safe_recovery_required": session.config.exposure_safe_recovery_seconds,
 		"action": "Return through the inner door to safe pressure, equip a suit, or ask the field engineer to service the seal." if actor.in_airlock_pressure_volume else "Reach breathable shelter or use a sealed suit with oxygen."}
 
@@ -50,6 +54,7 @@ func refresh_actor(actor: CharacterState) -> void:
 			actor.exposure_cause = "SUIT SEAL FAILED - REACH SAFE PRESSURE"
 		elif actor.suit_on and (actor.suit_charge <= 0.0 or session.balance.suit_o2_capacity_kg <= 0.0):
 			actor.exposure_cause = "SUIT OXYGEN EMPTY - REACH SAFE PRESSURE"
+		actor.hazard_cause = DeathReasons.hazard_id(session, actor, air)
 		actor.exposure_safe_seconds = 0.0
 	if before != [actor.exposure_active, actor.exposure_protected, actor.exposure_cause, actor.exposure_area]:
 		_publish(session, actor)
@@ -74,8 +79,9 @@ func advance(seconds: float) -> void:
 		if actor.exposure_active:
 			actor.lethal_exposure_seconds += seconds
 			if actor.lethal_exposure_seconds >= maxf(0.05, session.config.exposure_lethal_seconds) - 1e-8:
+				var cause := actor.hazard_cause if actor.hazard_cause != "" else "unknown"
 				actor.health = 0.0
-				session.recover_character(actor.id)
+				session.recover_character(actor.id, cause)
 				continue
 			if previous_remaining != ceili(maxf(0.0, session.config.exposure_lethal_seconds - actor.lethal_exposure_seconds)):
 				_publish(session, actor)
@@ -84,7 +90,10 @@ func advance(seconds: float) -> void:
 			if actor.exposure_safe_seconds >= maxf(0.0, session.config.exposure_safe_recovery_seconds) - 1e-8:
 				actor.lethal_exposure_seconds = 0.0
 				actor.exposure_safe_seconds = 0.0
+				actor.hazard_cause = ""
 				_publish(session, actor)
+		else:
+			MedCare.advance_actor(session, actor, seconds)
 
 func reset_character(actor: CharacterState) -> void:
 	var session := _session_ref.get_ref() as SessionService
@@ -93,10 +102,13 @@ func reset_character(actor: CharacterState) -> void:
 	actor.exposure_active = false
 	actor.exposure_protected = false
 	actor.exposure_cause = ""
+	actor.hazard_cause = ""
 	actor.in_airlock_pressure_volume = false
 	if session != null:
 		_publish(session, actor)
 
+## Door facts from the world: 901/902 exit tunnel inner/outer, 912 garden dome outer door (its vestibule is Mars air
+## while that door is open). Other ids are ignored.
 func set_airlock_door_open(door_id: int, opened: bool) -> void:
 	var session := _session_ref.get_ref() as SessionService
 	if session == null or not session.authoritative:

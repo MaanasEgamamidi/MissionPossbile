@@ -1,0 +1,132 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS the map gives obstacles, doors and standing spots in the four rooms
+PASS the screen and hologram shaders compile
+PASS energy: presenter names its track
+PASS energy V1 builds nothing (today's room)
+PASS energy V2 builds a stage
+PASS energy V2 adds visible equipment over the level below (2 kinds of part, 99 parts)
+PASS energy V2 stays inside its room and under the ceiling
+PASS energy V2 clips no wall, prop or door
+PASS energy V2 keeps doors, standing spots and the respawn spot clear
+PASS energy V2 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  energy V2: 13 surfaces, 2 labels/lights, 1 clusters
+PASS energy V2 keeps draw calls sensible (15)
+PASS energy V2 draws on its own zone's layers
+PASS energy V3 builds a stage
+PASS energy V3 adds visible equipment over the level below (5 kinds of part, 511 parts)
+PASS energy V3 stays inside its room and under the ceiling
+PASS energy V3 clips no wall, prop or door
+PASS energy V3 keeps doors, standing spots and the respawn spot clear
+PASS energy V3 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+PASS energy V3 outdoor parts stay on their trackers or roof and out of the way
+  energy V3: 20 surfaces, 3 labels/lights, 4 clusters
+PASS energy V3 keeps draw calls sensible (23)
+PASS energy V3 draws on its own zone's layers
+PASS energy V4 builds a stage
+PASS energy V4 adds visible equipment over the level below (8 kinds of part, 1134 parts)
+PASS energy V4 stays inside its room and under the ceiling
+PASS energy V4 clips no wall, prop or door
+PASS energy V4 keeps doors, standing spots and the respawn spot clear
+PASS energy V4 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+PASS energy V4 outdoor parts stay on their trackers or roof and out of the way
+  energy V4: 25 surfaces, 7 labels/lights, 4 clusters
+PASS energy V4 keeps draw calls sensible (32)
+PASS energy V4 draws on its own zone's layers
+PASS energy: the grow-in plays per cluster and ends at full size
+PASS life_support: presenter names its track
+PASS life_support V1 builds nothing (today's room)
+PASS life_support V2 builds a stage
+PASS life_support V2 adds visible equipment over the level below (2 kinds of part, 38 parts)
+PASS life_support V2 stays inside its room and under the ceiling
+PASS life_support V2 clips no wall, prop or door
+PASS life_support V2 keeps doors, standing spots and the respawn spot clear
+PASS life_support V2 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  life_support V2: 15 surfaces, 3 labels/lights, 2 clusters
+PASS life_support V2 keeps draw calls sensible (18)
+PASS life_support V2 draws on its own zone's layers
+PASS life_support V3 builds a stage
+PASS life_support V3 adds visible equipment over the level below (5 kinds of part, 115 parts)
+PASS life_support V3 stays inside its room and under the ceiling
+PASS life_support V3 clips no wall, prop or door
+PASS life_support V3 keeps doors, standing spots and the respawn spot clear
+PASS life_support V3 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  life_support V3: 27 surfaces, 6 labels/lights, 3 clusters
+PASS life_support V3 keeps draw calls sensible (33)
+PASS life_support V3 draws on its own zone's layers
+PASS life_support V4 builds a stage
+PASS life_support V4 adds visible equipment over the level below (11 kinds of part, 203 parts)
+PASS life_support V4 stays inside its room and under the ceiling
+PASS life_support V4 clips no wall, prop or door
+PASS life_support V4 keeps doors, standing spots and the respawn spot clear
+PASS life_support V4 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  life_support V4: 37 surfaces, 10 labels/lights, 5 clusters
+PASS life_support V4 keeps draw calls sensible (47)
+PASS life_support V4 draws on its own zone's layers
+PASS life_support: the grow-in plays per cluster and ends at full size
+PASS health: presenter names its track
+PASS health V1 builds nothing (today's room)
+PASS health V2 builds a stage
+PASS health V2 adds visible equipment over the level below (5 kinds of part, 24 parts)
+PASS health V2 stays inside its room and under the ceiling
+PASS health V2 clips no wall, prop or door
+PASS health V2 keeps doors, standing spots and the respawn spot clear
+PASS health V2 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  health V2: 11 surfaces, 0 labels/lights, 2 clusters
+PASS health V2 keeps draw calls sensible (11)
+PASS health V2 draws on its own zone's layers
+PASS health V3 builds a stage
+PASS health V3 adds visible equipment over the level below (7 kinds of part, 66 parts)
+PASS health V3 stays inside its room and under the ceiling
+PASS health V3 clips no wall, prop or door
+PASS health V3 keeps doors, standing spots and the respawn spot clear
+PASS health V3 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  health V3: 26 surfaces, 1 labels/lights, 4 clusters
+PASS health V3 keeps draw calls sensible (27)
+PASS health V3 draws on its own zone's layers
+PASS health V4 builds a stage
+PASS health V4 adds visible equipment over the level below (10 kinds of part, 129 parts)
+PASS health V4 stays inside its room and under the ceiling
+PASS health V4 clips no wall, prop or door
+PASS health V4 keeps doors, standing spots and the respawn spot clear
+PASS health V4 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  health V4: 49 surfaces, 3 labels/lights, 7 clusters
+PASS health V4 keeps draw calls sensible (52)
+PASS health V4 draws on its own zone's layers
+PASS health: the grow-in plays per cluster and ends at full size
+PASS command: presenter names its track
+PASS command V1 builds nothing (today's room)
+PASS command V2 builds a stage
+PASS command V2 adds visible equipment over the level below (1 kinds of part, 6 parts)
+PASS command V2 stays inside its room and under the ceiling
+PASS command V2 clips no wall, prop or door
+PASS command V2 keeps doors, standing spots and the respawn spot clear
+PASS command V2 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  command V2: 5 surfaces, 1 labels/lights, 1 clusters
+PASS command V2 keeps draw calls sensible (6)
+PASS command V2 draws on its own zone's layers
+PASS command V3 builds a stage
+PASS command V3 adds visible equipment over the level below (3 kinds of part, 105 parts)
+PASS command V3 stays inside its room and under the ceiling
+PASS command V3 clips no wall, prop or door
+PASS command V3 keeps doors, standing spots and the respawn spot clear
+PASS command V3 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+  command V3: 22 surfaces, 2 labels/lights, 3 clusters
+PASS command V3 keeps draw calls sensible (24)
+PASS command V3 draws on its own zone's layers
+PASS command V4 builds a stage
+PASS command V4 adds visible equipment over the level below (7 kinds of part, 145 parts)
+PASS command V4 stays inside its room and under the ceiling
+PASS command V4 clips no wall, prop or door
+PASS command V4 keeps doors, standing spots and the respawn spot clear
+PASS command V4 has nothing floating (each piece stands on the floor or hangs from a wall, the ceiling or a map object)
+PASS command V4 outdoor parts stay on their trackers or roof and out of the way
+  command V4: 35 surfaces, 3 labels/lights, 5 clusters
+PASS command V4 keeps draw calls sensible (38)
+PASS command V4 draws on its own zone's layers
+PASS command: the grow-in plays per cluster and ends at full size
+PASS energy: levels swap cleanly (one stage at a time, none at V1)
+PASS life_support: levels swap cleanly (one stage at a time, none at V1)
+PASS health: levels swap cleanly (one stage at a time, none at V1)
+PASS command: levels swap cleanly (one stage at a time, none at V1)
+RESULT 117/117

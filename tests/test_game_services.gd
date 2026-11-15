@@ -22,6 +22,9 @@ func _canon(d: Dictionary) -> String:
 func _make(dir: String) -> GameServices:
 	var g := GameServices.new()
 	g.saves = SaveService.new(dir, "colony", 2)
+	# Save/continue identity of the parked crew is checked from the Med Bay start: on load parked crew are put back on
+	# their hub spots, so the tutorial start (everyone outside) is checked in tests/test_tutorial_start.gd instead.
+	g.config.tutorial_start_outside = false
 	root.add_child(g)
 	return g
 

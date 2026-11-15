@@ -1,7 +1,9 @@
 class_name TutorialHud
 extends PanelContainer
-## The tutorial tracker on the HUD (Prompt 12): the stage, the open step, the specialist cue, the explanation (unless
-## already mastered), hints when they are due, a reminder line, and the campaign goal after the tutorial.
+## The tutorial tracker on the HUD (whiteboard tutorial, 2026-11-14): Mission Control's step, its newest line, the
+## progress ("Tapes found 2/6 · Tapes played 1/6"), the open step, the specialist cue, the explanation (unless already
+## mastered), hints when they are due, the step's checklist (tapes, or broken spots by room with who can fix them),
+## and the colony goal after the tutorial.
 ## It sits on the right edge below the crew box, so it never covers the colony corner (top left), the crew box (top
 ## right), the messages (top centre) or the crosshair. It only shows what TutorialPresenter.view() gives it.
 
@@ -14,12 +16,16 @@ const BOTTOM_SHARE := 0.78
 
 var services: GameServices
 var title_label: Label
+## Mission Control's newest line.
+var mission_label: Label
 var progress_label: Label
 var objective_label: Label
 var cue_label: Label
 var explain_label: Label
 var hint_label: Label
 var reminder_label: Label
+## The step's checklist.
+var list_label: Label
 var goal_label: Label
 var footer_label: Label
 var _scroll: ScrollContainer
@@ -47,12 +53,14 @@ func setup(p_services: GameServices) -> void:
 	box.add_theme_constant_override(&"separation", 4)
 	_scroll.add_child(box)
 	title_label = _label(box, "Title", UiTheme.HEADING)
+	mission_label = _label(box, "Mission", UiTheme.GOOD)
 	progress_label = _label(box, "Progress", UiTheme.MUTED)
 	objective_label = _label(box, "Objective", &"")
 	cue_label = _label(box, "Cue", UiTheme.GOOD)
 	explain_label = _label(box, "Explain", UiTheme.MUTED)
 	hint_label = _label(box, "Hint", UiTheme.WARN)
 	reminder_label = _label(box, "Reminder", UiTheme.MUTED)
+	list_label = _label(box, "List", &"")
 	goal_label = _label(box, "Goal", &"")
 	footer_label = _label(box, "Footer", UiTheme.MUTED)
 	_layout()
@@ -73,6 +81,7 @@ func _label(parent: Control, n: String, variation: StringName) -> Label:
 ## Shows a view from TutorialPresenter.view().
 func show_view(v: Dictionary) -> void:
 	_put(title_label, String(v.get("title", "")))
+	_put(mission_label, String(v.get("mission", "")))
 	_put(progress_label, String(v.get("progress", "")))
 	_put(objective_label, String(v.get("objective", "")))
 	_put(cue_label, String(v.get("cue", "")))
@@ -84,6 +93,7 @@ func show_view(v: Dictionary) -> void:
 		hint_lines.append("Hint: " + h)
 	_put(hint_label, "\n".join(hint_lines))
 	_put(reminder_label, String(v.get("reminder", "")))
+	_put(list_label, "\n".join(v.get("list", PackedStringArray()) as PackedStringArray))
 	_put(goal_label, "\n".join(v.get("goal", PackedStringArray()) as PackedStringArray))
 	_put(footer_label, String(v.get("footer", "")))
 	visible = title_label.text != "" or reminder_label.text != ""
@@ -138,7 +148,7 @@ func _notification(what: int) -> void:
 ## Every visible line of text, top to bottom (for tests).
 func lines() -> PackedStringArray:
 	var out := PackedStringArray()
-	for l: Label in [title_label, progress_label, objective_label, cue_label, explain_label, hint_label, reminder_label, goal_label, footer_label]:
+	for l: Label in [title_label, mission_label, progress_label, objective_label, cue_label, explain_label, hint_label, reminder_label, list_label, goal_label, footer_label]:
 		if l.visible and l.text != "":
 			out.append(l.text)
 	return out

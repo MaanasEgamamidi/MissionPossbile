@@ -1,0 +1,6 @@
+{
+	"_about": "Stations of the visible upgrade paths (data/area_levels.json). Most tracks are upgraded at an existing station of their area (greenhouse console, power panel, med station...). The Garden dome has no station of its own, so it gets an upgrade console just inside its west airlock, on the north side of the doorway (out of the airlock opening, the central aisle and the planters' reach); its model is drawn by scripts/upgrades/stages/garden_stages.gd at every level.",
+	"stations": [
+		{"id": "upgrade_garden", "position": [44.15, 0.0, 24.35], "kind": "upgrade_console", "name": "Garden upgrade console", "symbol": "❀", "specialty": "", "description": "Plant more of the Garden dome."}
+	]
+}

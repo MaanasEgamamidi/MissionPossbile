@@ -1,9 +1,12 @@
 class_name StoryLogPanel
 extends UiPanel
-## The colony journal (L): what the tutorial asks now, the campaign goal, and the optional story of the first crew
-## (Prompt 12). It only reads state.campaign and state.discoveries and sends ordinary requests:
-##   * "Show a hint" (local), "Answer here" opens the question of a knowledge step (QuizPanel finds the station in reach),
-##   * "Remind me" asks the host for a reminder run of a finished stage (`tutorial_replay`),
+## The colony journal (L): what Mission Control asks now (with the step's checklist), Mission Control's log, the
+## colony goal, and the optional story of the first crew. It only reads state.campaign and state.discoveries and sends
+## ordinary requests:
+##   * "Show a hint" (local), "Answer here" opens the question of a knowledge step (QuizPanel finds the station in reach;
+##     the whiteboard tutorial has no question steps, so it stays hidden there),
+##   * "Remind me" asks the host to repeat Mission Control's lines of a finished step (`tutorial_replay`; nothing
+##     counts twice),
 ##   * the story lists each discovery with its clue records: found ones with their text, fiction label and the real
 ##     science they touch (source ids from the register), missing ones with where to look. Solving it is optional.
 
@@ -23,6 +26,8 @@ var _objective_label: Label
 var _cue_label: Label
 var _explain_label: Label
 var _hint_label: Label
+var _list_label: Label
+var _log_label: Label
 var _answer_note: Label
 var _replay_note: Label
 var _goal_box: VBoxContainer
@@ -96,6 +101,7 @@ func _build() -> void:
 	_cue_label = _text(body, "", UiTheme.GOOD)
 	_explain_label = _text(body, "", UiTheme.MUTED)
 	_hint_label = _text(body, "", UiTheme.WARN)
+	_list_label = _text(body, "")
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 12)
 	body.add_child(row)
@@ -112,9 +118,13 @@ func _build() -> void:
 	row.add_child(answer_button)
 	_answer_note = _text(body, "", UiTheme.MUTED)
 
+	# ---- Mission Control's log
+	_heading(body, "%s says" % TutorialSystem.speaker())
+	_log_label = _text(body, "", UiTheme.MUTED)
+
 	# ---- reminders
 	_heading(body, "Reminders")
-	_text(body, "Replay a stage you have finished, as a reminder. Nothing in a reminder counts twice.", UiTheme.MUTED)
+	_text(body, "Hear Mission Control again for a step you have finished. Nothing counts twice.", UiTheme.MUTED)
 	var rrow := HBoxContainer.new()
 	rrow.add_theme_constant_override(&"separation", 12)
 	body.add_child(rrow)
@@ -190,7 +200,10 @@ func refresh() -> void:
 	var asked := presenter.requested_hints if presenter != null else _local_hints
 	var v := TutorialPresenter.view(services, idle, asked)
 	_show(_stage_label, String(v.get("title", "")))
-	_show(_objective_label, String(v.get("objective", "")) if String(v.get("objective", "")) != "" else String(v.get("progress", "")))
+	var now_line := String(v.get("objective", ""))
+	if String(v.get("progress", "")) != "":
+		now_line = (now_line + "\n" if now_line != "" else "") + String(v.get("progress", ""))
+	_show(_objective_label, now_line)
 	_show(_cue_label, String(v.get("cue", "")))
 	var o := TutorialSystem.current_objective(st)
 	var explain := String(v.get("explain", ""))
@@ -202,6 +215,12 @@ func refresh() -> void:
 	for h in hints:
 		lines.append("Hint: " + h)
 	_show(_hint_label, "\n".join(lines))
+	_show(_list_label, "\n".join(v.get("list", PackedStringArray()) as PackedStringArray))
+	var log := PackedStringArray()
+	for entry: Variant in TutorialSystem.mission_log(st):
+		if entry is Dictionary:
+			log.append("“%s”" % String((entry as Dictionary).get("text", "")))
+	_show(_log_label, "\n".join(log.slice(maxi(0, log.size() - 12))) if not log.is_empty() else "Nothing yet.")
 	hint_button.visible = not o.is_empty()
 	hint_button.disabled = hints.size() >= int(v.get("hints_total", 0))
 	hint_button.text = "Show a hint" if not hint_button.disabled else "No more hints"
@@ -279,27 +298,22 @@ func _refresh_replay(st: ColonyState) -> void:
 	for s: Dictionary in TutorialSystem.stages():
 		if TutorialSystem.is_stage_completed(st, int(s.n)):
 			done.append(str(int(s.n)))
-	var r := TutorialSystem.replay_of(st)
-	var key := ",".join(done) + "|" + str(r.get("stage", 0))
+	var key := ",".join(done)
 	if key != _replay_key:
 		_replay_key = key
 		var keep := replay_option.get_selected_id()
 		replay_option.clear()
 		for n_text in done:
 			var n := int(n_text)
-			replay_option.add_item("Stage %d: %s" % [n, String(TutorialSystem.stage_def(n).get("title", ""))], n)
+			replay_option.add_item("Step %d: %s" % [n, String(TutorialSystem.stage_def(n).get("title", ""))], n)
 		if keep >= 0 and replay_option.get_item_index(keep) >= 0:
 			replay_option.select(replay_option.get_item_index(keep))
 	replay_option.disabled = done.is_empty()
-	replay_button.disabled = done.is_empty() or not r.is_empty()
-	stop_button.visible = not r.is_empty()
-	if not r.is_empty():
-		var ro := TutorialSystem.replay_objective(st)
-		_show(_replay_note, "Reminder running: %s. Next: %s" % [String(TutorialSystem.stage_def(int(r.stage)).get("title", "")),
-			TutorialSystem.objective_text(ro, TutorialPresenter.switching_disabled(services)) if not ro.is_empty() else "finishing"])
-	elif done.is_empty():
-		_show(_replay_note, "Finish a stage first; then you can replay it here.")
-	else:
+	replay_button.disabled = done.is_empty()
+	stop_button.visible = false
+	if done.is_empty():
+		_show(_replay_note, "Finish a step first; then you can hear it again here.")
+	elif _replay_note.text.begins_with("Finish"):
 		_show(_replay_note, "")
 
 
@@ -318,6 +332,9 @@ func _send(action: StringName, params: Dictionary) -> void:
 	var result := services.request(action, &"", params)
 	if result.pending:
 		_message.text = "Asked the host…"
+	elif result.ok and action == &"tutorial_replay":
+		_message.text = ""
+		_show(_replay_note, String(result.changes.get("text", "")))
 	elif result.ok:
 		_message.text = String(result.changes.get("text", ""))
 	else:
@@ -347,7 +364,7 @@ func _refresh_goal(st: ColonyState) -> void:
 	var line := ""
 	match status:
 		"locked":
-			line = "The certification sol starts after the tutorial."
+			line = "The certification sol starts once the base is operational."
 		"waiting":
 			line = "The certification sol starts when every line above has a ✓."
 		"paused_reserve":

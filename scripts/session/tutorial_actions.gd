@@ -1,15 +1,16 @@
 class_name TutorialActions
 extends RefCounted
-## Host actions of the tutorial and the optional story (Prompt 12), validated by ActionService like every other action.
+## Host actions of the tutorial and the optional story, validated by ActionService like every other action.
 ##   read_record      at a record station (kind "record", data/stations_lore.json): finds its first-crew record
 ##                    once for the colony (state.discoveries) and any discovery it completes. Reading it again shows
 ##                    the same text and changes nothing.
-##   tutorial_replay  params {"stage": 1..10, or 0 to stop}: starts a reminder run of a stage the colony has already
-##                    done. A reminder records nothing twice (no stage, no evidence, no certification).
-## It also lets the tutorial see the real actions its objectives are about (TutorialSystem.watched_actions()): each of
-## those definitions gets its `apply` wrapped so that, after the action has changed the colony, TutorialSystem.observe
-## credits the objective, finds records at salvage donors and notices a reserve the action emptied. The wrapped action
-## behaves exactly as before and returns the same changes; no other part's file is edited.
+##   tutorial_replay  params {"stage": 1..3}: a reminder of a step the colony has already finished. It repeats Mission
+##                    Control's lines of that step to the player who asked and changes nothing (nothing counts twice).
+##                    0 is accepted and does nothing (the old "stop the reminder").
+## It also lets the tutorial see the real actions it is about (TutorialSystem.watched_actions(): the tapes played at
+## the Command Room cassette player, records at salvage donors, suit refills): each of those definitions gets its
+## `apply` wrapped so that, after the action has changed the colony, TutorialSystem.observe records it. The wrapped
+## action behaves exactly as before and returns the same changes; no other part's file is edited.
 ## Register this LAST in SessionService._init, after every part whose actions the tutorial watches.
 
 const ACTIONS: Array[StringName] = [&"read_record", &"tutorial_replay"]
@@ -69,12 +70,9 @@ static func _check(ctx: ActionService.Context) -> ActionResult:
 				return ActionResult.failure(ctx.request.request_id, &"unknown_target", "There is nothing to read here.")
 		&"tutorial_replay":
 			var n := int(ctx.request.params.stage)
-			if n == 0:
-				if TutorialSystem.replay_of(ctx.state).is_empty():
-					return ActionResult.failure(ctx.request.request_id, &"missing_prerequisite", "No reminder is running.")
-			elif not TutorialSystem.is_stage_completed(ctx.state, n):
+			if n > 0 and not TutorialSystem.is_stage_completed(ctx.state, n):
 				return ActionResult.failure(ctx.request.request_id, &"missing_prerequisite",
-					"Stage %d is not done yet, so there is nothing to remind you of. Follow the tutorial instead." % n)
+					"Step %d is not done yet, so there is nothing to remind you of. Follow Mission Control instead." % n)
 	return null
 
 
@@ -93,10 +91,11 @@ static func _apply(ctx: ActionService.Context) -> Dictionary:
 				changes["text"] += " (The colony has read this record before.)"
 		&"tutorial_replay":
 			var n := int(ctx.request.params.stage)
-			TutorialSystem.start_replay(ctx.state, n)
 			changes["stage"] = n
 			if n == 0:
-				changes["text"] = "Reminder stopped."
+				changes["text"] = ""
 			else:
-				changes["text"] = "Reminder of stage %d: %s. Nothing you do in it counts twice." % [n, String(TutorialSystem.stage_def(n).get("title", ""))]
+				var lines := TutorialSystem.reminder_lines(n)
+				changes["lines"] = Array(lines)
+				changes["text"] = "Reminder of step %d, %s:\n%s" % [n, String(TutorialSystem.stage_def(n).get("title", "")), "\n".join(lines)]
 	return changes

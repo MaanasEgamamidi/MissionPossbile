@@ -21,12 +21,28 @@ func _initialize() -> void:
 	main._rebuild_crew()
 	await _frames(5)
 	var services := main.services
-	_check("new game starts in Med Bay", services.zones.zone_at_world(main.player.global_position) == "Med Bay")
+	# Owner rule 2026-11-14 (tutorial mode) replaces the Prompt Pack's Med Bay spawn: a new game starts suited just outside
+	# the exit tunnel's outer door, every door held open while the tutorial runs; the Med Bay stays the hub and respawn.
+	var me := services.local_character()
+	var spawn := services.config.tutorial_spawn_position + services.config.tutorial_spawn_offsets[0]
+	var body := main.player.global_position
+	_check("new game starts suited at the tutorial spawn outside the tunnel door",
+		Vector2(body.x - spawn.x, body.z - spawn.z).length() < 0.1 and absf(body.y - spawn.y) < 0.15 and services.zones.zone_at_world(body) == ColonyZones.EXTERIOR
+		and body.z > 14.85 and me.suit_on and me.suit_charge >= 99.0, "%s suit %s %.1f" % [body, me.suit_on, me.suit_charge])
 	for actor: CharacterState in services.state().characters.values():
 		_check("safe parked feet " + String(actor.id), _clear(actor.hub_spot), str(actor.hub_spot))
-	_check("switching point reachable from spawn", services.session.is_at_hub(main.player.global_position))
-	await _capture("med_bay_spawn")
+	_check("Med Bay is still the hub: every hub spot is in the Med Bay at the switching point", services.state().characters.values().all(func(c: CharacterState) -> bool:
+		return services.zones.zone_at_world(c.hub_spot) == "Med Bay" and services.session.is_at_hub(c.hub_spot)))
+	await _frames(90)          # GameMain holds the doors open every 0.5 s; then 0.6 s of door travel
+	_check("tutorial doors are held open", main.tutorial_doors_open() and main.find_children("*", "DoorController", true, false).all(func(d: DoorController) -> bool: return d.is_open()))
+	var steps := _walk_steps(body, func(p: Vector3) -> bool: return services.session.is_at_hub(p) and services.zones.zone_at_world(p) == "Med Bay")
+	_check("switching point reachable on foot from the spawn with the tutorial doors open", steps > 0, "%d grid steps of %.1f m" % [steps, WALK_CELL_M])
+	await _capture("tutorial_spawn")
 	var snapshot := services.snapshot()
+	# Respawn: a recovered crew member wakes on their Med Bay hub spot (the restore below puts the colony back).
+	var down := services.state().character(&"crew_2")
+	services.session.recover_character(down.id)
+	_check("Med Bay is still the respawn point", down.position == down.hub_spot and services.zones.zone_at_world(down.position) == "Med Bay", str(down.position))
 	var continued := Vector3(29, 0.04, -13)
 	snapshot.colony.characters.crew_1.position = [continued.x, continued.y, continued.z]
 	snapshot.colony.characters.crew_4.hub_spot = [-7.3, 0, -15.7]
@@ -103,7 +119,12 @@ func _initialize() -> void:
 			await _frames(1)
 		else:
 			var panel := StationPanels.for_station(StringName(id), services)
-			_check("task anchor station opens " + id, panel != null and panel.panel_title() == String(entry.name))
+			# Broken parts (2026-11-14): a task with an installed puzzle opens its mini-game while broken. T05 and T07
+			# have no puzzle and still open the reserved station surface named after the anchor.
+			if PuzzleRegistry.is_broken(services.state(), String(entry.task_id)):
+				_check("broken task anchor opens its mini-game " + id, panel is TaskPanel and (panel as TaskPanel).task_id == String(entry.task_id), str(panel))
+			else:
+				_check("task anchor station opens " + id, panel != null and panel.panel_title() == String(entry.name))
 			if panel != null: panel.free()
 		if not captured.has(entry.room_id):
 			captured[entry.room_id] = true
@@ -133,6 +154,43 @@ func _clear(at: Vector3) -> bool:
 	query.transform.origin = at + Vector3.UP * 0.9
 	query.collision_mask = Layers.WORLD | Layers.DOOR
 	return root.get_world_3d().direct_space_state.intersect_shape(query).is_empty()
+
+const WALK_CELL_M := 0.4
+const WALK_STEP_M := 0.3
+
+## Walking on foot, as a flood fill over a WALK_CELL_M grid: each spot must have ground under it at most WALK_STEP_M
+## above or below the last one and room for the body. Returns the number of steps to the first spot `goal` accepts,
+## or -1. Bounded to the base and its surroundings.
+func _walk_steps(from: Vector3, goal: Callable) -> int:
+	var space := root.get_world_3d().direct_space_state
+	var start := Vector2i(roundi(from.x / WALK_CELL_M), roundi(from.z / WALK_CELL_M))
+	var height := {start: from.y}
+	var dist := {start: 0}
+	var queue: Array[Vector2i] = [start]
+	var head := 0
+	while head < queue.size():
+		var k := queue[head]
+		head += 1
+		var y: float = height[k]
+		if goal.call(Vector3(k.x * WALK_CELL_M, y, k.y * WALK_CELL_M)):
+			return int(dist[k])
+		for d: Vector2i in [Vector2i(1, 0), Vector2i(-1, 0), Vector2i(0, 1), Vector2i(0, -1)]:
+			var n := k + d
+			var x := n.x * WALK_CELL_M
+			var z := n.y * WALK_CELL_M
+			if dist.has(n) or x < -45.0 or x > 50.0 or z < -35.0 or z > 30.0:
+				continue
+			dist[n] = -1
+			var ray := space.intersect_ray(PhysicsRayQueryParameters3D.create(Vector3(x, y + WALK_STEP_M + 0.05, z), Vector3(x, y - WALK_STEP_M, z), Layers.WORLD))
+			if ray.is_empty():
+				continue
+			var ground := float((ray.position as Vector3).y)
+			if not _clear(Vector3(x, ground + 0.08, z)):
+				continue
+			height[n] = ground
+			dist[n] = int(dist[k]) + 1
+			queue.append(n)
+	return -1
 
 func _frames(count: int) -> void:
 	for i in count: await physics_frame

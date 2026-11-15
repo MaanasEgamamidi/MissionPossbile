@@ -15,7 +15,7 @@
 	"drivetrain_efficiency": {"category": "fictional", "source_ids": [], "note": "0.8: battery-to-wheel share (motor, gearbox, wiring losses). Principle-based game value."},
 	"map_distance_factor": {"category": "balance", "source_ids": [], "note": "60: every metre driven or climbed on the map uses the energy of 60 m. The playable map is about 150 m across; without this the battery would never matter. Like the short game sol, it is a game rule, and it does not change with the sol length setting."},
 	"range_terrain_factor": {"category": "balance", "source_ids": [], "note": "1.3: the range estimate allows 30 % more energy than flat firm ground for slopes and soft sand. Range assumes the battery, cargo and crew aboard now (at least a driver) and no energy back downhill."},
-	"charger_kw": {"category": "balance", "source_ids": [], "note": "5 kW taken from the colony battery while charging (the colony battery holds 800 kWh in GameBalance)."},
+	"charger_kw": {"category": "balance", "source_ids": [], "note": "5 kW taken from the colony battery while charging (the colony battery holds 700 kWh in GameBalance at V1, since 2026-11-14)."},
 	"charger_efficiency": {"category": "fictional", "source_ids": [], "note": "0.9: share of the charger's energy that reaches the rover battery (the colony battery's own charge efficiency is also 0.9 in GameBalance)."},
 	"charge_radius_m": {"category": "balance", "source_ids": [], "note": "7 m cable reach from the charger station (the parked rover's centre is 3.1 m from it)."},
 	"charge_reserve_fraction": {"category": "balance", "source_ids": [], "note": "0.35: charging pauses at 35 % of the colony battery (above the 30 % low-battery warning), or at the energy_battery_reserve upgrade's life-support reserve if higher."},

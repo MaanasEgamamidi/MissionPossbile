@@ -1,0 +1,14 @@
+DroneV1 rotor hubs: RotorHub_BL, RotorHub_BR, RotorHub_FL, RotorHub_FR
+exported drone_v1.glb: 47 objects, 4108 triangles
+DroneV2 rotor hubs: RotorHub_BL, RotorHub_BR, RotorHub_FL, RotorHub_FR
+exported drone_v2.glb: 53 objects, 5356 triangles
+DroneV3 rotor hubs: RotorHub_BL, RotorHub_BR, RotorHub_FL, RotorHub_FR
+exported drone_v3.glb: 63 objects, 6628 triangles
+DroneV4 rotor hubs: RotorHub_BL, RotorHub_BR, RotorHub_FL, RotorHub_FR
+exported drone_v4.glb: 79 objects, 8312 triangles
+exported drone_pad.glb: 28 objects, 2252 triangles
+rendered G:\nasa app\mars_colony_revisions_wt\docs\revisions\evidence\drone\drone_stages_preview.png
+rendered G:\nasa app\mars_colony_revisions_wt\docs\revisions\evidence\drone\drone_stages_top.png
+rendered G:\nasa app\mars_colony_revisions_wt\docs\revisions\evidence\drone\drone_pad_preview.png
+saved G:\nasa app\mars_colony_revisions_wt\assets_src\drone\drone_kit.blend
+DONE

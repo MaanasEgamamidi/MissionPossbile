@@ -1,7 +1,20 @@
 class_name CassettePresenter
 extends Node3D
-## Six original native cassette props. Presentation follows shared authoritative collection state.
-## The existing sensing Areas remain the only interaction shape; these props add no solid collision.
+## Six room cassettes and the Command Room tape deck as real models (assets/props/*.glb, built by
+## tools/blender/props/build_props.py). Each rests ON a real surface (a desk, crate, bench or table top): the spot is
+## "prop_position" / "prop_yaw_deg" of its entry in data/stations_repairs.json, measured in the intact map so the visual
+## top and the collision top agree within 2 cm. Nothing floats and no sign hangs in the air (owner 2026-11-14): the HUD
+## prompt "[E] ..." says what to do. Presentation follows shared authoritative collection state.
+## The station's sensing Area3D stays the only interaction shape: its sphere, plus a small reach box around the prop so
+## that aiming at the prop itself works. The props add no solid collision.
+
+const TAPE_SCENE := "res://assets/props/cassette_tape.glb"
+const PLAYER_SCENE := "res://assets/props/cassette_player.glb"
+## Top of the tape's room colour band, in the tape model (glb) frame: the room name is printed flat on it.
+const TAPE_STRIP_TOP := Vector3(0.0, 0.0198, -0.032)
+## Reach boxes (designer balance): a little larger than the props, so E aims easily at a small tape.
+const TAPE_REACH := Vector3(0.30, 0.14, 0.24)
+const PLAYER_REACH := Vector3(0.62, 0.34, 0.42)
 
 var services: GameServices
 var cassette_nodes: Dictionary = {}
@@ -12,18 +25,20 @@ func setup(p_services: GameServices, collision: Node3D) -> void:
 	var stations := collision.get_node_or_null("Stations")
 	if stations == null:
 		return
+	var entries := {}
+	for entry: Dictionary in StationCatalog.extra_entries():
+		if entry.has("id"):
+			entries[String(entry.id)] = entry
 	for cassette_id: String in CassetteCatalog.TAPES:
 		var station := stations.get_node_or_null(NodePath(cassette_id)) as Area3D
 		if station == null:
 			continue
-		_hide_reserved_marker(station)
 		var model := _cassette(cassette_id)
-		station.add_child(model)
+		_place(station, model, entries.get(cassette_id, {}), TAPE_REACH, 0.06)
 		cassette_nodes[cassette_id] = station
 	var player := stations.get_node_or_null(NodePath(CassetteCatalog.PLAYER_ID)) as Area3D
 	if player != null:
-		_hide_reserved_marker(player)
-		player.add_child(_player_model())
+		_place(player, _player_model(), entries.get(CassetteCatalog.PLAYER_ID, {}), PLAYER_REACH, 0.16)
 	services.events.state_changed.connect(func(_reason: StringName) -> void: refresh())
 	services.events.game_loaded.connect(func(_source: String) -> void: refresh())
 	refresh()
@@ -44,73 +59,74 @@ func refresh() -> void:
 		station.collision_layer = Layers.STATION if available else 0
 		station.set_meta("cassette_collected", not available)
 
-static func _hide_reserved_marker(station: Area3D) -> void:
-	for child_name: String in ["Marker", "LocationLabel"]:
-		var old := station.get_node_or_null(NodePath(child_name)) as Node3D
-		if old != null:
-			old.visible = false
+## World position (on its support surface) and yaw of a prop, from its station entry. Without "prop_position" the prop
+## sits on the floor under the station.
+static func prop_pose(entry: Dictionary, station_position: Vector3) -> Transform3D:
+	var at := station_position - Vector3(0, 1.0, 0)
+	if entry.has("position"):
+		var q: Array = entry.position
+		at = Vector3(float(q[0]), float(q[1]), float(q[2]))
+	if entry.has("prop_position"):
+		var p: Array = entry.prop_position
+		at = Vector3(float(p[0]), float(p[1]), float(p[2]))
+	return Transform3D(Basis(Vector3.UP, deg_to_rad(float(entry.get("prop_yaw_deg", 0.0)))), at)
 
-static func _box(parent: Node3D, label: String, size: Vector3, at: Vector3, color: Color) -> MeshInstance3D:
-	var instance := MeshInstance3D.new()
-	instance.name = label
-	var mesh := BoxMesh.new()
-	mesh.size = size
-	instance.mesh = mesh
-	instance.position = at
-	var material := StandardMaterial3D.new()
-	material.albedo_color = color
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	instance.material_override = material
-	parent.add_child(instance)
-	return instance
+## Puts the model at its surface spot (stations sit under the identity "Stations" node, so local = world offsets) and
+## adds the reach box, `lift` metres high, around it.
+static func _place(station: Area3D, model: Node3D, entry: Dictionary, reach: Vector3, lift: float) -> void:
+	var pose := prop_pose(entry, station.position)
+	model.transform = Transform3D(pose.basis, pose.origin - station.position)
+	station.add_child(model)
+	var shape := CollisionShape3D.new()
+	shape.name = "PropReach"
+	var box := BoxShape3D.new()
+	box.size = reach
+	shape.shape = box
+	shape.transform = Transform3D(pose.basis, pose.origin - station.position + Vector3(0, lift, 0))
+	station.add_child(shape)
 
-static func _sign(parent: Node3D, label: String, text: String, at: Vector3, pixels := 32) -> void:
-	var sign := Label3D.new()
-	sign.name = label
-	sign.text = text
-	sign.position = at
-	sign.font_size = pixels
-	sign.pixel_size = 0.0016
-	sign.outline_size = 6
-	sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	sign.no_depth_test = false
-	parent.add_child(sign)
+static func _instance(path: String, label: String) -> Node3D:
+	var scene := load(path) as PackedScene
+	if scene == null:
+		push_warning("CassettePresenter: missing model " + path)
+		var empty := Node3D.new()
+		empty.name = label
+		return empty
+	var node := scene.instantiate() as Node3D
+	node.name = label
+	return node
 
 static func _cassette(cassette_id: String) -> Node3D:
 	var info: Dictionary = CassetteCatalog.TAPES[cassette_id]
 	var model := Node3D.new()
 	model.name = "CassetteModel"
-	var color := Color(String(info.color))
-	_box(model, "DisplayStand", Vector3(0.18, 0.75, 0.16), Vector3(0, -0.49, 0), Color("1a2935"))
-	_box(model, "CassetteShell", Vector3(0.36, 0.23, 0.07), Vector3.ZERO, color)
-	_box(model, "TapeWindow", Vector3(0.27, 0.105, 0.012), Vector3(0, 0.018, 0.042), Color("15212c"))
-	for side: float in [-1.0, 1.0]:
-		var reel := MeshInstance3D.new()
-		reel.name = "ReelLeft" if side < 0.0 else "ReelRight"
-		var mesh := CylinderMesh.new()
-		mesh.top_radius = 0.037
-		mesh.bottom_radius = 0.037
-		mesh.height = 0.014
-		reel.mesh = mesh
-		reel.rotation.x = PI * 0.5
-		reel.position = Vector3(side * 0.075, 0.02, 0.055)
-		var material := StandardMaterial3D.new()
-		material.albedo_color = Color("efece0")
-		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-		reel.material_override = material
-		model.add_child(reel)
-	_box(model, "LabelStrip", Vector3(0.29, 0.042, 0.014), Vector3(0, -0.075, 0.045), Color("efece0"))
-	_sign(model, "RoomLabel", "%s\n%s CASSETTE" % [info.title, info.code], Vector3(0, 0.28, 0), 34)
-	_sign(model, "PickupLabel", "E  Collect tape", Vector3(0, -0.24, 0), 24)
+	var tape := _instance(TAPE_SCENE, "Tape")
+	model.add_child(tape)
+	var strip := StandardMaterial3D.new()
+	strip.albedo_color = Color(String(info.color))
+	strip.roughness = 0.55
+	for part: String in ["RoomStrip", "LabelLine"]:
+		var mesh := tape.find_child(part, true, false) as MeshInstance3D
+		if mesh != null:
+			mesh.material_override = strip
+	# The room name printed flat on the colour band (not a floating sign): it lies on the tape and reads from +Z.
+	var label := Label3D.new()
+	label.name = "RoomLabel"
+	label.text = "%s  %s" % [info.code, info.title]
+	label.position = TAPE_STRIP_TOP + Vector3(0, 0.0004, 0)
+	label.rotation.x = -PI * 0.5
+	label.font_size = 40
+	label.pixel_size = 0.00025
+	label.outline_size = 0
+	label.modulate = Color("1b1d20")
+	label.double_sided = false
+	label.no_depth_test = false
+	label.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	model.add_child(label)
 	return model
 
 static func _player_model() -> Node3D:
 	var model := Node3D.new()
 	model.name = "CassettePlayerModel"
-	_box(model, "PlayerStand", Vector3(0.32, 0.7, 0.28), Vector3(0, -0.48, 0), Color("1a2935"))
-	_box(model, "PlayerShell", Vector3(0.58, 0.25, 0.25), Vector3.ZERO, Color("334956"))
-	_box(model, "CassetteDoor", Vector3(0.29, 0.14, 0.02), Vector3(-0.07, 0.02, 0.14), Color("43b8b1"))
-	for index in 3:
-		_box(model, "Control%d" % index, Vector3(0.04, 0.04, 0.02), Vector3(0.2, 0.07 - index * 0.06, 0.14), Color("f1a35e"))
-	_sign(model, "PlayerLabel", "COMMAND ROOM\nCASSETTE PLAYER", Vector3(0, 0.34, 0), 34)
+	model.add_child(_instance(PLAYER_SCENE, "Deck"))
 	return model

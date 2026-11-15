@@ -1,0 +1,68 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS every station that serves an upgrade path has its Upgrades strip, and no other station has one
+PASS strips found on 9 stations, none on 66 others
+PASS every upgrade path (the drone pad aside, until it exists) shows on a station
+PASS the Garden upgrade console is on the map
+PASS the console gets its own panel script
+PASS the console panel is titled by its station
+PASS the console shows only the garden strip
+PASS the console has a short description and no 'more controls later' note
+PASS garden strip: name, pips and stage
+PASS garden strip: next level words and its effect in plain words
+PASS the console's first focus is its upgrade button
+PASS the console panel has no layout or focus problems at 1280x720
+PASS greenhouse console: strip with the grow racks
+PASS too few parts: button greyed out and says why
+PASS the right specialist is told it is them
+PASS the next level's effect in plain words
+PASS upgrade button takes keyboard focus like the other panel buttons
+PASS wrong specialist: greyed out with the specialist reason
+PASS the right specialist with parts: button ready
+PASS pressing sends exactly one upgrade_area for the greenhouse console
+PASS the level rose to V2 and the parts were spent
+PASS the panel shows the host's answer
+PASS after the upgrade: V2 pips, the new stage and the next button
+PASS a refused upgrade shows the host's reason and keeps the level
+PASS at V4 the button goes and the strip says it is fully upgraded
+PASS the garage is on the map
+PASS garage: the rover's V level follows its modules
+PASS garage: no upgrade button for the rover, a garage hint instead
+PASS the death notice is part of the HUD and hidden at the start
+PASS another astronaut's death never shows
+PASS after my respawn the card shows why I died
+PASS first death: no count line
+PASS the card never takes the mouse or focus
+PASS the card sits at the top centre
+PASS E closes it
+PASS the same death never shows twice
+PASS a new death shows again with how often it happened
+PASS it goes by itself after about 12 s
+PASS no new record yet: nothing shows
+PASS the record arriving just after the respawn still shows
+PASS loading a game right after a death shows it
+PASS loading a game long after a death does not show it
+PASS ... and that old death stays seen after the next respawn event
+  note: PowerModel.outlook found: the chip uses it
+PASS day: sun symbol and battery share
+PASS day: words follow the energy model's outlook
+PASS 80 %: normal colour
+PASS night: moon, battery share, how fast it falls and how long it lasts
+PASS night: the numbers from the outlook
+PASS below 30 %: amber
+PASS below 15 %: red
+PASS hours in words
+PASS level-up words from the alert
+PASS a real upgrade raises the level
+PASS a level up pops up: 'Greenhouse grow racks: V3: Three-layer rack with drip lines'
+PASS the HUD's last alert uses the same words
+PASS any track's level up pops up
+PASS the battery chip sits just under the vitals bar
+PASS HUD messages start below the chip
+PASS the chip has text
+PASS no errors during the test
+RESULT 60/60
+WARNING: 27 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

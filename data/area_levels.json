@@ -1,0 +1,115 @@
+{
+	"_about": "Visible upgrade paths (2026-11-14 owner request): every interactable area, the scout drone and the rover get levels V1..V4. V1 is today's model. Each level up costs spare parts (state.parts), is done at one of the track's stations by its specialist (empty = anyone), and changes both what the area looks like (scripts/upgrades/stages/<track>_stages.gd) and what it does (the effect tables below, read with AreaLevels.effect). Effect numbers are designer balance, never NASA figures, unless a source id is given in source_ids. The rover's look follows its existing module levels (state.rover.levels, 1..5), so its entry has no costs of its own: it is upgraded in the garage as before.",
+	"max_level": 4,
+	"tracks": [
+		{
+			"id": "food",
+			"name": "Greenhouse grow racks",
+			"zone": "Greenhouse",
+			"station_kinds": ["food"],
+			"specialty": "biology_food",
+			"cost_parts": [0, 2, 3, 4],
+			"stages": ["One layer of grow beds", "Two-layer rack with LED bars", "Three-layer rack with drip lines", "Four-layer vertical farm with full LED canopy"],
+			"effects": {
+				"grow_layers": [1, 2, 3, 4],
+				"yield_factor": [1.0, 1.9, 2.8, 3.6]
+			}
+		},
+		{
+			"id": "garden",
+			"name": "Garden dome planting",
+			"zone": "Garden dome",
+			"station_kinds": ["upgrade_console"],
+			"station_ids": ["upgrade_garden"],
+			"specialty": "biology_food",
+			"cost_parts": [0, 2, 3, 4],
+			"stages": ["Bare planters", "Ground cover and herbs", "Shrubs and a raised bed ring", "Dwarf fruit trees and a full canopy"],
+			"effects": {
+				"plant_o2_kg_per_hour": [0.0, 0.01, 0.02, 0.035],
+				"meals_per_sol": [0.0, 0.5, 1.0, 2.0]
+			},
+			"source_ids": {"plant_o2_kg_per_hour": ["S20"]},
+			"effect_notes": {"plant_o2_kg_per_hour": "NASA-derived (S20 BVAD Rev2 Table 4-91: lettuce gives 7.78 g O2 per m2 per day, a sol average). Planted area is balance: V2 31 m2, V3 62 m2, V4 108 m2 of leafy plants, so 31 x 7.78 / 24 = 0.010, 62 x 7.78 / 24 = 0.020, 108 x 7.78 / 24 = 0.035 kg O2 per game hour. One crew member breathes 0.0373 kg/h (S20 Table 3-31), so the full garden covers about one crew member in four. Plants also take up 1.375 kg CO2 per kg O2 (physics, agrees with Table 4-91)."}
+		},
+		{
+			"id": "energy",
+			"name": "Power room and solar field",
+			"zone": "Power Room",
+			"station_kinds": ["power"],
+			"specialty": "electrical_comms",
+			"cost_parts": [0, 2, 3, 4],
+			"stages": ["Today's battery rows", "New battery rack and a bigger inverter", "Third rack, cable trays and solar wings", "Battery wall, coolant loop and wide solar wings"],
+			"effects": {
+				"solar_factor": [1.0, 1.25, 1.5, 1.8],
+				"battery_capacity_factor": [1.0, 1.25, 1.5, 2.0]
+			},
+			"effect_notes": {"battery_capacity_factor": "balance (2026-11-14 energy worker): 700, 875, 1,050 and 1,400 kWh. Was 1.0/1.5/2.0/3.0; lowered so night still matters at V2 and V3 (a wasteful night uses about 340 kWh).", "solar_factor": "balance: bigger solar wings, multiplies every tracker's daytime output. At night solar is 0 kW at every level."}
+		},
+		{
+			"id": "life_support",
+			"name": "Life support plant",
+			"zone": "Life Support",
+			"station_kinds": ["lifesupport"],
+			"specialty": "medical_life_support",
+			"cost_parts": [0, 2, 3, 4],
+			"stages": ["Today's air plant", "Second scrubber bed and an O2 buffer tank", "Twin electrolysers in a water loop", "Backup plant: three tanks, filter bank and labelled pipes"],
+			"effects": {
+				"scrubber_factor": [1.0, 1.25, 1.5, 2.0],
+				"o2_production_factor": [1.0, 1.25, 1.5, 2.0],
+				"recycler_factor": [1.0, 1.1, 1.2, 1.35]
+			}
+		},
+		{
+			"id": "health",
+			"name": "Med bay",
+			"zone": "Med Bay",
+			"station_kinds": ["heal"],
+			"specialty": "medical_life_support",
+			"cost_parts": [0, 2, 3, 4],
+			"stages": ["Today's med bay", "Vitals monitors and an IV stand", "Second bed with a body scanner arch", "Surgical light and a full treatment corner"],
+			"effects": {
+				"heal_rate_factor": [1.0, 1.5, 2.0, 3.0],
+				"recovery_health_bonus": [0, 10, 20, 30]
+			}
+		},
+		{
+			"id": "command",
+			"name": "Command room",
+			"zone": "Command Room",
+			"station_kinds": ["computer", "comms"],
+			"specialty": "",
+			"cost_parts": [0, 2, 3, 4],
+			"stages": ["Today's consoles", "Colony map on the wall", "Relay rack and a second row of screens", "Screen wall, holo table and a roof dish"],
+			"effects": {
+				"drone_range_m": [150.0, 300.0, 600.0, 1200.0]
+			}
+		},
+		{
+			"id": "scout_drone",
+			"name": "Scout drone",
+			"zone": "Exterior",
+			"station_kinds": ["drone_pad"],
+			"specialty": "",
+			"cost_parts": [0, 2, 3, 4],
+			"stages": ["Manual-control drone", "Bigger battery and longer rotors", "Programmable autopilot and survey camera", "Long-range autopilot with routes, lights and sensor pod"],
+			"effects": {
+				"speed_mps": [5.0, 7.0, 9.0, 12.0],
+				"flight_seconds": [90.0, 150.0, 240.0, 360.0],
+				"survey_radius_m": [20.0, 30.0, 45.0, 60.0],
+				"autopilot": [0, 0, 1, 1],
+				"max_waypoints": [0, 0, 1, 4]
+			}
+		},
+		{
+			"id": "rover",
+			"name": "Crew rover",
+			"zone": "Hangar bay",
+			"station_kinds": ["garage"],
+			"specialty": "",
+			"follows": "rover_modules",
+			"cost_parts": [0, 0, 0, 0],
+			"stages": ["Stock rover", "First upgrades show: battery packs, hub motors, axle covers, cargo rack, chunky tyres", "Many upgrades: roof light bar and antenna mast", "Most modules high: dust guards and a full roll cage"],
+			"effects": {}
+		}
+	]
+}

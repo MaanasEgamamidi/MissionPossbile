@@ -1,0 +1,12 @@
+imported BP01 2 objects
+imported BP02 4 objects
+imported BP03 1 objects
+materials without a GC_ twin (kept flat): []
+tunnel cut: removed 809 leaf faces
+BP01 fixed 570.7 s {'eye_godot': [-5.638, 1.64, -12.45], 'look_godot': [-11.336, 1.1, -12.45]}
+BP01 broken 454.4 s
+BP02 fixed 488.6 s {'eye_godot': [-3.6, 1.6, -12.8], 'look_godot': [-3.4, 0.9, -17.3]}
+BP02 broken 370.4 s
+BP03 fixed 445.8 s {'eye_godot': [27.944, 1.64, -10.443], 'look_godot': [24.955, 1.1, -16.387]}
+BP03 broken 443.4 s
+done 2778.9 s

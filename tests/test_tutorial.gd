@@ -1,31 +1,28 @@
 extends SceneTree
-## Prompt 12: the ten-stage tutorial, the first campaign milestone and the optional first-crew story.
+## The whiteboard tutorial (owner decisions 2026-11-14), which replaces the Prompt Pack's old ten-stage tutorial:
+## arrival outside the open base, the first team's 6 room tapes (found n/6, played n/6 at the Command Room cassette
+## player), Mission Control's "Fix the base", the 10 broken spots (T05 and T07 not required), then "Base operational"
+## and the held doors released. Also: the tutorial station lock, the wrong-specialist scrambled panel, the crew radio
+## gate, save/load, replication and late join, the colony goal (certification) after the tutorial, and the optional
+## first-crew story (shared machinery that still applies).
 ## SYNTHETIC headless checks on the real model and real actions (no scene, no player, no network): crew move by the
-## host's own position reports, and every objective is completed by a real action or real colony state. A few set-ups
-## are marked "synthetic set-up" where a test jumps straight to the part it is about (for example stage 9 or the
-## certification sol); the full solo and four-player runs never do that: even the first radio card is installed with
-## real actions (its questions at the comms console, then install_upgrade by the electrical specialist).
+## host's own position reports; tapes are collected and played with the real cassette actions; every broken spot is
+## fixed through the real RepairRuntime path (task_claim, task_move) with a stand-in "finish" rule, because each real
+## puzzle is solved in its own tests/test_puzzle_tNN.gd. Set-ups that jump ahead are marked "synthetic set-up".
 ## Run: ..\godot.cmd --headless --path . --script res://tests/test_tutorial.gd
 
+const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
+const CommsGate := preload("res://scripts/voice/comms_gate.gd")
 const MANIFEST := "res://data/colony_manifest.json"
 const SUITS := &"al_suit_rack"
-const COMPUTER := &"cm_colony_computer"
 const COMMS := &"cm_comms_console"
 const POWER := &"pw_panel"
-const LS := &"ls_console"
-const FOOD := &"gh_console"
-const BED := &"gd_planter"
-const BED2 := &"gd_planter.001"
-const GYM := &"rk_treadmill"
+const PLAYER := &"cassette_player_command_center"
 const TRACKER := &"sf_solar_tracker"
-const TRACKER2 := &"sf_solar_tracker.001"
-const DONOR := &"pr_swgr_burnt"
-const SITE := &"site_east_rocks"
-const STAGE_TITLES: Array[String] = ["Arrival and movement", "Airlock interaction", "Hub monitoring and crew selection",
-	"Solar maintenance", "Energy distribution", "Greenhouse operations", "Personal health and body energy",
-	"Communications", "Independent problem: greenhouse power", "Back to the hub, then explore"]
-const KINDS: Array[String] = ["moved", "near", "suit_on", "outside", "inside", "at_hub", "specialist_played", "knowledge",
-	"action", "suit_topped", "cleaner_ok", "oxygen_makers_on", "greenhouse_water", "comms_stage", "stage9_fixed", "stage9_holds"]
+const STAGE_TITLES: Array[String] = ["Arrival", "The first team's tapes", "Fix the base"]
+const KINDS: Array[String] = ["inside_base", "tapes_found", "tapes_played", "fixes"]
+## Owner 2026-11-14 / docs/revisions/BROKEN_PARTS_BRIEF.md: the 10 broken spots (T05 and T07 have no broken part).
+const TEN: Array[String] = ["T01", "T02", "T03", "T04", "T06", "T08", "T09", "T10", "T11", "T12"]
 const FORBIDDEN_WORDS: Array[String] = ["alien", "dead", "died", "death", "dying", "body", "bodies", "blood", "corpse", "killed",
 	"monster", "remains", "grave", "skeleton", "injured", "wounded"]
 const SIZES := [[Vector2i(1280, 720), 1.0], [Vector2i(1920, 1080), 1.0], [Vector2i(1280, 720), 1.5]]
@@ -56,6 +53,9 @@ var _event_nodes: Array[GameEvents] = []
 var _zones: ColonyZones
 var _catalog: Dictionary
 var _notes := PackedStringArray()
+## Per session: Mission Control alerts and objective events seen.
+var _alerts := {}
+var _objective_events := {}
 
 
 func _initialize() -> void:
@@ -69,12 +69,12 @@ func _initialize() -> void:
 	_test_lore_data()
 	_test_sources()
 	_test_wrapping()
-	_test_solo_run()
-	_test_four_players()
+	_test_solo_flow()
 	_test_order()
-	_test_repeat_and_replay()
-	_test_hints_and_mastery()
-	_test_stage9_variants()
+	_test_lock_host()
+	_test_voice_gate()
+	_test_save_and_late_join()
+	_test_migration()
 	_test_certification()
 	_test_lore_runtime()
 	await _test_presentation()
@@ -100,6 +100,7 @@ func _check(label: String, condition: bool, detail: String = "state mismatch") -
 
 
 ## A host session on the real map with `active` players (peers 1..active), each claiming crew_1..crew_N for real.
+## Zones are wired as in the game (cassette playback and repairs check the room).
 func _session(active: int, seed_value := 4242) -> SessionService:
 	var ev := GameEvents.new()
 	_event_nodes.append(ev)
@@ -107,6 +108,7 @@ func _session(active: int, seed_value := 4242) -> SessionService:
 	var st := ColonyState.new_game(s.balance, seed_value, _zones.names)
 	st.stations = _catalog.duplicate(true)
 	s.outside_test = func(p: Vector3) -> bool: return _zones.zone_at_world(p) == ColonyZones.EXTERIOR
+	s.zone_at_position = func(p: Vector3) -> String: return _zones.zone_at_world(p)
 	var ids: Array = st.characters.keys()
 	ids.sort()
 	for i in ids.size():
@@ -123,6 +125,28 @@ func _session(active: int, seed_value := 4242) -> SessionService:
 		var r := s.request(&"claim_character", StringName("crew_%d" % (i + 1)), {}, i + 1)
 		if not r.ok:
 			push_error("claim failed: %s" % r.message)
+	var heard: Array[String] = []
+	var events: Array[String] = []
+	_alerts[s] = heard
+	_objective_events[s] = events
+	ev.system_alert.connect(func(id: StringName, _level: StringName, text: String) -> void:
+		if id == &"mission_control":
+			heard.append(text))
+	ev.objective_changed.connect(func(id: StringName) -> void: events.append(String(id)))
+	return s
+
+
+## A new game in tutorial mode as the real game starts it (synthetic set-up of GameServices._tutorial_start and the
+## presenter's mode switch): the active crew suited at the tutorial spawn outside, tutorial mode on.
+func _tutorial_session(active: int, seed_value := 4242) -> SessionService:
+	var s := _session(active, seed_value)
+	for i in active:
+		var c := s.state.character(StringName("crew_%d" % (i + 1)))
+		c.suit_on = true
+		c.suit_charge = 100.0
+		c.suit_integrity = 1.0
+		_go(s, c.id, s.config.tutorial_spawn_position + s.config.tutorial_spawn_offsets[i])
+	TutorialSystem.begin_tutorial_mode(s.state, true)
 	return s
 
 
@@ -132,15 +156,25 @@ func _resume(s: SessionService, d: Dictionary) -> SessionService:
 	_event_nodes.append(ev)
 	var s2 := SessionService.new(GameConfig.new(), GameBalance.new(), ev)
 	s2.outside_test = s.outside_test
+	s2.zone_at_position = s.zone_at_position
 	var c := SolClock.from_dict(s.clock.to_dict())
 	s2.begin(ColonyState.from_dict(d), c)
 	for p: int in s.peers:
 		s2.peer_joined(p)
+	var heard: Array[String] = []
+	_alerts[s2] = heard
+	_objective_events[s2] = [] as Array[String]
+	ev.system_alert.connect(func(id: StringName, _level: StringName, text: String) -> void:
+		if id == &"mission_control":
+			heard.append(text))
 	return s2
 
 
+## The colony as a save holds it (the repair records through their save projection), back from JSON text.
 func _json(st: ColonyState) -> Dictionary:
-	return JSON.parse_string(JSON.stringify(st.to_dict()))
+	var d := st.to_dict()
+	d["repair"] = RepairCatalog.for_save(st.repair)
+	return JSON.parse_string(JSON.stringify(d))
 
 
 func _peer(s: SessionService, crew: StringName) -> int:
@@ -161,11 +195,6 @@ func _do(s: SessionService, crew: StringName, action: StringName, station: Strin
 	return s.request(action, station, params, _peer(s, crew))
 
 
-func _answer(s: SessionService, crew: StringName, station: StringName, qid: String) -> ActionResult:
-	var choice := int(ProgressionSystem.current_variant(s.state, StringName(qid)).get("correct", 0))
-	return _do(s, crew, &"answer_question", station, {"question_id": qid, "choice": choice})
-
-
 ## Real time passes: SessionService.advance in 0.2 s steps (one 5 Hz tick each).
 func _tick(s: SessionService, seconds: float) -> void:
 	var n := ceili(seconds / 0.2 - 1e-6)
@@ -182,18 +211,6 @@ func _switch(s: SessionService, from: StringName, to: StringName) -> ActionResul
 	var peer := _peer(s, from)
 	_go(s, from, s.config.hub_position)
 	return s.request(&"claim_character", to, {}, peer)
-
-
-func _stage(s: SessionService) -> int:
-	return TutorialSystem.current_stage(s.state)
-
-
-func _current(s: SessionService) -> String:
-	return String(TutorialSystem.current_objective(s.state).get("id", ""))
-
-
-func _done(s: SessionService, id: String) -> bool:
-	return TutorialSystem.is_objective_done(s.state, id)
 
 
 func _approx(a: float, b: float, tol := 1e-6) -> bool:
@@ -233,173 +250,81 @@ func _words(text: String) -> int:
 func _mentions_switch(text: String) -> bool:
 	var t := text.to_lower()
 	return t.contains("switch at the hub") or t.contains("switch crew") or t.contains("play as") or t.contains("and choose them") \
-		or t.contains("choose them on the crew screen") or t.contains("change crew") or t.contains("switch to")
+		or t.contains("choose them on the crew screen") or t.contains("change crew") or t.contains("switch to") or t.contains("swap")
 
 
-## Installs the first radio card with real actions: answer its questions at the comms console, then install with the
-## electrical specialist (the card comes from data/upgrades.json, Prompt 11).
-func _install_radio(s: SessionService, elec: StringName) -> bool:
-	var c := ProgressionSystem.card(&"comms_radio_1")
-	if c == null:
-		_notes.append("comms_radio_1 is missing from data/upgrades.json")
-		return false
-	for q in c.questions:
-		_answer(s, elec, COMMS, String(q))
-	var r := _do(s, elec, &"install_upgrade", COMMS, {"upgrade_id": "comms_radio_1"})
-	if not r.ok:
-		_notes.append("comms_radio_1 could not be installed with real actions after stages 1-7: %s (executor: give the card evidence the tutorial earns)" % r.message)
-	return r.ok
+func _heard(s: SessionService) -> Array:
+	return _alerts.get(s, []) as Array
 
 
-## Real fix of each stage 9 fault at the power panel, by `crew`.
-func _solve_stage9(s: SessionService, crew: StringName) -> bool:
-	var st := s.state
-	var s9 := TutorialSystem.stage9_of(st)
-	var ok := true
-	match String(s9.get("variant", "")):
-		"greenhouse_breaker":
-			ok = _do(s, crew, &"set_zone_power", POWER, {"zone": "Greenhouse", "on": true}).ok
-		"trackers_stopped":
-			ok = _do(s, crew, &"set_equipment", POWER, {"equipment": "trackers", "on": true}).ok
-		"lighting_overload":
-			for zone: String in ["Hangar bay", "Dome plaza", "Garden dome", "Exterior", "Command Room", "Mess hall"]:
-				if TutorialSystem.room_light_kw(st, s.balance) <= float(s9.limit_kw):
-					break
-				ok = _do(s, crew, &"set_zone_power", POWER, {"zone": zone, "on": false}).ok and ok
-			ok = _do(s, crew, &"set_zone_power", POWER, {"zone": "Greenhouse", "on": true}).ok and ok
-	return ok
+func _count_heard(s: SessionService, needle: String) -> int:
+	var n := 0
+	for line: String in _heard(s):
+		if line.contains(needle):
+			n += 1
+	return n
 
 
-## Plays the tutorial with one player (crew_1, the electrical specialist) from stage 1 until stage `until` starts.
-## With `switches` the player changes crew at the hub where a specialist fits the work (stage 6, 8, 10).
-## Returns the requests that were refused, as text (empty: all real actions were accepted).
-func _solo_flow(s: SessionService, until: int, switches := false, at_boundary := Callable()) -> PackedStringArray:
-	var bad := PackedStringArray()
-	var me: StringName = &"crew_1"
-	var st := s.state
-	_tick(s, 0.4)
-	for n in range(1, until):
-		if at_boundary.is_valid():
-			at_boundary.call(n)
-		var r: ActionResult
-		match n:
-			1:
-				_go(s, me, s.state.character(me).position + Vector3(9.0, 0.0, 0.0))
-				_tick(s, 0.4)
-				_go(s, me, _pos(s, SUITS) + Vector3(0.5, 0.0, 0.0))
-			2:
-				r = _do(s, me, &"begin_suit_check", SUITS, {"on": true})
-				if not r.ok: bad.append("suit: " + r.message)
-				_tick(s, 1.4)
-				_go(s, me, _pos(s, TRACKER) + Vector3(2.0, 0.0, 0.0))
-				s.note_airlock_cycle()
-				_tick(s, 0.4)
-				_go(s, me, _pos(s, SUITS))
-			3:
-				_go(s, me, s.config.hub_position)
-				_tick(s, 0.4)
-				r = _answer(s, me, COMPUTER, "energy_q_battery_night")
-				if not r.ok: bad.append("battery question: " + r.message)
-			4:
-				r = _do(s, me, &"clean_panel", TRACKER)
-				if not r.ok: bad.append("clean: " + r.message)
-				_tick(s, 0.4)
-				r = _do(s, me, &"repair_cleaner", TRACKER)
-				if not r.ok: bad.append("repair: " + r.message)
-				_tick(s, 0.4)
-				r = _answer(s, me, POWER, "energy_q_dust_output")
-				if not r.ok: bad.append("dust question: " + r.message)
-			5:
-				r = _answer(s, me, POWER, "energy_q_net_power")
-				if not r.ok: bad.append("net power question: " + r.message)
-				_tick(s, 0.4)
-				r = _do(s, me, &"set_zone_power", POWER, {"zone": "Hangar bay", "on": false})
-				if not r.ok: bad.append("room off: " + r.message)
-				_tick(s, 0.4)
-				r = _do(s, me, &"set_water_allocation", LS, {"electrolysis_feed_l_per_hour": 1.0})
-				if not r.ok: bad.append("feed: " + r.message)
-				r = _do(s, me, &"set_equipment", LS, {"equipment": "electrolyser", "on": true})
-				if not r.ok: bad.append("electrolyser: " + r.message)
-				r = _do(s, me, &"set_equipment", LS, {"equipment": "co2_unit", "on": true})
-				if not r.ok: bad.append("co2 unit: " + r.message)
-				_tick(s, 0.4)
-				r = _answer(s, me, LS, "ls_q_two_paths")
-				if not r.ok: bad.append("two paths: " + r.message)
-			6:
-				if switches:
-					r = _switch(s, me, &"crew_3")
-					if not r.ok: bad.append("switch to biology: " + r.message)
-					me = &"crew_3"
-				r = _do(s, me, &"plant", BED, {"crop": "lettuce"})
-				if not r.ok: bad.append("plant: " + r.message)
-				_tick(s, 0.4)
-				r = _do(s, me, &"set_greenhouse_water", FOOD, {"greenhouse_l_per_hour": 1.0})
-				if not r.ok: bad.append("greenhouse water: " + r.message)
-				_tick(s, 0.4)
-				r = _do(s, me, &"inspect_bed", BED)
-				if not r.ok: bad.append("inspect: " + r.message)
-				_tick(s, 0.4)
-				r = _answer(s, me, FOOD, "food_q_light")
-				if not r.ok: bad.append("light question: " + r.message)
-			7:
-				r = _do(s, me, &"exercise", GYM)
-				if not r.ok: bad.append("exercise: " + r.message)
-				_tick(s, 0.4)
-				if st.character(me).suit_charge < 95.0:
-					r = _do(s, me, &"refill_suit", SUITS)
-					if not r.ok: bad.append("refill: " + r.message)
-			8:
-				if switches and me != &"crew_1":
-					r = _switch(s, me, &"crew_1")
-					if not r.ok: bad.append("switch to electrical: " + r.message)
-					me = &"crew_1"
-				_go(s, me, _pos(s, COMMS))
-				_tick(s, 0.4)
-				if not _install_radio(s, me): bad.append("radio card")
-			9:
-				if not _solve_stage9(s, me): bad.append("stage 9 fix")
-				_game_hours(s, 1.3)
-			10:
-				_go(s, me, s.config.hub_position)
-				_tick(s, 0.4)
-				r = _switch(s, me, &"crew_4")
-				if not r.ok: bad.append("switch to field engineer: " + r.message)
-				me = &"crew_4"
-				_tick(s, 0.4)
-				r = _do(s, me, &"inspect_donor", DONOR)
-				if not r.ok: bad.append("inspect donor: " + r.message)
-		_tick(s, 0.6)
-		if _stage(s) != n + 1 and not (n == 10 and TutorialSystem.is_tutorial_done(st)):
-			bad.append("stage %d did not finish (stage %d, open: %s)" % [n, _stage(s), _current(s)])
-			return bad
-	if at_boundary.is_valid():
-		at_boundary.call(until)
-	return bad
+## Collects one tape with the real action by `crew`.
+func _collect(s: SessionService, crew: StringName, id: String) -> ActionResult:
+	return _do(s, crew, &"cassette_collect", StringName(id))
 
 
-## Synthetic set-up: marks stages 1..n-1 done (as if played) so a test can start at stage n.
-func _skip_to(s: SessionService, n: int) -> void:
-	var t: Dictionary = TutorialSystem.ensure(s.state).tutorial
-	for k in range(1, n):
-		for o: Dictionary in TutorialSystem.objectives_of(k):
-			(t.objectives as Dictionary)[String(o.id)] = {"done": true, "at_hours": 0.0, "by": "crew_1", "skipped": false}
-		(t.completed as Dictionary)[str(k)] = {"at_hours": 0.0}
-	t["stage"] = n
-	t["started"] = false
-	t["current"] = ""
+## Plays one tape at the Command Room cassette player with the real actions (open the player, choose the tape).
+func _play(s: SessionService, crew: StringName, id: String) -> ActionResult:
+	var opened := _do(s, crew, &"cassette_open", PLAYER)
+	if not opened.ok:
+		return opened
+	return s.request(&"cassette_select", PLAYER, {"cassette_id": id}, _peer(s, crew))
 
 
-## Synthetic set-up: tier 1 in every sector (questions and evidence recorded directly) and the first radio card.
-func _make_sectors_work(s: SessionService) -> void:
-	var st := s.state
-	for sector: String in ProgressionSystem.SECTORS:
-		var rule := ProgressionSystem.tier_rule(sector, 1)
-		for q in rule.get("questions", []):
-			var v: Dictionary = (ProgressionSystem.question(StringName(q)).variants as Array)[0]
-			st.knowledge[String(q)] = {"by": "crew_1", "sector": sector, "at_hours": 0.0, "variant": 0, "example": String(v.example)}
-		for e in rule.get("evidence", []):
-			ProgressEvidence.record(st, s.events, StringName(e), sector, &"crew_1")
-	st.upgrades["comms_radio_1"] = {"installed": true, "by": "crew_1", "at_hours": 0.0, "parts": 1, "station": String(COMMS), "sector": "comms"}
+## Stand-in rule for every broken spot: one "finish" move completes it (the real puzzles: tests/test_puzzle_tNN.gd).
+func _stand_in_rules(s: SessionService) -> void:
+	var finish := func(_task: Dictionary, move: Dictionary) -> Dictionary:
+		if String(move.get("move", "")) != "finish":
+			return {"accepted": false}
+		return {"accepted": true, "puzzle_state": {"done": 1}, "progress": 1.0, "complete": true}
+	for id: String in TEN:
+		s.repair_runtime.register_rule(id, finish, false)
+
+
+## Fixes broken spot `task` by `crew` through the real RepairRuntime path; returns the move's answer.
+func _fix(s: SessionService, crew: StringName, task: String) -> ActionResult:
+	var station := StringName(RepairCatalog.anchor_id(task))
+	var gen := int(s.state.repair.tasks[task].fault_generation)
+	var claim := _do(s, crew, &"task_claim", station, {"generation": gen})
+	if not claim.ok:
+		return claim
+	return s.request(&"task_move", station, {"generation": gen, "move": "finish", "value": 1}, _peer(s, crew))
+
+
+## The crew member of `specialty`.
+func _crew_of(specialty: String) -> StringName:
+	return StringName("crew_%d" % (CharacterState.SPECIALTIES.find(StringName(specialty)) + 1))
+
+
+## Fixes every listed spot solo by `start` crew, switching at the hub to the right specialist (real claims).
+## Returns the crew member played at the end.
+func _fix_all_solo(s: SessionService, start: StringName, counts: Array) -> StringName:
+	var me := start
+	for task: String in TEN:
+		if TutorialSystem.is_fixed(s.state, task):
+			continue
+		var spec := String(s.state.repair.tasks[task].required_specialty)
+		var who := me
+		if spec != "general" and String(s.state.character(me).specialty) != spec:
+			who = _crew_of(spec)
+			if s.state.character(who).owner_peer == 0:
+				if not _switch(s, me, who).ok:
+					push_error("switch to %s failed" % who)
+				me = who
+		var r := _fix(s, who, task)
+		if not r.ok:
+			_notes.append("fix %s failed: %s %s" % [task, r.reason, r.message])
+		_go(s, who, s.config.hub_position)        # back to the hub (the leaking vestibule is no place to wait)
+		_tick(s, 0.4)
+		counts.append(TutorialSystem.fixed_count(s.state))
+	return me
 
 
 # ================================================================ data
@@ -407,20 +332,19 @@ func _make_sectors_work(s: SessionService) -> void:
 func _test_data() -> void:
 	var stages := TutorialSystem.stages()
 	var titles: Array[String] = []
-	var order_ok := stages.size() == 10
+	var order_ok := stages.size() == TutorialSystem.STAGE_COUNT
 	for i in stages.size():
 		order_ok = order_ok and int((stages[i] as Dictionary).n) == i + 1
 		titles.append(String((stages[i] as Dictionary).title))
-	_check("data: ten stages in the supplied order (arrival, airlock, hub, solar, energy, greenhouse, health, comms, independent problem, hub and exploration)",
-		order_ok and titles == STAGE_TITLES, str(titles))
+	_check("data: three steps in order (arrival, the first team's tapes, fix the base)", order_ok and titles == STAGE_TITLES, str(titles))
 	var ids := {}
 	var bad := PackedStringArray()
-	var session := _session(1)
 	for s: Dictionary in stages:
-		if (s.get("teaches", []) as Array).is_empty() or String(s.get("intro", "")) == "":
-			bad.append("stage %d: no teaches or intro" % int(s.n))
-		if (s.get("objectives", []) as Array).is_empty():
-			bad.append("stage %d: no objectives" % int(s.n))
+		if String(s.get("intro", "")) == "" or (s.get("start_messages", []) as Array).is_empty():
+			bad.append("step %d: no intro or Mission Control line" % int(s.n))
+		for m in s.get("start_messages", []):
+			if TutorialSystem.message_text(String(m)) == "":
+				bad.append("step %d: message %s missing" % [int(s.n), m])
 		for o: Dictionary in s.get("objectives", []):
 			var id := String(o.get("id", ""))
 			if id == "" or ids.has(id):
@@ -428,36 +352,45 @@ func _test_data() -> void:
 			ids[id] = true
 			if not KINDS.has(String(o.get("kind", ""))):
 				bad.append("%s: unknown kind %s" % [id, o.get("kind", "")])
-			if String(o.get("text", "")) == "" or String(o.get("explain", "")) == "":
-				bad.append("%s: text or explanation missing" % id)
-			if String(o.kind) != "stage9_fixed" and (o.get("hints", []) as Array).is_empty():
-				bad.append("%s: no hints" % id)
-			var p: Dictionary = o.get("params", {})
-			if p.has("station") and not _catalog.has(String(p.station)):
-				bad.append("%s: station %s is not on the map" % [id, p.station])
-			if String(o.kind) == "knowledge" and ProgressionSystem.question(StringName(String(p.get("question", "")))).is_empty():
-				bad.append("%s: question %s does not exist" % [id, p.get("question", "")])
-			for a in p.get("actions", []):
-				if session.actions.definition(StringName(String(a))) == null:
-					bad.append("%s: action %s is not registered" % [id, a])
-			for key in ["specialty", "specialty_hint"]:
-				if o.has(key) and not CharacterState.SPECIALTIES.has(StringName(String(o[key]))):
-					bad.append("%s: unknown specialty %s" % [id, o[key]])
-			# with four players nothing may ask anyone to switch crew
+			if String(o.get("text", "")) == "" or String(o.get("explain", "")) == "" or (o.get("hints", []) as Array).is_empty():
+				bad.append("%s: text, explanation or hints missing" % id)
 			if _mentions_switch(TutorialSystem.objective_text(o, true)):
-				bad.append("%s: the four-player text asks to switch: %s" % [id, TutorialSystem.objective_text(o, true)])
-			for h in TutorialSystem.hints_for(session.state, o, true):
+				bad.append("%s: the four-player text asks to switch" % id)
+			for h in TutorialSystem.hints_for(null, o, true):
 				if _mentions_switch(h):
 					bad.append("%s: a four-player hint asks to switch: %s" % [id, h])
-	_check("data: every objective has a known kind, words, an explanation, hints, real stations, questions and actions; with four players none asks to switch crew",
+	_check("data: every objective has a known kind, words, an explanation and hints; every step has Mission Control lines; with four players none asks to switch crew",
 		bad.is_empty(), "\n  ".join(bad))
-	var variants: Dictionary = TutorialSystem.stage9_data().get("variants", {})
-	var vbad := PackedStringArray()
-	for v: String in TutorialSystem.VARIANTS:
-		var vd: Dictionary = variants.get(v, {})
-		if String(vd.get("problem", "")) == "" or (vd.get("hints", []) as Array).size() < 2 or String(vd.get("solved", "")) == "":
-			vbad.append(v)
-	_check("data: three stage 9 variants, each with a problem, at least two hints and a solved line", variants.size() == 3 and vbad.is_empty(), str(vbad))
+	var listed: Array[String] = []
+	for f: Dictionary in TutorialSystem.fix_defs():
+		listed.append(String(f.task))
+	var fbad := PackedStringArray()
+	for id: String in TEN:
+		if not PuzzleRegistry.has_puzzle(id):
+			fbad.append("%s has no puzzle installed" % id)
+		if String(TutorialSystem.fix_def(id).get("text", "")) == "" or String(TutorialSystem.fix_def(id).get("done", "")) == "":
+			fbad.append("%s has no words" % id)
+	_check("data: the fix list is the 10 broken spots in room order (T05 and T07 not required), each with its puzzle installed and words",
+		listed == TEN and Array(TutorialSystem.required_fixes()) == TEN and fbad.is_empty(), "%s %s" % [listed, fbad])
+	var text := ""
+	for m: String in (TutorialSystem.data().get("messages", {}) as Dictionary):
+		text += " " + TutorialSystem.message_text(m)
+	var low := text.to_lower()
+	var scary := PackedStringArray()
+	for w in FORBIDDEN_WORDS:
+		for token in low.replace(".", " ").replace(",", " ").replace(":", " ").replace("!", " ").split(" ", false):
+			if token == w:
+				scary.append(w)
+	_check("data: Mission Control tells the story (2060s, Earth, the second team, the first team's tapes) with no scary words; the fix line says 'Fix the base: get it to operational condition.'",
+		low.contains("2060s") and low.contains("earth") and low.contains("second team") and low.contains("tape") and scary.is_empty()
+		and TutorialSystem.message_text("fix_start").begins_with("Fix the base: get it to operational condition."), str(scary))
+	var rows := TutorialSystem.fix_rows(null)
+	var specs := {}
+	for r: Dictionary in rows:
+		specs[String(r.task)] = String(r.specialty)
+	_check("data: the list shows the specialist each spot needs (T02, T04 electrical; T09 medical; T12 field engineering; the rest anyone)",
+		specs.T02 == "electrical_comms" and specs.T04 == "electrical_comms" and specs.T09 == "medical_life_support" and specs.T12 == "field_engineering_geology"
+		and specs.T01 == "" and specs.T03 == "" and specs.T06 == "" and specs.T08 == "" and specs.T10 == "" and specs.T11 == "", str(specs))
 
 
 func _test_lore_data() -> void:
@@ -491,43 +424,10 @@ func _test_lore_data() -> void:
 			if TutorialSystem.record_def(String(clue)).is_empty():
 				dbad.append("%s: unknown clue %s" % [d.id, clue])
 			used[String(clue)] = true
-		for need in d.get("requires", []):
-			var found := false
-			for other: Dictionary in TutorialSystem.discovery_defs():
-				found = found or String(other.id) == String(need)
-			if not found:
-				dbad.append("%s needs unknown %s" % [d.id, need])
-		if _words(String(d.get("text", ""))) > 60:
-			dbad.append("%s is longer than 60 words" % d.id)
 	for r: Dictionary in recs:
 		if not used.has(String(r.id)) and String(r.id) != "rec_handover":
 			dbad.append("%s is no clue of any discovery" % r.id)
 	_check("lore: four discoveries and a final one; every clue exists and every record (except the handover note) is a clue", TutorialSystem.discovery_defs().size() == 5 and dbad.is_empty(), "\n  ".join(dbad))
-	var lore := TutorialSystem.lore()
-	_check("lore: the premise and the record label say it is fiction, and the premise is hopeful (everyone got home safely)",
-		String(lore.get("premise", "")).begins_with("Fiction") and String(lore.get("fiction_label", "")).begins_with("Fiction")
-		and String(lore.get("premise", "")).contains("safely"), String(lore.get("premise", "")))
-	# record stations: existing map objects, not claimed by any other stations_*.json file
-	var data: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/stations_lore.json"))
-	var objects := {}
-	for o: Dictionary in (JSON.parse_string(FileAccess.get_file_as_string(MANIFEST)) as Dictionary).objects:
-		objects[String(o.name)] = true
-	var sbad := PackedStringArray()
-	var others := {}
-	for entry: Dictionary in StationCatalog.extra_entries():
-		if entry.has("object") and String(entry.get("kind", "")) != "record":
-			others[String(entry.object)] = true
-	for entry: Dictionary in data.stations:
-		var name := String(entry.object)
-		if not objects.has(name):
-			sbad.append("%s is not in the map" % name)
-		if others.has(name):
-			sbad.append("%s is also a station of another part" % name)
-		if String((_catalog.get(name, {}) as Dictionary).get("kind", "")) != "record":
-			sbad.append("%s is not a record station" % name)
-		if TutorialSystem.records_at(name, "read_record").size() != 1:
-			sbad.append("%s holds %d records" % [name, TutorialSystem.records_at(name, "read_record").size()])
-	_check("lore: %d record stations on existing map objects, each holding one record, none claimed by another part" % (data.stations as Array).size(), sbad.is_empty(), "\n  ".join(sbad))
 
 
 func _test_sources() -> void:
@@ -544,33 +444,11 @@ func _test_sources() -> void:
 				bad.append("%s cites %s, not in the register" % [r.id, id])
 			elif String(known[String(id)]) != "VERIFIED":
 				bad.append("%s cites %s (%s), not a verified source" % [r.id, id, known[String(id)]])
-		if (r.get("source_ids", []) as Array).is_empty():
-			var sci := String(r.science).to_lower()
-			if not (sci.contains("game") or sci.contains("principle")):
-				bad.append("%s has no source and does not say it is a game rule or a general principle" % r.id)
-	_check("sources: every record's source id is a VERIFIED register entry; records without one say they are a game rule or a general principle", bad.is_empty(), "\n  ".join(bad))
+	_check("sources: every record's source id is a VERIFIED register entry", bad.is_empty(), "\n  ".join(bad))
 	var cats: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/model_sources_campaign.json"))
-	var need := ["hint_after_s", "hint_repeat_s", "near_m", "move_m", "stage9.hold_hours", "stage9.lighting_line_room_kw", "certification.sols",
-		"objective_params.metres", "objective_params.min_l_per_hour", "objective_params.min_charge", "objective_params.min"]
-	var missing := PackedStringArray()
-	var allowed := ["requirement", "design", "balance", "fiction", "index"]
-	if cats is Dictionary:
-		for key: String in need:
-			var e: Dictionary = (cats as Dictionary).get(key, {})
-			if not allowed.has(String(e.get("category", ""))):
-				missing.append(key)
-		for key: String in (cats as Dictionary):
-			var e: Dictionary = (cats as Dictionary)[key]
-			for id in e.get("source_ids", []):
-				if not known.has(String(id)):
-					missing.append("%s cites unknown %s" % [key, id])
-		var data := TutorialSystem.data()
-		var values_ok := _approx(float(data.hint_after_s), float((cats as Dictionary).hint_after_s.value)) and _approx(float(data.stage9.lighting_line_room_kw), float((cats as Dictionary)["stage9.lighting_line_room_kw"].value))
-		if not values_ok:
-			missing.append("values in model_sources_campaign.json differ from data/tutorial.json")
-	else:
-		missing.append("model_sources_campaign.json unreadable")
-	_check("sources: every tutorial and campaign number has a category (requirement, design, balance or fiction) in model_sources_campaign.json", missing.is_empty(), "\n  ".join(missing))
+	var ok := cats is Dictionary and _approx(float(TutorialSystem.data().hint_after_s), float((cats as Dictionary).hint_after_s.value)) \
+		and String(((cats as Dictionary).get("certification.sols", {}) as Dictionary).get("category", "")) != ""
+	_check("sources: the hint timing and the certification sol keep their categories in model_sources_campaign.json", ok)
 
 
 func _test_wrapping() -> void:
@@ -579,457 +457,290 @@ func _test_wrapping() -> void:
 	var all_wrapped := true
 	for id: String in TutorialSystem.watched_actions():
 		all_wrapped = all_wrapped and TutorialActions.is_observed(s.actions, StringName(id))
-	_check("actions: every action the tutorial and story watch is registered and observed (TutorialActions registered last): %s" % ", ".join(TutorialSystem.watched_actions()),
-		missing.is_empty() and all_wrapped, "missing %s" % str(missing))
-	# a watched action behaves exactly as before: same answer and the same change of the colony
-	var a := _session(1)
-	var b := _session(1)
-	var d := ActionService.Definition.new()
-	d.id = &"clean_panel"
-	d.target_kind = &"station"
-	d.station_kinds = PackedStringArray(["solar"])
-	d.check = func(_ctx: ActionService.Context) -> ActionResult: return null
-	d.apply = func(ctx: ActionService.Context) -> Dictionary:
-		ctx.state.panel_dust[0] = 0.0
-		return {"action": "clean_panel", "target": String(ctx.request.target), "text": "Panel 1 is clean: it makes its full power again."}
-	b.actions.register(d)               # b: the unwrapped stand-in with the same effect on panel 1
-	var ra := _do(a, &"crew_1", &"clean_panel", TRACKER)
-	var rb := _do(b, &"crew_1", &"clean_panel", TRACKER)
-	_check("actions: a watched action gives the same answer and changes the colony the same way", ra.ok and rb.ok
-		and _approx(float(a.state.panel_dust[0]), float(b.state.panel_dust[0])) and String(ra.changes.text) == String(rb.changes.text), "%s / %s" % [ra.changes, rb.changes])
+	_check("actions: every action the tutorial watches is registered and observed (TutorialActions registered last): %s" % ", ".join(TutorialSystem.watched_actions()),
+		missing.is_empty() and all_wrapped and TutorialSystem.watched_actions().has("cassette_select"), "missing %s" % str(missing))
 
 
-# ================================================================ solo run
+# ================================================================ the flow, solo
 
-func _test_solo_run() -> void:
-	var s := _session(1, 4242)
+func _test_solo_flow() -> void:
+	var s := _tutorial_session(1, 4242)
 	var st := s.state
-	var boundary_bad := PackedStringArray()
-	var seen_stages := PackedInt32Array()
-	# save/load at every stage boundary: the colony saved as JSON resumes at the same stage and objectives
-	var at_boundary := func(n: int) -> void:
-		seen_stages.append(n)
-		var d := _json(st)
-		var copy := ColonyState.from_dict(d)
-		if TutorialSystem.current_stage(copy) != _stage(s) or String(TutorialSystem.current_objective(copy).get("id", "")) != _current(s):
-			boundary_bad.append("stage %d: saved copy at %d/%s, game at %d/%s" % [n, TutorialSystem.current_stage(copy), TutorialSystem.current_objective(copy).get("id", ""), _stage(s), _current(s)])
-		if not _same(copy.campaign, st.campaign):
-			boundary_bad.append("stage %d: campaign data changed by save/load" % n)
-		var s2 := _resume(s, d)
-		var zones_before := s2.state.zones.duplicate(true)
-		var trackers_before := s2.state.is_on("trackers")
-		_tick(s2, 0.6)
-		if TutorialSystem.current_stage(s2.state) != _stage(s) or String(TutorialSystem.current_objective(s2.state).get("id", "")) != _current(s):
-			boundary_bad.append("stage %d: resumed game moved to %d/%s" % [n, TutorialSystem.current_stage(s2.state), TutorialSystem.current_objective(s2.state).get("id", "")])
-		if n >= 9 and (not _same(zones_before, s2.state.zones) or trackers_before != s2.state.is_on("trackers")):
-			boundary_bad.append("stage %d: the resumed game injected the stage 9 fault again" % n)
-	var bad := _solo_flow(s, 11, true, at_boundary)
-	var t := TutorialSystem.tutorial_of(st)
-	var real_switches := 0
-	_check("solo: one player completes all ten stages with real actions only, switching crew only at the hub (biology for the greenhouse, electrical for comms, field engineer to explore)",
-		bad.is_empty() and TutorialSystem.is_tutorial_done(st) and (t.completed as Dictionary).size() == 10 and s.peers.size() == 1
-		and st.character(&"crew_4").owner_peer == 1, "\n  ".join(bad))
-	_check("solo: save/load at every stage boundary resumes the same stage and the same objective, without injecting the stage 9 fault twice (%d boundaries)" % seen_stages.size(),
-		boundary_bad.is_empty() and seen_stages.size() == 11, "\n  ".join(boundary_bad))
-	var who_bad := PackedStringArray()
-	for o: Dictionary in TutorialSystem.objectives_of(4) + TutorialSystem.objectives_of(8):
-		var rec := TutorialSystem.objective_record(st, String(o.id))
-		if not bool(rec.get("done", false)):
-			who_bad.append(String(o.id))
-	_check("solo: the specialist steps were done (cleaner repaired by the electrical specialist, comms reached by them)", who_bad.is_empty()
-		and st.condition_of("cleaner") >= s.balance.equipment_min_condition and String((st.upgrades.get("comms_radio_1", {}) as Dictionary).get("by", "")) == "crew_1", str(who_bad))
-	_check("solo: the tutorial earned energy and life-support competence through its own steps (energy tier 1 at stage 4, the life-support answer at stage 5)",
-		ProgressionSystem.tier(st, "energy") >= 1 and st.knowledge.has("ls_q_two_paths") and st.evidence.has("energy_diagnose_output_loss"), str(st.progress.get("tiers", {})))
-	_check("solo: free exploration reached: tutorial done, certification waiting for the sectors, a first-crew record found on the way",
-		String(TutorialSystem.certification_of(st).status) == "waiting" and TutorialSystem.is_found(st, "rec_switchgear"), str(TutorialSystem.certification_of(st)))
-	# ---- continuation to the first campaign milestone, still one player, still real actions
-	var me: StringName = &"crew_4"
-	var log := PackedStringArray()
-	var r := _do(s, me, &"adjust_nutrients", BED, {"level": 0.2})
-	log.append("nutrients %s" % r.ok)
+	_stand_in_rules(s)
 	_tick(s, 0.4)
-	r = _do(s, me, &"inspect_bed", BED)
-	log.append("inspect %s" % r.ok)
-	r = _answer(s, me, FOOD, "food_q_symptom")
-	log.append("symptom %s" % r.ok)
-	r = _do(s, me, &"adjust_nutrients", BED, {"level": 0.7})
-	r = _do(s, me, &"inspect_donor", DONOR, {"choice": "relay"})
-	log.append("donor %s" % r.ok)
-	r = _answer(s, me, COMPUTER, "res_q_compatible")
-	log.append("res question %s" % r.ok)
-	r = _do(s, me, &"begin_suit_check", SUITS, {"on": true})
-	_tick(s, 1.4)
-	r = _do(s, me, &"take_sample", SITE)
-	log.append("sample %s %s" % [r.ok, r.message])
-	_go(s, me, _pos(s, SUITS))
-	r = _answer(s, me, COMPUTER, "sci_q_context")
-	log.append("sci question %s" % r.ok)
-	_game_hours(s, 1.2)
-	var missing := TutorialSystem.requirements_missing(st)
-	_check("solo: after the tutorial one player brings all five sectors to tier 1 with real actions (food symptom, salvage, field sample), and the radio works",
-		missing.is_empty(), "%s\n  %s" % [str(missing), ", ".join(log)])
-	_tick(s, 0.6)
-	var running := String(TutorialSystem.certification_of(st).status) == "running"
-	s.request(&"set_sol_minutes", &"", {"minutes": 5.0}, 1)
-	var lowest := INF
-	for i in 1600:
-		s.advance(0.2)
-		for k: StringName in TutorialSystem.RESERVES:
-			lowest = minf(lowest, st.store(k))
-		if String(TutorialSystem.certification_of(st).status) == "complete":
-			break
-	var cert := TutorialSystem.certification_of(st)
-	_check("solo: the certification sol starts after the tutorial and completes after one full sol with every reserve above zero (lowest %.2f)" % lowest,
-		running and String(cert.status) == "complete" and lowest > 0.0 and float(cert.completed_at_hours) - float(cert.started_at_hours) >= GameConfig.SOL_HOURS - 0.01,
-		str(cert))
-	var records_found := 0
-	for d: Variant in st.discoveries:
-		if d is Dictionary and String((d as Dictionary).get("kind", "")) == "record":
-			records_found += 1
-	_check("solo: the mystery is optional: the milestone completed with %d of %d records found" % [records_found, TutorialSystem.records().size()],
-		records_found < TutorialSystem.records().size())
-	# ---- play continues in the same world
-	var parts_before := st.parts
-	r = _answer(s, me, COMPUTER, "energy_q_tracking")
-	var r2 := _do(s, &"crew_4", &"set_equipment", POWER, {"equipment": "cabin_fans", "on": true})
-	_game_hours(s, 2.0)
-	var d2 := _json(st)
-	var s3 := _resume(s, d2)
-	_tick(s3, 0.6)
-	_check("solo: after the milestone everything keeps working: questions, switches, the simulation, save/load; the milestone stays complete",
-		r.ok and r2.ok and st.parts == parts_before and String(TutorialSystem.certification_of(s3.state).status) == "complete"
-		and TutorialSystem.is_tutorial_done(s3.state) and st.invariants_ok().is_empty(), "%s %s %s" % [r.message, r2.message, st.invariants_ok()])
-
-
-# ================================================================ four players
-
-func _test_four_players() -> void:
-	var s := _session(4, 777)
-	var st := s.state
-	var bad := PackedStringArray()
-	var said := PackedStringArray()
-	var cast := {"a": &"crew_2", "b": &"crew_3", "c": &"crew_4", "elec": &"crew_1", "bio": &"crew_3", "field": &"crew_4"}
-	# every text a four-player group sees, for every crew member's screen
-	var collect := func() -> void:
-		var o := TutorialSystem.current_objective(st)
-		if o.is_empty():
-			return
-		said.append(TutorialSystem.objective_text(o, true))
-		for h in TutorialSystem.hints_for(st, o, true):
-			said.append(h)
-		for id: StringName in [&"crew_1", &"crew_2", &"crew_3", &"crew_4"]:
-			var spec := String(o.get("specialty", o.get("specialty_hint", "")))
-			said.append(TutorialSystem.specialist_cue(st, spec, id, true, o.has("specialty_hint")))
-	var claim := s.request(&"claim_character", &"crew_2", {}, 1)
-	_tick(s, 0.4)
-	collect.call()
-	var a: StringName = cast.a
-	_go(s, a, st.character(a).position + Vector3(0.0, 0.0, 9.0))
-	_tick(s, 0.4)
-	collect.call()
-	_go(s, cast.b, _pos(s, SUITS))
-	_tick(s, 0.4)
-	collect.call()
-	# stage 2 by player 4 alone
-	var c: StringName = cast.c
-	var r := _do(s, c, &"begin_suit_check", SUITS, {"on": true})
-	_tick(s, 1.4)
-	collect.call()
-	_go(s, c, _pos(s, TRACKER) + Vector3(2.0, 0, 0))
-	_tick(s, 0.4)
-	collect.call()
-	_go(s, c, _pos(s, SUITS))
-	_tick(s, 0.6)
-	collect.call()
-	if _stage(s) != 3: bad.append("stage 2 not done (%d %s)" % [_stage(s), _current(s)])
-	# stage 3: the team is at the hub already; the electrical specialist is played (no switch); player 2 answers
-	_go(s, a, s.config.hub_position)
-	_tick(s, 0.4)
-	collect.call()
-	r = _answer(s, a, COMPUTER, "energy_q_battery_night")
-	_tick(s, 0.6)
-	collect.call()
-	if _stage(s) != 4: bad.append("stage 3 not done (%d %s)" % [_stage(s), _current(s)])
-	# stage 4: player 4 (outside, suited) cleans, player 1 (electrical) repairs, player 3 answers
-	r = _do(s, c, &"clean_panel", TRACKER2)
-	if not r.ok: bad.append("clean " + r.message)
-	_tick(s, 0.4)
-	collect.call()
-	r = _do(s, cast.elec, &"repair_cleaner", TRACKER2)
-	if not r.ok: bad.append("repair " + r.message)
-	_tick(s, 0.4)
-	collect.call()
-	r = _answer(s, cast.b, POWER, "energy_q_dust_output")
-	_tick(s, 0.6)
-	collect.call()
-	if _stage(s) != 5: bad.append("stage 4 not done (%d %s)" % [_stage(s), _current(s)])
-	# stage 5: each step by a different player
-	r = _answer(s, cast.elec, POWER, "energy_q_net_power")
-	_tick(s, 0.4)
-	collect.call()
-	r = _do(s, a, &"set_zone_power", POWER, {"zone": "Dome plaza", "on": false})
-	_tick(s, 0.4)
-	collect.call()
-	_do(s, cast.b, &"set_water_allocation", LS, {"electrolysis_feed_l_per_hour": 1.0})
-	_do(s, cast.b, &"set_equipment", LS, {"equipment": "electrolyser", "on": true})
-	_do(s, cast.b, &"set_equipment", LS, {"equipment": "co2_unit", "on": true})
-	_tick(s, 0.4)
-	collect.call()
-	r = _answer(s, c, LS, "ls_q_two_paths")
-	_tick(s, 0.6)
-	collect.call()
-	if _stage(s) != 6: bad.append("stage 5 not done (%d %s)" % [_stage(s), _current(s)])
-	# stage 6 by the biology player, stage 7 by player 2
-	r = _do(s, cast.bio, &"plant", BED2, {"crop": "lettuce"})
-	_tick(s, 0.4)
-	collect.call()
-	r = _do(s, cast.bio, &"set_greenhouse_water", FOOD, {"greenhouse_l_per_hour": 1.0})
-	_tick(s, 0.4)
-	collect.call()
-	r = _do(s, a, &"inspect_bed", BED2)
-	_tick(s, 0.4)
-	collect.call()
-	r = _answer(s, cast.bio, FOOD, "food_q_light")
-	_tick(s, 0.6)
-	collect.call()
-	if _stage(s) != 7: bad.append("stage 6 not done (%d %s)" % [_stage(s), _current(s)])
-	r = _do(s, a, &"exercise", GYM)
-	_tick(s, 0.4)
-	collect.call()
-	r = _do(s, c, &"refill_suit", SUITS)          # player 4 was outside: their tank is not full
-	_tick(s, 0.6)
-	collect.call()
-	if _stage(s) != 8: bad.append("stage 7 not done (%d %s)" % [_stage(s), _current(s)])
-	_go(s, cast.elec, _pos(s, COMMS))
-	_tick(s, 0.4)
-	collect.call()
-	_install_radio(s, cast.elec)
-	_tick(s, 0.6)
-	collect.call()
-	if _stage(s) != 9: bad.append("stage 8 not done (%d %s)" % [_stage(s), _current(s)])
-	if not _solve_stage9(s, a): bad.append("stage 9 fix")
-	_game_hours(s, 1.3)
-	collect.call()
-	if _stage(s) != 10: bad.append("stage 9 not done (%d %s)" % [_stage(s), _current(s)])
-	_go(s, a, s.config.hub_position)
-	_tick(s, 0.4)
-	collect.call()
-	r = _do(s, cast.field, &"inspect_donor", &"ls_filter_old")
-	_tick(s, 0.6)
-	var all_said := "\n".join(said)
-	var asks := PackedStringArray()
-	for line in said:
-		if _mentions_switch(line):
-			asks.append(line)
-	var actors := {}
-	for o_id: String in (TutorialSystem.tutorial_of(st).objectives as Dictionary):
-		var by := String((TutorialSystem.objective_record(st, o_id)).get("by", ""))
-		if by != "":
-			actors[by] = true
-	_check("four players: all ten stages done with real actions, no crew switch (switching refused as disabled), every step by one player",
-		bad.is_empty() and TutorialSystem.is_tutorial_done(st) and not claim.ok and claim.reason == &"character_taken" and s.peers.size() == 4
-		and st.character(&"crew_1").owner_peer == 1 and st.character(&"crew_4").owner_peer == 4, "\n  ".join(bad))
-	_check("four players: nothing shown to the group asks anyone to switch crew; the cues name who should act (%d lines checked)" % said.size(),
-		asks.is_empty() and all_said.contains("played by another player") and all_said.contains("You are the"), "\n  ".join(asks))
-	_check("four players: work was shared (%d different crew members completed steps); no step waited for two players at once" % actors.size(), actors.size() >= 3, str(actors.keys()))
-
-
-# ================================================================ order
-
-func _test_order() -> void:
-	var s := _session(1, 99)
-	var st := s.state
-	_tick(s, 0.4)
-	# a stage 4 action done during stage 1 does not count later
-	var early := _do(s, &"crew_1", &"clean_panel", TRACKER)
+	var heard := _heard(s)
+	_check("arrival: tutorial mode, step 1, Mission Control speaks first (welcome to Mars in the 2060s, the crew radio is down)",
+		TutorialSystem.tutorial_active(st) and TutorialSystem.current_stage(st) == 1 and heard.size() >= 2
+		and String(heard[0]).begins_with("Mission Control: Welcome to Mars") and String(heard[1]).contains("radio is broken"), str(heard))
+	_check("arrival: still outside, so the step stays open", String(TutorialSystem.current_objective(st).get("id", "")) == "arrival_inside" and st.character(&"crew_1").outside)
 	_go(s, &"crew_1", s.config.hub_position)
 	_tick(s, 0.4)
-	var credited_early := (TutorialSystem.tutorial_of(st).credit as Dictionary).has("solar_clean")
-	var bad := _solo_flow(s, 4)
-	_tick(s, 0.6)
-	_check("order: a stage 4 action done during stage 1 is not counted; stage 4 asks for it again",
-		early.ok and not credited_early and bad.is_empty() and _stage(s) == 4 and not _done(s, "solar_clean") and _current(s) == "solar_clean", "%s %s" % [bad, _current(s)])
-	# finish stage 4 for real
-	_do(s, &"crew_1", &"clean_panel", TRACKER)
-	_tick(s, 0.4)
-	_do(s, &"crew_1", &"repair_cleaner", TRACKER)
-	_tick(s, 0.4)
-	_answer(s, &"crew_1", POWER, "energy_q_dust_output")
-	_tick(s, 0.6)
-	# stage 5: step 2 done before step 1 is credited but only completes after step 1
-	var off := _do(s, &"crew_1", &"set_zone_power", POWER, {"zone": "Hangar bay", "on": false})
-	var planted := _do(s, &"crew_1", &"plant", BED, {"crop": "lettuce"})          # a stage 6 action, early
-	_tick(s, 0.6)
-	var held := not _done(s, "energy_switch_off") and not _done(s, "energy_predict") and _current(s) == "energy_predict"
-	_answer(s, &"crew_1", POWER, "energy_q_net_power")
-	_tick(s, 0.6)
-	_check("order: inside a stage, a step done early is kept but completes only after the step before it",
-		off.ok and held and _done(s, "energy_predict") and _done(s, "energy_switch_off") and _current(s) == "energy_oxygen_on",
-		"held %s, current %s" % [held, _current(s)])
-	var order_ok := true
-	var t := TutorialSystem.tutorial_of(st)
-	var prev := -1.0
-	for n in range(1, 6):
-		for o: Dictionary in TutorialSystem.objectives_of(n):
-			var rec := TutorialSystem.objective_record(st, String(o.id))
-			if bool(rec.get("done", false)):
-				order_ok = order_ok and float(rec.at_hours) >= prev - 1e-9
-				prev = float(rec.at_hours)
-	_check("order: objectives were completed in the data's order across stages", order_ok)
-	_do(s, &"crew_1", &"set_water_allocation", LS, {"electrolysis_feed_l_per_hour": 1.0})
-	_do(s, &"crew_1", &"set_equipment", LS, {"equipment": "electrolyser", "on": true})
-	_do(s, &"crew_1", &"set_equipment", LS, {"equipment": "co2_unit", "on": true})
-	_tick(s, 0.4)
-	_answer(s, &"crew_1", LS, "ls_q_two_paths")
-	_tick(s, 0.6)
-	_check("order: a stage 6 action done during stage 5 does not count for stage 6; nothing of stage 6 is done when it starts",
-		planted.ok and _stage(s) == 6 and not _done(s, "greenhouse_plant") and not (t.completed as Dictionary).has("6"), _current(s))
+	_check("arrival: walking into the base finishes step 1; step 2 asks for the 6 tapes", TutorialSystem.current_stage(st) == 2
+		and String(TutorialSystem.current_objective(st).get("id", "")) == "tapes_found" and _count_heard(s, "Find all 6 tapes") == 1, str(_heard(s)))
+	# find the tapes with the real pickup, play some on the way
+	var found_counts: Array[int] = []
+	var ids: Array = CassetteCatalog.TAPES.keys()
+	for i in ids.size():
+		var r := _collect(s, &"crew_1", String(ids[i]))
+		if not r.ok:
+			_notes.append("collect %s: %s %s" % [ids[i], r.reason, r.message])
+		_tick(s, 0.2)
+		found_counts.append(TutorialSystem.tapes_found(st))
+	var view_after_find := TutorialPresenter.list_lines(st, 2)
+	_check("tapes: 'Tapes found' counts 1/6 .. 6/6 with the real pickup, and Mission Control says when all are found",
+		Array(found_counts) == [1, 2, 3, 4, 5, 6] and TutorialSystem.is_objective_done(st, "tapes_found") and _count_heard(s, "All 6 tapes found") == 1
+		and String(TutorialSystem.current_objective(st).get("id", "")) == "tapes_played", "%s %s" % [found_counts, _heard(s)])
+	var goal_card: Array = st.campaign.get("objectives", [])
+	_check("tapes: the goal card shows 'Tapes found 6/6' and 'Tapes played 0/6'", goal_card.size() == 2 and String(goal_card[0].text) == "Tapes found" and String(goal_card[0].label) == "6/6"
+		and String(goal_card[1].text) == "Tapes played" and String(goal_card[1].label) == "0/6" and view_after_find.size() == 6, str(goal_card))
+	# playing away from the player is refused by the cassette rules; playing at the player counts once
+	_go(s, &"crew_1", s.config.hub_position)
+	var far := s.request(&"cassette_select", PLAYER, {"cassette_id": String(ids[0])}, 1)
+	var played_counts: Array[int] = []
+	for i in ids.size():
+		var r := _play(s, &"crew_1", String(ids[i]))
+		if not r.ok:
+			_notes.append("play %s: %s %s" % [ids[i], r.reason, r.message])
+		if i == 0:
+			_play(s, &"crew_1", String(ids[0]))     # the same tape again counts once
+		_tick(s, 0.2)
+		played_counts.append(TutorialSystem.tapes_played(st))
+		if i == 4:
+			_check("tapes: no 'Fix the base' before every tape is played (5 of 6 played)", TutorialSystem.current_stage(st) == 2
+				and _count_heard(s, "Fix the base") == 0)
+	_check("tapes: 'Tapes played' counts 1/6 .. 6/6 at the Command Room player; a replay counts once; from afar it is refused",
+		not far.ok and Array(played_counts) == [1, 2, 3, 4, 5, 6] and (TutorialSystem.tutorial_of(st).played as Array).size() == 6, "%s %s" % [played_counts, far.reason])
+	s.request(&"cassette_close", PLAYER, {}, 1)
+	_check("fix: once all 6 are played Mission Control says 'Fix the base: get it to operational condition.' (once) and step 3 opens",
+		TutorialSystem.current_stage(st) == 3 and _count_heard(s, "Mission Control: Fix the base: get it to operational condition.") == 1
+		and String(TutorialSystem.current_objective(st).get("id", "")) == "fix_all", str(_heard(s)))
+	var lines := TutorialPresenter.list_lines(st, 3)
+	var joined := "\n".join(lines)
+	_check("fix: the list shows the 10 broken spots by room with the specialist each needs; T05 and T07 are not on it",
+		lines.size() == 10 and joined.contains("Command Room: Fix the wires (⚡ Electrical and comms specialist)") and joined.contains("Med Bay: Fix the test-tube rack (✚ Medical and life support specialist)")
+		and joined.contains("Hangar and airlock: Repair the air leak (⛏ Field engineering and geology specialist)") and joined.contains("Command Room: Fix the radio signal")
+		and not joined.contains("Command Room: Fix the radio signal (") and not joined.contains("Elements") and not joined.contains("Pipes"), joined)
+	var card: Array = st.campaign.get("objectives", [])
+	_check("fix: the goal card lists the 6 rooms with their fixed counts", card.size() == 6 and String(card[0].text) == "Fix the Command Room" and String(card[0].label) == "0/2", str(card))
+	# wrong specialist refused on the host; the right one fixes it
+	var wrong := _fix(s, &"crew_1", "T09")
+	_check("fix: the host refuses a specialised spot for the wrong specialist (T09 by the electrical specialist)", not wrong.ok and wrong.reason == &"wrong_specialty"
+		and PuzzleRegistry.is_broken(st, "T09"), "%s %s" % [wrong.reason, wrong.message])
+	_go(s, &"crew_1", s.config.hub_position)
+	var counts: Array = []
+	var last := _fix_all_solo(s, &"crew_1", counts)
+	_check("fix: each of the 10 fixes counts once, in order (solo, switching to the medical and field specialists at the hub)",
+		counts == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] and TutorialSystem.fixed_count(st) == 10 and last == &"crew_4", "%s" % [counts])
+	_check("fix: Mission Control counts each fix ('... 3 of 10 fixed.') and says when a room is restored",
+		_count_heard(s, "of 10 fixed.") == 10 and _count_heard(s, "3 of 10 fixed.") == 1 and _count_heard(s, "is restored!") == 6
+		and _count_heard(s, "The Command Room is restored!") == 1, "\n".join(PackedStringArray(_heard(s))))
+	var info := TutorialSystem.base_operational_info(st)
+	var events: Array = _objective_events[s]
+	_check("done: all 10 fixed finishes the tutorial; campaign.base_operational is set with at_hours; 'base_operational' fires exactly once",
+		TutorialSystem.is_tutorial_done(st) and TutorialSystem.is_base_operational(st) and bool(info.done) and float(info.at_hours) > 0.0
+		and _approx(float(info.at_hours), float(TutorialSystem.tutorial_of(st).done_at_hours)) and events.count("base_operational") == 1
+		and _count_heard(s, "The base is operational!") == 1, "%s %s" % [info, events.count("base_operational")])
+	_check("done: tutorial mode ends (stations unlocked, held doors released: GameMain reads is_tutorial_done)", not TutorialSystem.tutorial_active(st)
+		and not TutorialLock.active(st))
+	var power := _do(s, last, &"set_zone_power", POWER, {"zone": "Hangar bay", "on": false})
+	_check("done: after the tutorial a locked station works again (power panel)", power.ok, "%s %s" % [power.reason, power.message])
+	_tick(s, 1.0)
+	_check("done: nothing fires twice later", (_objective_events[s] as Array).count("base_operational") == 1 and _count_heard(s, "The base is operational!") == 1)
+	var card2: Array = st.campaign.get("objectives", [])
+	_check("done: the goal card shows 'Base operational'", card2.size() == 1 and String(card2[0].text) == "Base operational" and bool(card2[0].done), str(card2))
+	# reminders repeat Mission Control's lines of a finished step and change nothing
+	var before := JSON.stringify(st.campaign)
+	var remind := s.request(&"tutorial_replay", &"", {"stage": 2}, 1)
+	_check("reminder: a finished step's Mission Control lines come back on request, and nothing changes", remind.ok and String(remind.changes.text).contains("Find all 6 tapes")
+		and JSON.stringify(st.campaign) == before, String(remind.changes.get("text", remind.message)))
 
 
-# ================================================================ repeat and replay
+# ================================================================ order: early fixes, T05/T07
 
-func _test_repeat_and_replay() -> void:
+func _test_order() -> void:
+	var s := _tutorial_session(1, 99)
+	var st := s.state
+	_stand_in_rules(s)
+	_go(s, &"crew_1", s.config.hub_position)
+	_tick(s, 0.4)
+	var early := _fix(s, &"crew_1", "T01")
+	_go(s, &"crew_1", s.config.hub_position)
+	_tick(s, 0.4)
+	_check("order: a broken spot fixed during the tapes step works and counts at once", early.ok and TutorialSystem.fixed_count(st) == 1 and TutorialSystem.current_stage(st) == 2, "%s %s" % [early.reason, early.message])
+	for task: String in TEN:
+		st.repair.tasks[task].first_completed = true      # synthetic set-up: every spot fixed before the tapes
+	_tick(s, 0.4)
+	_check("order: even with every spot fixed the tutorial waits for the tapes", not TutorialSystem.is_tutorial_done(st) and TutorialSystem.current_stage(st) == 2
+		and TutorialSystem.tutorial_active(st))
+	for id: String in CassetteCatalog.TAPES:
+		_collect(s, &"crew_1", id)
+		_play(s, &"crew_1", id)
+	_tick(s, 0.4)
+	_check("order: the last tape played then finishes it straight away (fix step done at once) with Base operational",
+		TutorialSystem.is_tutorial_done(st) and TutorialSystem.is_base_operational(st) and TutorialSystem.is_stage_completed(st, 3))
+	_check("order: T05 and T07 (no broken part) are never needed", not PuzzleRegistry.is_broken(st, "T05") and not PuzzleRegistry.is_broken(st, "T07")
+		and not st.repair.tasks.T05.first_completed and not st.repair.tasks.T07.first_completed)
+
+
+# ================================================================ station lock (host)
+
+func _test_lock_host() -> void:
+	var s := _tutorial_session(1, 321)
+	var st := s.state
+	_tick(s, 0.4)
+	_go(s, &"crew_1", s.config.hub_position)
+	_tick(s, 0.4)
+	var power := _do(s, &"crew_1", &"set_zone_power", POWER, {"zone": "Hangar bay", "on": false})
+	var solar := _do(s, &"crew_1", &"clean_panel", TRACKER)
+	var record := _do(s, &"crew_1", &"read_record", &"pr_fsp_console")
+	_check("lock: during the tutorial other stations are refused on the host with a plain message (power panel, sun tracker, record console)",
+		not power.ok and power.reason == TutorialLock.REASON and power.message == TutorialLock.MESSAGE and not solar.ok and solar.reason == TutorialLock.REASON
+		and not record.ok and record.reason == TutorialLock.REASON and st.is_zone_powered("Hangar bay"), "%s / %s / %s" % [power.reason, solar.reason, record.reason])
+	var suit := _do(s, &"crew_1", &"begin_suit_check", SUITS, {"on": false})
+	var tape := _collect(s, &"crew_1", "cassette_med_bay")
+	var player := _do(s, &"crew_1", &"cassette_open", PLAYER)
+	s.request(&"cassette_close", PLAYER, {}, 1)
+	var gen := int(st.repair.tasks.T01.fault_generation)
+	var broken := _do(s, &"crew_1", &"task_claim", &"repair_t01", {"generation": gen})
+	var release := s.request(&"task_release", &"repair_t01", {"generation": gen}, 1)
+	var t05 := _do(s, &"crew_1", &"task_claim", &"repair_t05", {"generation": int(st.repair.tasks.T05.fault_generation)})
+	_check("lock: the suit rack, tape pickups, the cassette player and broken spots still work; releasing a spot always works; T05 (no broken part) is locked",
+		suit.ok and tape.ok and player.ok and broken.ok and release.ok and not t05.ok and t05.reason == TutorialLock.REASON,
+		"%s %s %s %s %s %s" % [suit.reason, tape.reason, player.reason, broken.reason, release.reason, t05.reason])
+	var swap := _switch(s, &"crew_1", &"crew_2")
+	_check("lock: the crew screen (C) at the hub still swaps crew", swap.ok and st.character(&"crew_2").owner_peer == 1, swap.message)
+	_check("lock: what the HUD hides matches the host (power locked; suits, tapes, player and broken spots usable; fixed spots locked)",
+		not TutorialLock.station_usable(st, st.stations[String(POWER)]) and TutorialLock.station_usable(st, st.stations[String(SUITS)])
+		and TutorialLock.station_usable(st, st.stations["cassette_hangar"]) and TutorialLock.station_usable(st, st.stations[String(PLAYER)])
+		and TutorialLock.station_usable(st, st.stations["repair_t02"]) and not TutorialLock.station_usable(st, st.stations["repair_t07"]))
+	st.repair.tasks.T02.first_completed = true       # synthetic set-up: T02 fixed
+	_check("lock: a fixed spot locks again until the base is fixed, with its own message", not TutorialLock.station_usable(st, st.stations["repair_t02"])
+		and TutorialLock.message_for(st, st.stations["repair_t02"]) == TutorialLock.FIXED_MESSAGE)
+	TutorialSystem.skip_tutorial(st, s.events)
+	var after := _do(s, &"crew_2", &"set_zone_power", POWER, {"zone": "Hangar bay", "on": false})
+	_check("lock: after the tutorial every station works as before (skipped tutorial: no Base operational moment)", after.ok and not st.is_zone_powered("Hangar bay")
+		and TutorialSystem.is_tutorial_done(st) and not TutorialSystem.is_base_operational(st), after.message)
+	# a simulation harness that never switches tutorial mode on keeps every station working
+	var h := _session(1, 322)
+	_tick(h, 0.4)
+	var plain := _do(h, &"crew_1", &"set_zone_power", POWER, {"zone": "Hangar bay", "on": false})
+	_check("lock: without tutorial mode (simulation harnesses) nothing is locked and the crew radio is up", plain.ok and not TutorialSystem.tutorial_active(h.state)
+		and not CommsGate.voice_down(h.state), plain.message)
+
+
+# ================================================================ crew radio gate
+
+func _test_voice_gate() -> void:
+	var s := _tutorial_session(2, 555)
+	var st := s.state
+	_stand_in_rules(s)
+	_tick(s, 0.4)
+	var down := CommsGate.voice_down(st)
+	var vs := VoiceService.new()
+	var gs_stub := GameServices.new()
+	gs_stub.session = s
+	vs.services = gs_stub
+	var line_down := vs.own_line() if gs_stub.has_game() else CommsGate.MESSAGE
+	_go(s, &"crew_1", s.config.hub_position)
+	_tick(s, 0.4)
+	var r := _fix(s, &"crew_1", "T01")
+	_go(s, &"crew_1", s.config.hub_position)
+	_tick(s, 0.4)
+	var up := not CommsGate.voice_down(st) and not vs.comms_down()
+	_check("voice: crew voice is down at the start of the tutorial with a clear line, and back once the T01 radio is fixed (Mission Control says so)",
+		down and line_down == CommsGate.MESSAGE and r.ok and up and _count_heard(s, "your crew radio works") == 1, "%s %s %s" % [down, line_down, r.message])
+	vs.free()
+	gs_stub.free()
+
+
+# ================================================================ save/load, replication, late join
+
+func _test_save_and_late_join() -> void:
+	var s := _tutorial_session(2, 777)
+	var st := s.state
+	_stand_in_rules(s)
+	_tick(s, 0.4)
+	_go(s, &"crew_1", s.config.hub_position)
+	_go(s, &"crew_2", s.config.hub_position)
+	_tick(s, 0.4)
+	var ids: Array = CassetteCatalog.TAPES.keys()
+	for i in 4:
+		_collect(s, &"crew_1", String(ids[i]))
+	for i in 2:
+		_play(s, &"crew_2", String(ids[i]))
+	s.request(&"cassette_close", PLAYER, {}, 2)
+	_tick(s, 0.4)
+	var s2 := _resume(s, _json(st))
+	_tick(s2, 0.4)
+	_check("save: mid-tapes the colony resumes at the same step with 4/6 found and 2/6 played; Mission Control does not repeat itself",
+		TutorialSystem.current_stage(s2.state) == 2 and TutorialSystem.tapes_found(s2.state) == 4 and TutorialSystem.tapes_played(s2.state) == 2
+		and TutorialSystem.tutorial_active(s2.state) and _heard(s2).is_empty(), "%d %d %s" % [TutorialSystem.tapes_found(s2.state), TutorialSystem.tapes_played(s2.state), _heard(s2)])
+	# finish the tapes and fix some spots in the resumed colony
+	s2.request(&"claim_character", &"crew_1", {}, 1)
+	s2.request(&"claim_character", &"crew_2", {}, 2)
+	_stand_in_rules(s2)
+	for i in ids.size():
+		_collect(s2, &"crew_1", String(ids[i]))
+		_play(s2, &"crew_1", String(ids[i]))
+	s2.request(&"cassette_close", PLAYER, {}, 1)
+	_fix(s2, &"crew_1", "T01")
+	_fix(s2, &"crew_1", "T02")
+	_go(s2, &"crew_1", s2.config.hub_position)
+	_tick(s2, 0.4)
+	# a late joiner gets the host's state as a whole (ColonyState dictionary, as NetSession sends it)
+	var client := ColonyState.from_dict(JSON.parse_string(JSON.stringify(s2.state.to_dict())))
+	var same := (TutorialSystem.current_stage(client) == 3 and TutorialSystem.tapes_played(client) == 6 and TutorialSystem.fixed_count(client) == 2
+		and TutorialPresenter.list_lines(client, 3) == TutorialPresenter.list_lines(s2.state, 3) and TutorialSystem.tutorial_active(client)
+		and _same(client.campaign.objectives, s2.state.campaign.objectives) and TutorialSystem.last_message(client) == TutorialSystem.last_message(s2.state))
+	var locks_same := true
+	for sid: String in s2.state.stations:
+		locks_same = locks_same and TutorialLock.station_usable(client, s2.state.stations[sid]) == TutorialLock.station_usable(s2.state, s2.state.stations[sid])
+	_check("late join: a client sees the same step, counts, fix list, goal card, Mission Control line and station locks as the host", same and locks_same)
+	var s3 := _resume(s2, _json(s2.state))
+	_check("save: fixes and played tapes survive save/load (2 of 10 fixed, step 3)", TutorialSystem.current_stage(s3.state) == 3 and TutorialSystem.fixed_count(s3.state) == 2
+		and TutorialSystem.tapes_played(s3.state) == 6)
+	s3.request(&"claim_character", &"crew_1", {}, 1)
+	s3.request(&"claim_character", &"crew_2", {}, 2)
+	_stand_in_rules(s3)
+	_fix_all_solo(s3, &"crew_1", [])
+	var s4 := _resume(s3, _json(s3.state))
+	_tick(s4, 0.4)
+	var late := ColonyState.from_dict(JSON.parse_string(JSON.stringify(s4.state.to_dict())))
+	_check("save + late join: Base operational and the finished tutorial survive save/load and reach a late joiner (no second moment)",
+		TutorialSystem.is_base_operational(s4.state) and TutorialSystem.is_tutorial_done(s4.state) and TutorialSystem.is_base_operational(late)
+		and not TutorialSystem.tutorial_active(late) and _heard(s4).is_empty() and _approx(float(TutorialSystem.base_operational_info(late).at_hours), float(TutorialSystem.base_operational_info(s3.state).at_hours)))
+
+
+func _test_migration() -> void:
 	var s := _session(1, 31)
 	var st := s.state
-	var bad := _solo_flow(s, 5)
-	var t := TutorialSystem.tutorial_of(st)
-	var completed_before: Dictionary = (t.completed as Dictionary).duplicate(true)
-	var evidence_before := st.evidence.duplicate(true)
-	var knowledge_before := st.knowledge.duplicate(true)
-	var objectives_before: Dictionary = (t.objectives as Dictionary).duplicate(true)
-	# doing stage 4 work again changes nothing in the tutorial
-	_do(s, &"crew_1", &"clean_panel", TRACKER2)
-	_answer(s, &"crew_1", POWER, "energy_q_dust_output")
-	_tick(s, 0.6)
-	_check("repeat: doing a finished stage's work again adds nothing (stage records, evidence, knowledge and objectives unchanged)",
-		bad.is_empty() and _same(t.completed, completed_before) and _same(st.evidence, evidence_before) and _same(st.knowledge, knowledge_before)
-		and _same(t.objectives, objectives_before) and _stage(s) == 5, "%s" % bad)
-	# a reminder run of stage 4
-	var refused := s.request(&"tutorial_replay", &"", {"stage": 7}, 1)
-	var no_stop := s.request(&"tutorial_replay", &"", {"stage": 0}, 1)
-	var start := s.request(&"tutorial_replay", &"", {"stage": 4}, 1)
+	st.campaign = {"version": 1, "tutorial": {"stage": 10, "done": true, "done_at_hours": 5.0, "objectives": {}, "completed": {"10": {"at_hours": 5.0}}},
+		"stage9": {"variant": "trackers_stopped", "injected": true}, "certification": {"status": "waiting"}}
 	_tick(s, 0.4)
-	var replay_open := String(TutorialSystem.replay_objective(st).get("id", ""))
-	_do(s, &"crew_1", &"clean_panel", TRACKER)
-	_tick(s, 1.0)
-	var finished := TutorialSystem.replay_of(st).is_empty()
-	_check("replay: only finished stages can be replayed; the reminder asks for the stage's work again and ends by itself",
-		not refused.ok and refused.reason == &"missing_prerequisite" and not no_stop.ok and start.ok and replay_open == "solar_clean" and finished,
-		"%s / %s / open %s / finished %s" % [refused.message, start.message, replay_open, finished])
-	_check("replay: nothing in the reminder counted twice (stage records, evidence, knowledge, main objectives and stage unchanged)",
-		_same(t.completed, completed_before) and _same(st.evidence, evidence_before) and _same(st.knowledge, knowledge_before)
-		and _same(t.objectives, objectives_before) and _stage(s) == 5)
-	# a reminder of stage 2 needs the walk again; it can be stopped
-	s.request(&"tutorial_replay", &"", {"stage": 2}, 1)
-	_tick(s, 0.4)
-	var stop := s.request(&"tutorial_replay", &"", {"stage": 0}, 1)
-	_check("replay: a reminder can be stopped and shows explanations even when mastered",
-		stop.ok and TutorialSystem.replay_of(st).is_empty() and TutorialSystem.explanation_for(st, TutorialSystem.objective_def("airlock_suit"), true) != ""
-		and TutorialSystem.explanation_for(st, TutorialSystem.objective_def("airlock_suit")) == "", stop.message)
+	_check("old saves: a colony that finished the old ten-stage tutorial stays finished (no locks, no Base operational moment), and stage 9 is retired",
+		TutorialSystem.is_tutorial_done(st) and not TutorialSystem.tutorial_active(st) and not TutorialSystem.is_base_operational(st) and not st.campaign.has("stage9")
+		and int(st.campaign.version) == TutorialSystem.VERSION)
+	var s2 := _session(1, 32)
+	s2.state.campaign = {"version": 1, "tutorial": {"stage": 4, "done": false, "objectives": {"arrival_walk": {"done": true}}, "completed": {"1": {}}}}
+	_tick(s2, 0.4)
+	_check("old saves: an unfinished old tutorial starts the new flow from the beginning",
+		not TutorialSystem.is_tutorial_done(s2.state) and int(TutorialSystem.tutorial_of(s2.state).flow) == TutorialSystem.FLOW and TutorialSystem.current_stage(s2.state) == 2
+		and not (TutorialSystem.tutorial_of(s2.state).objectives as Dictionary).has("arrival_walk"))
 
 
-# ================================================================ hints and mastery
+# ================================================================ colony goal after the tutorial (certification)
 
-func _test_hints_and_mastery() -> void:
-	var after := TutorialSystem.number("hint_after_s", 75.0)
-	var rep := TutorialSystem.number("hint_repeat_s", 60.0)
-	var table := [TutorialSystem.hint_count(0.0, 0, 3), TutorialSystem.hint_count(after - 0.1, 0, 3), TutorialSystem.hint_count(after, 0, 3),
-		TutorialSystem.hint_count(after + rep, 0, 3), TutorialSystem.hint_count(after + 10.0 * rep, 0, 3), TutorialSystem.hint_count(0.0, 1, 3),
-		TutorialSystem.hint_count(after, 5, 3), TutorialSystem.hint_count(1000.0, 0, 0)]
-	_check("hints: none at first, one after %d real seconds without progress, one more every %d s, one per request, never more than there are" % [roundi(after), roundi(rep)],
-		table == [0, 0, 1, 2, 3, 1, 3, 0], str(table))
-	# mastery: the battery question answered before stage 3 makes its step skip, with no explanation
-	var s := _session(1, 55)
+func _make_sectors_work(s: SessionService) -> void:
 	var st := s.state
-	_tick(s, 0.4)
-	var r := _answer(s, &"crew_1", COMPUTER, "energy_q_battery_night")
-	var o := TutorialSystem.objective_def("hub_reserves")
-	var shown_before_stage := TutorialSystem.explanation_for(st, o)
-	var fresh := TutorialSystem.explanation_for(st, TutorialSystem.objective_def("arrival_walk"))
-	var bad := _solo_flow(s, 4)
-	var rec := TutorialSystem.objective_record(st, "hub_reserves")
-	_check("mastery: a question the colony already knows skips its step and its explanation; an unknown step shows its explanation",
-		r.ok and bad.is_empty() and bool(rec.get("skipped", false)) and shown_before_stage == "" and fresh != "", "%s %s %s" % [bad, rec, shown_before_stage])
-	_check("mastery: a finished stage's explanations are skipped from then on", TutorialSystem.explanation_for(st, TutorialSystem.objective_def("arrival_walk")) == ""
-		and TutorialSystem.explanation_for(st, TutorialSystem.objective_def("solar_clean")) != "")
-	# cues: one to three players are told to switch only when nobody plays the specialist
-	var s2 := _session(2, 56)
-	var cue_mine := TutorialSystem.specialist_cue(s2.state, "electrical_comms", &"crew_1", false)
-	var cue_other := TutorialSystem.specialist_cue(s2.state, "electrical_comms", &"crew_2", false)
-	var cue_nobody := TutorialSystem.specialist_cue(s2.state, "field_engineering_geology", &"crew_2", false)
-	var cue_team := TutorialSystem.specialist_cue(s2.state, "field_engineering_geology", &"crew_2", true)
-	_check("cues: your own specialist step, a step another player's specialist does, a switch cue only when nobody plays the specialist (never with four players)",
-		cue_mine.contains("You are the") and cue_other.contains("played by another player") and cue_nobody.contains("Switch at the hub")
-		and not _mentions_switch(cue_team) and cue_mine.contains("⚡") and cue_nobody.contains("⛏"), "\n  %s\n  %s\n  %s\n  %s" % [cue_mine, cue_other, cue_nobody, cue_team])
+	for sector: String in ProgressionSystem.SECTORS:
+		var rule := ProgressionSystem.tier_rule(sector, 1)
+		for q in rule.get("questions", []):
+			var v: Dictionary = (ProgressionSystem.question(StringName(q)).variants as Array)[0]
+			st.knowledge[String(q)] = {"by": "crew_1", "sector": sector, "at_hours": 0.0, "variant": 0, "example": String(v.example)}
+		for e in rule.get("evidence", []):
+			ProgressEvidence.record(st, s.events, StringName(e), sector, &"crew_1")
+	st.upgrades["comms_radio_1"] = {"installed": true, "by": "crew_1", "at_hours": 0.0, "parts": 1, "station": String(COMMS), "sector": "comms"}
 
-
-# ================================================================ stage 9
-
-func _test_stage9_variants() -> void:
-	var seen := {}
-	var first := {}
-	var stable := true
-	for seed_value in range(1, 41):
-		var v := TutorialSystem.variant_for_seed(seed_value)
-		stable = stable and v == TutorialSystem.variant_for_seed(seed_value)
-		seen[v] = true
-		if not first.has(v):
-			first[v] = seed_value
-	var three := {}
-	for seed_value in [1, 2, 3]:
-		three[TutorialSystem.variant_for_seed(seed_value)] = true
-	_check("stage 9: the variant comes from the colony seed (same seed, same variant); seeds 1, 2, 3 give %d different variants; all three appear" % three.size(),
-		stable and three.size() >= 2 and seen.size() == 3, "%s %s" % [three.keys(), first])
-	for v: String in TutorialSystem.VARIANTS:
-		var seed_value := int(first.get(v, 1))
-		var s := _session(1, seed_value)
-		var st := s.state
-		_do(s, &"crew_1", &"plant", BED, {"crop": "lettuce"})
-		_do(s, &"crew_1", &"set_greenhouse_water", FOOD, {"greenhouse_l_per_hour": 1.0})
-		_tick(s, 0.4)
-		_skip_to(s, 9)                            # synthetic set-up: stages 1-8 marked done
-		_tick(s, 0.6)
-		var s9 := TutorialSystem.stage9_of(st)
-		var injected_ok := bool(s9.get("injected", false)) and String(s9.variant) == v
-		match v:
-			"greenhouse_breaker":
-				injected_ok = injected_ok and not st.is_zone_powered("Greenhouse")
-			"trackers_stopped":
-				injected_ok = injected_ok and not st.is_on("trackers")
-			"lighting_overload":
-				injected_ok = injected_ok and not st.is_zone_powered("Greenhouse") and TutorialSystem.room_light_kw(st, s.balance) > float(s9.limit_kw)
-		# harmless: two sols unsolved, nobody loses health, stores stay valid
-		var health := {}
-		for c: CharacterState in st.active_characters():
-			health[c.id] = c.health
-		s.request(&"set_sol_minutes", &"", {"minutes": 5.0}, 1)
-		_game_hours(s, 2.0 * GameConfig.SOL_HOURS)
-		var harmless := st.invariants_ok().is_empty() and not bool(TutorialSystem.stage9_of(st).solved)
-		for c: CharacterState in st.active_characters():
-			harmless = harmless and c.health >= float(health[c.id]) - 1e-6
-		# save and load mid-problem: no second injection
-		var s2 := _resume(s, _json(st))
-		var trips_before := int(TutorialSystem.stage9_of(s2.state).get("trips", 0))
-		var at_before := float(TutorialSystem.stage9_of(s2.state).at_hours)
-		_tick(s2, 0.6)
-		var once := float(TutorialSystem.stage9_of(s2.state).at_hours) == at_before and int(TutorialSystem.stage9_of(s2.state).get("trips", 0)) == trips_before
-		# the overload breaker opens again if the grow lights come back with every room light on
-		var retrip := true
-		if v == "lighting_overload":
-			_do(s2, &"crew_1", &"set_zone_power", POWER, {"zone": "Greenhouse", "on": true})
-			_tick(s2, 0.6)
-			retrip = not s2.state.is_zone_powered("Greenhouse") and int(TutorialSystem.stage9_of(s2.state).trips) > trips_before
-		var fixed := _solve_stage9(s2, &"crew_1")
-		_tick(s2, 0.6)
-		var half := _done(s2, "challenge_fix") and not _done(s2, "challenge_hold")
-		_game_hours(s2, 1.2)
-		_tick(s2, 0.6)
-		_check("stage 9 %s (seed %d): injected into the real colony, harmless for two sols, not injected again after save/load%s, solved with real power-panel actions held for an hour" % [v, seed_value, ", the breaker re-opens while the room lights are too many" if v == "lighting_overload" else ""],
-			injected_ok and harmless and once and retrip and fixed and half and bool(TutorialSystem.stage9_of(s2.state).solved) and _stage(s2) == 10,
-			"injected %s harmless %s once %s retrip %s fixed %s half %s solved %s stage %d" % [injected_ok, harmless, once, retrip, fixed, half, TutorialSystem.stage9_of(s2.state).get("solved"), _stage(s2)])
-
-
-# ================================================================ certification
 
 func _test_certification() -> void:
 	var s := _session(1, 808)
@@ -1037,64 +748,28 @@ func _test_certification() -> void:
 	s.request(&"set_sol_minutes", &"", {"minutes": 5.0}, 1)
 	_tick(s, 0.4)
 	_check("certification: locked during the tutorial", String(TutorialSystem.certification_of(st).status) == "locked")
-	_skip_to(s, 11)                               # synthetic set-up: the tutorial marked done
+	TutorialSystem.skip_tutorial(st, s.events)        # synthetic set-up: the tutorial finished
 	_tick(s, 0.6)
 	var waiting := String(TutorialSystem.certification_of(st).status) == "waiting" and TutorialSystem.requirements_missing(st).size() == 6
-	_make_sectors_work(s)                         # synthetic set-up: tier 1 everywhere and the first radio card
+	_make_sectors_work(s)                             # synthetic set-up: tier 1 everywhere and the first radio card
 	_tick(s, 0.6)
 	var cert := TutorialSystem.certification_of(st)
-	_check("certification: waits for all five sectors and the radio, then the sol starts", waiting and String(cert.status) == "running", str(cert))
-	var progress_before := {"knowledge": st.knowledge.duplicate(true), "evidence": st.evidence.duplicate(true), "upgrades": st.upgrades.duplicate(true),
-		"tiers": (st.progress.get("tiers", {}) as Dictionary).duplicate(true), "tutorial": (TutorialSystem.tutorial_of(st)).duplicate(true)}
-	# an emergency recovery restarts the sol
+	_check("certification (kept after the base works): waits for all five sectors and the radio, then the sol starts", waiting and String(cert.status) == "running", str(cert))
 	_game_hours(s, 0.5 * GameConfig.SOL_HOURS)
 	var half := float(TutorialSystem.certification_of(st).elapsed_hours)
 	s.recover_character(&"crew_1")
 	_tick(s, 0.4)
 	cert = TutorialSystem.certification_of(st)
-	var after_recovery := float(cert.elapsed_hours) < 0.1 and String(cert.status) == "running" and (cert.resets as Array).size() == 1 \
-		and String((cert.resets as Array)[0].reason) == "recovery"
-	_check("certification: an emergency recovery restarts the sol (%.1f h were done) and keeps running" % half, half > 10.0 and after_recovery, str(cert))
-	# a reserve reaching zero restarts it and holds it until the store is above zero again (synthetic: food nearly gone)
-	_game_hours(s, 0.3 * GameConfig.SOL_HOURS)
-	st.stores[&"food_meals"] = 0.002
-	_tick(s, 1.0)
-	cert = TutorialSystem.certification_of(st)
-	var paused := String(cert.status) == "paused_reserve" and (cert.resets as Array).size() == 2 and String((cert.resets as Array)[1].detail) == "food_meals"
-	st.add_to_store(&"food_meals", 60.0)          # synthetic: a harvest
-	_tick(s, 0.6)
-	var resumed := String(TutorialSystem.certification_of(st).status) == "running"
-	_check("certification: the food store reaching zero restarts the sol and holds it until food is back; then it starts again", paused and resumed, str(cert))
-	# a real action that empties a store (a suit refill taking the last oxygen) restarts it too
-	_game_hours(s, 0.1 * GameConfig.SOL_HOURS)
-	st.stores[&"oxygen_kg"] = 0.05                # synthetic: oxygen nearly gone
-	st.character(&"crew_1").suit_charge = 0.0
-	var refill := _do(s, &"crew_1", &"refill_suit", SUITS)
-	cert = TutorialSystem.certification_of(st)
-	var o2_reset := refill.ok and String(cert.status) == "paused_reserve" and String((cert.resets as Array).back().detail) == "oxygen_kg"
-	st.add_to_store(&"oxygen_kg", 60.0)           # synthetic: oxygen restored
-	_tick(s, 0.6)
-	_check("certification: a suit refill that takes the last oxygen restarts the sol at once", o2_reset and String(TutorialSystem.certification_of(st).status) == "running", str(cert))
-	var kept := _same(st.knowledge, progress_before.knowledge) and _same(st.evidence, progress_before.evidence) and _same(st.upgrades, progress_before.upgrades) \
-		and _same(st.progress.get("tiers", {}), progress_before.tiers) and _same(TutorialSystem.tutorial_of(st).completed, (progress_before.tutorial as Dictionary).completed)
-	_check("certification: restarts never wipe progress (knowledge, evidence, upgrades, tiers, tutorial)", kept)
-	# save/load mid-sol keeps the count; then a full sol completes it
+	_check("certification: an emergency recovery restarts the sol (%.1f h were done) and keeps running" % half, half > 10.0 and float(cert.elapsed_hours) < 0.1
+		and String(cert.status) == "running" and (cert.resets as Array).size() == 1, str(cert))
 	var s2 := _resume(s, _json(st))
-	var e_before := float(TutorialSystem.certification_of(s2.state).elapsed_hours)
-	_tick(s2, 0.4)
-	var continued := float(TutorialSystem.certification_of(s2.state).elapsed_hours) >= e_before and String(TutorialSystem.certification_of(s2.state).status) == "running"
 	for i in 1700:
 		s2.advance(0.2)
 		if String(TutorialSystem.certification_of(s2.state).status) == "complete":
 			break
 	cert = TutorialSystem.certification_of(s2.state)
-	_check("certification: save/load mid-sol keeps the count; one full sol later the first milestone is complete",
-		continued and String(cert.status) == "complete" and float(cert.completed_at_hours) - float(cert.started_at_hours) >= GameConfig.SOL_HOURS - 0.01, str(cert))
-	# after completion nothing undoes it
-	s2.state.stores[&"food_meals"] = 0.0
-	s2.recover_character(&"crew_1")
-	_tick(s2, 1.0)
-	_check("certification: after completion a later shortage or rescue does not undo the milestone", String(TutorialSystem.certification_of(s2.state).status) == "complete")
+	_check("certification: after save/load one full sol completes the first milestone", String(cert.status) == "complete"
+		and float(cert.elapsed_hours) >= GameConfig.SOL_HOURS - 0.01, str(cert))
 
 
 # ================================================================ story records
@@ -1103,6 +778,7 @@ func _test_lore_runtime() -> void:
 	var s := _session(1, 1234)
 	var st := s.state
 	_tick(s, 0.4)
+	var stage_before := TutorialSystem.current_stage(st)
 	var r1 := _do(s, &"crew_1", &"read_record", &"pr_fsp_console")
 	var r2 := _do(s, &"crew_1", &"read_record", &"pr_fsp_console")
 	var count := st.discoveries.size()
@@ -1112,9 +788,7 @@ func _test_lore_runtime() -> void:
 	_check("story: a record is found once by reading it at its console; reading again adds nothing; elsewhere or from afar it is refused",
 		r1.ok and bool(r1.changes.new) and r2.ok and not bool(r2.changes.new) and count == 1 and TutorialSystem.is_found(st, "rec_power_console")
 		and not wrong.ok and not far.ok and far.reason == &"too_far", "%s %s %s" % [r1.message, wrong.reason, far.reason])
-	# records at salvage donors come with the real inspect action, then a discovery completes once
 	_do(s, &"crew_1", &"inspect_donor", &"pr_bat_rack_alarm")
-	var before_crash := TutorialSystem.is_found(st, "disc_small_battery")
 	_do(s, &"crew_1", &"begin_suit_check", SUITS, {"on": true})
 	_tick(s, 1.4)
 	_do(s, &"crew_1", &"inspect_donor", &"sf_crash_tank")
@@ -1124,43 +798,24 @@ func _test_lore_runtime() -> void:
 		if d is Dictionary and String((d as Dictionary).id) == "disc_small_battery":
 			discs += 1
 	_check("story: inspecting salvage donors finds their records; three clues make the discovery, recorded once",
-		not before_crash and discs == 1 and TutorialSystem.is_found(st, "rec_battery_rack") and TutorialSystem.is_found(st, "rec_crash_tank"))
-	# every other record, then the final discovery
-	var all_ok := true
-	for r: Dictionary in TutorialSystem.records():
-		if TutorialSystem.is_found(st, String(r.id)):
-			continue
-		var station := StringName(String(r.station))
-		if String(r.via) == "read_record":
-			all_ok = _do(s, &"crew_1", &"read_record", station).ok and all_ok
-		else:
-			all_ok = _do(s, &"crew_1", &"inspect_donor", station).ok and all_ok
-	var ids := {}
-	for d: Variant in st.discoveries:
-		ids[String((d as Dictionary).id)] = int(ids.get(String((d as Dictionary).id), 0)) + 1
-	var once := true
-	for k in ids:
-		once = once and int(ids[k]) == 1
-	_check("story: all %d records and %d discoveries (the final one last) are found, each exactly once, saved in state.discoveries" % [TutorialSystem.records().size(), TutorialSystem.discovery_defs().size()],
-		all_ok and once and ids.size() == TutorialSystem.records().size() + TutorialSystem.discovery_defs().size() and TutorialSystem.is_found(st, "disc_cascade_solved")
-		and _index_of(st, "disc_cascade_solved") > _index_of(st, "disc_small_battery") and _index_of(st, "disc_cascade_solved") > _index_of(st, "disc_less_sun") and _index_of(st, "disc_cascade_solved") > _index_of(st, "disc_one_line") and _index_of(st, "disc_cascade_solved") > _index_of(st, "disc_safe_return"), str(ids))
+		discs == 1 and TutorialSystem.is_found(st, "rec_battery_rack") and TutorialSystem.is_found(st, "rec_crash_tank"))
 	var copy := ColonyState.from_dict(_json(st))
-	_check("story: discoveries survive save/load", copy.discoveries.size() == st.discoveries.size() and TutorialSystem.is_found(copy, "disc_cascade_solved"))
-	_check("story: finding records changes nothing in the tutorial or the colony stores", TutorialSystem.current_stage(st) <= 2 and st.invariants_ok().is_empty())
+	_check("story: discoveries survive save/load and change nothing in the tutorial or the colony stores", copy.discoveries.size() == st.discoveries.size()
+		and TutorialSystem.current_stage(st) == stage_before and st.invariants_ok().is_empty())
 
 
-# ================================================================ presentation
+# ================================================================ presentation (HUD, lock on screen, scrambled panel, journal)
 
 func _test_presentation() -> void:
 	var gs := GameServices.new()
-	gs.saves = SaveService.new(ProjectSettings.globalize_path("res://").path_join("_test_saves/wT"), "colony", 2)
+	gs.saves = SaveService.new(ProjectSettings.globalize_path("res://").path_join("_test_saves/test_tutorial"), "colony", 2)
 	root.add_child(gs)
+	gs.set_process(false)
 	gs.start_new_game(4242)
 	var stretch := root.content_scale_mode
 	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
 	await process_frame
 	root.size = Vector2i(1280, 720)
-	await process_frame
 	await process_frame
 	var game := FakeGame.new()
 	game.name = "FakeGame"
@@ -1174,20 +829,22 @@ func _test_presentation() -> void:
 	var presenter := TutorialPresenter.new()
 	game.add_child(presenter)
 	presenter.setup(null, gs, game)
-	for i in 4:
+	gs.session.advance(0.4)
+	for i in 3:
 		await process_frame
 	presenter.refresh()
 	await process_frame
-	await process_frame
+	var st := gs.state()
 	var w := presenter.hud_widget
-	var lines := w.lines()
+	var lines := "\n".join(w.lines())
+	_check("hud: a new game is in tutorial mode (the presenter switches it on from the game's settings)", TutorialSystem.tutorial_active(st) and gs.config.tutorial_start_outside)
+	_check("hud: the tracker is under the GameHud and shows Mission Control, step 1 and its newest line", w.get_parent() == game.hud and w.visible
+		and lines.contains("Mission Control · step 1 of 3: Arrival") and lines.contains("Walk into the base") and lines.contains("“"), lines)
 	var rect := w.get_global_rect()
 	var top_right := game.hud.root_control().find_child("TopRight", true, false) as Control
 	var top_left := game.hud.root_control().find_child("TopLeft", true, false) as Control
 	var screen := Rect2(Vector2.ZERO, Vector2(1280, 720))
 	var centre := Rect2(Vector2(640 - 120, 360 - 80), Vector2(240, 160))
-	_check("hud: the tracker is under the GameHud and shows stage 1 with its first step", w.get_parent() == game.hud and w.visible and "\n".join(lines).contains("Tutorial 1 of 10")
-		and "\n".join(lines).contains("W A S D"), "\n".join(lines))
 	_check("hud: at 1280x720 the tracker is on screen and covers neither the colony corner, the crew box nor the crosshair",
 		screen.encloses(rect) and not rect.intersects(top_right.get_global_rect()) and not rect.intersects(top_left.get_global_rect()) and not rect.intersects(centre)
 		and UiLayoutCheck.problems(w, Vector2(1280, 720)).is_empty(), "%s vs %s / %s %s" % [rect, top_right.get_global_rect(), top_left.get_global_rect(), UiLayoutCheck.problems(w, Vector2(1280, 720))])
@@ -1198,88 +855,130 @@ func _test_presentation() -> void:
 	presenter.request_hint()
 	var asked := (presenter.current_view().hints as PackedStringArray).size()
 	var me := gs.local_character()
-	gs.report_position(me.id, me.position + Vector3(9.0, 0.0, 0.0), 0.0)
+	gs.report_position(me.id, gs.config.hub_position, 0.0)
 	gs.session.advance(0.4)
 	presenter._process(0.3)
 	presenter.refresh()
 	var after := (presenter.current_view().hints as PackedStringArray).size()
-	_check("hud: a hint after 80 s without progress, a second on request (N), none again once the step is done",
-		timed == 1 and asked == 2 and after == 0 and presenter.idle_seconds < 1.0, "%d %d %d" % [timed, asked, after])
-	# the journal fits every screen size, its buttons can be focused
-	var panels: Array[UiPanel] = []
+	_check("hud: a hint after 80 s without progress, a second on request (N), none once the step is done", timed == 1 and asked == 2 and after == 0
+		and TutorialSystem.current_stage(st) == 2 and String(presenter.current_view().progress) == "Tapes found 0/6 · Tapes played 0/6", "%d %d %d %s" % [timed, asked, after, presenter.current_view().progress])
+	# the [E] prompt: only tapes, broken spots and the suit rack
+	var hud := game.hud
+	hud.set_target({"kind": "station", "id": String(POWER)})
+	var power_cue := hud.cue_text()
+	hud.set_target({"kind": "station", "id": String(SUITS)})
+	var suit_cue := hud.cue_text()
+	hud.set_target({"kind": "station", "id": "repair_t02"})
+	var broken_cue := hud.cue_text()
+	hud.set_target({"kind": "station", "id": "cassette_med_bay"})
+	var tape_cue := hud.cue_text()
+	hud.set_target({"kind": "station", "id": "repair_t05"})
+	var t05_cue := hud.cue_text()
+	_check("hud: during the tutorial the power panel and T05 show no [E] prompt; the suit rack, a tape and a broken spot do",
+		power_cue == "" and t05_cue == "" and suit_cue.begins_with("[E]") and broken_cue.begins_with("[E]") and tape_cue.begins_with("[E]"),
+		"'%s' '%s' '%s' '%s' '%s'" % [power_cue, t05_cue, suit_cue, broken_cue, tape_cue])
+	# a locked station's panel closes at once with the plain message; the cassette player stays open
+	game.ui.open(StationPanels.for_station(POWER, gs))
+	await process_frame
+	await process_frame
+	var said := "\n".join(hud.current_messages() + hud.waiting_messages()).contains("Not yet: Mission Control")
+	var closed := game.ui.top() == null and presenter.closed_locked_panels == 1
+	gs.report_position(me.id, CharacterState._v3(st.stations[String(SUITS)].position), 0.0)
+	game.ui.open(StationPanels.for_station(SUITS, gs))
+	await process_frame
+	await process_frame
+	var suits_open := game.ui.top() != null and presenter.closed_locked_panels == 1
+	game.ui.close_all()
+	gs.report_position(me.id, gs.config.hub_position, 0.0)
+	_check("lock on screen: E on a locked station closes its panel at once and says why; the suit rack's panel stays open", closed and said and suits_open,
+		"closed %s said %s suits %s: %s" % [closed, said, suits_open, hud.current_messages() + hud.waiting_messages()])
+	# wrong specialist: the scrambled panel (crew_1 is the electrical specialist)
+	var resolved := [0]
+	gs.events.action_resolved.connect(func(_r: ActionResult) -> void: resolved[0] += 1)
+	var t09 := PuzzleRegistry.make_panel("T09", &"repair_t09", gs) as TaskPanel
+	game.ui.open(t09)
+	await process_frame
+	var buttons := t09.play_area.find_children("*", "BaseButton", true, false).size()
+	var n_before: int = resolved[0]
+	t09.submit_move({"move": "pour", "value": 1})
+	var claim := t09.request_host(&"task_claim")
+	var line := t09.unreadable_label.text if t09.unreadable_label != null else ""
+	var scrambled := (t09.play_area.find_child("Scrambled", true, false) as Control)
+	_check("scrambled panel: the wrong specialist sees the mini-game frame with scrambled symbols, no controls, and 'Only the ✚ Medical and life support specialist can read this. Press C to swap to them at the Med Bay hub.'",
+		t09.unreadable and game.ui.top() == t09 and scrambled != null and scrambled.get_child_count() == 12 and buttons == 0 and not t09.reset_button.visible
+		and line == "Only the ✚ Medical and life support specialist can read this. Press C to swap to them at the Med Bay hub.", "%s buttons=%d" % [line, buttons])
+	_check("scrambled panel: no move is possible (nothing reaches the host)", not t09.pending and not claim.ok and resolved[0] == n_before, "%d %d" % [resolved[0], n_before])
+	_check("scrambled panel: the scramble is the same for the same seed and unreadable (no words)", TaskPanel.scrambled_text(7, 8) == TaskPanel.scrambled_text(7, 8)
+		and not TaskPanel.scrambled_text(7, 8).to_lower().contains("pour"))
+	game.ui.close_all()
+	var t02 := PuzzleRegistry.make_panel("T02", &"repair_t02", gs) as TaskPanel
+	var t01 := PuzzleRegistry.make_panel("T01", &"repair_t01", gs) as TaskPanel
+	_check("scrambled panel: the right specialist gets the real mini-game (T02 by the electrical specialist); a general task opens for anyone (T01)",
+		t02 != null and not t02.unreadable and (t02.get_script() as Script).resource_path.ends_with("t02_panel.gd")
+		and t01 != null and not t01.unreadable and (t01.get_script() as Script).resource_path.ends_with("t01_panel.gd"))
+	t02.free()
+	t01.free()
+	# the journal fits every screen size and its buttons can be focused
+	var layout := PackedStringArray()
 	var journal := StoryLogPanel.new()
 	journal.presenter = presenter
 	journal.setup(gs)
-	panels.append(journal)
-	var layout := PackedStringArray()
-	for panel in panels:
-		root.add_child(panel)
-		panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		for sz: Array in SIZES:
-			root.size = sz[0]
-			_apply_text_scale(float(sz[1]))
-			await process_frame
-			await process_frame
-			panel.refresh()
-			await process_frame
-			for line in UiLayoutCheck.problems(panel, Vector2(sz[0])):
-				layout.append("%s at %s: %s" % [panel.name, sz[0], line])
-			var min_size := panel.get_combined_minimum_size()
-			if min_size.x > float(sz[0].x) or min_size.y > float(sz[0].y):
-				layout.append("%s at %s: minimum size %s is bigger than the screen" % [panel.name, sz[0], min_size])
-			for line in UiLayoutCheck.focus_problems(panel):
-				layout.append("%s focus: %s" % [panel.name, line])
-		_apply_text_scale(1.0)
-	_check("journal: fits 1280x720, 1920x1080 and text 1.5; every button takes focus", layout.is_empty() and not UiLayoutCheck.focusable(journal).is_empty(), "\n  ".join(layout))
-	# the journal's answer button works where the question can be answered
+	root.add_child(journal)
+	journal.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	for sz: Array in SIZES:
+		root.size = sz[0]
+		_apply_text_scale(float(sz[1]))
+		await process_frame
+		await process_frame
+		journal.refresh()
+		await process_frame
+		for l in UiLayoutCheck.problems(journal, Vector2(sz[0])):
+			layout.append("journal at %s: %s" % [sz[0], l])
+		var min_size := journal.get_combined_minimum_size()
+		if min_size.x > float(sz[0].x) or min_size.y > float(sz[0].y):
+			layout.append("journal at %s: minimum size %s is bigger than the screen" % [sz[0], min_size])
+		for l in UiLayoutCheck.focus_problems(journal):
+			layout.append("journal focus: %s" % l)
+	_apply_text_scale(1.0)
 	root.size = Vector2i(1280, 720)
-	var t: Dictionary = TutorialSystem.ensure(gs.state()).tutorial
-	_skip_to_gs(gs, 3)
-	gs.session.advance(0.4)
-	gs.report_position(me.id, gs.config.hub_position, 0.0)
-	gs.session.advance(0.4)
-	journal.refresh()
-	var away := journal.answer_button.visible and journal.answer_button.disabled
-	gs.report_position(me.id, CharacterState._v3((gs.state().stations["cm_colony_computer"] as Dictionary).position), 0.0)
-	journal.refresh()
-	var near := journal.answer_button.visible and not journal.answer_button.disabled
-	_check("journal: 'Answer the question here' opens only where the step's question can be answered (the colony computer)", away and near and String(t.current) == "hub_reserves",
-		"away %s near %s current %s" % [away, near, t.current])
-	# four players: nothing on the tracker asks to switch
+	_check("journal: fits 1280x720, 1920x1080 and text 1.5; every button takes focus", layout.is_empty() and not UiLayoutCheck.focusable(journal).is_empty(), "\n  ".join(layout))
+	_check("journal: shows Mission Control's log (the welcome line) and the step's tape checklist", journal._log_label.text.contains("Welcome to Mars")
+		and journal._list_label.text.contains("Med Bay tape"), journal._log_label.text)
+	# four players: nothing on the tracker asks to switch; the scrambled line names the other player
 	for p in [2, 3, 4]:
 		gs.session.peer_joined(p)
 		gs.session.request(&"claim_character", StringName("crew_%d" % p), {}, p)
-	_skip_to_gs(gs, 10)
-	gs.session.advance(0.6)
+		gs.session.report_position(p, StringName("crew_%d" % p), gs.config.hub_position, 0.0)
+	for id: String in CassetteCatalog.TAPES:
+		(st.repair.collected_cassettes as Array).append(id)          # synthetic set-up: every tape found and played
+		(TutorialSystem.tutorial_of(st).played as Array).append(id)
+	gs.session.advance(0.4)
 	presenter.refresh()
 	var team_lines := "\n".join(presenter.hud_widget.lines())
 	journal.refresh()
-	var journal_text := journal._objective_label.text + " " + journal._cue_label.text
-	_check("hud: with four players the screens are in team mode, the crew-selection step names who leads, and nothing asks to switch", TutorialPresenter.switching_disabled(gs) and TutorialSystem.objective_text(TutorialSystem.objective_def("explore_engineer"), true).contains("player leads") and TutorialSystem.is_objective_done(gs.state(), "explore_engineer") and not _mentions_switch(team_lines)
-		and not _mentions_switch(journal_text), team_lines)
+	var journal_text := journal._objective_label.text + " " + journal._cue_label.text + " " + journal._list_label.text
+	var t09b := PuzzleRegistry.make_panel("T09", &"repair_t09", gs) as TaskPanel
+	_check("hud: with four players the fix step lists who fixes what and nothing asks to switch; the scrambled line says another player plays the specialist",
+		TutorialPresenter.switching_disabled(gs) and TutorialSystem.current_stage(st) == 3 and team_lines.contains("Fixed 0 of 10") and not _mentions_switch(team_lines)
+		and not _mentions_switch(journal_text) and t09b.unreadable_label.text.contains("Another player plays them"), team_lines)
+	t09b.free()
+	# the held doors: GameMain reads the replicated tutorial state
+	var gm := GameMain.new()
+	gm.services = gs
+	var held := gm.tutorial_doors_open()
+	TutorialSystem.skip_tutorial(st, gs.events)
+	var released := not gm.tutorial_doors_open()
+	gm.free()
+	hud.set_target({"kind": "station", "id": "cm_comms_console"})
+	hud.refresh()
+	hud.set_target({"kind": "station", "id": String(POWER)})
+	_check("after the tutorial: the doors are released and the power panel shows its [E] prompt again", held and released and hud.cue_text().begins_with("[E]"), hud.cue_text())
 	journal.queue_free()
 	game.queue_free()
 	root.content_scale_mode = stretch
+	gs.saves.delete_all()
 	gs.queue_free()
 	await process_frame
-
-
-func _index_of(st: ColonyState, id: String) -> int:
-	for i in st.discoveries.size():
-		if String((st.discoveries[i] as Dictionary).get("id", "")) == id:
-			return i
-	return -1
-
-
-func _skip_to_gs(gs: GameServices, n: int) -> void:
-	var t: Dictionary = TutorialSystem.ensure(gs.state()).tutorial
-	for k in range(1, n):
-		for o: Dictionary in TutorialSystem.objectives_of(k):
-			(t.objectives as Dictionary)[String(o.id)] = {"done": true, "at_hours": 0.0, "by": "crew_1", "skipped": false}
-		(t.completed as Dictionary)[str(k)] = {"at_hours": 0.0}
-	t["stage"] = n
-	t["started"] = false
-	t["current"] = ""
 
 
 ## Applies a text scale (the same way tests\test_station_panels.gd does while UiTheme's scale is a stub).

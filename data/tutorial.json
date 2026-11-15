@@ -1,44 +1,84 @@
 {
-	"schema": 1,
-	"note": "Prompt 12 ten-stage tutorial, read by TutorialSystem (host) and shown by TutorialPresenter, TutorialHud and StoryLogPanel. Every objective is checked on the host from the real colony state or from a real action that changed the simulation; there are no tutorial-only actions that complete an objective. Objectives of a stage complete in order. 'text' is for one to three players; 'text_team' (when present) replaces it with four players, where switching crew is disabled. 'explain' is skipped when the colony already knows 'question' or the stage was done before in this colony. 'specialty' gives the specialist cue. Numbers are listed with their category in data/model_sources_campaign.json.",
+	"schema": 2,
+	"note": "Whiteboard tutorial (owner decisions 2026-11-14), read by TutorialSystem (host) and shown by TutorialPresenter, TutorialHud, StoryLogPanel and the HUD goal card (state.campaign.objectives). It replaces the Prompt Pack's old ten-stage tutorial. Three steps: arrival, the first team's six tapes (Prompt Pack C01/C02), then fixing the base's broken spots (T01-T12 without T05 and T07). Every objective is checked on the host from the real colony state: tapes collected (state.repair.collected_cassettes), tapes played (host-accepted cassette_select / cassette_read at the Command Room player) and spots fixed (state.repair.tasks[id].first_completed). Mission Control is the guide: its lines are in 'messages' and are sent once each as system alerts. 'text_team' replaces 'text' with four players, where switching crew is disabled. Counts (6 tapes, 10 spots) are game design, not NASA numbers.",
+	"speaker": "Mission Control",
 	"hint_after_s": 75.0,
 	"hint_repeat_s": 60.0,
-	"near_m": 3.0,
-	"move_m": 8.0,
-	"stage9": {
-		"hold_hours": 1.0,
-		"lighting_line_room_kw": 3.5,
-		"variants": {
-			"greenhouse_breaker": {
-				"title": "Dark grow lights",
-				"problem": "Greenhouse alert: the grow lights are dark and the plants have stopped growing. Find out why and fix it yourselves.",
-				"hints": ["Inspect a planted bed in the garden dome. What does its light reading say?",
-					"Lights that are switched off are not the same as lights without power. Look at the room circuits on the power panel.",
-					"Switch the Greenhouse circuit back on at the power panel, or the grow lights at the greenhouse console."],
-				"solved": "The grow lights are on again and the plants grow."
-			},
-			"trackers_stopped": {
-				"title": "Less sun on the panels",
-				"problem": "Power alert: since a power blip the solar panels make less power, so the big greenhouse lights take more from the battery. Find out why and fix it yourselves.",
-				"hints": ["Is this a supply problem or a demand problem? Compare the solar power on the power panel with what the loads ask for.",
-					"Are the sun trackers still turning the panels to face the sun?",
-					"Switch the sun trackers back on at the power panel."],
-				"solved": "The trackers turn the panels again, so the panels catch more sun for the greenhouse."
-			},
-			"lighting_overload": {
-				"title": "The lighting line keeps tripping",
-				"problem": "Greenhouse alert: a power blip switched every room light on, and the grow lights switched off. The lighting line opens its breaker when the grow lights and too many room lights pull power together. Fix it yourselves.",
-				"hints": ["Which loads share the lighting line? Look at the room circuits on the power panel.",
-					"Switch off the lights of rooms nobody is using, then switch the Greenhouse circuit back on.",
-					"The lighting line holds the grow lights plus at most %s kW of other room lights."],
-				"solved": "The lighting line holds: the grow lights are on and the empty rooms are dark."
-			}
-		}
+	"rooms": {
+		"command_center": "Command Room",
+		"power_supply": "Power Room",
+		"greenhouse": "Greenhouse",
+		"green_dome": "Garden dome",
+		"med_bay": "Med Bay",
+		"hangar": "Hangar and airlock"
 	},
+	"fixes": [
+		{"task": "T01", "text": "Fix the radio signal", "done": "The radio signal is fixed"},
+		{"task": "T02", "text": "Fix the wires", "done": "The wires are fixed"},
+		{"task": "T03", "text": "Fix the power dials", "done": "The power dials are fixed"},
+		{"task": "T04", "text": "Repair the power circuit", "done": "The power circuit is repaired"},
+		{"task": "T06", "text": "Fix the broken pipe", "done": "The water pipe is fixed"},
+		{"task": "T08", "text": "Repair the broken glass", "done": "The dome glass is repaired"},
+		{"task": "T09", "text": "Fix the test-tube rack", "done": "The test-tube rack is fixed"},
+		{"task": "T10", "text": "Fix the unplugged equipment", "done": "The Med Bay equipment is plugged in"},
+		{"task": "T11", "text": "Clean the dusty hangar", "done": "The hangar is clean"},
+		{"task": "T12", "text": "Repair the air leak", "done": "The airlock seal is repaired"}
+	],
+	"messages": {
+		"welcome": "Welcome to Mars, crew. It is the 2060s and Earth is in trouble: people need a new home. You are the second team sent here. The first team could not finish their mission.",
+		"radio_down": "Your crew radio is broken, so for now only Mission Control can talk to you. We opened every door for you. Walk into the base.",
+		"tapes_start": "The first team left a tape in each of the 6 main rooms. Find all 6 tapes, then play them on the cassette player in the Command Room. They tell us what happened.",
+		"tapes_all_found": "All 6 tapes found! Play each one on the cassette player in the Command Room.",
+		"fix_start": "Fix the base: get it to operational condition. The tapes showed us 10 broken spots. Some jobs need a specialist: the list shows who.",
+		"fixed": "{done}. {n} of {total} fixed.",
+		"room_restored": "The {room} is restored!",
+		"radio_back": "We can hear the whole crew again: your crew radio works. Hold V to talk.",
+		"base_operational": "The base is operational! Great work, crew. The doors work normally again and every machine is yours to use."
+	},
+	"stages": [
+		{
+			"n": 1, "id": "arrival", "title": "Arrival",
+			"intro": "You stand outside the first team's base in your suits. The doors are open.",
+			"start_messages": ["welcome", "radio_down"],
+			"objectives": [
+				{"id": "arrival_inside", "kind": "inside_base",
+					"text": "Walk into the base through the open doors.",
+					"explain": "W A S D to walk, the mouse to look. Your suit keeps you safe outside. Inside the base you can breathe the air.",
+					"hints": ["Walk forward: the open doors are right in front of you.", "Press M for the blueprint map of the base."]}
+			]
+		},
+		{
+			"n": 2, "id": "tapes", "title": "The first team's tapes",
+			"intro": "Each main room has one tape from the first team.",
+			"start_messages": ["tapes_start"],
+			"objectives": [
+				{"id": "tapes_found", "kind": "tapes_found", "done_message": "tapes_all_found",
+					"text": "Find the 6 room tapes: one in each main room.",
+					"explain": "The tapes are in the Command Room, the Power Room, the Greenhouse, the Garden dome, the Med Bay and the Hangar. Look at a tape and press E to pick it up. The whole crew shares the tapes.",
+					"hints": ["Press M for the map and visit each main room.", "Look at a tape and press E."]},
+				{"id": "tapes_played", "kind": "tapes_played",
+					"text": "Play every tape on the cassette player in the Command Room.",
+					"explain": "Tapes only play on the Command Room cassette player. Each one shows a photo and tells you about its room and its broken spots.",
+					"hints": ["The cassette player is in the Command Room. Look at it and press E.", "Choose a tape in the list to play it."]}
+			]
+		},
+		{
+			"n": 3, "id": "fix", "title": "Fix the base",
+			"intro": "Fix the base: get it to operational condition.",
+			"start_messages": ["fix_start"],
+			"objectives": [
+				{"id": "fix_all", "kind": "fixes",
+					"text": "Fix the base: fix every broken spot on the list.",
+					"explain": "Look at a broken spot and press E to start fixing it. A job with a specialist symbol can only be done by that specialist. A room is restored when all its broken spots are fixed.",
+					"hints": ["Look at a broken spot and press E.", "A ⚡, ✚ or ⛏ job needs that specialist. Press C at the Med Bay hub to swap to them."],
+					"hints_team": ["Look at a broken spot and press E.", "A ⚡, ✚ or ⛏ job needs that specialist. Ask the player of that crew member."]}
+			]
+		}
+	],
 	"certification": {
 		"sols": 1.0,
 		"reserves": ["battery_kwh", "water_l", "oxygen_kg", "food_meals"],
-		"words": "First campaign milestone: all five sectors and communications work, and the battery, water, oxygen and food stay above zero for one full sol with no emergency rescue."
+		"words": "Next goal after the base works: all five sectors and communications work, and the battery, water, oxygen and food stay above zero for one full sol with no emergency rescue."
 	},
 	"campaign_tips": {
 		"energy": "⚡ Energy: clean a dusty panel or repair the cleaner, then answer why dusty panels give less power.",
@@ -48,195 +88,5 @@
 		"science": "✦ Science: the ⛏ Field engineer takes a field sample at a sample site, then answer the 'where and when' question.",
 		"comms": "✉ Communications: install the first radio repair card at the comms console.",
 		"food_stock": "Four crew eat 12 meals per sol. Plant more beds so the food store does not run out."
-	},
-	"stages": [
-		{
-			"n": 1, "id": "arrival", "title": "Arrival and movement",
-			"teaches": ["W A S D: walk", "Mouse: look around", "Shift: sprint · Space: jump", "Tab: first or third person", "M: blueprint map"],
-			"intro": "Welcome to the colony! The first crew left it asleep. Your crew will wake it up again. First, learn to move.",
-			"objectives": [
-				{"id": "arrival_walk", "kind": "moved", "params": {"metres": 8.0},
-					"text": "Walk around: W A S D to move, the mouse to look.",
-					"explain": "Hold Shift to sprint and press Space to jump. Mars pulls you down less than Earth does (3.73 m/s², source S01), so jumps float.",
-					"hints": ["Press W to walk forward and move the mouse to turn.", "Tab switches between first and third person if you want to see your body."]},
-				{"id": "arrival_suit_rack", "kind": "near", "params": {"station": "al_suit_rack"},
-					"text": "Find the suit rack in the Airlock. Press M for the blueprint map if you get lost.",
-					"explain": "The blueprint map shows every room of the base. You put on a suit at the suit rack before you go outside.",
-					"hints": ["Press M and look for the suit rack symbol ◆ in the Airlock.", "Follow the corridor signs to the Airlock."]}
-			]
-		},
-		{
-			"n": 2, "id": "airlock", "title": "Airlock interaction",
-			"teaches": ["E: use what you look at", "Suit check: one second, standing still", "Airlock: one door shuts before the other opens", "Suit tank: oxygen for outside only"],
-			"intro": "Outside there is almost no air to breathe. A suit and an airlock keep you safe.",
-			"objectives": [
-				{"id": "airlock_suit", "kind": "suit_on",
-					"text": "Look at the suit rack and press E to put on your suit.",
-					"explain": "Your suit has its own oxygen tank. It is only used outside. The bar on the right of the screen shows how full it is.",
-					"hints": ["Stand close to the suit rack, look at it and press E.", "Wait one second while the suit check runs. Walking away cancels it."]},
-				{"id": "airlock_out", "kind": "outside", "same_actor_as": "airlock_suit",
-					"text": "Go outside through the airlock: walk through the inner door, wait for it to shut, then the outer door opens.",
-					"explain": "An airlock keeps the air in. Each time the outer door opens, a little cabin air is lost and the colony tops it up from its reserves.",
-					"hints": ["The exit tunnel leads from the base to the outside. Its doors open when you walk up to them.", "If a door stays shut, the other door is still open. Wait a few seconds."]},
-				{"id": "airlock_in", "kind": "inside", "same_actor_as": "airlock_out",
-					"text": "Now come back inside through the same airlock.",
-					"explain": "Inside the base your suit tank is not used. You can keep the suit on or take it off at the rack.",
-					"hints": ["Turn around and walk back through both doors."]}
-			]
-		},
-		{
-			"n": 3, "id": "hub", "title": "Hub monitoring and crew selection",
-			"teaches": ["The hub: where crew wait", "C: crew screen", "Colony summary: stores and how long they last"],
-			"intro": "The hub is the colony's meeting point. From here you plan, check the stores and choose crew.",
-			"objectives": [
-				{"id": "hub_go", "kind": "at_hub",
-					"text": "Go to the hub in the Med Bay. Crew nobody plays wait here and use no supplies.",
-					"explain": "Each crew member keeps their own suit, health and cargo. A crew member nobody plays waits at the hub and does no work.",
-					"hints": ["Press M: the hub is in the Med Bay.", "Walk into the Med Bay; the waiting crew stand there."]},
-				{"id": "hub_specialist", "kind": "specialist_played", "params": {"specialty": "electrical_comms"}, "specialty": "electrical_comms",
-					"text": "The next job needs the ⚡ Electrical and comms specialist. If you play someone else, open the crew screen (C) here at the hub and choose them.",
-					"text_team": "The next job is for the ⚡ Electrical and comms specialist. Open the crew screen (C) to see who plays them.",
-					"explain": "Specialists do special jobs: only the Electrical and comms specialist can repair the broken panel cleaner. Anyone can clean panels or flip switches.",
-					"hints": ["Press C to open the crew screen.", "On the Electrical and comms card, choose 'Play as'."],
-					"hints_team": ["Press C to open the crew screen: each card says who plays that crew member."]},
-				{"id": "hub_reserves", "kind": "knowledge", "params": {"question": "energy_q_battery_night"}, "question": "energy_q_battery_night",
-					"text": "At the colony computer in the Command Room, open the colony summary. Then answer: why does a solar colony need a battery?",
-					"explain": "The colony summary shows the battery, water, oxygen and food, and how long each will last. The panels make no power at night.",
-					"hints": ["The colony computer is in the Command Room. Look at it and press E.", "Open Upgrades, find the 'Battery reserve' card and press Questions. Or press L at the computer and choose Answer."]}
-			]
-		},
-		{
-			"n": 4, "id": "solar", "title": "Solar maintenance",
-			"teaches": ["Cleaning a dusty panel at a sun tracker (anyone)", "Repairing the panel cleaner (⚡ specialist)", "Dust on panels means less power"],
-			"intro": "The solar panels are dusty and their automatic cleaner is broken, so the colony gets little power.",
-			"objectives": [
-				{"id": "solar_clean", "kind": "action", "params": {"actions": ["clean_panel"]},
-					"text": "Put on your suit, go outside to the sun trackers and clean a dusty panel (E at a tracker).",
-					"explain": "Dust blocks sunlight. A panel 45 % covered gives about 45 % less power. Anyone can clean a panel by hand.",
-					"hints": ["The sun trackers stand in two fields outside the base. Press M to find them (☀).", "Look at a tracker and press E, then choose Clean."]},
-				{"id": "solar_cleaner", "kind": "cleaner_ok", "specialty": "electrical_comms",
-					"text": "Repair the broken panel cleaner at any sun tracker. Only the ⚡ Electrical and comms specialist can do it.",
-					"text_team": "The ⚡ Electrical and comms specialist repairs the broken panel cleaner at any sun tracker.",
-					"explain": "A working cleaner wipes every panel at sunrise, so nobody has to clean by hand each day.",
-					"hints": ["At a sun tracker, press E and choose Repair cleaner.", "The repair button only works for the Electrical and comms specialist."]},
-				{"id": "solar_why", "kind": "knowledge", "params": {"question": "energy_q_dust_output"}, "question": "energy_q_dust_output",
-					"text": "Answer the question: why do dusty panels give less power? (colony computer, or J at the power panel)",
-					"explain": "Fixing the panels and explaining why earns the colony its first Energy level.",
-					"hints": ["Open Upgrades at the colony computer, choose 'Better sun tracking' and press Questions.", "Or stand at the power panel, press L and choose Answer."]}
-			]
-		},
-		{
-			"n": 5, "id": "energy", "title": "Energy distribution",
-			"teaches": ["Power panel: supply, demand and the battery", "Room circuits on and off", "Machines use power: the oxygen makers", "When power runs short, the least important loads stop first"],
-			"intro": "Power is shared. Every light and machine you switch on takes part of it; the battery covers what the sun cannot.",
-			"objectives": [
-				{"id": "energy_predict", "kind": "knowledge", "params": {"question": "energy_q_net_power"}, "question": "energy_q_net_power",
-					"text": "At the power panel in the Power Room, read the supply and the demand. Press L there and answer: what does the battery do?",
-					"explain": "Power in minus power asked for: if it is negative, the battery gives the difference and its energy goes down.",
-					"hints": ["The power panel is in the Power Room. Look at it and press E to read it.", "Stand at the power panel, press L and choose Answer."]},
-				{"id": "energy_switch_off", "kind": "action", "params": {"actions": ["set_zone_power"], "on": false, "noncritical_room": true},
-					"text": "Save power: at the power panel, switch off the lights of a room nobody is using.",
-					"explain": "Room lights are small loads, but many small loads add up. Air, heat and the controls never go on this list.",
-					"hints": ["On the power panel, the room circuits are listed with their kW.", "Choose a room such as the Hangar bay and switch it off."]},
-				{"id": "energy_oxygen_on", "kind": "oxygen_makers_on",
-					"text": "At the life-support console, send feed water to the electrolyser and switch on both oxygen makers. They use power: watch the demand rise.",
-					"explain": "The electrolyser splits water into oxygen (like on the ISS, S08). The CO2-oxygen unit makes oxygen from the Mars air with power only (like MOXIE, S09).",
-					"hints": ["The life-support console is in the Life Support room.", "Set the electrolyser feed water above 0, then switch on the electrolyser and the CO2-oxygen unit."]},
-				{"id": "energy_two_paths", "kind": "knowledge", "params": {"question": "ls_q_two_paths"}, "question": "ls_q_two_paths",
-					"text": "Answer: which oxygen maker needs water? (colony computer, or J at the life-support console)",
-					"explain": "When both makers have run for an hour each, this answer gives the colony its first Life support level.",
-					"hints": ["Open Upgrades at the colony computer, choose 'Reliable water recycler' and press Questions.", "Or stand at the life-support console, press L and choose Answer."]}
-			]
-		},
-		{
-			"n": 6, "id": "greenhouse", "title": "Greenhouse operations",
-			"teaches": ["Planting a bed", "Greenhouse water allocation", "Grow lights are a big power load", "Inspecting a bed: water, nutrients, light"],
-			"intro": "Stored food will not last for ever. The garden dome can grow fresh food, if it gets light and water.",
-			"objectives": [
-				{"id": "greenhouse_plant", "kind": "action", "params": {"actions": ["plant"]}, "specialty_hint": "biology_food",
-					"text": "In the garden dome, plant lettuce in a planter (E at a planter). Anyone can; the ❀ Biology and food specialist is the expert.",
-					"explain": "Lettuce has been grown in the Veggie chamber on the ISS (S11). That is space-station evidence, not proof that it grows on Mars. Crop times in the game are shortened.",
-					"hints": ["The garden dome is the glass dome with the planters. Press M to find it.", "Look at an empty planter, press E and choose Plant lettuce."]},
-				{"id": "greenhouse_water", "kind": "greenhouse_water", "params": {"min_l_per_hour": 0.5},
-					"text": "Send water to the greenhouse: at the greenhouse console, set the water to 1 L per hour or more.",
-					"explain": "The beds only get the water the colony sends them. Drinking water always comes first.",
-					"hints": ["The greenhouse console is in the Greenhouse room.", "Raise the greenhouse water to at least 0.5 L per hour."]},
-				{"id": "greenhouse_inspect", "kind": "action", "params": {"actions": ["inspect_bed"], "living_bed": true},
-					"text": "Inspect the bed you planted: read its water, nutrients and light.",
-					"explain": "A symptom is a clue; the measurement is the proof. Check the numbers before you change anything.",
-					"hints": ["Look at your planted bed, press E and choose Inspect."]},
-				{"id": "greenhouse_light", "kind": "knowledge", "params": {"question": "food_q_light"}, "question": "food_q_light",
-					"text": "Answer: why do the grow lights use so much power? (colony computer, or J at the greenhouse console)",
-					"explain": "The grow lights (9 kW) are the colony's biggest light load. When power runs short they are among the first loads to stop.",
-					"hints": ["Open Upgrades at the colony computer, choose 'Scheduled plant care' and press Questions.", "Or stand at the greenhouse console, press L and choose Answer."]}
-			]
-		},
-		{
-			"n": 7, "id": "health", "title": "Personal health and body energy",
-			"teaches": ["Health: air, water and food keep you well", "Body energy (stamina) is not colony electricity", "Refilling the suit tank from the colony oxygen reserve", "At zero health you are brought back to the hub"],
-			"intro": "Look after your crew member: health, body energy and the suit tank are theirs alone.",
-			"objectives": [
-				{"id": "health_exercise", "kind": "action", "params": {"actions": ["exercise"]},
-					"text": "In the rec kitchen, exercise once on the treadmill (E). Watch your body energy bar.",
-					"explain": "Exercise uses body energy now and makes your crew member fitter, so body energy comes back faster. It never touches the battery.",
-					"hints": ["The treadmill is in the rec kitchen next to the mess hall.", "If you are too tired, rest a moment: body energy comes back."]},
-				{"id": "health_suit", "kind": "suit_topped", "params": {"min_charge": 95.0},
-					"text": "Refill your suit tank at the suit rack. It takes oxygen from the colony reserve.",
-					"explain": "Putting the suit on or off never fills the tank. Only the suit rack does, and that oxygen comes out of the colony's store.",
-					"hints": ["Go to the suit rack in the Airlock, press E and choose Refill tank."]}
-			]
-		},
-		{
-			"n": 8, "id": "comms", "title": "Communications",
-			"teaches": ["The comms console", "Radio stages: the damaged radio buffers speech", "Upgrade cards: questions, practical work, parts, specialist"],
-			"intro": "Outside, the crew talk by radio. The first crew's radio is damaged: it holds speech back before passing it on.",
-			"objectives": [
-				{"id": "comms_go", "kind": "near", "params": {"station": "cm_comms_console"}, "specialty": "electrical_comms",
-					"text": "Go to the comms console in the Command Room.",
-					"explain": "The radio delay comes from the damaged equipment buffering speech. It is not network lag and not the time a signal needs to reach Earth.",
-					"hints": ["The comms console is in the Command Room, next to the colony computer."]},
-				{"id": "comms_install", "kind": "comms_stage", "params": {"min": 1}, "specialty": "electrical_comms",
-					"text": "Install the first radio repair card. Answer its questions first; the ⚡ Electrical and comms specialist installs it at the comms console.",
-					"text_team": "Install the first radio repair card: answer its questions, then the ⚡ Electrical and comms specialist installs it at the comms console.",
-					"explain": "Each repair stage shortens the radio delay: 30 s, then 15 s, 5 s and almost none. Messages to Earth stay slow: Earth is far away.",
-					"hints": ["Open Upgrades at the colony computer and find the first radio card.", "The card lists what is still missing: questions, a practical task and parts."]}
-			]
-		},
-		{
-			"n": 9, "id": "challenge", "title": "Independent problem: greenhouse power",
-			"teaches": ["Use what you learned about power on a new problem"],
-			"intro": "A new problem, and this time you solve it yourselves. Hints come if you get stuck.",
-			"objectives": [
-				{"id": "challenge_fix", "kind": "stage9_fixed",
-					"text": "Something is wrong with the greenhouse power. Find the cause and fix it.",
-					"explain": "Think like on the power panel: is the power switched off, is there too little supply, or is the demand too high?",
-					"hints": []},
-				{"id": "challenge_hold", "kind": "stage9_holds",
-					"text": "Check that your fix holds for one hour of colony time.",
-					"explain": "A good fix keeps working. Watch the greenhouse alert and the power panel.",
-					"hints": ["If the problem came back, look again at what changed."]}
-			]
-		},
-		{
-			"n": 10, "id": "explore", "title": "Back to the hub, then explore",
-			"teaches": ["The colony keeps running: plan the next jobs at the hub", "Field work: samples and salvage"],
-			"intro": "The colony is awake. Plan the next jobs at the hub, then go and explore.",
-			"objectives": [
-				{"id": "explore_hub", "kind": "at_hub",
-					"text": "Come back to the hub in the Med Bay.",
-					"explain": "Back at the hub you can see every crew member and plan who does what next.",
-					"hints": ["Press M: the hub is in the Med Bay."]},
-				{"id": "explore_engineer", "kind": "specialist_played", "params": {"specialty": "field_engineering_geology"}, "specialty": "field_engineering_geology",
-					"text": "Field work is next: the ⛏ Field engineering and geology specialist takes samples and recovers salvage. Choose them on the crew screen (C) here at the hub.",
-					"text_team": "Field work is next: the ⛏ Field engineering and geology specialist's player leads it. Press C to see who that is.",
-					"explain": "Anyone can inspect a damaged machine for useful parts, but only the field engineer recovers parts and takes rock samples.",
-					"hints": ["Press C to open the crew screen.", "On the Field engineering and geology card, choose 'Play as'."],
-					"hints_team": ["Press C to open the crew screen: each card says who plays that crew member."]},
-				{"id": "explore_field", "kind": "action", "params": {"actions": ["inspect_donor", "take_sample"]},
-					"text": "Explore: inspect a damaged machine for useful parts (E at a salvage donor), or take a rock sample at a sample site.",
-					"explain": "Salvage donors are broken machines the first crew left behind. Some of their parts still work. You may also find their records.",
-					"hints": ["Salvage donors include the burnt switchgear in the Power Room and the old air filter in Life Support.", "Sample sites are outside; the blueprint map (M) shows them."]}
-			]
-		}
-	]
+	}
 }

@@ -79,6 +79,13 @@ static func for_station(station_id: StringName, services: GameServices) -> UiPan
 		reader.set_meta(&"station_id", station_id)
 		reader.setup(services)
 		return reader
+	# Broken parts: while a repair task's spot is still broken, E opens its mini-game (PuzzleRegistry), not maintenance.
+	if kind == "repair_task":
+		var task_id := String(record.get("task_id", ""))
+		if PuzzleRegistry.is_broken(services.state(), task_id):
+			var game := PuzzleRegistry.make_panel(task_id, station_id, services)
+			if game != null:
+				return game
 	var panel: StationPanel
 	# A later milestone adds a panel for a kind by creating res://scripts/ui/stations/<kind>_station_panel.gd
 	# (a script extending StationPanel). It takes precedence over the built-in panels below.

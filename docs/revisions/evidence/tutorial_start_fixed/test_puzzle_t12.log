@@ -1,0 +1,65 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS supports resume
+PASS same seed, same leak
+PASS seeds vary the leak, the gap and the press direction
+PASS rule: right section found
+PASS rule: wrong section refused
+PASS rule: fitting before finding refused
+PASS rule: pressure check first refused
+PASS rule: section out of range refused
+PASS rule: forged skipped steps are not kept
+PASS rule: find, fit, 5 presses and the pressure check complete it
+PASS T12 puzzle installed and broken at start
+PASS repair_t12 station exists
+PASS host plays the field engineer
+PASS other specialty cannot claim T12
+PASS other specialty cannot move T12
+PASS engineer at the station claims T12: ok  (zone Airlock at (22.0, 0.04, 9.3))
+PASS forged completion flag rejected
+PASS unknown move fails closed
+PASS negative value fails closed
+PASS out-of-range section fails closed
+PASS wrong section fails closed
+PASS pressure check first fails closed
+PASS future step fails closed
+PASS rejections changed nothing
+PASS leak found by the vapour
+PASS replayed find request fails closed
+PASS wrong seal fails closed
+PASS right seal fitted
+PASS pressing out of order fails closed
+PASS press point out of range fails closed
+PASS first press
+PASS save keeps the half-done seal (supports_resume)
+PASS whole edge pressed after the reload, not complete before the check
+PASS pressure check completes T12
+PASS T12 no longer broken; seal fault clear
+PASS moves after completion refused
+PASS a safe-side spot within reach of repair_t12 exists: station (22.0, 0.04, 9.3), spot (21.25, 0.04, 7.05)
+PASS the BP08 door spot is reachable from the safe side too: door spot (22.0, 0.04, 10.45), spot (21.25, 0.04, 8.2), in vestibule true
+PASS S04 fault switch is the T12 seal fault
+PASS seal fault vents the vestibule: { "pressure_kpa": 0.6, "breathable": false, "leaking": true, "repressurizing": false, "seal_condition": 0.396875, "inner_open": false, "outer_open": false, "status": "Seal leaking" }
+PASS unsuited engineer on the safe side is not exposed
+PASS engineer claims T12 from the safe side during the leak: ok 
+PASS visitor in the vestibule is exposed while the seal is open
+PASS still leaking until the pressure check
+PASS pressure check completes T12 during the fault
+PASS completion clears the seal fault S04 reads
+PASS leak stopped; vestibule repressurising: { "pressure_kpa": 4.628, "breathable": false, "leaking": false, "repressurizing": true, "seal_condition": 1.0, "inner_open": false, "outer_open": false, "status": "Repressurizing" }
+PASS vestibule back to safe pressure: { "pressure_kpa": 101.3, "breathable": true, "leaking": false, "repressurizing": false, "seal_condition": 1.0, "inner_open": false, "outer_open": false, "status": "Pressurized" }
+PASS engineer never exposed
+PASS E at the broken spot opens the T12 mini-game
+PASS panel claimed the task on open
+PASS panel layout fits 1280x720
+PASS panel names the safe side and the suit: Exit vestibule: 16 kPa, seal leaking. Work from the hangar side of the inner door, or wear a working suit if you must step inside.
+PASS Tab reaches every door section
+PASS focusing the leaking part tells it in words: Right side: a cold breeze and lots of white vapour here!
+PASS wrong section explained: No vapour comes out at the floor edge. Look for the white puffs, or check each part for a breeze.
+PASS found: step 2 shown, focus follows
+PASS wrong seal explained: The thick seal (12 mm) is too thick for a 8 mm gap. Pick the seal as wide as the gap.
+PASS press out of order explained: Press point 1 next, so no air bubble gets trapped under the seal.
+PASS whole edge pressed by keyboard; pressure check shown
+PASS keyboard path solves T12 through the session: Fixed! The seal holds. The leak has stopped and the vestibule is filling back up with air.
+PASS panel shows the host's success
+RESULT 62/62

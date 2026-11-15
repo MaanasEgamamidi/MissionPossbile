@@ -54,6 +54,19 @@ const MARS_GRAVITY := 3.73
 ## Collision-probed parking positions relative to the Med Bay hub (fourth avoids bedside equipment).
 @export var crew_hub_offsets: Array[Vector3] = [Vector3(1.2, 0, 0), Vector3(0, 0, 1.2), Vector3(-1.2, 0, 0), Vector3(-0.3, 0, -1.2)]
 
+@export_group("Tutorial mode (owner rule, 2026-11-14)")
+## A new game starts in tutorial mode: every crew member is already suited and stands right outside the base's main
+## doors (the exit tunnel's outer door), and every door is held open until the tutorial is finished. The Med Bay stays
+## the hub and the respawn point. Tests that need the old Med Bay start set tutorial_start_outside = false.
+@export var tutorial_start_outside := true
+@export var tutorial_start_suited := true
+@export var tutorial_doors_open := true
+## Where the crew stand at the start: just south of the exit tunnel's outer door (door 902 at z 14.55-14.85, x 18-26),
+## facing the door (yaw 0 faces -z). Offsets keep the four crew apart.
+@export var tutorial_spawn_position := Vector3(22.0, 0.04, 16.8)
+@export var tutorial_spawn_yaw := 0.0
+@export var tutorial_spawn_offsets: Array[Vector3] = [Vector3(0, 0, 0), Vector3(-1.2, 0, 0.4), Vector3(1.2, 0, 0.4), Vector3(0, 0, 1.4)]
+
 @export_group("Player (initial tuning, Prompt 04)")
 @export var fov_degrees := 72.0
 @export var third_person_distance_m := 2.5

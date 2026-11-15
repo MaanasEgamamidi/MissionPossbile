@@ -16,6 +16,10 @@ var required_role := "general"
 var instructions := ""
 var pending := false
 var succeeded := false
+## Wrong specialist (owner 2026-11-14): the controls are scrambled symbols nobody can read and no move can be sent.
+var unreadable := false
+## The clear line under the scrambled controls ("Only the ⚡ Electrical and comms specialist can read this. ...").
+var unreadable_label: Label
 var play_area: VBoxContainer
 var progress_bar: ProgressBar
 var status_label: Label
@@ -127,10 +131,63 @@ func first_focus() -> Control:
 
 ## A puzzle emits only discrete moves; no completion boolean is accepted by this frame.
 func submit_move(move: Dictionary) -> void:
-	if pending or succeeded or _closing:
+	if pending or succeeded or _closing or unreadable:
 		return
 	set_pending()
 	move_requested.emit(move.duplicate(true))
+
+
+## Turns this frame into the wrong-specialist view: rows of scrambled symbols where the controls would be (unreadable
+## on purpose, the same for the same `seed_value`), one clear `line` saying who can read it and how to swap, no reset,
+## no moves. Only Cancel / close works.
+func show_unreadable(line: String, seed_value := 0) -> void:
+	if not _built:
+		return
+	unreadable = true
+	for child in play_area.get_children():
+		play_area.remove_child(child)
+		child.queue_free()
+	_instructions.text = ""
+	var grid := GridContainer.new()
+	grid.name = "Scrambled"
+	grid.columns = 4
+	grid.add_theme_constant_override(&"h_separation", 12)
+	grid.add_theme_constant_override(&"v_separation", 10)
+	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	play_area.add_child(grid)
+	for i in 12:
+		var cell := PanelContainer.new()
+		cell.name = "Cell%d" % i
+		cell.theme_type_variation = UiTheme.HUD_PANEL
+		cell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var glyphs := Label.new()
+		glyphs.text = scrambled_text(seed_value * 31 + i, 6 + (i % 4))
+		glyphs.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		glyphs.theme_type_variation = UiTheme.MUTED
+		cell.add_child(glyphs)
+		grid.add_child(cell)
+	unreadable_label = _label("UnreadableLine", UiTheme.WARN)
+	unreadable_label.text = line
+	play_area.add_child(unreadable_label)
+	progress_bar.visible = false
+	reset_button.visible = false
+	status_label.text = "Your crew member cannot read these controls."
+	status_label.theme_type_variation = UiTheme.MUTED
+	_update_enabled()
+
+
+## Scrambled symbols for the wrong-specialist view: `count` characters from a fixed set, the same for the same seed.
+## Only characters every UI font has, so it reads as nonsense, not as missing letters.
+static func scrambled_text(seed_value: int, count: int) -> String:
+	const GLYPHS := "#%&@?~^*=+<>/\\|{}[]§¤¥ÆØÐÞßµ¿¡"
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(seed_value)
+	var out := ""
+	for i in count:
+		out += GLYPHS[rng.randi_range(0, GLYPHS.length() - 1)]
+		if i % 3 == 2 and i < count - 1:
+			out += " "
+	return out
 
 
 func set_pending(request_id := "") -> void:
@@ -144,6 +201,8 @@ func set_pending(request_id := "") -> void:
 
 ## Optional services adapter for real puzzles. The generic shell registers no puzzle rules.
 func request_host(action: StringName, params := {}) -> ActionResult:
+	if unreadable:
+		return ActionResult.failure("", &"wrong_specialty", unreadable_label.text if unreadable_label != null else "")
 	if services == null or anchor_id.is_empty():
 		var missing := ActionResult.failure("", &"not_available_yet")
 		accept_host_result(missing)

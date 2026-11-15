@@ -1,0 +1,551 @@
+{
+ "ok": true,
+ "started": "2026-11-14 18:27:22",
+ "part": "BP05",
+ "source": {
+  "blend": "G:\\nasa app\\broken_parts\\BP05_dome_glass.blend",
+  "sha256": "9340E28DC052A6718E45BF3DD1B3B3A6FBDC23099FA5245AC734F20F480108B8",
+  "bytes": 10054281,
+  "exported_with_blender": "5.3.0"
+ },
+ "skipped": [
+  {
+   "name": "gd_airlock__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.001__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.001__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.002__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.002__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.003__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.003__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.004__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.004__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.005__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.005__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.006__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.006__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.007__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.007__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.008__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring.008__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_ring_vent.009__context_b",
+   "why": "no map_matrix_world (layout context)"
+  },
+  {
+   "name": "gd_floor__context_b",
+   "why": "no map_matrix_world (layout context)"
+  }
+ ],
+ "splits": [],
+ "nodes": [
+  {
+   "name": "gd_shell__broken",
+   "parent": null,
+   "kind": "model",
+   "source_object": "gd_shell__broken",
+   "map_object": "gd_shell",
+   "tris": 254534,
+   "origin_godot": [
+    50.0,
+    0.0,
+    27.0
+   ],
+   "aabb_min": [
+    42.2874,
+    0.6701,
+    19.046
+   ],
+   "aabb_max": [
+    57.954,
+    8.754,
+    34.954
+   ],
+   "roles": [
+    "bp_crack",
+    "bp_haze",
+    "glass_gd",
+    "offwhite",
+    "steel",
+    "white"
+   ]
+  },
+  {
+   "name": "gd_glass_shards__broken",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "gd_glass_shards__broken",
+   "map_object": "gd_glass_shards",
+   "tris": 20552,
+   "origin_godot": [
+    50.0,
+    0.0,
+    27.0
+   ],
+   "aabb_min": [
+    43.8656,
+    -0.0303,
+    25.8255
+   ],
+   "aabb_max": [
+    57.2363,
+    0.088,
+    34.7818
+   ],
+   "roles": [
+    "bp_shard"
+   ]
+  },
+  {
+   "name": "gd_dust_drift__broken",
+   "parent": null,
+   "kind": "effect",
+   "source_object": "gd_dust_drift__broken",
+   "map_object": "gd_dust_drift",
+   "tris": 61320,
+   "origin_godot": [
+    50.0,
+    0.0,
+    27.0
+   ],
+   "aabb_min": [
+    43.8729,
+    -0.1578,
+    27.629
+   ],
+   "aabb_max": [
+    57.8967,
+    0.1178,
+    35.0424
+   ],
+   "roles": [
+    "sf_drift"
+   ]
+  }
+ ],
+ "bounds": {
+  "center": [
+   50.1207,
+   4.2981,
+   27.0442
+  ],
+  "size": [
+   15.6666,
+   8.9118,
+   15.9964
+  ],
+  "min": [
+   42.2874,
+   -0.1578,
+   19.046
+  ],
+  "max": [
+   57.954,
+   8.754,
+   35.0424
+  ]
+ },
+ "palette": {
+  "white": {
+   "rgb_linear": [
+    0.693872,
+    0.679542,
+    0.64448
+   ],
+   "hex": "#d9d7d2",
+   "emission": 0,
+   "roughness": 0.55,
+   "metallic": 0.05,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.693872,
+    0.679542,
+    0.64448
+   ],
+   "rough0": 0.471,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.35,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "offwhite": {
+   "rgb_linear": [
+    0.48515,
+    0.467784,
+    0.423268
+   ],
+   "hex": "#b9b6ae",
+   "emission": 0,
+   "roughness": 0.6,
+   "metallic": 0.05,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "paint",
+   "base_linear": [
+    0.48515,
+    0.467784,
+    0.423268
+   ],
+   "rough0": 0.492,
+   "metal0": 0.0,
+   "var": 0.07,
+   "wear": 0.35,
+   "grime": 0.35,
+   "bump": 0.012,
+   "bscale": 320.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "steel": {
+   "rgb_linear": [
+    0.226966,
+    0.238398,
+    0.262251
+   ],
+   "hex": "#83868c",
+   "emission": 0,
+   "roughness": 0.45,
+   "metallic": 0.4,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "metal",
+   "base_linear": [
+    0.56,
+    0.57,
+    0.58
+   ],
+   "rough0": 0.32,
+   "metal0": 1.0,
+   "var": 0.05,
+   "wear": 0.25,
+   "grime": 0.4,
+   "bump": 0.006,
+   "bscale": 90.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": true,
+   "render_rgb_linear": [
+    0.56,
+    0.57,
+    0.58
+   ]
+  },
+  "glass_gd": {
+   "rgb_linear": [
+    0.502886,
+    0.686685,
+    0.760525
+   ],
+   "hex": "#bcd8e2",
+   "emission": 0,
+   "roughness": 0.03,
+   "metallic": 0.0,
+   "alpha": 0.14,
+   "alpha_source": "palette",
+   "note": null,
+   "mat_class": "glass",
+   "base_linear": [
+    0.502886,
+    0.686685,
+    0.760525
+   ],
+   "rough0": 0.01,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.5,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 0.12,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_crack": {
+   "rgb_linear": [
+    0.904661,
+    0.938686,
+    0.955973
+   ],
+   "hex": "#f4f8fa",
+   "emission": 0,
+   "roughness": 0.35,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "plastic",
+   "base_linear": [
+    0.85,
+    0.85,
+    0.85
+   ],
+   "rough0": 0.35,
+   "metal0": 0.0,
+   "var": 0.02,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.008,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 0.0,
+   "edge_rough": 0.55,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_haze": {
+   "rgb_linear": [
+    0.814847,
+    0.879622,
+    0.904661
+   ],
+   "hex": "#e9f1f4",
+   "emission": 0,
+   "roughness": 0.4,
+   "metallic": 0.0,
+   "alpha": 0.45,
+   "alpha_source": "derivative default",
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glass",
+   "base_linear": [
+    0.814847,
+    0.85,
+    0.85
+   ],
+   "rough0": 0.45,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.2,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 0.35,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "bp_shard": {
+   "rgb_linear": [
+    0.62396,
+    0.814847,
+    0.879622
+   ],
+   "hex": "#cfe9f1",
+   "emission": 0,
+   "roughness": 0.08,
+   "metallic": 0.0,
+   "alpha": 0.35,
+   "alpha_source": "derivative default",
+   "note": "broken-part role (G:/nasa app/broken_parts/scripts), exported by tools/blender/broken_parts/export_broken_parts.py",
+   "mat_class": "glass",
+   "base_linear": [
+    0.62396,
+    0.814847,
+    0.85
+   ],
+   "rough0": 0.28,
+   "metal0": 0.0,
+   "var": 0.05,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.01,
+   "bscale": 300.0,
+   "dust_k": 0.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 0.35,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  },
+  "sf_drift": {
+   "rgb_linear": [
+    0.434154,
+    0.194618,
+    0.097587
+   ],
+   "hex": "#b07a58",
+   "emission": 0,
+   "roughness": 0.95,
+   "metallic": 0.0,
+   "alpha": null,
+   "alpha_source": null,
+   "note": null,
+   "mat_class": "rock",
+   "base_linear": [
+    0.434154,
+    0.194618,
+    0.097587
+   ],
+   "rough0": 0.97,
+   "metal0": 0.0,
+   "var": 0.06,
+   "wear": 0.0,
+   "grime": 0.0,
+   "bump": 0.02,
+   "bscale": 260.0,
+   "dust_k": 1.0,
+   "edge_color": [
+    0.55,
+    0.56,
+    0.57
+   ],
+   "edge_metal": 1.0,
+   "edge_rough": 0.35,
+   "coat": 0.0,
+   "emit_k": 1.0,
+   "tint": 1.0,
+   "ior": 1.5,
+   "explicit_colour": false,
+   "render_rgb_linear": null
+  }
+ },
+ "unmapped_materials": {},
+ "lights": [],
+ "export": {
+  "path": "G:\\nasa app\\mars_colony_revisions_wt\\assets\\broken_parts\\BP05.glb",
+  "result": [
+   "FINISHED"
+  ],
+  "bytes": 10590460,
+  "sha256": "CF1956ACF68A7238723DD9CF1B46CA80841320863CA23DDEC4377DEE34E216FD",
+  "tris": 336406
+ },
+ "secs": 1.0
+}

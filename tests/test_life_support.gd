@@ -217,7 +217,7 @@ func _sources() -> void:
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://data/model_sources.json"))
 	var missing: Array = []
 	var fields := 0
-	var categories := ["physics", "S08", "fiction scaled from S09", "S01", "S02", "balance", "index"]
+	var categories := ["physics", "S08", "fiction scaled from S09", "S01", "S02", "S20", "balance", "index"]   # S20: NASA BVAD Rev2 (2026-11-14)
 	if data is Dictionary:
 		for p: Dictionary in GameBalance.new().get_property_list():
 			if int(p.usage) & PROPERTY_USAGE_SCRIPT_VARIABLE:

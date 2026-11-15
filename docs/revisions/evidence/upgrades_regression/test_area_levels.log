@@ -1,0 +1,31 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS every requested area has a track
+PASS at least four levels
+PASS every track names a stage, a cost and every effect for each level
+PASS every track except the drone (its pad comes with the drone) has a station on the map
+PASS a new colony starts every track at V1
+PASS V1 effect is the first entry
+PASS effect follows the level
+PASS missing effect gives the default
+PASS level is clamped to the maximum
+PASS stock rover is V1
+PASS fully upgraded rover modules show V4
+PASS one module step shows V2
+PASS the greenhouse console exists
+PASS the wrong specialist is refused
+PASS the biologist upgrades the greenhouse to V2
+PASS parts are spent once
+PASS the wrong station is refused
+PASS no parts, no upgrade
+PASS V4 is the top and asking again spends nothing
+PASS the energy upgrade grows the battery capacity once
+PASS the rover look cannot be bought (it follows the modules)
+PASS unknown track is refused
+PASS levels survive save and replication
+PASS drone state survives save and replication
+PASS an old save without levels loads at V1
+PASS every track has a stage presenter that names its track
+PASS attach_all builds one presenter per track without a game
+PASS every stage of every track builds without a game running
+RESULT 28/28

@@ -1,0 +1,121 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS immediate entry warning sol5 delta0.007
+PASS healthy through3.99 no doubled gas damage sol5 delta0.007
+PASS exactly one recovery at4 sol5 delta0.007
+PASS recovery retains existing cost ledgers sol5 delta0.007
+PASS immediate entry warning sol5 delta0.016
+PASS healthy through3.99 no doubled gas damage sol5 delta0.016
+PASS exactly one recovery at4 sol5 delta0.016
+PASS recovery retains existing cost ledgers sol5 delta0.016
+PASS immediate entry warning sol5 delta0.200
+PASS healthy through3.99 no doubled gas damage sol5 delta0.200
+PASS exactly one recovery at4 sol5 delta0.200
+PASS recovery retains existing cost ledgers sol5 delta0.200
+PASS immediate entry warning sol5 delta1.000
+PASS healthy through3.99 no doubled gas damage sol5 delta1.000
+PASS exactly one recovery at4 sol5 delta1.000
+PASS recovery retains existing cost ledgers sol5 delta1.000
+PASS immediate entry warning sol5 delta10.000
+PASS healthy through3.99 no doubled gas damage sol5 delta10.000
+PASS exactly one recovery at4 sol5 delta10.000
+PASS recovery retains existing cost ledgers sol5 delta10.000
+PASS immediate entry warning sol20 delta0.007
+PASS healthy through3.99 no doubled gas damage sol20 delta0.007
+PASS exactly one recovery at4 sol20 delta0.007
+PASS recovery retains existing cost ledgers sol20 delta0.007
+PASS immediate entry warning sol20 delta0.016
+PASS healthy through3.99 no doubled gas damage sol20 delta0.016
+PASS exactly one recovery at4 sol20 delta0.016
+PASS recovery retains existing cost ledgers sol20 delta0.016
+PASS immediate entry warning sol20 delta0.200
+PASS healthy through3.99 no doubled gas damage sol20 delta0.200
+PASS exactly one recovery at4 sol20 delta0.200
+PASS recovery retains existing cost ledgers sol20 delta0.200
+PASS immediate entry warning sol20 delta1.000
+PASS healthy through3.99 no doubled gas damage sol20 delta1.000
+PASS exactly one recovery at4 sol20 delta1.000
+PASS recovery retains existing cost ledgers sol20 delta1.000
+PASS immediate entry warning sol20 delta10.000
+PASS healthy through3.99 no doubled gas damage sol20 delta10.000
+PASS exactly one recovery at4 sol20 delta10.000
+PASS recovery retains existing cost ledgers sol20 delta10.000
+PASS immediate entry warning sol120 delta0.007
+PASS healthy through3.99 no doubled gas damage sol120 delta0.007
+PASS exactly one recovery at4 sol120 delta0.007
+PASS recovery retains existing cost ledgers sol120 delta0.007
+PASS immediate entry warning sol120 delta0.016
+PASS healthy through3.99 no doubled gas damage sol120 delta0.016
+PASS exactly one recovery at4 sol120 delta0.016
+PASS recovery retains existing cost ledgers sol120 delta0.016
+PASS immediate entry warning sol120 delta0.200
+PASS healthy through3.99 no doubled gas damage sol120 delta0.200
+PASS exactly one recovery at4 sol120 delta0.200
+PASS recovery retains existing cost ledgers sol120 delta0.200
+PASS immediate entry warning sol120 delta1.000
+PASS healthy through3.99 no doubled gas damage sol120 delta1.000
+PASS exactly one recovery at4 sol120 delta1.000
+PASS recovery retains existing cost ledgers sol120 delta1.000
+PASS immediate entry warning sol120 delta10.000
+PASS healthy through3.99 no doubled gas damage sol120 delta10.000
+PASS exactly one recovery at4 sol120 delta10.000
+PASS recovery retains existing cost ledgers sol120 delta10.000
+PASS large delta and simulation backlog cannot delay four-second recovery
+PASS backlog drains without advancing hazard real time
+PASS actual global pause freezes hazard and pressure
+PASS unpause resumes existing deadline
+PASS non-exposure water and food health accounting remains active
+PASS one peer's fatal exposure does not broadcast a global modal interruption
+PASS functional sealed suit protects and consumes tank once
+PASS reserve exhaustion has no full-frame grace sol5 delta0.016
+PASS reserve exhaustion has no full-frame grace sol5 delta0.200
+PASS reserve exhaustion has no full-frame grace sol5 delta1.000
+PASS reserve exhaustion has no full-frame grace sol5 delta10.000
+PASS reserve exhaustion has no full-frame grace sol120 delta0.016
+PASS reserve exhaustion has no full-frame grace sol120 delta0.200
+PASS reserve exhaustion has no full-frame grace sol120 delta1.000
+PASS reserve exhaustion has no full-frame grace sol120 delta10.000
+PASS single actual ten-second frame interleaves reserve failure and recovery
+PASS failed suit seal cannot protect a charged tank
+PASS breathable entry ends danger without a free full timer
+PASS boundary crossing preserves prior exposure debt
+PASS repeated boundary use still reaches original cumulative deadline
+PASS brief valid protection ends active hazard without clearing debt
+PASS equipment toggling cannot refresh the countdown
+PASS explicit uninterrupted safe interval clears exposure
+PASS enclosed Garden dome is breathable
+PASS ongoing exposure disk write
+PASS reload retains active encounter and cumulative real seconds
+PASS reload grants no new full timer
+PASS reload encounter recovers exactly once at remaining deadline
+PASS reload preserves partial safe interval without offline recovery
+PASS reload cannot immediately clear pending exposure debt
+PASS persisted safe interval finishes after remaining real time
+PASS replicated client cannot advance death, pressure or wear
+PASS direct replica backend entry points cannot mutate host-owned gameplay
+PASS debug fault hook is host only and not a network action
+PASS restore retains unprotected remote chamber encounter even with zero timer
+PASS restore parks healthy sealed charged remote crew safely
+PASS restore retains broken-seal remote chamber encounter
+PASS restore uses saved local pressure before parking decisions
+PASS Garden dome remains safe when restoring a local airlock failure
+PASS controlled debug seal fault exists
+PASS working suit rack remains on breathable safe side
+PASS local seal fault does not depressurize Garden dome
+PASS failed chamber has immediate localized danger cause
+PASS unsuited chamber entry recovers on four-second schedule
+PASS local door pressure model does not duplicate global gas loss
+PASS existing global airlock cycle ledger still applies exactly once
+PASS seal maintenance requires field engineer even from safe side
+PASS properly suited engineer can enter failed volume
+PASS field engineer starts host-timed safe-side seal maintenance
+PASS seal service stops leak without puzzle milestone or reward
+PASS sealed chamber enters readable repressurization
+PASS sealed chamber returns to safe pressure over time
+PASS repair does not create a role-switch bypass
+PASS first outer-door motion invalidates safe pressure
+PASS shutting outer door is not instantly safe
+PASS door boundary hysteresis prevents tiny-step warning flicker
+PASS inner egress flag does not falsify failed pressure safety
+PASS safe inner-side escape remains available
+RESULT 118/118

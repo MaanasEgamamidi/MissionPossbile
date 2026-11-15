@@ -182,6 +182,9 @@ func _persistence_and_authority() -> void:
 	game.session.balance = game.balance
 	game.saves = SaveService.new(ProjectSettings.globalize_path("res://tests/tmp/survival"), "fixture")
 	game.saves.delete_all()
+	# S01 reload timing needs an unsuited astronaut from the Med Bay, not the tutorial start (suited, outside).
+	game.config.tutorial_start_outside = false
+	game.config.tutorial_start_suited = false
 	game.start_new_game(729)
 	_watch_recovery(game.session)
 	var actor := game.local_character()
@@ -266,6 +269,9 @@ func _restore_remote_pressure() -> void:
 
 func _pressure_and_maintenance() -> void:
 	var s := _session()
+	# 2026-11-14: a new game's T12 seal is the broken part (BP08) and leaks until its puzzle is solved. This scenario is
+	# S03/S04 wear on a seal that was already repaired once, so the fixture starts from a fixed seal.
+	s.state.repair.tasks.T12.first_completed = true
 	_check("controlled debug seal fault exists", s.survival.debug_trigger_airlock_fault())
 	var actor := s.state.character_of_peer(1)
 	_at(s, Vector3(16.4, 0.04, 9.55))

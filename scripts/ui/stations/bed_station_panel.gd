@@ -207,7 +207,7 @@ func _refresh_body(st: ColonyState) -> void:
 		left_text = "about %s sols" % num(left / GameConfig.SOL_HOURS, 1) if left >= GameConfig.SOL_HOURS else "about %d hours" % ceili(left)
 	_show_reading(&"harvest_in", left_text, &"urgent" if left_text == "Stopped" else &"ok")
 	if crop_id != "":
-		_crop_note.text = "%s: %s. %s meals per harvest (game balance)." % [String(c.get("name", crop_id)), String(c.get("evidence", "")), num(float(c.get("meals", 0.0)))]
+		_crop_note.text = "%s: %s. %s meals per harvest (game balance)." % [String(c.get("name", crop_id)), String(c.get("evidence", "")), num(CropSystem.harvest_meals(services.state(), crop_id))]
 		_time_note.text = "Time is squeezed: a %s crop takes about %s sols here; it takes %s." % [String(c.get("name", crop_id)).to_lower(), num(float(c.get("cycle_sols", 0.0))), String(c.get("earth_words", "much longer on Earth"))]
 	else:
 		_crop_note.text = "Lettuce has been grown on the International Space Station (an ISS analog, not Mars evidence). Tomato is a plan, not yet grown on the ISS."

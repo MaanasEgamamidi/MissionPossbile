@@ -1,0 +1,57 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+FAIL every station of a new game maps to the right panel class (21 base + those added by data files): 86 stations { "workbench": 1, "board": 1, "gym": 1, "survivor": 1, "heal": 1, "record": 7, "lab": 1, "computer": 1, "comms": 1, "weather": 1, "salvage": 15, "food": 1, "suits": 1, "power": 1, "lifesupport": 1, "solar": 12, "garage": 1, "bed": 7, "drone_pad": 1, "repair_task": 12, "cassette_anchor": 6, "cassette_player_anchor": 1, "rover_charger": 1, "sample_site": 3, "scout_bay": 1, "ore_deposit": 5, "upgrade_console": 1 }, wrong: repair_t01 (repair_task), repair_t02 (repair_task), repair_t03 (repair_task), repair_t04 (repair_task), repair_t06 (repair_task), repair_t08 (repair_task), repair_t09 (repair_task), repair_t10 (repair_task), repair_t11 (repair_task), repair_t12 (repair_task)
+PASS power panel: each equipment switch sends one set_equipment and shows the state after the answer and a tick
+PASS power panel: a cause-and-effect sentence after a machine switch
+PASS power panel: every machine switch shows its kW
+PASS power panel: forecast text matches ReserveForecast.compute()
+PASS power panel: battery as an amount (kWh of capacity, %)
+PASS power panel: no loads shed at the start, said in words
+PASS power panel: after an overload the shed loads are listed in words, with why (lights, greenhouse, co2_unit)
+PASS power panel: shedding order explained
+PASS power panel: a shed machine's switch says it has no power
+PASS power panel: energy alerts shown at the top in words
+PASS life support: each equipment switch sends one set_equipment and shows the state after the answer and a tick
+PASS life support: alerts for these systems at the top in words
+PASS life support: each water slider sends one set_water_allocation per release with both values
+PASS life support: a keyboard change of a slider sends one request
+PASS life support: drinking comes first and the protected reserve is stated
+PASS life support: the electrolyser shows its water use (L per hour)
+PASS life support: the CO2-oxygen unit shows no water use
+PASS life support: both processes side by side with kg per hour and kW
+PASS life support: stopped reason when the feed is 0
+PASS life support: stopped reason when the water quality is low
+PASS cabin air: O2, CO2 and pressure in kPa with words
+PASS cabin air: raising CO2 changes the level and the word (High, then Dangerous)
+PASS cabin air: the CO2 alert appears at the top in words
+PASS cabin air: says the room air is not the oxygen in the tanks
+PASS solar: 'Clean this panel' sends one clean_panel and this tracker's dust goes to 0
+PASS solar: shows this panel's output, the whole array and the trackers
+PASS solar: repair enabled for the electrical specialist while the cleaner is broken
+PASS solar: repair disabled for a non-electrical crew member, with the reason in words
+PASS solar: the electrical specialist repairs the cleaner, then the button says why it is off
+PASS suit rack: fill sends one refill_suit; the reserve falls by exactly what the tank gains
+PASS suit rack: says how much oxygen it takes and that this is the only way to fill a tank
+PASS suit rack: a full tank disables the fill button with the reason
+PASS suit rack: the suit button starts the suit check (begin_suit_check on)
+PASS suit rack: after the check the suit is on and the button takes it off
+PASS HUD: a system_alert reaches the message line at once, even when it is full
+PASS HUD: system alerts from an action and from the next tick show in the message line
+PASS HUD: urgent readings use the cabin air (CO2 high, O2 low) with kPa and a word
+PASS HUD: cue for a sun tracker
+PASS layout Power panel at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Power panel
+PASS layout Life support console at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Life support console
+PASS layout Sun tracker at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Sun tracker
+PASS layout Suit rack at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Suit rack
+PASS layout Colony at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Colony
+PASS layout Blueprint at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus Blueprint
+PASS layout HUD at 1280x720, 1920x1080 and 1280x720 text 1.5
+PASS focus HUD
+PASS no script or engine errors during the test
+RESULT 53/54

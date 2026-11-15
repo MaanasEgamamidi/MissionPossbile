@@ -1,0 +1,82 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS station: the drone pad comes from data/stations_drone.json (kind drone_pad)
+PASS station: the pad is outside on flat ground
+PASS station: no other station within 4 m of the pad (the scout bay stays clear)
+PASS station: the pad is out of the crew rover's lane from the garage (z 21.5..24.5)
+PASS new game: the drone starts docked on its pad, fully charged
+PASS levels: V1 effects come from data/area_levels.json (5 m/s, 90 s, 20 m survey, no autopilot) and the command range is 150 m
+PASS session: the drone system runs as a post-system of the simulation
+PASS fly: refused from far away
+PASS fly: E at the pad takes the controls; the drone lifts off with the pilot set
+PASS fly: a second pilot is refused while someone flies it
+PASS manual: W flies it forward at the level's speed (about 13 m in 3 s at 5 m/s)
+PASS manual: Space climbs
+PASS manual: the mouse turns it (the stick is relative to its heading)
+PASS manual: when the pilot's inputs stop arriving it slows down and hovers
+PASS hand back: E hands the drone back; it flies home by itself
+PASS hand back: it lands on its pad and charges
+PASS range: a warning at 90 % of the command room's radio range
+PASS range: it stops at the edge (150 m) and cannot fly further
+PASS range: the command room upgrade widens it (V2: 300 m)
+PASS range: with more range it flies on past the old edge
+PASS battery: flying uses 1/flight_seconds of it per second (V1: 90 s)
+PASS battery: when only the trip home is left it takes the controls away and flies home, with a warning
+PASS battery: it reaches its pad and lands
+PASS battery: an empty battery makes it fly home slowly and land
+PASS battery: it will not take off nearly empty; the reason is in words
+PASS battery: it charges on the pad
+PASS survey: nothing happens outside the survey radius (V1: 20 m)
+PASS survey: flying within the survey radius surveys the place and radios the scout report home
+PASS survey: it reveals the site's ore deposits exactly like the scout rover (and not the others)
+PASS survey: the colony counts the place as surveyed (map, goals) and a discovery is logged
+PASS autopilot: refused at V1 with a plain message (needs V3)
+PASS autopilot: refused at V2 with a plain message (needs V3)
+PASS autopilot V3: one place per trip (two are refused)
+PASS autopilot V3: an unknown place is refused
+PASS autopilot V3: it takes off for the chosen place by itself (sent from the colony computer)
+PASS autopilot V3: the host flies it there, surveys, comes back and lands while nobody watches (17 s)
+PASS autopilot V3: the survey revealed the gypsum deposit
+PASS autopilot: it can be called home on the way
+PASS route V4: at most 4 places
+PASS route V4: refused when the battery cannot hold the whole trip
+PASS route V4: a route of three places is accepted
+PASS route V4: it flies the waypoints in order, surveys each and lands
+PASS route V4: carbonate and olivine deposits are on the map now
+PASS save: state.drone (mid-flight on a route) survives a JSON round trip
+PASS replication: a client's copy (to_dict/from_dict) has the same drone: status, position, route, battery, level
+PASS save: an older save without the drone gets a docked, charged drone
+PASS co-op: the host refuses drone inputs from other peers, for another pilot, or with bad numbers
+PASS co-op: inputs from the pilot's own peer (motion extra "drone") fly the drone on the host
+PASS co-op: only the pilot can hand the drone back
+PASS co-op: when the pilot's player leaves, the drone flies home by itself
+PASS presenter: the V1 model of the stage presenter rides on the drone body (docked on the pad)
+PASS presenter: the pad model and its charger stand on the pad station
+PASS presenter: after an upgrade the drone shows the new level (V3: gimbal camera)
+PASS pilot: taking control switches to the drone's follow camera and shows the drone HUD
+PASS pilot: the walking body is held still while flying
+PASS pilot: on the host the presenter's input goes straight into the drone system
+PASS presenter: the body follows the flying drone and the rotors spin
+PASS pilot: the HUD shows battery, radio range and the keys
+PASS pilot: E hands it back; the player's camera returns
+PASS panel: the pad opens its own panel (scripts/ui/stations/drone_pad_station_panel.gd)
+PASS panel V1: level and battery shown; the autopilot list is locked with a note about V3
+PASS panel V4: places can be ticked into a route
+PASS panel V4: Send starts the autopilot on the ticked route
+PASS panel: Take control is off while the drone is out; Call it home is shown
+PASS panel: Take control starts manual flight
+PASS glbs: all four drone stages load, about 1 m across, origin at the feet, four named rotor hubs, the parts of each stage
+PASS glbs: V2 has longer rotors than V1 (wider span)
+PASS glbs: the landing pad loads (about 2.5 m wide, charger cabinet on its +z side)
+PASS game: GameMain adds the drone presenter, and the scout_drone stage rides on its body
+PASS game: E at the pad opens the drone pad panel
+PASS game: E again on the panel takes control; the panel closes and the walking body is held still
+PASS game: W flies the drone (keys reach the host's drone system) while the astronaut stays at the pad
+PASS game: E hands the drone back; it flies home by itself
+PASS game: once E is let go the astronaut walks again
+PASS no script or engine errors during the test
+RESULT 75/75
+WARNING: 125 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 28 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

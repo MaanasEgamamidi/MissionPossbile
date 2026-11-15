@@ -3,6 +3,7 @@ extends Control
 ## The mission-control HUD of the scout update, laid around GameHud's own corners (time and alerts top left, your crew
 ## member top right, the crosshair in the middle):
 ##   top centre     VitalsBar: electricity, oxygen, water, food, parts, science, ore. ⋯ (H) folds it, ? (F1) explains.
+##                  Under it the battery chip: sun or moon, battery %, and while it drains how fast and how long it lasts.
 ##   left           GoalsCard under the time (J folds it).
 ##   right          MiniMap under your crew member, then the pop-ups (ToastStack).
 ##   lower left     MissionControlCard: storm warnings with how many more storms are lined up, scout reports with the
@@ -18,6 +19,10 @@ const EDGE := 24.0
 const BUILD_REACH_M := 7.0
 ## Real seconds before the same low supply is announced again.
 const LOW_REPEAT_S := 180.0
+## Alert ids of upgrade_area level ups start with this, then the track id (AreaLevelActions).
+const LEVEL_ALERT_PREFIX := "area_level_"
+## Upgrade update (2026-11-14): the battery chip under the vitals bar (sun or moon, battery %, night drain).
+const EnergyChipScript := preload("res://scripts/ui/hud/energy_chip.gd")
 
 var services: GameServices
 var game: Node
@@ -25,6 +30,8 @@ var hud: GameHud
 var ui: UiRoot
 
 var vitals: VitalsBar
+## The battery chip under the vitals bar (scripts/ui/hud/energy_chip.gd).
+var energy: PanelContainer
 var goals: GoalsCard
 var map: MiniMap
 var toasts: ToastStack
@@ -67,6 +74,9 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 		if not _auto_compact:
 			_user_compact = on
 			_save())
+	energy = EnergyChipScript.new()
+	add_child(energy)
+	energy.setup(services)
 	goals = GoalsCard.new()
 	add_child(goals)
 	goals.setup(services)
@@ -241,7 +251,25 @@ func _on_alert(alert_id: StringName, level: StringName, text: String) -> void:
 	if alert_id == ScoutSystem.ALERT_ID and text.begins_with("Scout report"):
 		_scout_report.call_deferred(text)
 		return
+	if String(alert_id).begins_with(LEVEL_ALERT_PREFIX):
+		toasts.push(level_up_text(alert_id, text, services.state()), &"good")
+		return
 	toasts.push(text, kind)
+
+
+## The pop-up for a level up of an upgrade path (the `area_level_<track>` alert of upgrade_area):
+## "Greenhouse grow racks: V3: Three-layer rack with drip lines". The level comes from the alert's own words when they
+## name it (on a networked client the alert can arrive before the new level does), else from the colony.
+static func level_up_text(alert_id: StringName, text: String, st: ColonyState) -> String:
+	var track := String(alert_id).trim_prefix(LEVEL_ALERT_PREFIX)
+	if AreaLevels.track(track).is_empty():
+		return text
+	var lvl := AreaLevels.level(st, track)
+	var re := RegEx.create_from_string("\\bV(\\d+)\\b")
+	var m := re.search(text)
+	if m != null:
+		lvl = clampi(int(m.get_string(1)), AreaLevels.MIN_LEVEL, AreaLevels.max_level())
+	return "%s: %s" % [AreaLevels.track_name(track), AreaLevels.stage_text(track, lvl)]
 
 
 func _scout_report(text: String) -> void:
@@ -296,6 +324,7 @@ func refresh() -> void:
 	if services == null or not services.has_game():
 		return
 	vitals.refresh()
+	energy.call(&"refresh")
 	goals.refresh()
 	map.refresh()
 	var st := services.state()
@@ -366,10 +395,15 @@ func _layout() -> void:
 		vitals.position = Vector2(clampf((screen.x - vs.x) * 0.5, free_l, free_r - vs.x), EDGE)
 	else:
 		vitals.position = Vector2((screen.x - vs.x) * 0.5, maxf(left.end.y, right.end.y) + 10.0)
-	hud.top_reserved = vitals.position.y + vs.y
+	# the battery chip hangs just under the vitals bar, centred on it
+	var es := energy.get_combined_minimum_size()
+	energy.size = es
+	energy.position = Vector2(roundf(vitals.position.x + (vs.x - es.x) * 0.5), vitals.position.y + vs.y + 6.0)
+	var top_band := energy.position.y + es.y
+	hud.top_reserved = top_band
 	# left column: goals under the time
 	goals.size = goals.get_combined_minimum_size()
-	goals.position = Vector2(EDGE, maxf(left.end.y + 12.0, vitals.position.y + vs.y + 12.0 if vitals.position.x < goals.size.x + EDGE else 0.0))
+	goals.position = Vector2(EDGE, maxf(left.end.y + 12.0, top_band + 12.0 if vitals.position.x < goals.size.x + EDGE else 0.0))
 	# right column: map, then pop-ups
 	var ms := map.get_combined_minimum_size()
 	map.size = ms

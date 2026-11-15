@@ -10,6 +10,9 @@ var door_id: int
 var open_amount: float = 0.0
 ## Locked doors close and ignore nearby players.
 var locked: bool = false
+## Tutorial mode (owner rule, 2026-11-14): a held door stays fully open whoever is near, and an airlock pair may
+## both stand open. Set every half second by GameMain from the replicated tutorial state; locked still wins.
+var held_open: bool = false
 ## Real seconds for a complete opening or closing.
 var open_seconds: float = 0.6
 ## Player sensing distance from the average leaf origin.
@@ -92,9 +95,9 @@ func _physics_process(delta: float) -> void:
 	var sphere := _sense.get_child(0).shape as SphereShape3D
 	if not is_equal_approx(sphere.radius, sense_radius):
 		sphere.radius = sense_radius
-	var wants_open := not locked and _sense.has_overlapping_bodies()
+	var wants_open := not locked and (held_open or _sense.has_overlapping_bodies())
 	_shut_for = _shut_for + delta if _progress <= 0.0 else 0.0
-	if partner != null:
+	if partner != null and not held_open:
 		if wants_open:
 			wants_open = _may_open(delta)
 		else:

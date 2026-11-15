@@ -77,7 +77,12 @@ func _validation_and_leases() -> void:
 	_check("specialist and helper work concurrently in same room", _claim(s, "T02").ok and _claim(s, "T01", 2).ok and s.repair_runtime.locks.has("T01") and s.repair_runtime.locks.has("T02"))
 	s.repair_runtime.clear_session()
 	_claim(s, "T01")
-	_check("no production rule accepts completion", _move(s, "T01", 2).reason == &"not_available_yet")
+	# Broken parts (2026-11-14): ten tasks now have production rules (scripts/tasks/puzzles/). T05 and T07 still have
+	# none, so the "no rule installed" path is checked on T05 (biology_food) instead of T01.
+	a.specialty = &"biology_food"
+	_claim(s, "T05")
+	_check("no production rule accepts completion", _move(s, "T05", 2).reason == &"not_available_yet")
+	a.specialty = &"electrical_comms"
 	_check("untrusted completion boolean rejected", s.request(&"task_move", &"repair_t01", {"generation": 1, "move": "step", "value": 2, "complete": true}).reason == &"bad_request")
 	s.state.stations["repair_t01"].room_id = "med_bay"
 	_check("wrong room metadata rejected", _claim(s, "T01").reason == &"wrong_room")

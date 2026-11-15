@@ -179,8 +179,9 @@ func _refresh_body(st: ColonyState) -> void:
 	for id: String in CropSystem.bed_ids(st):
 		var b := CropSystem.bed(st, id)
 		if CropSystem.is_alive(b):
-			growing += float(FoodBalance.crop(String(b.crop)).get("meals", 0.0))
-	_show_reading(&"food_growing", "%s meals" % num(growing, 0), &"ok" if growing > 0.0 else &"warn")
+			growing += CropSystem.harvest_meals(st, String(b.crop))   # includes the grow-rack level (food.yield_factor)
+	var yf := CropSystem.yield_factor(st)
+	_show_reading(&"food_growing", "%s meals%s" % [num(growing, 0), (" (×%s from %d grow layers)" % [num(yf, 1), CropSystem.grow_layers(st)]) if yf > 1.0 else ""], &"ok" if growing > 0.0 else &"warn")
 	var start_sols := bal.food_meals_start / maxf(per_sol, bal.meals_per_sol)
 	_start_note.text = "Stored meals cover the start: the colony landed with %s meals, about %s sols for %d crew, while the first crops grow." % [
 		num(bal.food_meals_start, 0), num(start_sols, 0), maxi(1, int(crew))]

@@ -76,7 +76,8 @@ static func build(manifest_path: String, colliders_path: String) -> Node3D:
 			if entry.has("room_id"):
 				# Small, separate targets preserve access to neighbouring consoles and doors.
 				((station.get_child(0) as CollisionShape3D).shape as SphereShape3D).radius = 0.38
-				_add_foundation_marker(station, entry)
+				# No marker plate or floating name here any more (owner 2026-11-14: "no floating objects"): the HUD's
+				# "[E] ..." prompt names the station when it is aimed at; room cassettes and the player get real models.
 			result.get_node("Stations").add_child(station)
 	return result
 
@@ -97,29 +98,6 @@ static func _station_volume(id: String, kind: String, at: Vector3) -> Area3D:
 	station.add_child(shape)
 	return station
 
-
-## Reserved F06 locations, with original native geometry and no solid obstacle or collection logic.
-static func _add_foundation_marker(station: Area3D, entry: Dictionary) -> void:
-	var plate := MeshInstance3D.new()
-	plate.name = "Marker"
-	var box := BoxMesh.new()
-	box.size = Vector3(0.42, 0.27, 0.06)
-	plate.mesh = box
-	var material := StandardMaterial3D.new()
-	material.albedo_color = Color("e18b45") if String(entry.kind) == "repair_task" else Color("43b8b1")
-	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	plate.material_override = material
-	station.add_child(plate)
-	var label := Label3D.new()
-	label.name = "LocationLabel"
-	label.text = String(entry.get("name", entry.id)) if String(entry.kind) == "repair_task" else ("Tape location" if String(entry.kind) == "cassette_anchor" else "Cassette player")
-	label.position.y = 0.28
-	label.font_size = 48
-	label.pixel_size = 0.00125
-	label.outline_size = 5
-	label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	label.no_depth_test = false
-	station.add_child(label)
 
 ## Convert a Blender row matrix to Godot's Y-up coordinates.
 static func object_transform(m: Array) -> Transform3D:

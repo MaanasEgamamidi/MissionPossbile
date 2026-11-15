@@ -1,0 +1,31 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS actual door opening signal immediately vents local chamber
+PASS threshold event cannot falsely close pressure boundary
+PASS fully closed door allows recovery without locking inner egress
+PASS world pressure bridge never double bills colony gas
+PASS host starts ENet
+PASS first client joins
+PASS client receives active host exposure
+PASS hazard event forwards exact actor and cause
+PASS replica cannot tick exposure or wear
+PASS second client late joins
+PASS late join receives elapsed exposure and wear
+PASS global pause preserves timer and condition
+PASS host resolves once at four seconds
+PASS both peers receive recovered state
+PASS safe continuation does not duplicate recovery
+PASS two clients receive local pressure fault
+PASS local fault preserves healthy cabin
+PASS client has no debug fault authority
+PASS door facts replicate
+PASS client starts host timed maintenance
+PASS both peers see one maintenance clock
+PASS second peer cannot double maintenance
+PASS single completion restores mapped system
+PASS repair result converges across two clients
+PASS closing pending LAN maintenance releases host job
+PASS disconnected replica has no local host identity or save authority
+PASS disconnected replica cannot issue local mutations
+PASS disconnect preserves replica without offline ticking
+RESULT 28/28

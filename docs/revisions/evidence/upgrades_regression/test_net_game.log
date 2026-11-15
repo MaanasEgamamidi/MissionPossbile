@@ -1,0 +1,28 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS host: menu Host starts a colony and plays
+PASS doors: parked crew on the hub ring hold no door open  24 doors, 0 open
+PASS client: menu says it is connecting  Connecting to 127.0.0.1:24792…
+PASS client: playing after the colony arrives
+PASS client: controls a different crew member
+PASS client: menu closed
+PASS host: draws the client's body
+PASS host: the client's body can open doors (PLAYER-layer presence)
+PASS client: draws the host's body
+PASS motion: the host's drawing follows the client's body  (-4.423222, 0.058616, -13.42001) vs (-4.300013, 0.000017, -13.42675)
+PASS doors: a door on the host opens for the client
+PASS doors: and shuts when the client walks away
+PASS carry: the client aims at the crate  { "kind": "item", "id": &"crate_1", "node": @RigidBody3D@575:<RigidBody3D#2294921834447> }
+PASS carry: the client holds the crate once the host agrees
+PASS carry: the host draws it in the client's hands
+PASS carry: the client can put it down again
+PASS stations: unauthorized cassette player closes without exposing content
+PASS stations: client routes station screens and restricts remote playback  86 station routes
+PASS answers: a client's refusal shows on the client  c1998493792-23
+PASS answers: the client's refusal does not show on the host  ["That request did not make sense."]
+PASS host quit: client gets a reason for its menu  The connection to the host was lost, or the host closed the colony.
+RESULT 21/21
+WARNING: 214 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 28 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

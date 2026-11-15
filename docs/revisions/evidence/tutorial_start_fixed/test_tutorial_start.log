@@ -1,0 +1,50 @@
+﻿Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS config: the shipped game starts in tutorial mode (outside, suited, doors held open)
+PASS new game: all four crew wear a working suit with a full tank
+PASS new game: every crew member stands on their tutorial spawn spot  crew_1 (22.0, 0.04, 16.8) Exterior outside=true; crew_2 (20.8, 0.04, 17.2) Exterior outside=true; crew_3 (23.2, 0.04, 17.2) Exterior outside=true; crew_4 (22.0, 0.04, 18.2) Exterior outside=true
+PASS new game: the spawn is in the Exterior zone and every crew member counts as outside  crew_1 (22.0, 0.04, 16.8) Exterior outside=true; crew_2 (20.8, 0.04, 17.2) Exterior outside=true; crew_3 (23.2, 0.04, 17.2) Exterior outside=true; crew_4 (22.0, 0.04, 18.2) Exterior outside=true
+PASS new game: the spawn is right outside the exit tunnel's outer door (Mars side, within 4 m, in front of the doorway)  crew_1 (22.0, 0.04, 16.8) Exterior outside=true; crew_2 (20.8, 0.04, 17.2) Exterior outside=true; crew_3 (23.2, 0.04, 17.2) Exterior outside=true; crew_4 (22.0, 0.04, 18.2) Exterior outside=true
+PASS new game: crew stand at least 1 m apart (two body widths with room to spare)  1.26 m
+PASS new game: the host plays crew_1 and the tutorial is at stage 1, not done
+PASS new game: every hub spot (parking and respawn) is still in the Med Bay
+PASS new game: suited crew outside are not in danger
+PASS T12: the seal is a broken part at the start
+PASS T12: the exit vestibule leaks and is unbreathable from the start  { "pressure_kpa": 0.6, "breathable": false, "leaking": true, "repressurizing": false, "seal_condition": 0.99791666666667, "inner_open": false, "outer_open": false, "status": "Seal leaking" }
+PASS T12: a suited crew member in the leaking vestibule is protected (no countdown, no recovery)  in=true outside=true protected=true active=false t=0.00
+PASS save: written
+PASS continue: status ok  ok
+PASS continue: the host is back where they were saved, suited, same tank, still outside  (22.0, 0.04, 16.8) tank 98.774
+PASS continue: every crew member still wears the same suit with the same tank
+PASS continue: every crew member is at their saved spot or parked on their Med Bay hub spot
+PASS continue: T12 is still broken and the vestibule still leaks at the saved pressure  { "pressure_kpa": 0.6, "breathable": false, "leaking": true, "repressurizing": false, "seal_condition": 0.98645833333333, "inner_open": false, "outer_open": false, "status": "Seal leaking" }
+PASS continue: the tutorial is still running (so doors stay held open) and at the same stage
+PASS continue: hub spots are still in the Med Bay
+PASS T12: without a suit the leaking vestibule is deadly at once  AIRLOCK PRESSURE LOST - SUIT REQUIRED
+PASS respawn: an unsuited crew member in the vestibule is recovered once at 4 s  airlock_pressure
+PASS respawn: back in the Med Bay on the hub spot near the med station  (-6.1, 0.04, -14.5)
+PASS T12: once the seal puzzle is solved the vestibule stops leaking and repressurizes  { "pressure_kpa": 101.3, "breathable": true, "leaking": false, "repressurizing": false, "seal_condition": 0.96541666666666, "inner_open": false, "outer_open": false, "status": "Pressurized" }
+PASS world: every crew member's body fits at the spawn (no wall, rock, prop or door leaf) with ground under the feet
+PASS world: crew bodies do not overlap each other  1.27 m apart, radius 0.22
+PASS world: the host's body stands on the ground outside  (22.0, -0.049901, 16.8)
+PASS doors: the map's doors, the exit tunnel pair and the garden dome pair are all there  28 doors
+PASS doors: while the tutorial runs every door is held fully open
+PASS doors: both exit tunnel doors stand open together during the tutorial (interlock paused)
+PASS tutorial: finished
+PASS after tutorial: no door is held and every door has closed by itself
+PASS after tutorial: a door opens for a player and shuts again when they walk away  opened=true closed=true
+PASS after tutorial: the inner tunnel door opens for a player  inner 0.00 outer 0.97
+PASS after tutorial: the outer door stays shut while the inner door is open (airlock interlock back)
+PASS after tutorial: the outer door opens only after the inner door has been shut for the pressure cycle, never both open  gap 2.52 s (cycle 2.5 s), cycles 1, both false
+RESULT 36/36
+Godot_v4.7.2-stable_win64_console.exe : WARNING: 123 ObjectDB instances were leaked at exit (run with `--verbose` for 
+details).
+At line:1 char:444
++ ... nsole.exe'; & $g --headless --path . --script res://tests/test_tutori ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: 123 Ob...` for details).:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 28 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

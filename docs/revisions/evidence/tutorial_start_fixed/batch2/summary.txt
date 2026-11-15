@@ -1,0 +1,3 @@
+test_game_scene exit=0 RESULT 34/34 script_errors=0
+test_repair_anchors exit=0 RESULT 116/116 script_errors=0
+DONE

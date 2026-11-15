@@ -1,0 +1,77 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS data: the greenhouse has 1, 2, 3, 4 grow layers at V1..V4
+PASS data: the yield factor is 1 at V1 and rises with every level
+PASS data: the garden adds no meals at V1 and more at every level
+PASS data: the garden upgrade console is a station in the Garden dome and serves the garden track
+PASS data: the console is inside the dome, beside the west airlock (x 44.15, z 24.35) and out of its opening
+PASS greenhouse V1 is the map as it is (no extra build)
+PASS greenhouse V2: 4 racks, each with 1 added layer(s) over its bed (2 layers in all), 4 trays
+PASS greenhouse V2: all 1112 pieces inside the room and under the ceiling (top 2.42 m, ceiling tiles at 2.94 m)
+PASS greenhouse V2: every piece stands inside a bed's own footprint (6 cm margin)
+PASS greenhouse V2: walkway, door paths and aisles stay clear below head height
+PASS greenhouse V2: no station's reach spot is touched (6 stations in the room)
+PASS greenhouse V2: no colliders (visual only)
+PASS greenhouse V2: 7 draw nodes (plants are MultiMeshes)
+PASS greenhouse V3: 4 racks, each with 2 added layer(s) over its bed (3 layers in all), 8 trays
+PASS greenhouse V3: all 2274 pieces inside the room and under the ceiling (top 2.62 m, ceiling tiles at 2.94 m)
+PASS greenhouse V3: every piece stands inside a bed's own footprint (6 cm margin)
+PASS greenhouse V3: walkway, door paths and aisles stay clear below head height
+PASS greenhouse V3: no station's reach spot is touched (6 stations in the room)
+PASS greenhouse V3: no colliders (visual only)
+PASS greenhouse V3: 11 draw nodes (plants are MultiMeshes)
+PASS greenhouse V4: 4 racks, each with 3 added layer(s) over its bed (4 layers in all), 12 trays
+PASS greenhouse V4: all 3403 pieces inside the room and under the ceiling (top 2.88 m, ceiling tiles at 2.94 m)
+PASS greenhouse V4: every piece stands inside a bed's own footprint (6 cm margin)
+PASS greenhouse V4: walkway, door paths and aisles stay clear below head height
+PASS greenhouse V4: no station's reach spot is touched (6 stations in the room)
+PASS greenhouse V4: no colliders (visual only)
+PASS greenhouse V4: 13 draw nodes (plants are MultiMeshes)
+PASS greenhouse: the first added layer sits above every bed's own frame and LED bar
+PASS greenhouse: the LED strips glow
+PASS greenhouse V4: the full LED canopy covers every rack
+PASS garden V1: the upgrade console is built at its station (44.15, 24.35)
+PASS garden V1: the console shows 1 level light(s) lit
+PASS garden V1: all 18 pieces stay inside the base ring and under the dome glass
+PASS garden V1: the airlock mouth, the central aisle and the planter aisles stay clear
+PASS garden V1: no station's reach spot is touched (11 stations in the dome)
+PASS garden V1: no colliders (visual only)
+PASS garden V1: 18 draw nodes (plants are MultiMeshes)
+PASS garden V1: has only the console
+PASS garden V2: the upgrade console is built at its station (44.15, 24.35)
+PASS garden V2: the console shows 2 level light(s) lit
+PASS garden V2: all 676 pieces stay inside the base ring and under the dome glass
+PASS garden V2: the airlock mouth, the central aisle and the planter aisles stay clear
+PASS garden V2: no station's reach spot is touched (11 stations in the dome)
+PASS garden V2: no colliders (visual only)
+PASS garden V2: 22 draw nodes (plants are MultiMeshes)
+PASS garden V2: has GroundCover, Herbs, HerbPots
+PASS garden V3: the upgrade console is built at its station (44.15, 24.35)
+PASS garden V3: the console shows 3 level light(s) lit
+PASS garden V3: all 1402 pieces stay inside the base ring and under the dome glass
+PASS garden V3: the airlock mouth, the central aisle and the planter aisles stay clear
+PASS garden V3: no station's reach spot is touched (11 stations in the dome)
+PASS garden V3: no colliders (visual only)
+PASS garden V3: 28 draw nodes (plants are MultiMeshes)
+PASS garden V3: has RingWalls, RingSoil, Herbs, Shrubs
+PASS garden V4: the upgrade console is built at its station (44.15, 24.35)
+PASS garden V4: the console shows 4 level light(s) lit
+PASS garden V4: all 1486 pieces stay inside the base ring and under the dome glass
+PASS garden V4: the airlock mouth, the central aisle and the planter aisles stay clear
+PASS garden V4: no station's reach spot is touched (11 stations in the dome)
+PASS garden V4: no colliders (visual only)
+PASS garden V4: 32 draw nodes (plants are MultiMeshes)
+PASS garden V4: has RingWalls, Shrubs, TreeCrowns, TreeWood, Fruit
+PASS garden: every level shows more than the one before ([18, 676, 1402, 1486] pieces)
+PASS presenters: the food look appears from V2, the garden console from V1 ([[false, true], [true, true], [true, true], [true, true]])
+PASS yield: one tomato harvest gives [12.0, 22.8, 33.6, 43.2] meals at V1..V4 (crop meals x the racks' yield factor)
+PASS yield: CropSystem.harvest_meals is what a harvest adds
+PASS yield: V1 says nothing extra, a higher level tells the player about the layers in plain words
+PASS garden V1: no meals from the dome and nothing written to the crops record
+PASS garden V3: one sol adds 1.0000 meals (garden.meals_per_sol = 1.0)
+PASS garden: the meals do not depend on the tick size (1.000000000 vs 1.000000000)
+PASS garden: food ledger identity holds (store change = harvested - eaten - recovery)
+PASS garden: a full food store takes nothing more and books nothing
+PASS save/load: the garden's meals so far (0.30000) and both levels come back from the file
+PASS save/load: after loading the garden keeps adding exactly as without the save (0.500000)
+RESULT 74/74

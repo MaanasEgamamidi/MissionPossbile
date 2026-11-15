@@ -1,0 +1,49 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS crew 0 reserves a separate suit
+PASS crew 1 reserves a separate suit
+PASS crew 2 reserves a separate suit
+PASS crew 3 reserves a separate suit
+PASS four concurrent checks reserve all slots
+PASS walking away releases reservation
+PASS cancelled suit can be reserved again
+PASS worn suit remembers rack and preserves charge
+PASS worn suit remembers rack and preserves charge
+PASS worn suit remembers rack and preserves charge
+PASS worn suit remembers rack and preserves charge
+PASS four distinct worn suits
+PASS saved/replicated suit identity survives
+PASS saved/replicated suit identity survives
+PASS saved/replicated suit identity survives
+PASS saved/replicated suit identity survives
+PASS old saves get four unique slots
+PASS authored ladder has a climb volume
+PASS ladder can be aimed at from its foot
+PASS climb exits onto the real mezzanine
+PASS descend reaches hangar floor
+PASS menus pause ladder input
+PASS retracted camera never draws inside own body
+PASS interior surfaces corrected
+PASS both planters show soil
+PASS one chess set corrected
+PASS chess has 16 pieces per side
+PASS reported unwanted object hidden: ak_dust_drift
+PASS reported unwanted object hidden: ak_dust_trail
+PASS reported unwanted object hidden: qt_cable
+PASS reported unwanted object hidden: ls_drain
+PASS reported unwanted object hidden: ls_drain_001
+PASS outside finishes preserved
+PASS drain grates, wire and footprints located
+PASS greenhouse drain tiles drawn as whole floor tiles
+PASS dome plaza has a deck floor over the hall footprint
+PASS greenhouse has cleaning equipment
+PASS helmet identity bands cannot enter first-person jump view
+PASS rack displays four suits
+PASS four worn suits disappear from rack
+PASS return check starts
+PASS returned suit reappears in exact original slot
+RESULT 42/42
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 1 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

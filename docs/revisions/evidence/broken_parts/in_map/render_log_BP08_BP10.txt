@@ -1,0 +1,9 @@
+imported BP08 6 objects
+imported BP10 24 objects
+materials without a GC_ twin (kept flat): []
+tunnel cut: removed 809 leaf faces
+BP08 fixed 34.7 s {'eye_godot': [21.72, 1.64, 2.3], 'look_godot': [22.037, 1.1, 10.226]}
+BP08 broken 2561.1 s
+BP10 fixed 522.6 s {'eye_godot': [15.4, 1.6, 1.4], 'look_godot': [24.5, 0.2, -5.0]}
+BP10 broken 876.7 s
+done 3998.0 s

@@ -56,6 +56,9 @@ func _initialize() -> void:
 	services.saves = SaveService.new(_test_dir, "colony", 1)
 	root.add_child(services)
 	services.set_process(false)
+	# S02 warnings need an unsuited astronaut from the Med Bay, not the tutorial start (suited, outside).
+	services.config.tutorial_start_outside = false
+	services.config.tutorial_start_suited = false
 	services.start_new_game(2302)
 	services.session.outside_test = func(position: Vector3) -> bool: return _forced_outside and position.distance_to(_danger_origin) < 3.0
 	settings = GameSettings.new()
@@ -186,6 +189,8 @@ func _initialize() -> void:
 	var maintenance_station: Dictionary = services.state().stations["repair_t01"]
 	services.report_position(services.local_character().id, CharacterState._v3(maintenance_station.position), 0.0)
 	services.state().repair.tasks.T01.condition = 0.6
+	# T01 is a broken part at the start, so E would open its puzzle; this check is about maintenance on a fixed part.
+	services.state().repair.tasks.T01.first_completed = true
 	var maintenance := StationPanels.for_station(&"repair_t01", services) as MaintenanceStationPanel
 	ui.open(maintenance)
 	maintenance._start.pressed.emit()
