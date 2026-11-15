@@ -27,7 +27,7 @@ const DUSTY_WORD := "dusty"
 const SPECIALTY_INITIALS := {
 	&"electrical_comms": "E",
 	&"medical_life_support": "M",
-	&"biology_food": "B",
+	&"biology_food": "A",
 	&"field_engineering_geology": "F",
 }
 ## Marker colour of each crew member and its name for the legend come from CrewLooks (accent, colour_word).

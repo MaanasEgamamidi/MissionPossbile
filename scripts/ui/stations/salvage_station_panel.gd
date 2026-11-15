@@ -32,7 +32,14 @@ func take_reason_text(part_id: String) -> String:
 
 
 func _donor() -> Dictionary:
-	return ScienceActions.donor_info(String(station_id))
+	var donor := ScienceActions.donor_info(String(station_id))
+	if services != null and services.has_game():
+		var task_id := RepairCatalog.task_for_station(services.state(), String(station_id))
+		if task_id != "" and not RepairCatalog.is_broken(services.state(), task_id):
+			donor = donor.duplicate(true)
+			donor["name"] = "%s station" % String(RepairCatalog.TASKS[task_id][1])
+			donor["story"] = "This machine has been repaired. You can inspect its spare components."
+	return donor
 
 
 func _title_text() -> String:
@@ -49,7 +56,7 @@ func _shows_later_note() -> bool:
 
 
 func _what_you_can_do() -> PackedStringArray:
-	return PackedStringArray(["Look over the parts of this damaged object and read the clue for each.",
+	return PackedStringArray(["Look over the parts and read the clue for each.",
 		"Choose the part that fits the colony's own machines (anyone).",
 		"Take a fitting part out to refurbish at the workbench (field engineering and geology specialist ⛏)."])
 

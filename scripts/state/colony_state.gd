@@ -164,7 +164,7 @@ static func new_game(balance: GameBalance, seed_value: int, zone_names: PackedSt
 	s._start_systems(balance)
 	for z in zone_names:
 		s.zones[z] = {"powered": true, "condition": 1.0, "tier": 0}
-	var names := ["Electrical and communications", "Medical and life support", "Biology and food", "Field engineering and geology"]
+	var names := ["Electrical and communications", "Medical and life support", "Agriculture", "Field engineering and geology"]
 	for i in CharacterState.SPECIALTIES.size():
 		var c := CharacterState.new()
 		c.id = StringName("crew_%d" % (i + 1))

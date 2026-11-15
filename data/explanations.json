@@ -121,7 +121,7 @@
  "specialists": {
   "title": "Specialists",
   "short": "Each crew member is an expert in one kind of job.",
-  "long": "There are four specialists: electrical and comms, medical and life support, biology and food, and field engineering and geology. Some jobs need a certain specialist. Working together gets more done.",
+  "long": "There are four specialists: electrical and comms, medical and life support, agriculture, and field engineering and geology. Some jobs need a certain specialist. Working together gets more done.",
   "source_ids": [],
   "claim_ids": ["colony_premise"]
  },

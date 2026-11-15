@@ -92,7 +92,7 @@ func _session(active: int = 1) -> SessionService:
 	var game_clock := SolClock.new()
 	game_clock.phase = s.config.start_phase
 	s.begin(st, game_clock)
-	# crew_3 (biology and food) first, then the others
+	# crew_3 (agriculture) first, then the others
 	var order: Array[StringName] = [&"crew_3", &"crew_1", &"crew_2", &"crew_4"]
 	for i in active:
 		st.character(order[i]).owner_peer = i + 1
@@ -676,7 +676,7 @@ func _panels() -> void:
 	bed.water_switch.button_pressed = false
 	_check("bed panel: the water switch asks set_bed_water and shows the real state", services.sent_of(&"set_bed_water").size() == 1 and not bool(CropSystem.bed(st, String(BEDS[2])).valve) and not bed.water_switch.button_pressed)
 	bed.set_help_shown(true)   # UI overhaul: the sentences that explain are behind the panel's "?" switch
-	_check("bed panel: Harvest is disabled until the crop is ready; the specialist symbol is on the panel", (bed.buttons["harvest"] as Button).disabled and _all_text(bed).contains("❀ Biology and food specialists"))
+	_check("bed panel: Harvest is disabled until the crop is ready; the specialist symbol is on the panel", (bed.buttons["harvest"] as Button).disabled and _all_text(bed).contains("❀ Agriculture specialists"))
 
 	# ---- console
 	me.position = CharacterState._v3(st.stations[String(CONSOLE)].position)

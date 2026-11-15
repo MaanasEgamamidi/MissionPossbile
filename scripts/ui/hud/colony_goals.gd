@@ -20,7 +20,7 @@ const MAX_SHOWN := 6
 const ROLE_WORDS := {
 	"electrical_comms": "Electrical engineer",
 	"medical_life_support": "Medic",
-	"biology_food": "Biologist",
+	"biology_food": "Agriculture specialist",
 	"field_engineering_geology": "Field engineer",
 	"general": "anyone",
 }
@@ -36,14 +36,15 @@ static func all(state: ColonyState) -> Array[Dictionary]:
 	var tapes := TutorialSystem.tape_count()
 	var found := TutorialSystem.tapes_found(state)
 	var played := TutorialSystem.tapes_played(state)
-	# Owner 2026-11-14: first the only goal is finding every tape; once all are found the goals change to playing them
-	# and fixing the base (the repairs unlock at the same moment, TutorialSystem.repairs_unlocked).
+	# Collection remains a goal while individual tapes unlock playback and their room's repairs.
+	out.append(_with(_count("tapes_found", "Find the tapes", found, tapes), "tapes_found", "", "", ""))
 	if not TutorialSystem.repairs_unlocked(state):
-		out.append(_with(_count("tapes_found", "Find the tapes", found, tapes), "tapes_found", "", "", ""))
 		return out
 	out.append(_with(_count("tapes_played", "Play the tapes", played, tapes), "tapes_played", "", "Command Room", ""))
 	for r: Dictionary in TutorialSystem.fix_rows(state):
 		var task := String(r.task)
+		if not TutorialSystem.task_unlocked(state, task):
+			continue
 		var role := role_words(task)
 		var done := TutorialSystem.is_fixed(state, task)
 		var g := _with(_goal("fix_" + task, String(r.text), done, 1.0 if done else 0.0, ""), "fix", task, String(r.room), role)

@@ -28,7 +28,7 @@ const LOOKS: Array[Dictionary] = [
 		"symbol": &"Plus", "glyph": "✚", "glyph_scale": 1.0, "band": &"Double", "colour_word": "blue", "tag": "Medical"},
 	{"specialty": &"biology_food", "feminine": 1.0, "hair": [&"Hair_Bob"], "hair_suited": [&"HairIn_Bob"],
 		"hair_color": Color("a4502a"), "skin_color": Color("f1c9a5"), "accent": Color("178a3e"), "height": 0.90,
-		"symbol": &"Circle", "glyph": "●", "glyph_scale": 1.7, "band": &"Dots", "colour_word": "green", "tag": "Biology"},
+		"symbol": &"Circle", "glyph": "●", "glyph_scale": 1.7, "band": &"Dots", "colour_word": "green", "tag": "Agriculture"},
 	{"specialty": &"field_engineering_geology", "feminine": 0.0, "hair": [&"Hair_Buzz", &"Hair_Beard"],
 		"hair_suited": [&"HairIn_Buzz", &"Hair_Beard"],
 		"hair_color": Color("6b4a2b"), "skin_color": Color("c39a6e"), "accent": Color("d2379b"), "height": 1.0,

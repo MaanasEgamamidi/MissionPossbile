@@ -239,16 +239,32 @@ static func is_tutorial_done(state: ColonyState) -> bool:
 
 
 ## True while the colony is in tutorial mode: the game switched it on (begin_tutorial_mode) and the tutorial is not
-## done. Then only tapes, broken spots, doors and the suit rack respond to E, and the crew radio is down until T01.
+## done. Then only tapes and their broken spots respond to E; doors still work and the crew radio is down until T01.
 static func tutorial_active(state: ColonyState) -> bool:
 	var t := campaign_part(state, "tutorial")
 	return bool(t.get("locks", false)) and not bool(t.get("done", false))
 
 
-## Tapes first (owner 2026-11-14): in tutorial mode the repairs (broken spots, their green / red glow) and the
-## cassette player open only once the crew has found every room tape. Always true outside tutorial mode.
+## The cassette player and repair goals become available with the first pickup.
+## Individual repairs still require their own room's tape (task_unlocked).
 static func repairs_unlocked(state: ColonyState) -> bool:
-	return not tutorial_active(state) or tapes_found(state) >= tape_count()
+	return not tutorial_active(state) or tapes_found(state) > 0
+
+
+static func task_unlocked(state: ColonyState, task_id: String) -> bool:
+	if not tutorial_active(state):
+		return true
+	var info: Array = RepairCatalog.TASKS.get(task_id, [])
+	return not info.is_empty() and CassetteCatalog.collected(state, "cassette_" + String(info[0]))
+
+
+## Other stations unlock only when all six tapes and every required repair are finished.
+static func specialty_features_unlocked(state: ColonyState) -> bool:
+	return not tutorial_active(state) or restoration_complete(state)
+
+static func restoration_complete(state: ColonyState) -> bool:
+	return state != null and tapes_found(state) >= tape_count() and tapes_played(state) >= tape_count() \
+		and fixed_count(state) >= required_fixes().size()
 
 
 ## True while the crew can not talk to each other: tutorial mode and the T01 radio is still broken.
@@ -340,7 +356,7 @@ static func is_fixed(state: ColonyState, task_id: String) -> bool:
 	if state == null:
 		return false
 	var task: Dictionary = (state.repair.get("tasks", {}) as Dictionary).get(task_id, {})
-	return bool(task.get("first_completed", false))
+	return bool(task.get("first_completed", false)) and not RepairCatalog.is_broken(state, task_id)
 
 
 static func fixed_count(state: ColonyState) -> int:

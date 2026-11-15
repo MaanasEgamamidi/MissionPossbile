@@ -40,9 +40,12 @@ func _initialize() -> void:
 	OS.add_logger(_catcher)
 	PlayerInput.ensure_actions()
 	services = GameServices.new()
+	services.balance.maintenance_enabled = false
 	services.saves = SaveService.new(ProjectSettings.globalize_path("res://").path_join("_test_saves/science"), "colony", 2)
 	root.add_child(services)
 	services.start_new_game(1)
+	for task: Dictionary in services.state().repair.tasks.values():
+		task.broken = false
 	await _frames()
 	services.set_process(false)          # ticks only by hand
 	services.events.upgrade_eligibility_changed.connect(func(id: StringName) -> void: _eligibility[String(id)] = int(_eligibility.get(String(id), 0)) + 1)

@@ -11,7 +11,7 @@ extends RefCounted
 ##           Wrong, forged or replayed moves return accepted = false (RepairRuntime then fails closed).
 ##   res://scripts/tasks/puzzles/tNN_panel.gd  the mini-game (extends TaskPanel). It only sends task_move requests
 ##       and draws task.puzzle_state from the host; it never decides completion.
-## A task with both files is a "broken part" task: until its first completion (task.first_completed) the spot shows
+## A task with both files is a "broken part" task: while task.broken is true the spot shows
 ## the broken model, the prompt names the fault, and E opens the mini-game instead of the maintenance panel.
 
 const DIR := "res://scripts/tasks/puzzles/"
@@ -34,15 +34,12 @@ static func panel_path(task_id: String) -> String:
 
 ## True when the task has a rule and a panel installed.
 static func has_puzzle(task_id: String) -> bool:
-	return ResourceLoader.exists(rule_path(task_id)) and ResourceLoader.exists(panel_path(task_id))
+	return RepairCatalog.has_puzzle(task_id)
 
 
-## True while the task's spot is broken: it has a puzzle and has never been solved.
+## The same boolean controls the repair interaction, prompt and damaged model, including later faults.
 static func is_broken(state: ColonyState, task_id: String) -> bool:
-	if state == null or not has_puzzle(task_id):
-		return false
-	var task: Dictionary = state.repair.get("tasks", {}).get(task_id, {})
-	return not task.is_empty() and not bool(task.get("first_completed", false))
+	return RepairCatalog.is_broken(state, task_id)
 
 
 ## Registers every installed rule on the host's RepairRuntime. Called once per session.

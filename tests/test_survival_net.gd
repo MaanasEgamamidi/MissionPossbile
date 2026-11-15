@@ -53,6 +53,7 @@ func _run() -> void:
 	host.set_process(false)
 	# The door-cycle checks below are about a sealed airlock: the broken T12 seal of a new game would keep it leaking.
 	host.state().repair.tasks.T12.first_completed = true
+	host.state().repair.tasks.T12.broken = false
 	var inner := DoorController.new()
 	inner.door_id = 901
 	var outer := DoorController.new()
@@ -108,6 +109,8 @@ func _run() -> void:
 	host.session.survival.set_airlock_door_open(902, true)
 	check("door facts replicate", await until(func() -> bool: return bool(client.session.survival.pressure_info().outer_open) and bool(third.session.survival.pressure_info().outer_open)))
 	# A general task permits either client to work; the host owns all elapsed time and exclusive access.
+	# This scenario tests ordinary service wear, not an unsolved repair mini-game.
+	host.state().repair.tasks.T03.broken = false
 	var station := CharacterState._v3(host.state().stations.repair_t03.position)
 	host.session.report_position(client.local_peer(), actor_id, station, 0)
 	var gen := int(host.state().repair.tasks.T03.fault_generation)
@@ -128,6 +131,7 @@ func _run() -> void:
 	host.state().repair.tasks.T03.condition = 0.8
 	# T03 is a broken part at the start, so E would open its puzzle; this check is about the maintenance panel.
 	host.state().repair.tasks.T03.first_completed = true
+	host.state().repair.tasks.T03.broken = false
 	host.events.state_changed.emit(&"maintenance_fixture")
 	await until(func() -> bool: return is_equal_approx(float(client.state().repair.tasks.T03.condition), 0.8))
 	var pending_panel := StationPanels.for_station(&"repair_t03", client) as MaintenanceStationPanel

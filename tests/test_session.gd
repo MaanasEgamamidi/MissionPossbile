@@ -73,8 +73,11 @@ func _initialize() -> void:
 
 func _new_session() -> SessionService:
 	var s := SessionService.new(GameConfig.new(), GameBalance.new(), GameEvents.new())
+	s.balance.maintenance_enabled = false
 	var state := ColonyState.new_game(s.balance, 12345, PackedStringArray(["Power Room", "Life Support"]))
 	state.stations = _catalog.duplicate(true)
+	for task: Dictionary in state.repair.tasks.values():
+		task.broken = false
 	for actor: CharacterState in state.characters.values():
 		actor.hub_spot = s.config.hub_position
 		actor.position = actor.hub_spot
@@ -164,7 +167,8 @@ func _carry_and_switch() -> void:
 	_check("release", s.request(&"release_character").ok and c.owner_peer == 0 and c.cargo == [&"box"] and c.position == c.hub_spot)
 	var frozen: Dictionary = c.to_dict()
 	_run(s, 1200.0, 1.0)
-	_check("parked sol frozen and no consumption", c.to_dict() == frozen and s.state.ledger.meals_eaten == 0.0 and s.state.ledger.water_used_l == 0.0 and s.state.ledger.oxygen_used_kg == 0.0)
+	_check("parked sol frozen and no consumption", c.to_dict() == frozen and s.state.ledger.meals_eaten == 0.0 and s.state.ledger.water_used_l == 0.0 and s.state.ledger.oxygen_used_kg == 0.0,
+		"character changes=%s; meals=%s water=%s oxygen=%s" % [c.to_dict().keys().filter(func(key: Variant) -> bool: return c.to_dict()[key] != frozen.get(key)), s.state.ledger.meals_eaten, s.state.ledger.water_used_l, s.state.ledger.oxygen_used_kg])
 
 func _pause_and_suits() -> void:
 	var s := _new_session()

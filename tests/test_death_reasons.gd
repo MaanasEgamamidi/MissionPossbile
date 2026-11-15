@@ -48,6 +48,7 @@ func _session(sol_minutes := 20.0) -> SessionService:
 	s.outside_test = func(point: Vector3) -> bool: return _zones.zone_at_world(point) == ColonyZones.EXTERIOR
 	var state := ColonyState.new_game(balance, 4417, _zones.names)
 	state.stations = _catalog.duplicate(true)
+	state.repair.tasks.T10.broken = false
 	for actor: CharacterState in state.characters.values():
 		actor.position = s.config.hub_position
 		actor.hub_spot = actor.position

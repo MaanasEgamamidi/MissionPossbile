@@ -1,4 +1,5 @@
 extends SceneTree
+const SealRule := preload("res://scripts/tasks/puzzles/t12_rule.gd")
 ## S01/S04: real-time lethal exposure, protection, durable recovery interval and localized airlock pressure.
 
 const MARS := Vector3(200, 0.04, 200)
@@ -272,6 +273,7 @@ func _pressure_and_maintenance() -> void:
 	# 2026-11-14: a new game's T12 seal is the broken part (BP08) and leaks until its puzzle is solved. This scenario is
 	# S03/S04 wear on a seal that was already repaired once, so the fixture starts from a fixed seal.
 	s.state.repair.tasks.T12.first_completed = true
+	s.state.repair.tasks.T12.broken = false
 	_check("controlled debug seal fault exists", s.survival.debug_trigger_airlock_fault())
 	var actor := s.state.character_of_peer(1)
 	_at(s, Vector3(16.4, 0.04, 9.55))
@@ -306,9 +308,12 @@ func _pressure_and_maintenance() -> void:
 	var milestone := bool(task.first_completed)
 	var room_milestone := bool(s.state.repair.rooms.hangar.first_completed)
 	var parts := s.state.parts
-	var repair := s.request(&"maintenance_start", &"repair_t12", {"generation": int(task.fault_generation)})
-	_check("field engineer starts host-timed safe-side seal maintenance", repair.ok and float(repair.changes.duration_seconds) >= 20.0 and float(repair.changes.duration_seconds) <= 45.0)
-	_run(s, s.balance.maintenance_repair_seconds, 0.2)
+	var generation := int(task.fault_generation)
+	var repair := s.request(&"task_claim", &"repair_t12", {"generation": generation})
+	_check("field engineer starts the safe-side seal mini-game", repair.ok)
+	for point in range(1, SealRule.POINTS + 1):
+		s.request(&"task_move", &"repair_t12", {"generation":generation, "move":"press", "value":(point - 1) * SealRule.STEP_BASE + point})
+	s.advance(0.2)
 	_check("seal service stops leak without puzzle milestone or reward", not bool(task.maintenance_fault) and is_equal_approx(float(task.condition), 1.0) and bool(task.first_completed) == milestone and bool(s.state.repair.rooms.hangar.first_completed) == room_milestone and s.state.parts == parts)
 	_check("sealed chamber enters readable repressurization", bool(s.survival.pressure_info().repressurizing) and not bool(s.survival.pressure_info().breathable))
 	s.advance(s.config.airlock_pressure_recovery_seconds)

@@ -56,7 +56,7 @@ const ALERT_PREFIX := "colony_over_"
 ## Reasons: the store, words for the screens and what would have helped.
 const REASONS: Dictionary = {
 	"oxygen": {"key": &"oxygen_kg", "name": "Oxygen", "action": "make oxygen now", "text": "The colony ran out of oxygen.",
-		"hint": "Keep the oxygen plant (electrolyser) running and powered, fix the CO₂ scrubber early, and upgrade Life support (Biology) for Sabatier and oxygen from Mars air."},
+		"hint": "Keep the oxygen plant (electrolyser) running and powered, fix the CO₂ scrubber early, and upgrade Life support (Agriculture) for Sabatier and oxygen from Mars air."},
 	"water": {"key": &"water_l", "name": "Water", "action": "get water flowing now", "text": "The colony ran out of water.",
 		"hint": "Keep the water recycler working, ration water, and upgrade the Food track's water steps: the urine processor, the brine processor and, later, the ice drill."},
 	"food": {"key": &"food_meals", "name": "Food", "action": "find or grow food now", "text": "The colony ran out of food.",

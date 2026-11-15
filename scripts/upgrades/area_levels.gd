@@ -1,7 +1,7 @@
 class_name AreaLevels
 extends RefCounted
 ## Upgrade paths (owner request 2026-11-14; rebuilt 2026-11-15 for docs/revisions/UPGRADE_PATHS_PLAN.md §1-§7).
-## data/area_levels.json lists five SECTIONS (Energy, Biology, Health, Science, Communication), each with its core spot
+## data/area_levels.json lists five SECTIONS (Energy, Agriculture, Health, Science, Communication), each with its core spot
 ## (the station(s) where its upgrades are chosen) and its TRACKS. A track has its own number of levels (V1..Vn, 4 or 5;
 ## V1 is today's model). The level lives in state.levels[track_id] (plain int, saved and replicated with the colony); a
 ## missing entry means level 1.

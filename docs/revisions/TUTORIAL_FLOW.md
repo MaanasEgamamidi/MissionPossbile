@@ -41,6 +41,9 @@ tell us if you want that said more strongly.
   spots are fixed, and Mission Control says so. Each fix is counted out loud ("The wires are fixed. 3 of 10 fixed.").
 - Fixing the radio signal (T01) brings crew voice back, and Mission Control says so.
 - A spot fixed early (while the tapes are still being found) counts too. The tutorial still waits for all 6 tapes.
+- Each repair task stores a `broken` boolean. It controls the damaged model, repair prompt and mini-game routing;
+  `first_completed` records the historical milestone. The original machine's target also opens the repair while
+  broken. Completing the mini-game clears the boolean; normal controls are unavailable while it remains true.
 
 ## Done: Base operational
 
@@ -53,8 +56,10 @@ tell us if you want that said more strongly.
 
 ## Only tapes and broken parts respond to E
 
-While the tutorial runs, these still work: the doors, the suit rack, the tapes, the Command Room cassette player, every
-broken spot that is still broken, and the crew screen (C) at the Med Bay hub. Every other machine shows no "[E]" prompt.
+While the tutorial runs, these still work: the doors, the tapes, the Command Room cassette player after a pickup,
+the broken spots belonging to collected room tapes, and the crew screen (C) at the Med Bay hub. Every other station,
+including the suit rack and fixed machines, stays locked until all six tapes are found and played and all ten repairs
+are complete. Ordinary equipment wear waits until this restoration phase is finished. Every other machine shows no "[E]" prompt.
 If a player still presses E there, nothing opens and a message says: "Not yet: Mission Control needs the base fixed
 first. For now only the tapes and the broken spots work." A spot that is already fixed says it is fixed and that the
 other machines work again when the whole base is fixed. After the tutorial everything works as before.

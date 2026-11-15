@@ -65,6 +65,8 @@ func check(ctx: ActionService.Context) -> ActionResult:
 		return null
 	if int(task.fault_generation) != int(ctx.request.params.generation):
 		return ActionResult.failure(ctx.request.request_id, &"stale_fault", "This equipment fault changed. Reopen maintenance.")
+	if RepairCatalog.is_broken(ctx.state, task_id) and RepairCatalog.has_puzzle(task_id):
+		return ActionResult.failure(ctx.request.request_id, &"repair_required", "Complete this machine's repair mini-game first.")
 	if ctx.actor.exposure_active:
 		return ActionResult.failure(ctx.request.request_id, &"unsafe_maintenance", "Use a functional suit or return to safe pressure before maintenance.")
 	if not _valid_operator(ctx.session, ctx.actor, task, int(ctx.request.params.generation)):
@@ -105,6 +107,10 @@ func advance(session: SessionService, real_delta: float) -> void:
 	if not session.authoritative or session.paused or session.state == null or real_delta <= 0.0:
 		return
 	prune(session)
+	# The opening restoration phase cannot use maintenance stations. Keep its repaired
+	# machines intact, and never reset an unfinished mini-game through background wear.
+	if TutorialSystem.tutorial_active(session.state):
+		return
 	for task_id: String in RepairCatalog.TASKS:
 		var remaining := real_delta
 		if jobs.has(task_id):
@@ -154,7 +160,10 @@ func restore_task(session: SessionService, task_id: String, generation: int) -> 
 	var task: Dictionary = session.state.repair.tasks[task_id]
 	if int(task.fault_generation) != generation:
 		return false
+	if RepairCatalog.is_broken(session.state, task_id) and RepairCatalog.has_puzzle(task_id):
+		return false
 	task.condition = 1.0
+	task.broken = false
 	task.maintenance_fault = false
 	task.warning_active = false
 	task.wear_elapsed_seconds = 0.0

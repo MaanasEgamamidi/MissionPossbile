@@ -541,6 +541,7 @@ func _submit(action: StringName, target: StringName, params: Dictionary) -> Acti
 	if action == &"use_station" and OreCatalog.is_deposit(String(target)):
 		return services.request(&"ore_collect", target)
 	if action == &"use_station":
+		target = StringName(RepairCatalog.interaction_station_id(services.state(), String(target)))
 		var record: Dictionary = services.state().stations.get(String(target), {})
 		if String(record.get("kind", "")) == "cassette_anchor":
 			return services.request(&"cassette_collect", target)
@@ -727,6 +728,26 @@ func _process(_delta: float) -> void:
 
 
 # ---------------------------------------------------------------- input that belongs to the whole game
+
+## Pitch/demo shortcut. Handle before panel shortcuts; held keys never repeat the grant.
+func _input(event: InputEvent) -> void:
+	if not _playing or not event is InputEventKey:
+		return
+	var key := event as InputEventKey
+	if not key.pressed or key.echo or not key.ctrl_pressed or key.alt_pressed or key.shift_pressed or key.meta_pressed:
+		return
+	if key.keycode != KEY_M and key.physical_keycode != KEY_M:
+		return
+	var focused := get_viewport().gui_get_focus_owner()
+	if focused is LineEdit or focused is TextEdit:
+		return
+	get_viewport().set_input_as_handled()
+	if not services.is_authority():
+		hud.show_message("The host can press Ctrl+M to collect the demo cassettes.", 4.0)
+		return
+	var result := services.request(&"demo_collect_cassettes")
+	hud.show_message(String(result.changes.get("text", result.message)), 5.0)
+
 
 ## Esc, panels, the pause menu and the M / I / C / Shift+Backspace screens belong to UiRoot.
 ## Here only: a click takes the mouse back for play after the window lost it (alt-tab) while no panel is open.

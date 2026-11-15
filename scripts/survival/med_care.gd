@@ -31,6 +31,9 @@ static func station_in_reach(session: SessionService, actor: CharacterState) -> 
 		var record: Dictionary = session.state.stations[id]
 		if String(record.get("kind", "")) != "heal":
 			continue
+		if not ActionService.TutorialLock.station_usable(session.state, record) \
+				or RepairCatalog.is_broken(session.state, RepairCatalog.task_for_station(session.state, id)):
+			continue
 		if actor.position.distance_to(CharacterState._v3(record.get("position", []))) > session.config.interact_distance_m:
 			continue
 		if not session.state.is_zone_powered(String(record.get("zone", "Med Bay"))):

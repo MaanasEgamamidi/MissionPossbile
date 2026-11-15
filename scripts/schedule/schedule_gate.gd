@@ -35,7 +35,7 @@ const ACTION_BLOCKS := {
 	"bench_test": [["work", "chores"], "workbench"],
 	"inspect_donor": [["work", "chores", "field"], "salvage donor"],
 	"recover_part": [["work", "chores", "field"], "salvage donor"],
-	# greenhouse beds (Work for the biologist, and Base chores). The grow lights and greenhouse water stay open.
+	# greenhouse beds (Work for the agriculture specialist, and Base chores). The grow lights and greenhouse water stay open.
 	"plant": [["work", "chores"], "greenhouse"],
 	"inspect_bed": [["work", "chores"], "greenhouse"],
 	"adjust_nutrients": [["work", "chores"], "greenhouse"],

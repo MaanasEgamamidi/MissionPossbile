@@ -208,7 +208,7 @@ func _test_blocked_and_press() -> void:
 	_check("too few parts: button greyed out and says why", b != null and b.disabled and b.text == "Upgrade to V2"
 		and text.contains("✖ Needs 2 spare parts (the colony has 0).") and text.contains("⚙ 2") and cost_row.cost_label.theme_type_variation == UiTheme.WARN
 		and details.contains("Costs 2 spare parts · the colony has 0"), text + " | " + details)
-	_check("the right specialist is told it is them", details.contains("Who can do it: the biology and food specialist (you)"), details)
+	_check("the right specialist is told it is them", details.contains("Who can do it: the agriculture specialist (you)"), details)
 	_check("the next level's effect in plain words", details.contains("It gives: 2 grow layers · 1.9× the food of the first rack"), details)
 	_check("upgrade button takes keyboard focus like the other panel buttons", b != null and b.focus_mode == Control.FOCUS_ALL
 		and UiLayoutCheck.focus_problems(panel).is_empty(), "\n".join(UiLayoutCheck.focus_problems(panel)))
@@ -219,7 +219,7 @@ func _test_blocked_and_press() -> void:
 	panel.refresh()
 	text = "\n".join(panel.upgrade_lines("food"))
 	_check("wrong specialist: greyed out with the specialist reason", b.disabled
-		and text.contains("✖ Only the biology and food specialist can upgrade this.") and not panel.upgrade_details("food").contains("(you)")
+		and text.contains("✖ Only the agriculture specialist can upgrade this.") and not panel.upgrade_details("food").contains("(you)")
 		and cost_row.cost_label.theme_type_variation == UiTheme.GOOD, text)
 
 	# the right one presses it: one upgrade_area request through the panel, the level rises

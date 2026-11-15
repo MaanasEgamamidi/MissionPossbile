@@ -13,6 +13,7 @@ signal changed(setting: StringName)
 
 # --- Master switches (A/B testing) ---
 var zones_enabled := true             # Phase 2: room sleep/wake (camera layer mask, fixture lights)
+var room_props_enabled := true        # Phase 2: props added at run time inside a room sleep with that room
 var exterior_cull_enabled := true     # Phase 3: hide Mars when no window/open door can see it
 var view_activation_enabled := true   # Phase 4: pause crew animation outside the view cone
 var colony_lod_enabled := false       # Phase 5: HLOD proxies of the colony seen from far away (changes pixels)
@@ -55,7 +56,7 @@ var light_fade_begin := 30.0          # m, OmniLight3D/SpotLight3D distance_fade
 var light_fade_length := 10.0         # m
 var light_fade_shadow := 25.0         # m
 
-const SWITCHES: Array[StringName] = [&"zones_enabled", &"exterior_cull_enabled", &"view_activation_enabled",
+const SWITCHES: Array[StringName] = [&"zones_enabled", &"room_props_enabled", &"exterior_cull_enabled", &"view_activation_enabled",
 	&"colony_lod_enabled", &"visibility_ranges_enabled", &"shader_warmup_enabled", &"sun_shadow_tuning_enabled",
 	&"light_distance_fade_enabled"]
 

@@ -27,8 +27,8 @@
 	"messages": {
 		"welcome": "Welcome to Mars, crew. It is the 2060s and Earth is in trouble: people need a new home. You are the second team sent here. The first team could not finish their mission.",
 		"radio_down": "Your crew radio is broken, so for now only Mission Control can talk to you. We opened every door for you. Walk into the base and look for the gold lines on the floor.",
-		"tapes_start": "The first team left a tape in each of the 6 main rooms. Pick a gold line on the floor and follow it: each line leads to a glowing gold tape. Find all 6 tapes first: the repairs open once every tape is found.",
-		"tapes_all_found": "All 6 tapes found! The cassette player and the repairs work now. Play each tape on the cassette player in the Command Room: they tell us what happened.",
+		"tapes_start": "The first team left a tape in each of the 6 main rooms. Find all 6 tapes by following the gold lines. Each pickup unlocks that room's repairs immediately. Play your tapes at the Command Room cassette player. The other stations unlock after you have found and played all 6 tapes and finished every repair.",
+		"tapes_all_found": "All 6 tapes found! Every room's repairs are unlocked. Keep playing the tapes at the Command Room cassette player: they tell us what happened.",
 		"fix_start": "Fix the base: get it to operational condition. The tapes showed us 10 broken spots. Some jobs need a specialist: the list shows who.",
 		"fixed": "{done}. {n} of {total} fixed.",
 		"room_restored": "The {room} is restored!",
@@ -54,11 +54,11 @@
 			"objectives": [
 				{"id": "tapes_found", "kind": "tapes_found", "done_message": "tapes_all_found",
 					"text": "Find the 6 room tapes: one in each main room.",
-					"explain": "Follow a gold line on the floor to a glowing gold tape, look at it and press E to pick it up. There is one tape in each main room (the Garden dome's line goes outside, through the tunnel). The whole crew shares the tapes. The repairs open once all 6 are found.",
+					"explain": "Follow a gold line to a glowing tape, look at it and press E. There is one in each main room, including inside the Garden dome. The crew shares the tapes. Each pickup unlocks that room's minigames: green means anyone can do it, gold means your specialty, and red means another specialist is needed. Keep finding all 6 tapes.",
 					"hints": ["Press J to see the tapes on a map of the base.", "Look at a tape and press E."]},
 				{"id": "tapes_played", "kind": "tapes_played",
 					"text": "Play every tape on the cassette player in the Command Room.",
-					"explain": "Tapes only play on the Command Room cassette player. Each one shows a photo and tells you about its room and its broken spots.",
+					"explain": "Return to the Command Room cassette player whenever you find a tape: you can play it immediately without finding the other tapes first. Each shows a photo and explains its room. Find and play all 6 tapes and finish every repair to unlock the other stations.",
 					"hints": ["The cassette player is in the Command Room. Look at it and press E.", "Choose a tape in the list to play it."]}
 			]
 		},

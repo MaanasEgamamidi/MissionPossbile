@@ -2,8 +2,11 @@ class_name RepairCatalog
 extends RefCounted
 ## Stable foundation contract. These records do not implement any room puzzle or cassette behavior.
 
-const VERSION := 2
+const VERSION := 3
 const MAINTENANCE_SCHEMA := 1
+const PARTS_PATH := "res://data/broken_parts.json"
+static var _machine_tasks: Dictionary = {}
+static var _machine_tasks_loaded := false
 const ROOMS := {
 	"command_center": {"title": "Command center", "zones": ["Command Room"], "tasks": ["T01", "T02"]},
 	"power_supply": {"title": "Power supply", "zones": ["Power Room"], "tasks": ["T03", "T04"]},
@@ -30,6 +33,48 @@ const TASKS := {
 static func anchor_id(task_id: String) -> String:
 	return "repair_" + task_id.to_lower()
 
+static func has_puzzle(task_id: String) -> bool:
+	var base := "res://scripts/tasks/puzzles/" + task_id.to_lower()
+	return ResourceLoader.exists(base + "_rule.gd") and ResourceLoader.exists(base + "_panel.gd")
+
+## Current machine damage is independent of the historical first-completion milestone.
+static func is_broken(state: ColonyState, task_id: String) -> bool:
+	if state == null:
+		return false
+	var task: Dictionary = state.repair.get("tasks", {}).get(task_id, {})
+	if task.has("broken"):
+		return bool(task.broken)
+	return not task.is_empty() and _legacy_broken(task_id, task)
+
+static func _legacy_broken(task_id: String, task: Dictionary) -> bool:
+	return bool(task.get("maintenance_fault", false)) or (has_puzzle(task_id) and not bool(task.get("first_completed", false)))
+
+## A normal station and the repair anchor can belong to the same physical machine.
+## Use the part's object bindings, never proximity: nearby tapes and other machines stay independent.
+static func task_for_station(state: ColonyState, station_id: String) -> String:
+	if state == null or not state.stations.has(station_id):
+		return ""
+	var station: Dictionary = state.stations[station_id]
+	if String(station.get("kind", "")) == "repair_task":
+		return String(station.get("task_id", ""))
+	var explicit := String(station.get("repair_task_id", ""))
+	if explicit != "":
+		return explicit
+	if not _machine_tasks_loaded:
+		_machine_tasks_loaded = true
+		var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(PARTS_PATH))
+		if data is Dictionary:
+			for part: Dictionary in data.get("parts", []):
+				for key: String in ["hide_objects", "hide_nodes"]:
+					for object_name: String in part.get(key, []):
+						_machine_tasks[object_name] = String(part.get("task_id", ""))
+	return String(_machine_tasks.get(station_id, ""))
+
+## While damaged every interaction target on this machine opens its repair anchor.
+static func interaction_station_id(state: ColonyState, station_id: String) -> String:
+	var task_id := task_for_station(state, station_id)
+	return anchor_id(task_id) if is_broken(state, task_id) else station_id
+
 static func fresh(seed_value: int) -> Dictionary:
 	var result := {"version": VERSION, "maintenance_schema": MAINTENANCE_SCHEMA, "rooms": {}, "tasks": {}, "collected_cassettes": [], "seen_beauty_shots": [],
 		"legacy_maintenance": {"cleaner": {"last_condition": -1.0, "wear_elapsed_seconds": 0.0, "maintenance_cooldown_seconds": 0.0, "warning_active": false}}}
@@ -41,7 +86,7 @@ static func fresh(seed_value: int) -> Dictionary:
 		var info: Array = TASKS[task_id]
 		result.tasks[task_id] = {"task_id": task_id, "room_id": info[0], "title": info[1],
 			"required_specialty": info[2], "anchor_id": anchor_id(task_id), "puzzle_seed": random.randi(),
-			"fault_generation": 1, "progress": 0.0, "condition": 1.0, "first_completed": false,
+			"fault_generation": 1, "progress": 0.0, "condition": 1.0, "first_completed": false, "broken": has_puzzle(task_id),
 			"puzzle_state": {}, "resume_supported": false, "maintenance_schema": MAINTENANCE_SCHEMA,
 			"maintenance_fault": false, "wear_elapsed_seconds": 0.0, "maintenance_cooldown_seconds": 0.0, "warning_active": false}
 	return result
@@ -55,7 +100,7 @@ static func for_save(records: Dictionary) -> Dictionary:
 			task.puzzle_state = {}
 	return saved
 
-## Nested v0/v1 -> v2 maintenance migration; the surrounding save envelope stays compatible.
+## Add the damage boolean to older repair records; the surrounding save envelope stays compatible.
 ## Catalog identity and role fields always come from this host build.
 static func restore(saved: Dictionary, seed_value: int) -> Dictionary:
 	var result := fresh(seed_value)
@@ -76,6 +121,7 @@ static func restore(saved: Dictionary, seed_value: int) -> Dictionary:
 		if old_placeholder:
 			task.condition = 1.0
 		task.maintenance_fault = bool(incoming.get("maintenance_fault", int(task.fault_generation) > 1 and float(task.condition) < 1.0 and float(task.progress) < 1.0))
+		task.broken = bool(incoming.get("broken", _legacy_broken(task_id, task)))
 		for key: String in ["wear_elapsed_seconds", "maintenance_cooldown_seconds"]:
 			task[key] = maxf(0.0, float(incoming.get(key, 0.0)))
 		task.warning_active = bool(incoming.get("warning_active", false))

@@ -253,9 +253,8 @@ static func view(p_services: GameServices, idle: float, requested: int) -> Dicti
 					TutorialSystem.tapes_played(st), TutorialSystem.tape_count()]
 			3:
 				out["progress"] = "Fixed %d of %d broken spots" % [TutorialSystem.fixed_count(st), TutorialSystem.required_fixes().size()]
-				if me != null and StationPanels.SPECIALTY_WORDS.has(me.specialty):
-					out["cue"] = "You are the %s: jobs marked %s are yours; jobs without a symbol are for anyone." % [specialist_words(String(me.specialty)),
-						String(StationPanels.SPECIALTY_SYMBOLS.get(me.specialty, "●"))]
+		if (n == 3 or TutorialSystem.specialty_features_unlocked(st)) and me != null and StationPanels.SPECIALTY_WORDS.has(me.specialty):
+			out["cue"] = "Gold jobs are your specialty; green jobs are for anyone; red jobs need another specialist."
 		out["list"] = list_lines(st, n)
 		if not o.is_empty():
 			out["objective"] = "▶ " + TutorialSystem.objective_text(o, team)

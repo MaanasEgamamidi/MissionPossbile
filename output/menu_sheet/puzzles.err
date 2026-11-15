@@ -1,0 +1,14 @@
+WARNING: Mini-game kit: missing sprite res://assets/ui/minigames/dome/mars_view.png
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] tex (res://scripts/tasks/puzzles/kit.gd:49)
+       [1] _paint_window (res://scripts/tasks/puzzles/t08_panel.gd:431)
+       [2] _paint_board (res://scripts/tasks/puzzles/t08_panel.gd:414)
+       [3] _draw (res://scripts/tasks/puzzles/board_ui.gd:21)
+WARNING: Mini-game kit: missing sprite res://assets/ui/minigames/dome/dome_frame.png
+   at: push_warning (core/variant/variant_utility.cpp:1033)
+   GDScript backtrace (most recent call first):
+       [0] tex (res://scripts/tasks/puzzles/kit.gd:49)
+       [1] _paint_window (res://scripts/tasks/puzzles/t08_panel.gd:451)
+       [2] _paint_board (res://scripts/tasks/puzzles/t08_panel.gd:414)
+       [3] _draw (res://scripts/tasks/puzzles/board_ui.gd:21)

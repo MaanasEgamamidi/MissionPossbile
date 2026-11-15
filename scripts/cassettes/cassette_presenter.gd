@@ -18,7 +18,7 @@ const PLAYER_SCENE := "res://assets/props/cassette_player.glb"
 ## Top of the tape's room colour band, in the tape model (glb) frame: the room name is printed flat on it.
 const TAPE_STRIP_TOP := Vector3(0.0, 0.0198, -0.032)
 ## Reach boxes (designer balance): a little larger than the props, so E aims easily at a small tape.
-const TAPE_REACH := Vector3(0.5, 0.3, 0.44)
+const TAPE_REACH := Vector3(0.5, 0.3, 0.44) * 1.5
 const TAPE_GLOW_SHADER := preload("res://materials/specialist_gold.gdshader")
 ## Rich gold, the same as the gold guide lines (tape_trail_presenter.gd), strong enough to read from across a room.
 const TAPE_GLOW := Color(1.0, 0.75, 0.2)

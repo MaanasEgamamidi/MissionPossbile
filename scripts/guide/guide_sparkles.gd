@@ -228,7 +228,7 @@ func tutorial_target() -> Dictionary:
 	# Tapes not all found: the six tape trails lead the way.
 	if not TutorialSystem.repairs_unlocked(st):
 		return {}
-	if TutorialSystem.tapes_played(st) < TutorialSystem.tape_count():
+	if TutorialSystem.tapes_played(st) < TutorialSystem.tapes_found(st):
 		var deck: Variant = _anchors.get(CassetteCatalog.PLAYER_ID)
 		return {"at": deck, "why": "tape_player"} if deck is Vector3 else {}
 	var me := services.local_character()
@@ -238,7 +238,7 @@ func tutorial_target() -> Dictionary:
 	var open: Array[Dictionary] = []
 	var any_open := false
 	for row: Dictionary in TutorialSystem.fix_rows(st):
-		if bool(row.get("done", false)):
+		if bool(row.get("done", false)) or not TutorialSystem.task_unlocked(st, String(row.task)):
 			continue
 		any_open = true
 		var spec := String(row.get("specialty", ""))

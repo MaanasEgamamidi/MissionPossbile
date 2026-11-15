@@ -32,6 +32,9 @@ func _session() -> SessionService:
 	var session := SessionService.new(GameConfig.new(), GameBalance.new(), GameEvents.new())
 	var state := ColonyState.new_game(session.balance, 8831, _zones.names)
 	state.stations = _stations.duplicate(true)
+	# Maintenance scenarios start with machines available, independently of puzzle milestones.
+	for task: Dictionary in state.repair.tasks.values():
+		task.broken = false
 	session.zone_at_position = func(position: Vector3) -> String: return _zones.zone_at_world(position)
 	session.outside_test = func(position: Vector3) -> bool: return _zones.zone_at_world(position) == ColonyZones.EXTERIOR
 	for actor: CharacterState in state.characters.values():
@@ -56,6 +59,7 @@ func _migration() -> void:
 	old.version = 1
 	old.erase("maintenance_schema")
 	for task: Dictionary in old.tasks.values():
+		task.erase("broken")
 		task.erase("maintenance_schema")
 		task.condition = 0.0
 		task.erase("maintenance_fault")
@@ -67,7 +71,7 @@ func _migration() -> void:
 	old.collected_cassettes = ["cassette_med_bay"]
 	old.seen_beauty_shots = ["command_center"]
 	var restored := RepairCatalog.restore(old, s.state.rng_seed)
-	_check("v1 placeholder condition migrates operational without achievement", restored.version == 2 and restored.tasks.T03.condition == 1.0 and not restored.tasks.T03.first_completed)
+	_check("v1 placeholder condition migrates operational without achievement", restored.version == RepairCatalog.VERSION and restored.tasks.T03.condition == 1.0 and not restored.tasks.T03.first_completed)
 	_check("migration preserves a real partial puzzle", restored.tasks.T01.progress == 0.5 and restored.tasks.T01.puzzle_state == {"partial": 1} and restored.tasks.T01.condition == 0.0)
 	_check("migration preserves explicit fault generations and milestone", restored.tasks.T02.fault_generation == 3 and restored.tasks.T02.condition == 0.2 and restored.tasks.T02.maintenance_fault and restored.tasks.T02.first_completed)
 	_check("migration preserves collection and beauty history", restored.collected_cassettes == old.collected_cassettes and restored.seen_beauty_shots == old.seen_beauty_shots)

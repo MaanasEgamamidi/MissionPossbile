@@ -1,6 +1,6 @@
 class_name FoodActions
 extends RefCounted
-## Greenhouse actions (Prompt 08, food part). Anyone may do them: the biology and food specialist is the expert
+## Greenhouse actions (Prompt 08, food part). Anyone may do them: the agriculture specialist is the expert
 ## (the panels show the ❀ symbol), but the greenhouse stays usable by every crew member.
 ## Each is validated by ActionService like every other action; the effect is described in plain words in the result
 ## ("text") and announced through events.system_alert.

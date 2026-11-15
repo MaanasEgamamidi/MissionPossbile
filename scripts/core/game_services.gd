@@ -178,7 +178,8 @@ func restore(payload: Dictionary) -> void:
 		var catalog := StationCatalog.from_manifest(MANIFEST_PATH, zones)
 		for entry: Dictionary in StationCatalog.extra_entries():
 			var station_id := String(entry.get("id", ""))
-			if entry.has("room_id") and catalog.has(station_id) and not st.stations.has(station_id):
+			# Cassette placements are map data, not saved progress. Refresh them when a tape moves.
+			if entry.has("room_id") and catalog.has(station_id) and (not st.stations.has(station_id) or String(entry.get("kind", "")) == "cassette_anchor"):
 				st.stations[station_id] = catalog[station_id].duplicate(true)
 	var c := SolClock.from_dict(payload.get("clock", {}))
 	var host_character := StringName(String((payload.get("session", {}) as Dictionary).get("host_character", "")))

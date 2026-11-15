@@ -509,7 +509,7 @@ func _update_enabled() -> void:
 func _update_headings() -> void:
 	_title.text = task_title
 	_title.tooltip_text = room_title
-	_context.text = "%s | Role: %s" % [room_title, "All crew" if required_role == "general" else required_role.replace("_", " ")]
+	_context.text = "%s | Role: %s" % [room_title, "All crew" if required_role == "general" else String(StationPanels.SPECIALTY_WORDS.get(StringName(required_role), required_role.replace("_", " ")))]
 	_instructions.text = instructions
 	if help_button != null:
 		help_button.visible = not instructions.is_empty() and not unreadable

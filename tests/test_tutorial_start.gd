@@ -177,6 +177,7 @@ func _services_checks() -> void:
 
 	# ---- solving the T12 puzzle stops the leak
 	st2.repair.tasks.T12.first_completed = true
+	st2.repair.tasks.T12.broken = false
 	_run_for(g2, g2.config.airlock_pressure_recovery_seconds + 1.0)
 	var info3 := g2.session.survival.pressure_info()
 	_check("T12: once the seal puzzle is solved the vestibule stops leaking and repressurizes", not PuzzleRegistry.is_broken(st2, "T12") and not bool(info3.leaking) and bool(info3.breathable), str(info3))

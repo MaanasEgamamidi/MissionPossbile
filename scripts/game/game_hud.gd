@@ -940,7 +940,7 @@ func _refresh_crew() -> void:
 	_place_messages()          # the corner boxes may have changed size
 
 
-## ONE short word for a crew member's job: "Electrical", "Medical", "Biology", "Geology" (the name tag's word).
+## ONE short word for a crew member's job: "Electrical", "Medical", "Agriculture", "Geology" (the name tag's word).
 static func role_word(c: CharacterState) -> String:
 	var i := CrewLooks.index_of(c.specialty)
 	if i >= 0:
@@ -959,7 +959,8 @@ func _update_cue() -> void:
 	if kind == "station" and services != null and services.has_game() and OreCatalog.is_deposit(String(_target.get("id", ""))):
 		body = OreCatalog.cue_text(services.state(), String(_target.get("id", "")))
 	elif kind == "station" and services != null and services.has_game():
-		var rec: Dictionary = services.state().stations.get(String(_target.get("id", "")), {})
+		var station_id := RepairCatalog.interaction_station_id(services.state(), String(_target.get("id", "")))
+		var rec: Dictionary = services.state().stations.get(station_id, {})
 		var station_kind := String(rec.get("kind", ""))
 		if station_kind == "suits":
 			var me := services.local_character()

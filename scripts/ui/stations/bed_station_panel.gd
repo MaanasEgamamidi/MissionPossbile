@@ -86,7 +86,7 @@ func _build_body() -> void:
 	_add_reading(&"progress", "↑", "Growth", "food")
 	_add_reading(&"rate", "↗", "Growth speed", "stock_vs_flow")
 	_add_reading(&"harvest_in", "⧗", "Harvest in", "sol_length")
-	_add_note(_body, "%s Biology and food specialists know this job best, but anyone in the crew can do it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]))
+	_add_note(_body, "%s Agriculture specialists know this job best, but anyone in the crew can do it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]))
 	_crop_note = _add_note(_body, "")
 	_time_note = _add_note(_body, "")
 

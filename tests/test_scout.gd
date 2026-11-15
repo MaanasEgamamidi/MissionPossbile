@@ -270,7 +270,7 @@ func _test_goals() -> void:
 	# finding them is the only goal)
 	var titles := ColonyGoals.all(st()).map(func(g: Dictionary) -> String: return String(g.text))
 	_check("goals: objectives published by the campaign come after the tape and repair goals (301d499)",
-		titles == ["Find the tapes"] if not TutorialSystem.repairs_unlocked(st()) else (titles.size() > 1 and titles[0] == "Play the tapes" and titles.back() == "Tutorial step"),
+		titles == ["Find the tapes"] if not TutorialSystem.repairs_unlocked(st()) else (titles.size() > 2 and titles[0] == "Find the tapes" and titles[1] == "Play the tapes" and titles.back() == "Tutorial step"),
 		str(titles))
 	st().campaign.erase("objectives")
 

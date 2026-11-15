@@ -2,7 +2,7 @@ class_name CrewSelectPanel
 extends UiPanel
 ## Crew (C key, also opened from the menus): one card per crew member.
 ## UI overhaul (2026-11-15): a card is a portrait, the specialist symbol with ONE role word (the HUD's crew corner
-## uses the same: "Electrical", "Medical", "Biology", "Geology") and ONE thing at the bottom:
+## uses the same: "Electrical", "Medical", "Agriculture", "Geology") and ONE thing at the bottom:
 ##   * a big "Play" button on a crew member nobody plays (it asks the host with `claim_character`);
 ##   * a green plate with the tick and "You" on your own card (its edge is green too, and the portrait has the tick);
 ##   * an amber plate with a padlock and "Player 2" on a card another player has (padlock on the portrait, dimmed).

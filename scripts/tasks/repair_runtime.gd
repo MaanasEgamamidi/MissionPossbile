@@ -71,7 +71,8 @@ func check(ctx: ActionService.Context) -> ActionResult:
 		return ActionResult.failure(ctx.request.request_id, &"stale_fault", "This fault changed. Reopen the task to refresh it.")
 	var specialty := String(task.required_specialty)
 	if specialty != "general" and String(ctx.actor.specialty) != specialty:
-		return ActionResult.failure(ctx.request.request_id, &"wrong_specialty", "Switch to %s to work on %s." % [specialty.replace("_", " "), task.title])
+		var role := "Agriculture" if specialty == "biology_food" else specialty.replace("_", " ")
+		return ActionResult.failure(ctx.request.request_id, &"wrong_specialty", "Switch to %s to work on %s." % [role, task.title])
 	if not _eligible(ctx.session, ctx.actor, task):
 		return ActionResult.failure(ctx.request.request_id, &"wrong_room", "Stand beside this task in its room with a healthy crew member.")
 	var lease: Dictionary = locks.get(task_id, {})
@@ -116,6 +117,7 @@ func apply(ctx: ActionService.Context) -> Dictionary:
 	if bool(outcome.get("complete", false)):
 		first_completion = not bool(task.first_completed)
 		task.first_completed = true
+		task.broken = false
 		task.condition = 1.0
 		locks.erase(task_id)
 		ctx.session.wear_runtime.on_task_repaired(ctx.session, task_id)
@@ -135,6 +137,7 @@ func begin_fault(state: ColonyState, task_id: String, puzzle_seed: int, conditio
 	task.puzzle_state = {}
 	task.resume_supported = false
 	task.maintenance_fault = true
+	task.broken = true
 	locks.erase(task_id)
 	_update_room(state, String(task.room_id))
 	return true

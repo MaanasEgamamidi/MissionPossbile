@@ -67,7 +67,7 @@ func _build_body() -> void:
 	_add_reading(&"food_left", "⧗", "Lasts", "food")
 	_add_reading(&"food_growing", "↗", "Growing in the beds", "food")
 	_start_note = _add_note(_body, "")
-	_add_note(_body, "%s Biology and food specialists know the greenhouse best, but anyone in the crew can use it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]))
+	_add_note(_body, "%s Agriculture specialists know the greenhouse best, but anyone in the crew can use it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]))
 
 	# ---- beds
 	_add_heading(_body, "Beds")

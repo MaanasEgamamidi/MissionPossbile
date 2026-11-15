@@ -643,7 +643,7 @@ func _test_crew_looks() -> void:
 	a.set_suit(true)
 	var lift := tag.position.y - low if tag != null else 0.0
 	a.set_suit(false)
-	_check("looks: name tag is the crew symbol in the accent colour and a near-white word, higher over a helmet", tag != null and a.name_tag_text() == "● Biology"
+	_check("looks: name tag is the crew symbol in the accent colour and a near-white word, higher over a helmet", tag != null and a.name_tag_text() == "● Agriculture"
 		and symbol.modulate.is_equal_approx(CrewLooks.accent(2)) and word.modulate.is_equal_approx(PlayerVisual.NAME_TAG_TEXT) and word.outline_size > 0
 		and low > 1.7 and is_equal_approx(lift, PlayerVisual.NAME_TAG_SUITED_LIFT_M), a.name_tag_text())
 	var tag_cam := Camera3D.new()
