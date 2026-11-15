@@ -4,6 +4,8 @@ extends RefCounted
 
 ## Tutorial mode (2026-11-14): only tapes and broken spots work until the base is fixed.
 const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
+## Repair spots (2026-11-14): reach is measured to the whole broken object, not only its floor anchor.
+const RepairReach := preload("res://scripts/tasks/repair_reach.gd")
 
 ## Rules and callbacks for one action.
 class Definition extends RefCounted:
@@ -142,7 +144,8 @@ func _resolve_new(session: SessionService, request: ActionRequest) -> ActionResu
 		var locked := TutorialLock.refusal(ctx)
 		if locked != null:
 			return locked
-	if d.check_distance and ctx.actor != null and ctx.has_target_position and ctx.actor.position.distance_to(ctx.target_position) > ctx.config.interact_distance_m:
+	if d.check_distance and ctx.actor != null and ctx.has_target_position and ctx.actor.position.distance_to(ctx.target_position) > ctx.config.interact_distance_m \
+			and not (d.target_kind == &"station" and RepairReach.within(ctx.target, ctx.actor.position, ctx.config.interact_distance_m)):
 		return ActionResult.failure(request.request_id, &"too_far")
 	var specialty := d.specialty
 	if specialty == &"" and d.target_kind == &"station":

@@ -387,12 +387,8 @@ func _solve_t11() -> void:
 
 
 func _solve_t12() -> void:
-	var start := R12.current_state(_task())
-	await _press(panel.get("section_buttons")[int(start.leak)])
-	await _press(panel.get("seal_buttons")[int(start.gap)])
 	for i in R12.POINTS:
 		await _press(panel.get("press_buttons")[R12.next_point(R12.current_state(_task()))])
-	await _press(panel.get("test_button"))
 
 
 ## A spot within reach of the T12 station, on the hangar side, outside the leaking vestibule (from test_puzzle_t12.gd).

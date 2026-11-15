@@ -5,6 +5,8 @@ extends RefCounted
 ## {accepted, puzzle_state, progress, complete}. Only that server rule can decide completion.
 
 const CLAIM_SECONDS := 30.0
+## Reach is measured to the whole broken object (2026-11-14), not only the floor anchor.
+const RepairReach := preload("res://scripts/tasks/repair_reach.gd")
 var locks: Dictionary = {}
 var _rules: Dictionary = {}
 var _resume_rules: Dictionary = {}
@@ -49,7 +51,7 @@ func _eligible(session: SessionService, actor: CharacterState, task: Dictionary)
 	if specialty != "general" and String(actor.specialty) != specialty:
 		return false
 	var station: Dictionary = session.state.stations.get(String(task.anchor_id), {})
-	if station.is_empty() or actor.position.distance_to(CharacterState._v3(station.get("position", []))) > session.config.interact_distance_m:
+	if station.is_empty() or not RepairReach.within(station, actor.position, session.config.interact_distance_m):
 		return false
 	if String(station.get("task_id", "")) != String(task.task_id) or String(station.get("room_id", "")) != String(task.room_id):
 		return false

@@ -50,6 +50,8 @@ const SPRINT_HYSTERESIS: float = 0.15
 const RUNNING_LANDING_SPEED: float = 1.0
 ## Walk input may cut a standing landing short after this long.
 const LAND_INTERRUPT_AFTER_S: float = 0.2
+## How far behind the first thing the aim ray hits a broken part's target may still be (see aimed_target).
+const PART_REACH_SLACK_M: float = 0.6
 ## Current locomotion choice: idle, walk or sprint.
 var _locomotion: StringName = &"idle"
 ## Prompt 10: the seat anchor this body sits on (null when standing), its vehicle, and the standing collision
@@ -203,6 +205,18 @@ func aimed_target() -> Dictionary:
 	var ladder_hit := get_world_3d().direct_space_state.intersect_ray(ladder_query)
 	if not ladder_hit.is_empty() and (hit.is_empty() or start.distance_squared_to(ladder_hit.position) <= start.distance_squared_to(hit.position)):
 		hit = ladder_hit
+	# A broken part's whole model is its repair target (owner 2026-11-14, shapes added by BrokenPartPresenter). The
+	# intact object's collision box around it usually stops the ray a few centimetres first, so a part's target counts
+	# when it is hit within PART_REACH_SLACK_M behind that first hit (a real wall in front still blocks it).
+	if not hit.is_empty() and not (hit.collider is Area3D and (hit.collider as Node).has_meta("station_id")):
+		var part_query := PhysicsRayQueryParameters3D.create(start, query.to, Layers.STATION)
+		part_query.exclude = [get_rid()]
+		part_query.collide_with_areas = true
+		part_query.collide_with_bodies = false
+		var part_hit := get_world_3d().direct_space_state.intersect_ray(part_query)
+		if not part_hit.is_empty() and (part_hit.collider as Node).has_meta("part_reach") \
+				and start.distance_to(part_hit.position) <= start.distance_to(hit.position) + PART_REACH_SLACK_M:
+			hit = part_hit
 	if hit.is_empty() or (hit.position as Vector3).distance_to(global_position + Vector3.UP * tuning.eye_height_m) > tuning.reach_m:
 		return empty
 	var node: Node = hit.collider

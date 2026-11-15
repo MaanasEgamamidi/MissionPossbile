@@ -21,11 +21,24 @@ signal transition_finished(task_id: String)
 const DATA_PATH := "res://data/broken_parts.json"
 const SparkleBurst := preload("res://scripts/tasks/sparkle_burst.gd")
 const HangarDust := preload("res://scripts/tasks/hangar_dust.gd")
-## Gold highlight of a broken part whose task needs a specialist (owner request, 2026-11-14): a pulsing gold rim drawn as
-## material_overlay on the broken model (not on its effect nodes), gone with the model when the part is fixed.
-const SPECIALIST_GOLD := preload("res://materials/specialist_gold.gdshader")
-const GOLD_META := &"specialist_gold"
-static var _gold_material: ShaderMaterial
+## Role glow (owner request, 2026-11-14, replaces the gold specialist rim): every broken part glows for the player on
+## this machine, GREEN when that player's crew member can do the repair (a general task, or their own specialty) and
+## RED when it is another specialist's job. A pulsing rim drawn as material_overlay on the broken model (effects such as
+## vapour and spray stay plain), recoloured when the player swaps crew member, gone with the model when it is fixed.
+const GLOW_SHADER := preload("res://materials/specialist_gold.gdshader")
+const GLOW_META := &"role_glow"
+const GLOW_CAN := Color(0.3, 1.0, 0.42)
+const GLOW_CANNOT := Color(1.0, 0.22, 0.18)
+## Seconds between checks of which crew member this machine's player is.
+const ROLE_POLL := 0.25
+static var _glow_materials := {}
+## The broken model's meshes become the repair spot's aim target (owner 2026-11-14: the whole object, reachable from
+## 2-3 m): collision shapes on the station's sensing Area3D, on only while the part is broken.
+const REACH_META := &"part_reach"
+## Meshes larger than this (metres, longest side) get their exact triangles instead of a box (the dome glass, so its
+## inside stays open).
+const REACH_BOX_MAX := 4.0
+const AirLeakVfx := preload("res://scripts/tasks/air_leak_vfx.gd")
 const GROUP := &"broken_part_presenter"
 ## Seconds of the whole transition, when the broken model starts shrinking, when the intact one is back, and how
 ## long the warm glow lasts.
@@ -76,6 +89,9 @@ var _holder: Node3D
 var _state_id := 0
 var _completed := {}
 var _dust_left := 0.0
+var _role_left := 0.0
+## Specialty of this machine's crew member the glows were coloured for ("?" = not read yet).
+var _local_spec := "?"
 
 
 ## Creates the presenter under `parent` and sets it up. Returns it.
@@ -184,7 +200,7 @@ func _add_part(entry: Dictionary) -> void:
 	var p := {"task_id": task_id, "entry": entry, "special": special, "glb": glb, "model": node if node is Node3D else null,
 		"intact": [] as Array[Node3D], "effects": [] as Array[Node], "leaves": [] as Array, "door_static": [] as Array[Node3D],
 		"mask": 0, "bounds": AABB(), "shows_broken": false, "anim": -1.0, "swapped": false, "glow": null,
-		"overlays": {}, "dust": null, "dust_levels": [] as Array[float]}
+		"overlays": {}, "dust": null, "dust_levels": [] as Array[float], "reach": [] as Array[CollisionShape3D]}
 	# Godot node names ("gr_rack_002") and the map's object names ("gr_rack.002"); _find tries both spellings.
 	var names: Array = []
 	var door_spec: Dictionary = entry.get("door", {}) if entry.get("door") is Dictionary else {}
@@ -308,6 +324,10 @@ func step(delta: float) -> void:
 	var read_dust := _dust_left <= 0.0
 	if read_dust:
 		_dust_left = DUST_POLL
+	_role_left -= delta
+	if _role_left <= 0.0:
+		_role_left = ROLE_POLL
+		_follow_local_role()
 	for task_id: String in parts:
 		var p: Dictionary = parts[task_id]
 		var done := _first_completed(st, task_id)
@@ -343,6 +363,7 @@ func _show(p: Dictionary, broken: bool) -> void:
 			n.visible = not broken
 	if broken and String(p.special) == "door_901":
 		_follow_door(p)
+	_set_reach(p, broken)
 	if p.dust != null:
 		if broken:
 			_update_dust(p, services.state() if services != null and services.has_game() else null, true)
@@ -394,8 +415,12 @@ func _prepare_model(p: Dictionary) -> void:
 		if e != null:
 			effects.append(e)
 	p.effects = effects
-	if is_specialist_task(String(p.task_id)):
-		_apply_gold(model, effects)
+	if String(p.special) == "door_901":
+		var leak := model.find_child("air_leak_vfx__broken", true, false)
+		if leak != null:
+			AirLeakVfx.replace(leak, p.entry as Dictionary)
+	_apply_role_glow(p)
+	_build_reach(p)
 	if (p.bounds as AABB).size == Vector3.ZERO:
 		p.bounds = _bounds_of([model])
 	if String(p.special) == "door_901":
@@ -412,31 +437,163 @@ static func is_specialist_task(task_id: String) -> bool:
 	return info.size() >= 3 and String(info[2]) != "general"
 
 
-static func gold_material() -> ShaderMaterial:
-	if _gold_material == null:
-		_gold_material = ShaderMaterial.new()
-		_gold_material.shader = SPECIALIST_GOLD
-	return _gold_material
+## True when a crew member of `specialty` may do the task's repair: a general task, or their own specialty.
+static func can_do(task_id: String, specialty: String) -> bool:
+	var info: Array = RepairCatalog.TASKS.get(task_id, [])
+	var role := String(info[2]) if info.size() >= 3 else "general"
+	return role == "general" or role == "" or role == specialty
 
 
-## Puts the gold rim on every drawn mesh of the broken model except its effects (vapour, spray, dust stay plain).
-static func _apply_gold(model: Node3D, effects: Array[Node]) -> void:
+## The glow overlay: green (can do) or red (another specialist's job).
+static func glow_material(can: bool) -> ShaderMaterial:
+	if not _glow_materials.has(can):
+		var m := ShaderMaterial.new()
+		m.shader = GLOW_SHADER
+		m.set_shader_parameter(&"gold", GLOW_CAN if can else GLOW_CANNOT)
+		_glow_materials[can] = m
+	return _glow_materials[can]
+
+
+## Specialty of the crew member this machine's player controls, or "" when there is none.
+func local_specialty() -> String:
+	if services == null or not services.has_game():
+		return ""
+	var me := services.local_character()
+	return String(me.specialty) if me != null else ""
+
+
+static func _is_effect(p: Dictionary, n: Node) -> bool:
+	for e: Node in p.effects:
+		if is_instance_valid(e) and (e == n or e.is_ancestor_of(n)):
+			return true
+	return false
+
+
+## Puts the green or red rim on the broken model's meshes. Effects (vapour, spray, puddles) stay plain, unless the part
+## is nothing but effects (the hangar dust), which then glows itself.
+func _apply_role_glow(p: Dictionary) -> void:
+	var model := p.model as Node3D
+	if model == null or not is_instance_valid(model):
+		return
+	if _local_spec == "?":
+		_local_spec = local_specialty()
+	var can := can_do(String(p.task_id), _local_spec)
+	var mat := glow_material(can)
+	var plain: Array[GeometryInstance3D] = []
+	var fx: Array[GeometryInstance3D] = []
 	for g in _geometry(model):
-		var is_effect := false
-		for e: Node in effects:
-			if e == g or e.is_ancestor_of(g):
-				is_effect = true
-				break
-		if not is_effect:
-			g.material_overlay = gold_material()
-			g.set_meta(GOLD_META, true)
-	model.set_meta(GOLD_META, true)
+		if g is GPUParticles3D or g is CPUParticles3D or g.has_meta(AirLeakVfx.META):
+			continue
+		if _is_effect(p, g):
+			fx.append(g)
+		else:
+			plain.append(g)
+	var saved: Dictionary = p.overlays
+	for g in (plain if not plain.is_empty() else fx):
+		if saved.has(g):
+			saved[g] = mat          # mid-transition flash: the glow comes back when the flash ends
+		else:
+			g.material_overlay = mat
+		g.set_meta(GLOW_META, true)
+	model.set_meta(GLOW_META, "green" if can else "red")
 
 
-## True while the part shows its broken model with the gold specialist highlight (checks and tools).
-func shows_gold(task_id: String) -> bool:
+## "green", "red" or "" (no glow): the part's glow while its broken model is on show (checks and tools).
+func glow_of(task_id: String) -> String:
 	var p: Dictionary = parts.get(task_id, {})
-	return not p.is_empty() and bool(p.shows_broken) and p.model != null and is_instance_valid(p.model) and (p.model as Node3D).visible and bool((p.model as Node3D).get_meta(GOLD_META, false))
+	if p.is_empty() or not bool(p.shows_broken) or p.model == null or not is_instance_valid(p.model) or not (p.model as Node3D).visible:
+		return ""
+	return String((p.model as Node3D).get_meta(GLOW_META, ""))
+
+
+## True while the part shows its broken model with a glow (the older name, from the gold highlight).
+func shows_gold(task_id: String) -> bool:
+	return glow_of(task_id) != ""
+
+
+## Recolours every broken part when this machine's player becomes another crew member.
+func _follow_local_role() -> void:
+	var spec := local_specialty()
+	if spec == _local_spec:
+		return
+	_local_spec = spec
+	for task_id: String in parts:
+		var p: Dictionary = parts[task_id]
+		if p.model != null and is_instance_valid(p.model):
+			_apply_role_glow(p)
+
+
+# ---------------------------------------------------------------- the whole model is the repair target
+
+## The repair station's sensing Area3D of a task (world collision "Stations"), or null.
+func _station_area(task_id: String) -> Area3D:
+	if not is_inside_tree():
+		return null
+	var station_id := ""
+	for entry: Dictionary in StationCatalog.extra_entries():
+		if String(entry.get("kind", "")) == "repair_task" and String(entry.get("task_id", "")) == task_id:
+			station_id = String(entry.get("id", ""))
+			break
+	if station_id == "":
+		return null
+	for n: Node in get_tree().get_nodes_in_group(&"station_volume"):
+		if n is Area3D and String(n.get_meta("station_id", "")) == station_id:
+			return n as Area3D
+	return null
+
+
+## Adds one collision shape per mesh of the broken model to the task's station Area3D: a box around a small mesh, or
+## the mesh's own triangles (hit from both sides) when it is bigger than REACH_BOX_MAX.
+func _build_reach(p: Dictionary) -> void:
+	var model := p.model as Node3D
+	var station := _station_area(String(p.task_id))
+	if model == null or station == null or not station.is_inside_tree() or not model.is_inside_tree():
+		return
+	var shapes: Array[CollisionShape3D] = []
+	var to_local := station.global_transform.affine_inverse()
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		var m := mi as MeshInstance3D
+		if m.mesh == null or m.has_meta(AirLeakVfx.META):
+			continue
+		var box := m.get_aabb()
+		if box.size.length() < 0.02:
+			continue
+		var shape := CollisionShape3D.new()
+		shape.name = "PartReach_%d" % shapes.size()
+		if maxf(box.size.x, maxf(box.size.y, box.size.z)) > REACH_BOX_MAX:
+			var tri := m.mesh.create_trimesh_shape()
+			if tri == null:
+				continue
+			tri.backface_collision = true
+			shape.shape = tri
+			shape.transform = to_local * m.global_transform
+		else:
+			var b := BoxShape3D.new()
+			b.size = box.size.max(Vector3.ONE * 0.08)
+			shape.shape = b
+			shape.transform = to_local * m.global_transform * Transform3D(Basis.IDENTITY, box.get_center())
+		station.add_child(shape)
+		shapes.append(shape)
+	p.reach = shapes
+	if not shapes.is_empty():
+		station.set_meta(REACH_META, true)
+	_set_reach(p, bool(p.shows_broken) or model.visible)
+
+
+## Turns the part's model-shaped target on (while broken) or off (fixed: the floor anchor stays the target).
+func _set_reach(p: Dictionary, on: bool) -> void:
+	for s: CollisionShape3D in p.get("reach", []):
+		if is_instance_valid(s):
+			s.set_deferred(&"disabled", not on)
+
+
+## True while the part's model-shaped aim target is on (checks and tools).
+func reach_on(task_id: String) -> bool:
+	var p: Dictionary = parts.get(task_id, {})
+	for s: CollisionShape3D in p.get("reach", []):
+		if is_instance_valid(s) and not s.disabled:
+			return true
+	return false
 
 
 ## Splits the broken door model into the parts that slide with each leaf of door 901. The data file may name them
@@ -589,6 +746,7 @@ func _advance(p: Dictionary, delta: float) -> void:
 			(p.dust as RefCounted).call(&"clean")
 			p.dust_levels = [] as Array[float]
 		p.shows_broken = false
+		_set_reach(p, false)
 	if t >= GLOW_SECONDS:
 		_overlay(p, [], false)
 	if t >= SECONDS:

@@ -1,5 +1,6 @@
 extends SceneTree
-## Owner-requested headless check (2026-11-14): the gold highlight on broken parts whose task needs a specialist, and
+## Owner-requested headless check (2026-11-14): the green / red role glow on broken parts (green = this player can fix
+## it, red = another specialist's job), the whole broken model as the aim target, the T12 vapour jet, and
 ## the sparkle burst when a broken part is fixed. Uses the real data/broken_parts.json and the real glbs, in an empty
 ## world (no 300 MB map), and completes each task the way the host does (first_completed in the replicated state).
 ## Run: godot --headless --path . --script res://tools/godot/check_gold_and_sparkles.gd
@@ -30,37 +31,61 @@ func _initialize() -> void:
 	var world := Node3D.new()
 	world.name = "CheckWorld"
 	root.add_child(world)
+	# The repair stations' sensing areas, as WorldCollision makes them (the broken models add their aim shapes here).
+	var stations := Node3D.new()
+	stations.name = "Stations"
+	root.add_child(stations)
+	for entry: Dictionary in StationCatalog.extra_entries():
+		if String(entry.get("kind", "")) == "repair_task" and entry.has("position"):
+			var q: Array = entry.position
+			stations.add_child(WorldCollision._station_volume(String(entry.id), "repair_task", Vector3(float(q[0]), float(q[1]), float(q[2]))))
 	var p: BrokenParts = BrokenParts.new()
 	root.add_child(p)
 	p.set_process(false)
 	p.setup(world, host, null)
 	p.step(0.0)
+	await physics_frame
 	var st := host.state()
+	var me := host.local_character()
+	var my_spec := String(me.specialty) if me != null else ""
 	var tasks: Array = p.parts.keys()
 	tasks.sort()
 	_check("all 10 broken parts are loaded from data/broken_parts.json", tasks.size() == 10, ", ".join(tasks))
+	_check("this machine plays a crew member", me != null, my_spec)
 
-	# ---- gold highlight while broken
+	# ---- green (you can fix it) / red (another specialist's job) glow while broken, and the whole model is the target
 	for task_id: String in tasks:
-		var specialist := BrokenParts.is_specialist_task(task_id)
 		var broken := p.shows_broken(task_id)
-		var gold := p.shows_gold(task_id)
 		var role := String(RepairCatalog.TASKS[task_id][2])
+		var can := role == "general" or role == my_spec
 		_check("%s (%s): broken at the start" % [task_id, role], broken)
-		if specialist:
-			var model: Node3D = p.parts[task_id].model
-			var golden := 0
-			var plain := 0
-			for g in BrokenParts._geometry(model):
-				if g.material_overlay == BrokenParts.gold_material():
-					golden += 1
-				else:
-					plain += 1
-			_check("%s: specialist task shows the gold highlight" % task_id, gold and golden > 0, "%d gold meshes, %d plain (effects)" % [golden, plain])
-		else:
-			_check("%s: general task has no gold highlight" % task_id, not gold)
-	var shader_ok := BrokenParts.gold_material().shader != null and BrokenParts.gold_material().shader.get_mode() == Shader.MODE_SPATIAL
-	_check("gold highlight shader loads and compiles as a spatial shader", shader_ok)
+		var model: Node3D = p.parts[task_id].model
+		var lit := 0
+		for g in BrokenParts._geometry(model):
+			if g.material_overlay == BrokenParts.glow_material(can):
+				lit += 1
+		_check("%s: glows %s for a %s player" % [task_id, "GREEN" if can else "RED", my_spec], p.glow_of(task_id) == ("green" if can else "red") and lit > 0, "%d glowing meshes" % lit)
+		_check("%s: the whole broken model is the aim target" % task_id, p.reach_on(task_id), "%d shapes" % (p.parts[task_id].reach as Array).size())
+	var shader_ok := BrokenParts.glow_material(true).shader != null and BrokenParts.glow_material(true).shader.get_mode() == Shader.MODE_SPATIAL
+	_check("glow shader loads and compiles as a spatial shader", shader_ok)
+	var leak := (p.parts["T12"].model as Node3D).find_child("air_leak_vfx__broken", true, false) as MeshInstance3D
+	var jet := leak.get_node_or_null("VapourJet") as CPUParticles3D if leak != null else null
+	_check("T12: the ball cloud is gone and a vapour jet blows from the door gap", leak != null and leak.mesh == null and jet != null and jet.emitting)
+
+	# ---- swapping to the specialist turns that part green
+	var red_task := ""
+	for task_id: String in tasks:
+		if p.glow_of(task_id) == "red":
+			red_task = task_id
+			break
+	if me != null and red_task != "":
+		var old := me.specialty
+		me.specialty = StringName(String(RepairCatalog.TASKS[red_task][2]))
+		p.step(0.3)
+		_check("%s: turns GREEN when the player becomes its specialist (%s)" % [red_task, me.specialty], p.glow_of(red_task) == "green")
+		me.specialty = old
+		p.step(0.3)
+		_check("%s: back to RED after swapping back" % red_task, p.glow_of(red_task) == "red")
 
 	# ---- sparkles when a part is fixed (from the replicated completed state, as on every client)
 	for task_id: String in tasks:
@@ -90,7 +115,8 @@ func _initialize() -> void:
 			"%d stars, emitting=%s" % [stars, emitting])
 		for i in 80:
 			p.step(0.016)
-		_check("%s: after the burst the broken model and its gold are gone" % task_id, not p.shows_broken(task_id) and not p.shows_gold(task_id) and not p.in_transition(task_id))
+		await physics_frame
+		_check("%s: after the burst the broken model, its glow and its model target are gone" % task_id, not p.shows_broken(task_id) and p.glow_of(task_id) == "" and not p.in_transition(task_id) and not p.reach_on(task_id))
 
 	# ---- a loaded or late-joined colony that is already fixed shows no sparkles
 	var count := p.transitions_started

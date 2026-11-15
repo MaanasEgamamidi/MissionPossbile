@@ -13,7 +13,9 @@ const PLAYER_SCENE := "res://assets/props/cassette_player.glb"
 ## Top of the tape's room colour band, in the tape model (glb) frame: the room name is printed flat on it.
 const TAPE_STRIP_TOP := Vector3(0.0, 0.0198, -0.032)
 ## Reach boxes (designer balance): a little larger than the props, so E aims easily at a small tape.
-const TAPE_REACH := Vector3(0.30, 0.14, 0.24)
+const TAPE_REACH := Vector3(0.5, 0.3, 0.44)
+const TAPE_GLOW_SHADER := preload("res://materials/specialist_gold.gdshader")
+const TAPE_GLOW := Color(1.0, 0.86, 0.3)
 const PLAYER_REACH := Vector3(0.62, 0.34, 0.42)
 
 var services: GameServices
@@ -123,7 +125,30 @@ static func _cassette(cassette_id: String) -> Node3D:
 	label.no_depth_test = false
 	label.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	model.add_child(label)
+	_add_glow(model)
 	return model
+
+## Owner 2026-11-14: tapes glow so they are easy to find. A pulsing warm-yellow rim on the tape (the same rim shader as
+## the broken parts, in a colour of its own: green and red mean "you can / cannot fix this") and a small soft light
+## that makes a pool of glow on the surface it rests on. Gone with the tape once it is picked up.
+static func _add_glow(model: Node3D) -> void:
+	var glow := ShaderMaterial.new()
+	glow.shader = TAPE_GLOW_SHADER
+	glow.set_shader_parameter(&"gold", TAPE_GLOW)
+	glow.set_shader_parameter(&"base_glow", 0.35)
+	glow.set_shader_parameter(&"strength", 2.2)
+	for g in model.find_children("*", "GeometryInstance3D", true, false):
+		if g is MeshInstance3D:
+			(g as MeshInstance3D).material_overlay = glow
+	var light := OmniLight3D.new()
+	light.name = "TapeGlowLight"
+	light.light_color = TAPE_GLOW
+	light.light_energy = 1.2
+	light.omni_range = 1.1
+	light.omni_attenuation = 1.6
+	light.shadow_enabled = false
+	light.position = Vector3(0, 0.12, 0)
+	model.add_child(light)
 
 static func _player_model() -> Node3D:
 	var model := Node3D.new()

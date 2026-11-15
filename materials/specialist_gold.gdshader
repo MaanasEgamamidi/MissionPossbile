@@ -1,7 +1,8 @@
 shader_type spatial;
-// Gold highlight of a broken part whose repair needs a specialist (owner request, 2026-11-14). Drawn as a
-// material_overlay on top of the part's own materials: a warm gold rim that brightens toward the silhouette and pulses
-// slowly, so a specialised task reads at a glance from across the room. Soft and steady: no flicker (ages 9-12).
+// Pulsing rim glow drawn as a material_overlay (owner requests, 2026-11-14). The colour comes from "gold" per material:
+// broken parts glow green (this player can do the repair) or red (another specialist's job), see
+// broken_part_presenter.gd; cassette tapes glow warm yellow (cassette_presenter.gd). It brightens toward the silhouette
+// and pulses slowly, so it reads at a glance from across the room. Soft and steady: no flicker (ages 9-12).
 render_mode unshaded, blend_add, depth_draw_never, cull_back, shadows_disabled, fog_disabled;
 
 uniform vec4 gold : source_color = vec4(1.0, 0.76, 0.22, 1.0);
