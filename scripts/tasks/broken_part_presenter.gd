@@ -21,14 +21,14 @@ signal transition_finished(task_id: String)
 const DATA_PATH := "res://data/broken_parts.json"
 const SparkleBurst := preload("res://scripts/tasks/sparkle_burst.gd")
 const HangarDust := preload("res://scripts/tasks/hangar_dust.gd")
-## Role glow (owner request, 2026-11-14, replaces the gold specialist rim): every broken part glows for the player on
-## this machine, GREEN when that player's crew member can do the repair (a general task, or their own specialty) and
-## RED when it is another specialist's job. A pulsing rim drawn as material_overlay on the broken model (effects such as
+## Role glow: GREEN for general repairs, GOLD for this player's specialty,
+## RED for another specialist's job. A pulsing rim drawn as material_overlay on the broken model (effects such as
 ## vapour and spray stay plain), recoloured when the player swaps crew member, gone with the model when it is fixed.
 const GLOW_SHADER := preload("res://materials/specialist_gold.gdshader")
 const GLOW_META := &"role_glow"
 const GLOW_CAN := Color(0.3, 1.0, 0.42)
 const GLOW_CANNOT := Color(1.0, 0.22, 0.18)
+const GLOW_SPECIALTY := Color(1.0, 0.75, 0.2)
 ## Seconds between checks of which crew member this machine's player is.
 const ROLE_POLL := 0.25
 static var _glow_materials := {}
@@ -96,8 +96,9 @@ var _dust_left := 0.0
 var _role_left := 0.0
 ## Specialty of this machine's crew member the glows were coloured for ("?" = not read yet).
 var _local_spec := "?"
-## Whether the glows were on (tapes first: no glow until every tape is found in tutorial mode); -1 = not read yet.
+## Whether any room's repair glows were on; -1 = not read yet.
 var _glow_on := -1
+var _glow_tapes := -1
 
 
 ## Creates the presenter under `parent` and sets it up. Returns it.
@@ -465,14 +466,15 @@ static func can_do(task_id: String, specialty: String) -> bool:
 	return role == "general" or role == "" or role == specialty
 
 
-## The glow overlay: green (can do) or red (another specialist's job).
-static func glow_material(can: bool) -> ShaderMaterial:
-	if not _glow_materials.has(can):
+## The glow overlay: green (anyone), gold (own specialty), or red (cannot do).
+static func glow_material(can: bool, specialty := false) -> ShaderMaterial:
+	var color_id := "red" if not can else ("gold" if specialty else "green")
+	if not _glow_materials.has(color_id):
 		var m := ShaderMaterial.new()
 		m.shader = GLOW_SHADER
-		m.set_shader_parameter(&"gold", GLOW_CAN if can else GLOW_CANNOT)
-		_glow_materials[can] = m
-	return _glow_materials[can]
+		m.set_shader_parameter(&"gold", GLOW_CANNOT if not can else (GLOW_SPECIALTY if specialty else GLOW_CAN))
+		_glow_materials[color_id] = m
+	return _glow_materials[color_id]
 
 
 ## Specialty of the crew member this machine's player controls, or "" when there is none.
@@ -490,7 +492,7 @@ static func _is_effect(p: Dictionary, n: Node) -> bool:
 	return false
 
 
-## Puts the green or red rim on the broken model's meshes. Effects (vapour, spray, puddles) stay plain, unless the part
+## Puts the role-coloured rim on the broken model's meshes. Effects (vapour, spray, puddles) stay plain, unless the part
 ## is nothing but effects (the hangar dust), which then glows itself.
 func _apply_role_glow(p: Dictionary) -> void:
 	var model := p.model as Node3D
@@ -501,7 +503,8 @@ func _apply_role_glow(p: Dictionary) -> void:
 	if _glow_on < 0:
 		_glow_on = 1 if glows_allowed() else 0
 	var can := can_do(String(p.task_id), _local_spec)
-	var mat: Material = glow_material(can) if _glow_on == 1 else null
+	var specialist := is_specialist_task(String(p.task_id))
+	var mat: Material = glow_material(can, specialist) if glows_allowed(String(p.task_id)) else null
 	var plain: Array[GeometryInstance3D] = []
 	var fx: Array[GeometryInstance3D] = []
 	for g in _geometry(model):
@@ -518,18 +521,17 @@ func _apply_role_glow(p: Dictionary) -> void:
 		else:
 			g.material_overlay = mat
 		g.set_meta(GLOW_META, mat != null)
-	model.set_meta(GLOW_META, ("green" if can else "red") if mat != null else "")
+	model.set_meta(GLOW_META, ("red" if not can else ("gold" if specialist else "green")) if mat != null else "")
 
 
-## Tapes first (owner 2026-11-14): in tutorial mode the broken parts show no colour until every tape is found
-## (TutorialSystem.repairs_unlocked); the broken models still look broken.
-func glows_allowed() -> bool:
+## A room's pickup restores its repair colours immediately, without waiting for playback.
+func glows_allowed(task_id := "") -> bool:
 	if services == null or not services.has_game():
 		return true
-	return TutorialSystem.repairs_unlocked(services.state())
+	return TutorialSystem.task_unlocked(services.state(), task_id) if task_id != "" else TutorialSystem.repairs_unlocked(services.state())
 
 
-## "green", "red" or "" (no glow): the part's glow while its broken model is on show (checks and tools).
+## "green", "gold", "red" or "" (no glow): the part's glow while its broken model is on show.
 func glow_of(task_id: String) -> String:
 	var p: Dictionary = parts.get(task_id, {})
 	if p.is_empty() or not bool(p.shows_broken) or p.model == null or not is_instance_valid(p.model) or not (p.model as Node3D).visible:
@@ -547,8 +549,11 @@ func shows_gold(task_id: String) -> bool:
 func _follow_local_role() -> void:
 	var spec := local_specialty()
 	var on := 1 if glows_allowed() else 0
-	if spec == _local_spec and on == _glow_on:
+	# Each room unlocks separately, even when the crew already owns another tape.
+	var found := TutorialSystem.tapes_found(services.state())
+	if spec == _local_spec and on == _glow_on and found == _glow_tapes:
 		return
+	_glow_tapes = found
 	_local_spec = spec
 	_glow_on = on
 	for task_id: String in parts:

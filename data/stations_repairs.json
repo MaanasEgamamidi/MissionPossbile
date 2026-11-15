@@ -13,7 +13,7 @@
     {"id":"cassette_greenhouse","kind":"cassette_anchor","room_id":"greenhouse","cassette_id":"cassette_greenhouse","name":"Greenhouse cassette location","symbol":"T","position":[-6.5,0.042,0.6],"prop_position":[-7.02,1,0.52],"prop_yaw_deg":90},
     {"id":"repair_t07","kind":"repair_task","room_id":"green_dome","task_id":"T07","name":"T07 - Pipes","symbol":"7","specialty":"field_engineering_geology","position":[47.3,0.045,23]},
     {"id":"repair_t08","kind":"repair_task","room_id":"green_dome","task_id":"T08","name":"T08 - Glass","symbol":"8","specialty":"","position":[49.9,0.045,30.35]},
-    {"id":"cassette_green_dome","kind":"cassette_anchor","room_id":"green_dome","cassette_id":"cassette_green_dome","name":"Garden dome cassette location","symbol":"T","position":[51.2,0.045,19.7],"prop_position":[51.4,0.83,19.2],"prop_yaw_deg":0},
+    {"id":"cassette_green_dome","kind":"cassette_anchor","room_id":"green_dome","cassette_id":"cassette_green_dome","name":"Garden dome cassette location","symbol":"T","position":[54,0.045,29.22],"prop_position":[54.65,0.92,29.22],"prop_yaw_deg":0},
     {"id":"repair_t09","kind":"repair_task","room_id":"med_bay","task_id":"T09","name":"T09 - Mixture","symbol":"9","specialty":"medical_life_support","position":[-10.4,0.04,-12.45]},
     {"id":"repair_t10","kind":"repair_task","room_id":"med_bay","task_id":"T10","name":"T10 - Equipment","symbol":"10","specialty":"","position":[-3.5,0.04,-16.3]},
     {"id":"cassette_med_bay","kind":"cassette_anchor","room_id":"med_bay","cassette_id":"cassette_med_bay","name":"Med Bay cassette location","symbol":"T","position":[-6.7,0.04,-9.9],"prop_position":[-6.5,0.63,-9.5],"prop_yaw_deg":180},

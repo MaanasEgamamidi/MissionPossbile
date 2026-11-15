@@ -76,6 +76,8 @@ static func build(manifest_path: String, colliders_path: String) -> Node3D:
 			if entry.has("room_id"):
 				# Small, separate targets preserve access to neighbouring consoles and doors.
 				((station.get_child(0) as CollisionShape3D).shape as SphereShape3D).radius = 0.38
+				if String(entry.kind) == "cassette_anchor":
+					((station.get_child(0) as CollisionShape3D).shape as SphereShape3D).radius *= 1.5
 				# No marker plate or floating name here any more (owner 2026-11-14: "no floating objects"): the HUD's
 				# "[E] ..." prompt names the station when it is aimed at; room cassettes and the player get real models.
 			result.get_node("Stations").add_child(station)

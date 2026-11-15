@@ -190,7 +190,7 @@ func emergency_target(st: ColonyState, me: CharacterState, from: Vector3) -> Dic
 	# The exit tunnel door leaks air (T12), for the crew member who can seal it. Not while the tapes are still being
 	# found in the tutorial: the leak is there from the start and the suits keep everyone safe meanwhile.
 	if bool(st.pressure.get("leaking", false)) and _can_fix(me, "T12") and \
-			(not TutorialSystem.tutorial_active(st) or TutorialSystem.repairs_unlocked(st)):
+			TutorialSystem.task_unlocked(st, "T12"):
 		var leak: Variant = _task_spot(st, "T12")
 		if leak is Vector3:
 			return _entry(leak as Vector3, "air_leak", "Air is leaking at the exit tunnel door. Follow the gold sparkles and seal it (keep your helmet on).", &"danger")
@@ -247,13 +247,13 @@ func goal_target(st: ColonyState, me: CharacterState, from: Vector3) -> Dictiona
 					return _nearest(tapes, from)
 			"tapes_played":
 				var deck: Variant = _anchors.get(CassetteCatalog.PLAYER_ID, GoalsBigPanel.player_spot())
-				if deck is Vector3:
+				if deck is Vector3 and TutorialSystem.tapes_played(st) < TutorialSystem.tapes_found(st):
 					return _entry(deck as Vector3, "tape_player", "Follow the gold sparkles to the tape player in the Command Room and play your tapes.", &"good")
 			"fix":
 				# Every broken part this crew member can fix, the nearest first; none left for them: change crew member.
 				var mine: Array[Dictionary] = []
 				for h: Dictionary in goals:
-					if String(h.get("kind", "")) != "fix" or bool(h.get("done", false)):
+					if String(h.get("kind", "")) != "fix" or bool(h.get("done", false)) or not TutorialSystem.task_unlocked(st, String(h.get("task", ""))):
 						continue
 					var task := String(h.get("task", ""))
 					if not _can_fix(me, task):

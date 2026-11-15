@@ -579,8 +579,8 @@ func _test_order() -> void:
 	var early := _fix(s, &"crew_1", "T01")
 	_go(s, &"crew_1", s.config.hub_position)
 	_tick(s, 0.4)
-	_check("order: tapes first: a broken spot can not be fixed before every tape is found (plain message)", not early.ok and early.reason == TutorialLock.REASON
-		and early.message == TutorialLock.TAPES_MESSAGE % 6 and TutorialSystem.fixed_count(st) == 0 and TutorialSystem.current_stage(st) == 2, "%s %s" % [early.reason, early.message])
+	_check("order: a broken spot needs its own room's tape", not early.ok and early.reason == TutorialLock.REASON
+		and early.message.contains("Command Room cassette") and TutorialSystem.fixed_count(st) == 0 and TutorialSystem.current_stage(st) == 2, "%s %s" % [early.reason, early.message])
 	var ids: Array = CassetteCatalog.TAPES.keys()
 	for id: String in ids:
 		_collect(s, &"crew_1", id)
@@ -620,13 +620,14 @@ func _test_lock_host() -> void:
 		and not record.ok and record.reason == TutorialLock.REASON and st.is_zone_powered("Hangar bay"), "%s / %s / %s" % [power.reason, solar.reason, record.reason])
 	var suit := _do(s, &"crew_1", &"begin_suit_check", SUITS, {"on": false})
 	var tape := _collect(s, &"crew_1", "cassette_med_bay")
-	# tapes first: until every tape is found the cassette player and the broken spots are locked too
+	# One Med Bay pickup opens the player and that room, while Command Room repairs stay locked.
 	var early_player := _do(s, &"crew_1", &"cassette_open", PLAYER)
 	var early_spot := _do(s, &"crew_1", &"task_claim", &"repair_t01", {"generation": int(st.repair.tasks.T01.fault_generation)})
-	_check("lock: tapes first: before every tape is found only the tapes and the suit rack work; the player and broken spots say 'Find all 6 tapes first'",
-		suit.ok and tape.ok and not early_player.ok and early_player.reason == TutorialLock.REASON and early_player.message == tapes_line
+	_check("lock: first pickup opens playback and its room, while other rooms stay locked",
+		suit.ok and tape.ok and early_player.ok
 		and not early_spot.ok and early_spot.reason == TutorialLock.REASON and not TutorialLock.station_usable(st, st.stations["repair_t02"])
-		and not TutorialLock.station_usable(st, st.stations[String(PLAYER)]) and TutorialLock.station_usable(st, st.stations["cassette_hangar"]),
+		and TutorialLock.station_usable(st, st.stations[String(PLAYER)]) and TutorialLock.station_usable(st, st.stations["repair_t10"])
+		and TutorialLock.station_usable(st, st.stations["cassette_hangar"]),
 		"%s %s %s" % [tape.reason, early_player.reason, early_spot.reason])
 	for id: String in CassetteCatalog.TAPES:
 		if not CassetteCatalog.collected(st, id):
@@ -701,14 +702,14 @@ func _test_save_and_late_join() -> void:
 	var ids: Array = CassetteCatalog.TAPES.keys()
 	for i in 4:
 		_collect(s, &"crew_1", String(ids[i]))
-	var early_play := _play(s, &"crew_2", String(ids[0]))          # tapes first: the player waits for every tape
+	var early_play := _play(s, &"crew_2", String(ids[0]))
 	s.request(&"cassette_close", PLAYER, {}, 2)
 	_tick(s, 0.4)
 	var s2 := _resume(s, _json(st))
 	_tick(s2, 0.4)
-	_check("save: mid-tapes the colony resumes at the same step with 4/6 found and 0/6 played (the player waits for every tape); Mission Control does not repeat itself",
-		TutorialSystem.current_stage(s2.state) == 2 and TutorialSystem.tapes_found(s2.state) == 4 and TutorialSystem.tapes_played(s2.state) == 0
-		and not early_play.ok and early_play.reason == TutorialLock.REASON
+	_check("save: mid-tapes the colony resumes with 4/6 found and 1/6 played; Mission Control does not repeat itself",
+		TutorialSystem.current_stage(s2.state) == 2 and TutorialSystem.tapes_found(s2.state) == 4 and TutorialSystem.tapes_played(s2.state) == 1
+		and early_play.ok
 		and TutorialSystem.tutorial_active(s2.state) and _heard(s2).is_empty(), "%d %d %s" % [TutorialSystem.tapes_found(s2.state), TutorialSystem.tapes_played(s2.state), _heard(s2)])
 	# finish the tapes and fix some spots in the resumed colony
 	s2.request(&"claim_character", &"crew_1", {}, 1)
@@ -911,7 +912,7 @@ func _test_presentation() -> void:
 	game.ui.open(StationPanels.for_station(POWER, gs))
 	await process_frame
 	await process_frame
-	var said := "\n".join(hud.current_messages() + hud.waiting_messages()).contains("Find all 6 tapes first")
+	var said := "\n".join(hud.current_messages() + hud.waiting_messages()).contains("Find a room tape first")
 	var closed := game.ui.top() == null and presenter.closed_locked_panels == 1
 	gs.report_position(me.id, CharacterState._v3(st.stations[String(SUITS)].position), 0.0)
 	game.ui.open(StationPanels.for_station(SUITS, gs))

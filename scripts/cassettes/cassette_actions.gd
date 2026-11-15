@@ -2,6 +2,24 @@ class_name CassetteActions
 extends RefCounted
 
 static func register(service: ActionService) -> void:
+	var demo := ActionService.Definition.new()
+	demo.id = &"demo_collect_cassettes"
+	demo.host_only = true
+	demo.needs_actor = false
+	demo.check_distance = false
+	demo.allowed_while_paused = true
+	demo.important = true
+	demo.check = func(ctx: ActionService.Context) -> ActionResult:
+		return null if ctx.state != null else ActionResult.failure(ctx.request.request_id, &"no_game")
+	demo.apply = func(ctx: ActionService.Context) -> Dictionary:
+		var added := 0
+		for tape_id: String in CassetteCatalog.TAPES:
+			if not CassetteCatalog.collected(ctx.state, tape_id):
+				(ctx.state.repair.collected_cassettes as Array).append(tape_id)
+				added += 1
+		TutorialSystem.advance_tutorial(ctx.state, ctx.balance, ctx.session.events)
+		return {"added": added, "collected": TutorialSystem.tapes_found(ctx.state), "text": "Demo: all 6 cassettes collected. Play any tape in the Command Room."}
+	service.register(demo)
 	for id: StringName in [&"cassette_collect", &"cassette_open", &"cassette_select", &"cassette_read", &"cassette_close"]:
 		var definition := ActionService.Definition.new()
 		definition.id = id

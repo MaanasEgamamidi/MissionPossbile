@@ -17,8 +17,8 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 
 [audio]
 
-driver/enable_input=true
 general/text_to_speech=true
+driver/enable_input=true
 
 [autoload]
 

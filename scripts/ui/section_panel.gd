@@ -249,9 +249,12 @@ func _refresh_day(st: ColonyState, me: CharacterState) -> void:
 		_day_label.text = "✓ %s built %s. %s" % [String(done.get("by_name", "The crew")),
 			AreaLevels.stage_text_for(st, String(done.get("track", "")), int(done.get("level", 1))), ColonyBuilds.DONE_TEXT]
 		_day_label.theme_type_variation = UiTheme.GOOD
-	elif TutorialSystem.tutorial_active(st):
+	elif not TutorialSystem.specialty_features_unlocked(st):
 		_day_label.text = ColonyBuilds.TUTORIAL_TEXT
 		_day_label.theme_type_variation = UiTheme.MUTED
+	elif TutorialSystem.tutorial_active(st):
+		_day_label.text = "First tape played: you can choose today's one build now."
+		_day_label.theme_type_variation = UiTheme.GOOD
 	elif CrewDay.is_block(st, "plan"):
 		_day_label.text = "It is the Plan block: choose today's one build now."
 		_day_label.theme_type_variation = UiTheme.GOOD

@@ -1,12 +1,7 @@
 extends RefCounted
-## Tutorial station lock (owner 2026-11-14): while the colony is in tutorial mode (TutorialSystem.tutorial_active),
-## only a few stations respond to E, in two steps:
-##   1. Tapes first: until the crew has found every room tape (TutorialSystem.repairs_unlocked), only the room cassette
-##      pickups and the suit rack work. Gold lines lead to the tapes (scripts/cassettes/tape_trail_presenter.gd); every
-##      other station, the broken spots and the Command Room cassette player included, says "Find all 6 tapes first:
-##      follow the gold lines."
-##   2. Once every tape is found: the tapes, the suit rack, the Command Room cassette player and every repair_task
-##      station whose spot is still broken (its mini-game).
+## Tutorial station access: suit racks and pickups always work. A pickup unlocks
+## its room's broken spots and playback at the Command Room deck. Playing the first
+## collected tape restores the other station features. Uncollected rooms stay locked.
 ## Still working all along: doors (not stations), the crew screen (C, not a station) and everything those need.
 ## A locked station shows no "[E]" prompt (GameHud), its panel closes at once with a plain message
 ## (TutorialPresenter), and its actions are refused on the host (ActionService) with the same message. After the
@@ -15,15 +10,15 @@ extends RefCounted
 
 ## Station kinds that always work during the tutorial.
 const OPEN_KINDS: PackedStringArray = ["suits", "cassette_anchor"]
-## Station kinds that work once every tape is found (repair_task: only while its spot is broken).
+## Playback works with the first pickup.
 const AFTER_TAPES_KINDS: PackedStringArray = ["cassette_player_anchor"]
 ## Actions that only end or release something; they never do work, so they are never refused.
 const RELEASE_ACTIONS: Array[StringName] = [&"task_release", &"cassette_close", &"maintenance_cancel"]
 const REASON := &"tutorial_locked"
-const MESSAGE := "Not yet: Mission Control needs the base fixed first. For now only the tapes and the broken spots work."
-const FIXED_MESSAGE := "This spot is fixed. The other machines work again when the whole base is fixed."
-## Before every tape is found (%d = the number of tapes).
-const TAPES_MESSAGE := "Find all %d tapes first: follow the gold lines."
+const MESSAGE := "Play a collected tape at the Command Room cassette player to unlock the other station features."
+const FIXED_MESSAGE := "This spot is fixed. Play a collected tape in the Command Room to unlock the other station features."
+## Before the first tape is found (%d = the number of tapes).
+const TAPES_MESSAGE := "Find a room tape first: follow the gold lines (%d tapes to find)."
 
 
 ## True while stations are locked in this colony.
@@ -38,17 +33,18 @@ static func station_usable(state: ColonyState, record: Dictionary) -> bool:
 	var kind := String(record.get("kind", ""))
 	if OPEN_KINDS.has(kind):
 		return true
-	if not TutorialSystem.repairs_unlocked(state):
-		return false
 	if AFTER_TAPES_KINDS.has(kind):
-		return true
+		return TutorialSystem.repairs_unlocked(state)
 	if kind == "repair_task":
-		return PuzzleRegistry.is_broken(state, String(record.get("task_id", "")))
-	return false
+		var task_id := String(record.get("task_id", ""))
+		return TutorialSystem.task_unlocked(state, task_id) and (PuzzleRegistry.is_broken(state, task_id) or TutorialSystem.specialty_features_unlocked(state))
+	return TutorialSystem.specialty_features_unlocked(state)
 
 
 ## The plain message for a locked station.
 static func message_for(state: ColonyState, record: Dictionary) -> String:
+	if active(state) and String(record.get("kind", "")) == "repair_task" and not TutorialSystem.task_unlocked(state, String(record.get("task_id", ""))):
+		return "Find the %s cassette to unlock this room's minigames." % TutorialSystem.room_words(String(record.get("room_id", "")))
 	if active(state) and not TutorialSystem.repairs_unlocked(state):
 		return TAPES_MESSAGE % TutorialSystem.tape_count()
 	if String(record.get("kind", "")) == "repair_task" and TutorialSystem.is_fixed(state, String(record.get("task_id", ""))):

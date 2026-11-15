@@ -35,7 +35,7 @@ const HISTORY_MAX := 30
 const PLAN_TIME_WORDS := "20:00"
 const MISSED_TEXT := "You missed the vote: no radio contact."
 const DONE_TEXT := "Today's build is done — next build tomorrow at 20:00."
-const TUTORIAL_TEXT := "Not yet: fix the base first. Builds start after the tutorial."
+const TUTORIAL_TEXT := "Play one collected cassette in the Command Room to unlock builds."
 ## Alert ids (GameEvents.system_alert). Level ups keep "area_level_<track>" (MissionHud shows them as a pop-up).
 const ALERT_VOTE := &"build_vote"
 const LEVEL_ALERT_PREFIX := "area_level_"
@@ -156,18 +156,24 @@ static func waiting_names(st: ColonyState) -> PackedStringArray:
 
 # ---------------------------------------------------------------- the day's rules
 
+## Planning is available after the first playback while the tutorial clock is held.
+## The normal Plan block takes over once the tutorial is complete.
+static func planning_open(st: ColonyState) -> bool:
+	return (TutorialSystem.tutorial_active(st) and TutorialSystem.specialty_features_unlocked(st)) or CrewDay.is_block(st, "plan")
+
+
 ## What the day's rules say against building `track` now, as [{"kind", "text"}] (empty = the day allows it).
 static func day_blockers(st: ColonyState, track: String) -> Array[Dictionary]:
 	var out: Array[Dictionary] = []
 	if st == null:
 		return out
-	if TutorialSystem.tutorial_active(st):
+	if not TutorialSystem.specialty_features_unlocked(st):
 		out.append({"kind": "tutorial", "text": TUTORIAL_TEXT})
 		return out
 	if built_today(st):
 		out.append({"kind": "done_today", "text": DONE_TEXT})
 		return out
-	if not CrewDay.is_block(st, "plan"):
+	if not planning_open(st):
 		var h := CrewDay.hours_until(st, "plan")
 		var when := "in about %d hour%s" % [maxi(1, roundi(h)), "" if roundi(h) == 1 else "s"] if h < INF else "later"
 		out.append({"kind": "not_plan", "text": "Builds are chosen in the Plan block at %s (%s)." % [PLAN_TIME_WORDS, when]})
@@ -362,7 +368,7 @@ static func tick(session: SessionService) -> void:
 	var p := proposal(st)
 	if p.is_empty():
 		return
-	if int(p.get("sol", 0)) != CrewDay.sol_of(st) or not CrewDay.is_block(st, "plan"):
+	if int(p.get("sol", 0)) != CrewDay.sol_of(st) or not planning_open(st):
 		var text := "The Plan block is over: no build today. Try again tomorrow at %s." % PLAN_TIME_WORDS
 		_close(st, p, "expired", text)
 		_alert(session, ALERT_VOTE, &"warn", text)

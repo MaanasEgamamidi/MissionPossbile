@@ -11,7 +11,7 @@ extends Node3D
 ## line (directed-points emission from a baked points + tangents texture), about 1800 sparkles in total at most (half on
 ## the Low graphics preset), 30 fps fixed step with interpolation, no shadows, lights, collision or sub-emitters, and one
 ## shared star texture, draw mesh and draw material for every sparkle emitter (lines, tapes).
-## Shown only in tutorial mode while not every tape is found (TutorialSystem.repairs_unlocked). A tape's line thins out
+## Shown only in tutorial mode while not every tape is found. A tape's line thins out
 ## when that tape is collected and its last sparkles fade; all lines go when every tape is found or the tutorial is not
 ## active. Loading a save or joining late shows the lines as the state says, without a fade.
 ## Presentation only: it reads the replicated colony state. Created by CassettePresenter.setup and refreshed with the
@@ -191,7 +191,7 @@ func lines_wanted() -> bool:
 	if services == null or not services.has_game():
 		return false
 	var st := services.state()
-	return TutorialSystem.tutorial_active(st) and not TutorialSystem.repairs_unlocked(st)
+	return TutorialSystem.tutorial_active(st) and TutorialSystem.tapes_found(st) < TutorialSystem.tape_count()
 
 
 ## Follows the state. `snap`: show it as it is at once (setup, a loaded or joined colony), no fade.

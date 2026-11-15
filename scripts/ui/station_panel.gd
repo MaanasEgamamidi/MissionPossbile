@@ -1314,8 +1314,10 @@ func _refresh_upgrades(st: ColonyState) -> void:
 			_section_day.text = StationColonyBuilds.DONE_TEXT
 		elif not p.is_empty():
 			_section_day.text = StationColonyBuilds.vote_text_for(st, services.local_character())
-		elif TutorialSystem.tutorial_active(st):
+		elif not TutorialSystem.specialty_features_unlocked(st):
 			_section_day.text = StationColonyBuilds.TUTORIAL_TEXT
+		elif TutorialSystem.tutorial_active(st):
+			_section_day.text = "First tape played: you can choose today's one build now."
 		else:
 			_section_day.text = "One build a day for the whole colony, chosen in the Plan block at %s." % StationColonyBuilds.PLAN_TIME_WORDS
 	if upgrade_rows.is_empty():
