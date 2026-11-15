@@ -136,7 +136,9 @@ func preset_scale() -> float:
 	var level := GraphicsQuality.applied_level(get_tree())
 	if level < 0:
 		return 1.0
-	return float(GraphicsQuality.value("scale", level))
+	# on macOS this already includes the Retina pixel budget of that preset
+	var pixels := float(_window.size.x) * float(_window.size.y) if _window != null else 0.0
+	return GraphicsQuality.render_scale(level, pixels)
 
 
 func min_scale() -> float:
@@ -231,5 +233,5 @@ func _change(to: float, probe: bool) -> void:
 
 
 func _write(scale: float) -> void:
-	_window.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR if scale < 0.999 else Viewport.SCALING_3D_MODE_BILINEAR
+	_window.scaling_3d_mode = GraphicsQuality.upscaler(scale)
 	_window.scaling_3d_scale = scale

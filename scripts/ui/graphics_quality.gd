@@ -127,13 +127,16 @@ static func _apply_viewport(vp: Viewport, level: int) -> void:
 static func _apply_scale(vp: Viewport, level: int) -> void:
 	var size: Vector2i = (vp as Window).size if vp is Window else (vp as SubViewport).size if vp is SubViewport else Vector2i.ZERO
 	var scale := render_scale(level, float(size.x) * float(size.y))
-	if scale >= 1.0:
-		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
-	elif OS.has_feature("macos"):
-		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_METALFX_SPATIAL  # Apple's own upscaler: sharper than FSR 1 on Apple GPUs
-	else:
-		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR
+	vp.scaling_3d_mode = upscaler(scale)
 	vp.scaling_3d_scale = scale
+
+
+## The upscaler for a render scale: MetalFX on macOS (Apple's own, sharper than FSR 1 on Apple GPUs), FSR elsewhere,
+## plain bilinear at full resolution. DynamicResolution uses this too.
+static func upscaler(scale: float) -> Viewport.Scaling3DMode:
+	if scale >= 0.999:
+		return Viewport.SCALING_3D_MODE_BILINEAR
+	return Viewport.SCALING_3D_MODE_METALFX_SPATIAL if OS.has_feature("macos") else Viewport.SCALING_3D_MODE_FSR
 
 
 static func _apply_server(level: int) -> void:

@@ -50,9 +50,9 @@ func _initialize() -> void:
 
 	# settings
 	var s := GameSettings.new()
-	_check(s.graphics_auto and s.graphics_quality == GraphicsQuality.Level.HIGH, "defaults: fit to this computer on, High")
+	_check(s.graphics_auto and s.graphics_quality == GraphicsQuality.default_level(), "defaults: fit to this computer on, High")
 	s.fit_to_hardware()
-	_check(s.graphics_quality == GraphicsQuality.Level.HIGH, "headless: fitting leaves the preset alone")
+	_check(s.graphics_quality == GraphicsQuality.default_level(), "headless: fitting leaves the preset alone")
 	var dir := ProjectSettings.globalize_path("res://_test_saves/diag")
 	DirAccess.make_dir_recursive_absolute(dir)
 	var path := dir.path_join("hardware_settings.json")
@@ -60,7 +60,7 @@ func _initialize() -> void:
 	var old_file := GameSettings.load_or_default(path)
 	_check(old_file.graphics_quality == GraphicsQuality.Level.LOW and not old_file.graphics_auto,
 		"an older file with a preset picked by hand keeps it and turns fitting off")
-	_write(path, {"graphics_quality": GraphicsQuality.Level.HIGH})
+	_write(path, {"graphics_quality": GraphicsQuality.default_level()})
 	_check(GameSettings.load_or_default(path).graphics_auto, "an older file on the default preset gets fitting on")
 	s.graphics_auto = false
 	s.graphics_quality = GraphicsQuality.Level.ULTRA

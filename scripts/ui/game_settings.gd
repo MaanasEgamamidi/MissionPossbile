@@ -168,7 +168,7 @@ static func load_or_default(path := DEFAULT_PATH) -> GameSettings:
 			s.set(key, v)
 	# A file written before graphics_auto existed: a preset other than the default was chosen by hand, so keep it.
 	if not d.has("graphics_auto"):
-		s.graphics_auto = s.graphics_quality == GraphicsQuality.DEFAULT_LEVEL
+		s.graphics_auto = s.graphics_quality == GraphicsQuality.default_level()
 	s.fit_to_hardware()
 	return s
 
