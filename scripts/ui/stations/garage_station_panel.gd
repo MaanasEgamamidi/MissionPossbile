@@ -133,13 +133,13 @@ func _build_body() -> void:
 	RoverModel.ensure(st)
 	plan = RoverModel.clean_levels(st.rover.levels)
 	_add_reading(&"rover", "⌂", "Rover", "specialists")
-	_add_reading(&"parts", "⚙", "Spare parts the colony has", "parts")
-	_add_reading(&"battery", "⚡", "Rover battery (energy stored)", "battery")
-	_add_reading(&"cargo", "▤", "Cargo aboard", "cargo")
-	_add_reading(&"range", "↔", "Range now (battery, cargo and crew aboard)", "load")
+	_add_reading(&"parts", "⚙", "Spare parts", "parts")
+	_add_reading(&"battery", "▮", "Rover battery", "battery")
+	_add_reading(&"cargo", "♻", "Cargo aboard", "cargo")
+	_add_reading(&"range", "↔", "Range now", "load")
 
 	_add_heading_with_help(_body, "Plan the rover", "parts")
-	_add_text(_body, "Each step up costs 1, 2, 3 then 4 spare parts. Lowering a stat gives its parts back. Four seats in every build.", UiTheme.MUTED)
+	_add_note(_body, "Each step up costs 1, 2, 3 then 4 spare parts. Lowering a stat gives its parts back. Four seats in every build.")
 	for s: String in RoverModel.STATS:
 		var box := VBoxContainer.new()
 		box.name = "Plan_%s" % s
@@ -172,7 +172,9 @@ func _build_body() -> void:
 	_body.add_child(reset_row)
 	reset_button = Button.new()
 	reset_button.name = "Reset"
-	reset_button.text = "Back to the rover as it is"
+	reset_button.text = "Undo plan"
+	StationKit.button_pic(reset_button, &"reset", 22.0)
+	reset_button.tooltip_text = "Back to the rover as it is"
 	reset_button.pressed.connect(_on_reset)
 	reset_row.add_child(reset_button)
 
@@ -201,7 +203,7 @@ func _build_body() -> void:
 		grid.add_child(planned)
 		_table[String(row[0])] = {"now": now, "plan": planned}
 	_battery_note = _add_text(_body, "", UiTheme.MUTED)
-	_add_text(_body, "The rover's numbers are made up for the game, using real rules: a stronger motor goes faster, more mass and climbing use more energy (Mars gravity 3.73 m/s²), and grip is friction × weight. They are not NASA rover data.", UiTheme.MUTED)
+	_add_note(_body, "The rover's numbers are made up for the game, using real rules: a stronger motor goes faster, more mass and climbing use more energy (Mars gravity 3.73 m/s²), and grip is friction × weight. They are not NASA rover data.")
 	var ex := PackedStringArray()
 	for e: Array in EXAMPLES:
 		var lv := {}
@@ -211,7 +213,7 @@ func _build_body() -> void:
 		for s: String in e[1]:
 			parts.append("%s %d" % [String(RoverModel.STAT_NAMES[s]).to_lower(), int(e[1][s])])
 		ex.append("%s: %s (%d parts)" % [String(e[0]), ", ".join(parts), RoverModel.invested(lv)])
-	_add_text(_body, "Example ideas, not presets (set the sliders yourself): %s." % "; ".join(ex), UiTheme.MUTED)
+	_add_note(_body, "Example ideas, not presets (set the sliders yourself): %s." % "; ".join(ex))
 
 	_add_heading_with_help(_body, "Assembly", "specialists")
 	_who = _add_text(_body, "")
@@ -220,9 +222,8 @@ func _build_body() -> void:
 	_body.add_child(_challenge_box)
 	var commit_row := HBoxContainer.new()
 	_body.add_child(commit_row)
-	commit_button = Button.new()
+	commit_button = StationKit.action("", &"wrench")
 	commit_button.name = "Commit"
-	commit_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
 	commit_button.pressed.connect(_on_commit_pressed)
 	commit_row.add_child(commit_button)
 	_commit_reason = _add_text(commit_row, "", UiTheme.MUTED)
@@ -246,10 +247,10 @@ func _refresh_body(st: ColonyState) -> void:
 	var nxt := RoverModel.stats(plan, aboard, battery, crew)
 	var where := "in the garage" if RoverSystem.in_garage(st) else "away from the garage"
 	_show_reading(&"rover", ("Built · %s" % where) if built else "Not assembled yet", &"ok" if built else &"warn")
-	_show_reading(&"parts", "%d parts" % st.parts, &"ok" if st.parts > 0 else &"warn")
+	_show_reading(&"parts", "%d" % st.parts, &"ok" if st.parts > 0 else &"warn")
 	_show_reading(&"battery", "%s of %s kWh" % [num(battery, 1), num(float(cur.battery_capacity_kwh), 0)],
-		stock_level(battery, float(cur.battery_capacity_kwh)) if built else &"ok")
-	_show_reading(&"cargo", "%s of %s kg" % [num(aboard, 0), num(float(cur.cargo_capacity_kg), 0)], &"ok")
+		stock_level(battery, float(cur.battery_capacity_kwh)) if built else &"ok", battery / maxf(float(cur.battery_capacity_kwh), 0.001))
+	_show_reading(&"cargo", "%s of %s kg" % [num(aboard, 0), num(float(cur.cargo_capacity_kg), 0)], &"ok", aboard / maxf(float(cur.cargo_capacity_kg), 0.001))
 	_show_reading(&"range", RoverActions._range_text(float(cur.range_km)), &"ok" if float(cur.range_km) > 0.2 else &"warn")
 	for s: String in RoverModel.STATS:
 		var a := int(now[s])
@@ -289,7 +290,7 @@ func _refresh_body(st: ColonyState) -> void:
 	if sig != _sig:
 		_sig = sig
 		_build_challenge(st, engineer)
-	commit_button.text = "Refit the rover" if built else "Assemble the rover"
+	commit_button.text = "Refit rover" if built else "Build rover"
 	commit_button.visible = engineer
 	var reason := _commit_block(st, now, built, aboard, nxt, me)
 	commit_button.disabled = reason != ""
@@ -352,9 +353,10 @@ func _build_challenge(st: ColonyState, engineer: bool) -> void:
 		return
 	var now := RoverModel.clean_levels(st.rover.levels)
 	if bool(st.rover.built) and plan == now:
-		_add_text(_challenge_box, "Move a slider to plan a change; the assembly check for the changed modules appears here.", UiTheme.MUTED)
+		_add_text(_challenge_box, "Move a slider to plan a change.", UiTheme.MUTED)
 		return
-	_add_text(_challenge_box, "For each module: choose the one that fits, its socket, and answer the check. A wrong answer costs nothing: you get a new example.", UiTheme.MUTED)
+	_add_text(_challenge_box, "Pick the module, its socket and the answer.", UiTheme.MUTED)
+	_add_note(_challenge_box, "A wrong answer costs nothing: you get a new example.")
 	for step: Dictionary in _challenge.get("steps", []):
 		var s := String(step.stat)
 		var card := PanelContainer.new()

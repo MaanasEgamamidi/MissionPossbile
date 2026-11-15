@@ -675,6 +675,7 @@ func _panels() -> void:
 	services.sent.clear()
 	bed.water_switch.button_pressed = false
 	_check("bed panel: the water switch asks set_bed_water and shows the real state", services.sent_of(&"set_bed_water").size() == 1 and not bool(CropSystem.bed(st, String(BEDS[2])).valve) and not bed.water_switch.button_pressed)
+	bed.set_help_shown(true)   # UI overhaul: the sentences that explain are behind the panel's "?" switch
 	_check("bed panel: Harvest is disabled until the crop is ready; the specialist symbol is on the panel", (bed.buttons["harvest"] as Button).disabled and _all_text(bed).contains("❀ Biology and food specialists"))
 
 	# ---- console
@@ -688,6 +689,7 @@ func _panels() -> void:
 	_check("console: lists all 7 beds, with the tomato's stage", beds_shown.size() == 7 and "\n".join(beds_shown).contains("Tomato, seed"), "\n".join(beds_shown))
 	_check("console: food store and meals per sol for the crew; stored meals cover the start",
 		con.reading_text(&"food").contains("meals") and con.reading_text(&"food_use") == "3 meals per sol" and con.start_note_text().contains("Stored meals cover the start"), con.reading_text(&"food_use"))
+	con.set_help_shown(true)   # UI overhaul: the sentences that explain are behind the panel's "?" switch
 	_check("console: a '?' explains why light, water and nutrients matter", _has_explain(con, "food") and _all_text(con).contains("Why light, water and nutrients matter") and _all_text(con).contains("weeks to months on Earth"))
 	services.sent.clear()
 	con.lights_switch.button_pressed = false

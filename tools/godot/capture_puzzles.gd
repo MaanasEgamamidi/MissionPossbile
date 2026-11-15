@@ -1,7 +1,8 @@
 extends SceneTree
 ## Screenshots of the ten repair mini-games (T01 T02 T03 T04 T06 T08 T09 T10 T11 T12) for the owner, plus T02 opened by
 ## the wrong specialist (the scrambled panel). Needs a real window (headless cannot draw):
-##   godot --path . --resolution 1280x720 --script res://tools/godot/capture_puzzles.gd -- [--out <dir>] [--only T01,T03]
+##   godot --path . --script res://tools/godot/capture_puzzles.gd -- [--out <dir>] [--only T01,T03] [--size 1920x1080]
+## (the window is 1280x720 unless --size is given)
 ## Each game is started the way tests/test_puzzle_tNN.gd start theirs (GameServices + UiRoot, no world): the right crew
 ## member stands at the station, E's panel (StationPanels.for_station) opens, a shot is taken, the puzzle is played to
 ## the end through the panel's own keyboard path (the same keys the tests press), and the solved panel is shot.
@@ -21,6 +22,8 @@ const R11 := preload("res://scripts/tasks/puzzles/t11_rule.gd")
 const R12 := preload("res://scripts/tasks/puzzles/t12_rule.gd")
 const SAVE_DIR := "res://_test_saves/capture_puzzles"
 const SCREEN := Vector2i(1280, 720)
+## The window size in use: SCREEN, or "--size 1920x1080".
+var screen := SCREEN
 ## Task -> [crew member who plays it (their specialty fits the task), game seed used by the task's panel test].
 const PLAN := {
 	"T01": [&"crew_1", 4171], "T02": [&"crew_1", 4271], "T03": [&"crew_1", 4371], "T04": [&"crew_1", 4471],
@@ -101,7 +104,10 @@ func _scroll_shot(label: String) -> void:
 func _initialize() -> void:
 	root.mode = Window.MODE_WINDOWED
 	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
-	root.size = SCREEN
+	var wanted := _arg("--size", "").split("x", false)
+	if wanted.size() == 2 and int(wanted[0]) >= 640 and int(wanted[1]) >= 360:
+		screen = Vector2i(int(wanted[0]), int(wanted[1]))
+	root.size = screen
 	PlayerInput.ensure_actions()
 	out_dir = _arg("--out", ProjectSettings.globalize_path("res://docs/revisions/evidence/minigames"))
 	DirAccess.make_dir_recursive_absolute(out_dir)
@@ -180,7 +186,7 @@ func _open(id: String, crew: StringName, seed_value: int, right_specialist := tr
 	var settings := GameSettings.new()
 	settings.reduce_motion = true
 	ui.setup(services, settings)
-	root.size = SCREEN
+	root.size = screen
 	await _frames()
 	panel = StationPanels.for_station(station_id, services) as TaskPanel
 	if panel == null:

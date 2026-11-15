@@ -40,9 +40,9 @@ func _what_you_can_do() -> PackedStringArray:
 
 func _build_body() -> void:
 	_add_reading(&"parts", "⚙", "Spare parts", "parts")
-	_add_reading(&"from_salvage", "♻", "Spare parts made from salvage", "parts")
-	_add_reading(&"time", "⧗", "Time on the bench", "sol_clock")
-	_add_heading_with_help(_body, "Salvaged parts in your pack", "cargo")
+	_add_reading(&"from_salvage", "♻", "Made from salvage", "parts")
+	_add_reading(&"time", "⧗", "Bench time", "sol_clock")
+	_add_heading_with_help(_body, "In your pack", "cargo")
 	_carried_box = VBoxContainer.new()
 	_carried_box.name = "Carried"
 	_body.add_child(_carried_box)
@@ -52,16 +52,16 @@ func _build_body() -> void:
 	_body.add_child(_bench_box)
 	_done_label = _add_text(_body, "", UiTheme.MUTED)
 	_done_label.name = "Finished"
-	_add_heading_with_help(_body, "Special ore from outside", "parts")
+	_add_heading_with_help(_body, "Ore", "parts")
 	_ore_box = VBoxContainer.new()
 	_ore_box.name = "Ores"
 	_body.add_child(_ore_box)
 
 
 func _refresh_body(st: ColonyState) -> void:
-	_show_reading(&"parts", "%d parts" % st.parts, &"ok" if st.parts > 0 else &"warn")
-	_show_reading(&"from_salvage", "%d parts" % roundi(float(st.ledger.get(ScienceActions.LEDGER_PARTS, 0.0))), &"ok")
-	_show_reading(&"time", ScienceActions.hours_text(ScienceActions.refurbish_hours(st)) + (" · quicker (upgrade)" if st.has_upgrade("res_component_refurbishment") else ""), &"ok")
+	_show_reading(&"parts", "%d" % st.parts, &"ok" if st.parts > 0 else &"warn")
+	_show_reading(&"from_salvage", "%d" % roundi(float(st.ledger.get(ScienceActions.LEDGER_PARTS, 0.0))), &"ok")
+	_show_reading(&"time", ScienceActions.hours_text(ScienceActions.refurbish_hours(st)) + (" · quicker" if st.has_upgrade("res_component_refurbishment") else ""), &"ok")
 	var me := services.local_character()
 	var carried := ScienceActions.carried(st, me, ScienceActions.SALVAGED_PREFIX)
 	var samples := ScienceActions.carried(st, me, ScienceActions.SAMPLE_KIND)
@@ -76,7 +76,7 @@ func _refresh_body(st: ColonyState) -> void:
 		var l := _job_status[job] as Label
 		var b := test_buttons.get(job) as Button
 		if left > 1e-6:
-			l.text = "! Being refurbished: ready in %s" % ScienceActions.hours_text(left)
+			l.text = "! Being fixed up: ready in %s" % ScienceActions.hours_text(left)
 			l.theme_type_variation = UiTheme.WARN
 		else:
 			l.text = "✓ Ready for its bench test"
@@ -88,7 +88,8 @@ func _refresh_body(st: ColonyState) -> void:
 	var names := PackedStringArray()
 	for pid: String in comps:
 		names.append("%s × %d" % [pid.replace("_", " "), int(comps[pid])])
-	_done_label.text = "Components made so far: %s." % (", ".join(names) if not names.is_empty() else "none yet")
+	_done_label.text = "Made so far: %s." % ", ".join(names)
+	_done_label.visible = not names.is_empty()
 	_refresh_ores(st)
 
 
@@ -118,12 +119,14 @@ func _refresh_ores(st: ColonyState) -> void:
 		var b := Button.new()
 		b.name = "Ore_%s" % kind
 		b.text = "Cast a part" if parts_use else "Study it"
+		StationKit.button_pic(b, &"gear" if parts_use else &"zoom", 22.0)
 		b.disabled = have < (ScoutSystem.HEMATITE_PER_PART if parts_use else 1)
 		b.pressed.connect(func() -> void: _ask(&"process_ore", {"kind": kind}, _on_answer))
 		row.add_child(b)
 		ore_buttons[kind] = b
 	if not any:
-		_add_text(_ore_box, "No ore in store. The scout rover marks ore deposits on the map; collect it outside.", UiTheme.MUTED)
+		_add_text(_ore_box, "No ore yet. Collect it outside.", UiTheme.MUTED)
+		_add_note(_ore_box, "The scout rover marks ore deposits on the map.")
 	_add_text(_ore_box, "Science score: %d" % ScoutSystem.science_points(st), UiTheme.MUTED)
 
 
@@ -136,7 +139,7 @@ func _build_lists(st: ColonyState, carried: Array[String], samples: Array[String
 	test_buttons.clear()
 	_job_status.clear()
 	if carried.is_empty():
-		_add_text(_carried_box, "You carry no salvaged part. Take one out of a damaged object first (salvage donors).", UiTheme.MUTED)
+		_add_text(_carried_box, "No salvaged part. Take one from a wreck first.", UiTheme.MUTED)
 	for id in carried:
 		var item: Dictionary = st.items.get(id, {})
 		var part := ScienceActions.part_info(String(item.get("donor", "")), String(item.get("part", "")))
@@ -149,13 +152,15 @@ func _build_lists(st: ColonyState, carried: Array[String], samples: Array[String
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		var b := Button.new()
 		b.name = "Refurbish_%s" % id
-		b.text = "Refurbish"
+		b.text = "Fix it up"
+		StationKit.button_pic(b, &"wrench", 22.0)
+		b.tooltip_text = "Put it on the bench to clean and fit it."
 		b.theme_type_variation = UiTheme.PRIMARY_BUTTON
 		b.pressed.connect(_on_refurbish.bind(id))
 		row.add_child(b)
 		refurbish_buttons[id] = b
 	if not samples.is_empty():
-		_add_text(_carried_box, "You also carry a rock sample: samples go to the lab, they cannot become machine parts.", UiTheme.MUTED)
+		_add_text(_carried_box, "Rock samples go to the lab, not the bench.", UiTheme.MUTED)
 	var open := 0
 	var ids: Array = bench.keys()
 	ids.sort()
@@ -173,7 +178,8 @@ func _build_lists(st: ColonyState, carried: Array[String], samples: Array[String
 		_job_status[job] = _add_text(col, "")
 		var b := Button.new()
 		b.name = "Test_%s" % job
-		b.text = "Run the bench test"
+		b.text = "Test it"
+		StationKit.button_pic(b, &"check", 22.0)
 		b.pressed.connect(_on_test.bind(job))
 		col.add_child(b)
 		test_buttons[job] = b

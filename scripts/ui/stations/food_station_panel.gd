@@ -21,6 +21,8 @@ var _beds_box: VBoxContainer
 var _automation_box: VBoxContainer
 var _results_box: VBoxContainer
 var _results_note: Label
+var _results_heading: Label
+var _automation_heading: Control
 var _start_note: Label
 var _lights_pending := false
 
@@ -57,38 +59,39 @@ func start_note_text() -> String:
 
 func _build_body() -> void:
 	var fb := FoodBalance.shared()
-	_add_text(_body, "%s Biology and food specialists know the greenhouse best, but anyone in the crew can use it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]), UiTheme.MUTED)
-	_add_heading(_body, "Warnings")
-	_alerts_box = VBoxContainer.new()
-	_alerts_box.name = "Alerts"
-	_body.add_child(_alerts_box)
+	_alerts_box = _add_alerts_box()
 
-	# ---- food store
-	_add_heading_with_help(_body, "Food store", "food")
-	var store := VBoxContainer.new()
-	store.name = "Store"
-	_body.add_child(store)
-	_add_reading(&"food", "❀", "Food in store", "food", store)
-	_add_reading(&"food_use", "↓", "The crew eats", "stock_vs_flow", store)
-	_add_reading(&"food_left", "⧗", "Food lasts", "food", store)
-	_add_reading(&"food_growing", "↗", "Meals growing in the beds", "food", store)
-	_start_note = _add_text(store, "", UiTheme.MUTED)
+	# ---- food store (the readings at the top of the panel)
+	_add_reading(&"food", "❀", "Food", "food")
+	_add_reading(&"food_use", "↓", "Crew eats", "stock_vs_flow")
+	_add_reading(&"food_left", "⧗", "Lasts", "food")
+	_add_reading(&"food_growing", "↗", "Growing in the beds", "food")
+	_start_note = _add_note(_body, "")
+	_add_note(_body, "%s Biology and food specialists know the greenhouse best, but anyone in the crew can use it." % String(StationPanels.SPECIALTY_SYMBOLS[FoodActions.SPECIALIST]))
+
+	# ---- beds
+	_add_heading(_body, "Beds")
+	_beds_box = VBoxContainer.new()
+	_beds_box.name = "Beds"
+	_body.add_child(_beds_box)
 
 	# ---- grow lights
 	_add_heading_with_help(_body, "Grow lights", "zones_power")
 	lights_switch = CheckButton.new()
 	lights_switch.name = "LightsSwitch"
 	lights_switch.text = "Grow lights · %s kW" % num(services.balance.load_of_zone(fb.light_zone))
+	lights_switch.icon = StationKit.pic(&"flash", 24.0, &"heading")
 	lights_switch.toggled.connect(_on_lights_toggled)
 	_body.add_child(lights_switch)
 	_lights_status = _add_text(_body, "")
 
 	# ---- water
-	_add_heading_with_help(_body, "Greenhouse water", "water_allocation")
-	_add_reading(&"allocated", "≈", "Water sent to the greenhouse", "water_allocation", _body)
-	_add_reading(&"delivered", "⇣", "Water that really arrives", "water_allocation", _body)
+	_add_heading_with_help(_body, "Water", "water_allocation")
+	_add_reading(&"allocated", "≈", "Sent", "water_allocation", _body)
+	_add_reading(&"delivered", "⇣", "Arrives", "water_allocation", _body)
 	var row := HFlowContainer.new()
 	row.name = "WaterRow"
+	row.add_theme_constant_override(&"h_separation", 10)
 	_body.add_child(row)
 	var label := Label.new()
 	label.text = "Send"
@@ -98,7 +101,7 @@ func _build_body() -> void:
 	water_slider.min_value = 0.0
 	water_slider.max_value = 20.0
 	water_slider.step = 0.5
-	water_slider.custom_minimum_size.x = 160.0
+	water_slider.custom_minimum_size.x = 200.0
 	water_slider.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	water_slider.tooltip_text = "Greenhouse water, litres per hour (0 to 20)"
 	water_slider.set_value_no_signal(float(services.state().water_allocation.get("greenhouse_l_per_hour", 0.0)))
@@ -110,29 +113,24 @@ func _build_body() -> void:
 	water_button = Button.new()
 	water_button.name = "SendWater"
 	water_button.text = "Send water"
+	StationKit.button_pic(water_button, &"water", 22.0)
 	water_button.pressed.connect(func() -> void: _ask(&"set_greenhouse_water", {"greenhouse_l_per_hour": water_slider.value}, _on_answer))
 	row.add_child(water_button)
-	_add_text(_body, "Drinking water always comes first: the greenhouse only gets water above the drinking reserve. The beds use only the water that really arrives; it then goes to the wastewater tank for the recycler.", UiTheme.MUTED)
+	_add_note(_body, "Drinking water always comes first: the greenhouse only gets water above the drinking reserve. The beds use only the water that really arrives; it then goes to the wastewater tank for the recycler.")
 	_update_water_label()
 
-	# ---- beds
-	_add_heading(_body, "Beds")
-	_beds_box = VBoxContainer.new()
-	_beds_box.name = "Beds"
-	_body.add_child(_beds_box)
+	# ---- why (part of the help)
+	_help_only(_add_heading_with_help(_body, "Why light, water and nutrients matter", "food").get_parent() as Control)
+	_add_note(_body, "Plants make their food from light, so with no light they stop growing. Water carries food through the plant and keeps it firm: too little and it slows down and wilts. Nutrients build new leaves: too few and the leaves turn yellow and growth slows.", &"")
+	_add_note(_body, "Time is squeezed in the colony: lettuce takes about %s sols here and tomato about %s sols, but weeks to months on Earth. Lettuce has been grown on the International Space Station; tomato is only a plan there. Neither proves that crops grow on Mars." % [
+		num(float(FoodBalance.crop("lettuce").get("cycle_sols", 0.0))), num(float(FoodBalance.crop("tomato").get("cycle_sols", 0.0)))])
 
-	# ---- why
-	_add_heading_with_help(_body, "Why light, water and nutrients matter", "food")
-	_add_text(_body, "Plants make their food from light, so with no light they stop growing. Water carries food through the plant and keeps it firm: too little and it slows down and wilts. Nutrients build new leaves: too few and the leaves turn yellow and growth slows.")
-	_add_text(_body, "Time is squeezed in the colony: lettuce takes about %s sols here and tomato about %s sols, but weeks to months on Earth. Lettuce has been grown on the International Space Station; tomato is only a plan there. Neither proves that crops grow on Mars." % [
-		num(float(FoodBalance.crop("lettuce").get("cycle_sols", 0.0))), num(float(FoodBalance.crop("tomato").get("cycle_sols", 0.0)))], UiTheme.MUTED)
-
-	# ---- automation and lab results
-	_add_heading_with_help(_body, "Automation", "upgrades")
+	# ---- automation and lab results: shown once there is something installed or something to apply (or in the help)
+	_automation_heading = _add_heading_with_help(_body, "Automation", "upgrades").get_parent() as Control
 	_automation_box = VBoxContainer.new()
 	_automation_box.name = "Automation"
 	_body.add_child(_automation_box)
-	_add_heading(_body, "Lab results")
+	_results_heading = _add_heading(_body, "Lab results")
 	_results_note = _add_text(_body, "", UiTheme.MUTED)
 	_results_box = VBoxContainer.new()
 	_results_box.name = "Results"
@@ -165,14 +163,14 @@ func _refresh_body(st: ColonyState) -> void:
 	var alerts: Array = []
 	for a: Dictionary in st.crops.get("alerts", []):
 		alerts.append({"text": String(a.text), "level": String(a.level)})
-	_fill_alerts(_alerts_box, alerts, "No greenhouse problems right now.")
+	_fill_alerts(_alerts_box, alerts, "No greenhouse problems.")
 
 	# store
 	var crew := float(st.active_characters().size())
 	var food := st.store(&"food_meals")
 	var cap := float(st.capacities.get(&"food_meals", 0.0))
 	var per_sol := crew * bal.meals_per_sol
-	_show_reading(&"food", "%s of %s meals" % [num(food, 0), num(cap, 0)], StationPanel.stock_level(food, cap))
+	_show_reading(&"food", "%s of %s meals" % [num(food, 0), num(cap, 0)], StationPanel.stock_level(food, cap), food / maxf(cap, 1.0))
 	_show_reading(&"food_use", "%s meals per sol" % num(per_sol, 1), &"ok")
 	_show_reading(&"food_left", StationPanel.time_left_text(food, per_sol / GameConfig.SOL_HOURS), StationPanel._left_level(food, per_sol / GameConfig.SOL_HOURS))
 	var growing := 0.0
@@ -191,13 +189,13 @@ func _refresh_body(st: ColonyState) -> void:
 	if not _lights_pending:
 		lights_switch.set_pressed_no_signal(on)
 	if CropSystem.lights_working(st, fb):
-		_lights_status.text = "✓ On: the plants get light."
+		_lights_status.text = "✓ The plants get light."
 		_lights_status.theme_type_variation = UiTheme.GOOD
 	elif on:
-		_lights_status.text = "✖ Switched on but shed: there is not enough power, so the plants get no light."
+		_lights_status.text = "✖ No power: the plants get no light."
 		_lights_status.theme_type_variation = UiTheme.URGENT
 	else:
-		_lights_status.text = "○ Off: plants do not grow without light."
+		_lights_status.text = "○ Off: the plants stop growing."
 		_lights_status.theme_type_variation = UiTheme.MUTED
 
 	# water
@@ -266,11 +264,16 @@ func _fill_automation(lines: Array) -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_automation_box.add_child(l)
+	# What is installed is always shown; what is not yet installed is part of the help.
+	var any := false
 	for i in _automation_box.get_child_count():
 		var l := _automation_box.get_child(i) as Label
 		var ok := String(lines[i].level) == "ok"
 		l.text = ("✓ " if ok else "○ ") + String(lines[i].text)
 		l.theme_type_variation = UiTheme.GOOD if ok else UiTheme.MUTED
+		l.visible = ok or is_help_shown()
+		any = any or l.visible
+	_automation_heading.visible = any
 
 
 func _refresh_results(st: ColonyState) -> void:
@@ -289,6 +292,8 @@ func _refresh_results(st: ColonyState) -> void:
 		_results_note.text = "The lab has a nutrient setting. With the evidence-based settings upgrade you can apply it here; until then set nutrients by hand at each bed."
 	else:
 		_results_note.text = "Apply a lab nutrient setting to every growing bed."
+	_results_heading.visible = not usable.is_empty() or is_help_shown()
+	_results_note.visible = _results_heading.visible
 	for rid: String in usable:
 		if not result_buttons.has(rid):
 			var b := Button.new()

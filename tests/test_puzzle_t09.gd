@@ -123,7 +123,7 @@ func _rule_checks() -> void:
 			all_good = false
 			detail = "seed %d sorted=%s path=%s mixed=%d fallen=%d" % [s, Rule.is_sorted(start.tubes), path, mixed, fallen]
 		worst = maxi(worst, path.size())
-	_check("60 seeds: scrambled, always solvable, 3 tubes fallen", all_good, detail)
+	_check("60 seeds: scrambled, always solvable, %d tube(s) fallen" % Rule.FALLEN_TUBES, all_good, detail)
 	_check("kid-sized: every seed solves in at most 12 pours", worst <= 12, "longest shortest solution %d" % worst)
 	_check("seeds give different layouts", layouts.size() >= 40, "%d distinct of 60" % layouts.size())
 	var task := {"puzzle_seed": 77, "puzzle_state": {}}

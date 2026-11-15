@@ -1,6 +1,6 @@
 # UI overhaul: what to do after the tokens reset (written 2026-11-15)
 
-Branch `maanas/ui`, committed locally, **not pushed**. Full record: `UI_OVERHAUL.md` in this folder.
+Branch `maanas/ui`, **not pushed**. The first session's work is committed; check `git status` for the second session's. Full record: `UI_OVERHAUL.md` in this folder.
 
 ## Done
 
@@ -10,33 +10,34 @@ Branch `maanas/ui`, committed locally, **not pushed**. Full record: `UI_OVERHAUL
 - Menus, pause, settings, goals screen reworked; new action titles everywhere (incl. radio message, Blender data
   generator).
 
+## Done in the second session (2026-11-15, after the reset)
+
+- Station surfaces (shared frame + every station), cassette player, tape briefings.
+- Mission Control card, bottom dock, crew (C), cargo (I), Power & life support drawer (P).
+- Upgrade cards, colony summary, quiz, journal.
+- T09 opens with one fallen tube; `capture_puzzles.gd --size`; leftover developer phrases.
+- `test_game_scene` and `test_repair_anchors` checked against `72070d4`: both fail there too (see `UI_OVERHAUL.md`).
+
 ## Next, in priority order
 
-1. **Station panels** (skipped on purpose). The surfaces behind E at a station: `scripts/ui/station_panel.gd` +
-   `scripts/ui/stations/*` (bed, cargo, cassette player, colony computer, repair stations...). Same rules as the
-   rest: one obvious action, states not numbers, six words or fewer, pictures. Baseline shots of them (before) are in
-   the old session's scratchpad `stations/` folder, which may be wiped; re-capture with
-   `tools/godot/capture_stations.gd`. Tests: `tests/test_station_panels.gd`.
-2. **Other screens not touched**: crew select (C), cargo (I), colony summary, upgrade cards, power & life support
-   drawer (P). Upgrade cards had "many hundreds" of words (see `UI_OVERHAUL.md` §1).
-3. **Check `test_game_scene` (29/34)**: five suit-rack checks fail (player stuck ~2.3 m up near the rack). Probably
-   not UI. Run it on `72070d4` to confirm it was already failing; a suspect is the ~100 uncommitted `.glb.import`
-   changes from Godot reimporting (they are left uncommitted on purpose: decide whether to keep or `git restore` them).
-4. **Small leftovers**
-   - Goals screen (J): the list opens scrolled so the top row is cut in half.
-   - T09: owner's idea "open with the tubes already standing" for a shorter first puzzle is not done
-     (`t09_rule.gd` still has `FALLEN_TUBES = 3`). The fourth liquid (purple diamond) is drawn in code, no sprite.
-   - T02 wrong specialist: the concept wants the electrical badge where the first plug would be; needs a hook in
-     `puzzle_registry.gd` / `task_panel.gd` (the shell's generic padlock view is shown now and reads fine).
-   - `tools/godot/capture_puzzles.gd` forces 1280x720 (`--resolution` is ignored) and its stamp shot waits frames,
-     not seconds (solvers add a short wait as a workaround). Make both proper options.
-   - Mission Control card and the bottom dock still use the old `AstraStyle`, which ignores the text-size setting.
-   - Mid-game states not yet looked at in screenshots: a held plug (T02/T10), a wrong-socket shake, T04 meter with a
-     joined path at the wrong voltage.
-5. **Pre-existing failures (not caused by this branch)**: M key / blueprint (ui_framework 2, station_panels 1, off
+1. **Aiming bug (older than this branch)**: aiming at the Command Room tape picks the T02 repair station
+   (`tests/test_repair_anchors.gd`, 108/114). The broken rack's whole-model aim target covers the tape.
+2. **`test_game_scene` is timing dependent** (passes and fails on the same commit): make its suit-rack approach wait
+   until the player is standing still on the floor.
+3. **Small leftovers**
+   - T02 wrong specialist: the concept wants the electrical badge where the first plug would be; the shell's generic
+     padlock view is shown now and reads fine.
+   - Lab and weather station panels got the new frame only; their long text is untouched. The Upgrades strip on a
+     station still has five sentences per card (pinned by `test_upgrade_ui`).
+   - `PowerModel.LABELS` ("Electrolyser", "CO2-oxygen unit") is where the jargon on switches and alerts comes from.
+   - Pictogram sizes on the information panels are fixed when a panel opens (text and bars follow the setting live).
+   - Not yet looked at in screenshots: a held plug (T02 / T10), a wrong-socket shake, T04's meter with a joined path
+     at the wrong voltage, the drawer's Messages list with messages in it, the "B Build here" chip.
+   - Nothing was played end to end in the running game with a second player.
+4. **Pre-existing failures (not caused by this branch)**: M key / blueprint (ui_framework 2, station_panels 1, off
    since `301d499`), tutorial widget (tutorial 1) and scout goals (scout 1), off since `72070d4`. Update or delete
    those assertions when those features are decided.
-6. **Ship it**: push `maanas/ui` and open a PR to `main` when happy (`git push -u origin maanas/ui`).
+5. **Ship it**: push `maanas/ui` and open a PR to `main` when happy (`git push -u origin maanas/ui`).
 
 ## How to run things (this machine)
 

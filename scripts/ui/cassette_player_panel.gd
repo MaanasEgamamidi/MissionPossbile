@@ -1,7 +1,12 @@
 class_name CassettePlayerPanel
 extends UiPanel
+## The tape player in the Command Room: one picture button per tape along the top (a padlock on a tape that has not
+## been found, the play mark on the one that is playing), the photo on the left, the words on the right, and big
+## Back / Next buttons under them when a tape has more than one page.
 ## Content stays blank until the current host authorizes this actor at the physical player.
 ## Every tape/page change is independently authorized. Local validation closes stale readers immediately.
+
+const StationKit = preload("res://scripts/ui/stations/station_kit.gd")
 
 var station_id: StringName = CassetteLibrary.PLAYER_ID
 var selected_cassette := ""
@@ -13,9 +18,14 @@ var caption: Label
 var credit: Label
 var page_label: Label
 var close_button: Button
+## The tape buttons along the top, by cassette id (all six tapes, in library order).
+var tape_buttons: Dictionary = {}
 var _title: Label
 var _status: Label
-var _tapes: MenuButton
+var _tape_row: HBoxContainer
+var _esc_cap: PanelContainer
+## The tape whose words and photo are on screen now ("" = none).
+var _showing := ""
 var _previous: Button
 var _next: Button
 var _source: LinkButton
@@ -45,21 +55,49 @@ func setup(p_services: GameServices) -> void:
 	interrupt_on_critical = true
 	var frame := VBoxContainer.new()
 	frame.name = "Frame"
+	frame.add_theme_constant_override(&"separation", 6)
 	add_child(frame)
-	_tapes = MenuButton.new()
-	_tapes.name = "TapeLibrary"
-	_tapes.text = "Choose a collected tape"
-	_tapes.focus_mode = Control.FOCUS_ALL
-	_tapes.flat = false
-	_tapes.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	_tapes.get_popup().id_pressed.connect(_on_tape_selected)
-	frame.add_child(_tapes)
+	# ---- top: one picture button per tape (the row scrolls sideways on a very small screen), Esc, close
+	var top := HBoxContainer.new()
+	top.name = "Top"
+	top.add_theme_constant_override(&"separation", 8)
+	frame.add_child(top)
+	var tape_scroll := ScrollContainer.new()
+	tape_scroll.name = "TapeLibrary"
+	tape_scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	tape_scroll.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tape_scroll.follow_focus = true
+	top.add_child(tape_scroll)
+	_tape_row = HBoxContainer.new()
+	_tape_row.name = "Tapes"
+	_tape_row.add_theme_constant_override(&"separation", 6)
+	tape_scroll.add_child(_tape_row)
+	for record: Dictionary in CassetteLibrary.metadata():
+		var id := String(record.id)
+		var tile := Button.new()
+		tile.name = "Tape_%s" % id.validate_node_name()
+		tile.text = String(record.title).get_slice(" / ", 0)      # "Hangar / airlock" -> "Hangar": one or two words a tape
+		tile.custom_minimum_size = Vector2(0, 48)
+		tile.add_theme_constant_override(&"h_separation", 8)
+		tile.disabled = true
+		tile.pressed.connect(select_tape.bind(id))
+		_tape_row.add_child(tile)
+		tape_buttons[id] = tile
+	_esc_cap = UiTheme.key_cap("Esc")
+	_esc_cap.name = "EscKey"
+	top.add_child(_esc_cap)
+	close_button = StationKit.icon_button(&"close", "Close (Esc)")
+	close_button.name = "Close"
+	close_button.pressed.connect(func() -> void: close_requested.emit())
+	top.add_child(close_button)
+	# ---- photo and words
 	var columns := HBoxContainer.new()
 	columns.name = "PhotoAndBriefing"
 	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	frame.add_child(columns)
 	var left := _scroll_column(columns, "PhotoColumn")
-	_photo_hint = _label("PhotoHint", "Choose a collected tape at this player.")
+	_photo_hint = _label("PhotoHint", "Pick a tape.")
+	_photo_hint.theme_type_variation = UiTheme.HEADING
 	left.add_child(_photo_hint)
 	photo = TextureRect.new()
 	photo.name = "NASAImage"
@@ -79,31 +117,29 @@ func setup(p_services: GameServices) -> void:
 	_source.pressed.connect(_open_source)
 	left.add_child(_source)
 	var right := _scroll_column(columns, "BriefingColumn")
-	_title = _label("RoomTitle", "Command Room cassette player")
+	_title = _label("RoomTitle", "Tape player")
 	_title.theme_type_variation = UiTheme.HEADING
 	right.add_child(_title)
 	briefing_text = _label("Instructions", "")
 	right.add_child(briefing_text)
-	page_label = _label("Page", "")
-	page_label.theme_type_variation = UiTheme.MUTED
-	right.add_child(page_label)
-	_previous = Button.new()
-	_previous.name = "PreviousPage"
-	_previous.text = "Previous"
+	# ---- pages: Back, "1 / 3", Next, and one short status line
+	var pager := HBoxContainer.new()
+	pager.name = "Pager"
+	pager.add_theme_constant_override(&"separation", 10)
+	frame.add_child(pager)
+	_previous = _pager_button("PreviousPage", "Back", &"back")
 	_previous.pressed.connect(func() -> void: read_page(page_index - 1))
-	right.add_child(_previous)
-	_next = Button.new()
-	_next.name = "NextPage"
-	_next.text = "Next"
+	pager.add_child(_previous)
+	page_label = Label.new()
+	page_label.name = "Page"
+	page_label.theme_type_variation = UiTheme.MUTED
+	pager.add_child(page_label)
+	_next = _pager_button("NextPage", "Next", &"next")
 	_next.pressed.connect(func() -> void: read_page(page_index + 1))
-	right.add_child(_next)
-	_status = _label("AuthorizationStatus", "Waiting for the player...")
-	right.add_child(_status)
-	close_button = Button.new()
-	close_button.name = "Close"
-	close_button.text = "Close (Esc)"
-	close_button.pressed.connect(func() -> void: close_requested.emit())
-	frame.add_child(close_button)
+	pager.add_child(_next)
+	_status = _label("AuthorizationStatus", "One moment…")
+	_status.theme_type_variation = UiTheme.MUTED
+	pager.add_child(_status)
 	_clear_content()
 	if services != null:
 		var actor := services.local_character()
@@ -118,7 +154,19 @@ func panel_title() -> String:
 
 
 func first_focus() -> Control:
-	return close_button if pending or not _authorized else _tapes
+	if pending or not _authorized:
+		return close_button
+	# the tape that is playing, else the first tape that can be played
+	var first: Control = null
+	for id: String in tape_buttons:
+		var tile := tape_buttons[id] as Button
+		if tile.disabled:
+			continue
+		if id == _showing:
+			return tile
+		if first == null:
+			first = tile
+	return first if first != null else close_button
 
 
 func refresh() -> void:
@@ -198,7 +246,7 @@ func _accept_result(result: ActionResult) -> void:
 		return
 	_authorized = true
 	_rebuild_library(true)
-	_status.text = "The world keeps running. Use this Command Room player."
+	_status.text = ""
 	if _pending_action == &"cassette_open":
 		return
 	if String(result.changes.get("cassette_id", "")) != _pending_tape:
@@ -223,26 +271,33 @@ func _show_briefing() -> void:
 		return
 	_record = CassetteLibrary.details(selected_cassette)
 	if _record.is_empty():
-		_status.text = "This tape's offline briefing is unavailable."
+		_status.text = "✖ This tape cannot be played."
 		return
 	var pages: Array = _record.get("pages", [])
 	if page_index < 0 or page_index >= pages.size():
-		_status.text = "This briefing page is unavailable."
+		_status.text = "✖ This page is missing."
 		return
 	_title.text = String(_record.get("title", selected_cassette))
-	briefing_text.text = ("Preview - room puzzles are planned.\n\n" if String(_record.get("briefing_status", "preview")) == "preview" else "") + String(pages[page_index])
+	briefing_text.text = String(pages[page_index])
+	_showing = selected_cassette
 	caption.text = String(_record.get("caption", "Caption unavailable offline."))
 	credit.text = "Credit: " + String(_record.get("credit", "NASA; see source record."))
 	var path := String(_record.get("image_path", ""))
 	if not path.is_empty() and ResourceLoader.exists(path):
 		photo.texture = load(path) as Texture2D
-	_photo_hint.text = "Photo unavailable offline; caption and credit shown." if photo.texture == null else ""
+	_photo_hint.text = "No photo for this tape." if photo.texture == null else ""
 	_photo_hint.visible = photo.texture == null
 	photo.visible = photo.texture != null
 	_source.visible = _valid_source_url(String(_record.get("source_url", "")))
-	page_label.text = "Page %d / %d" % [page_index + 1, pages.size()]
+	# Back / Next only when the tape has more than one page.
+	var many := pages.size() > 1
+	page_label.text = "%d / %d" % [page_index + 1, pages.size()] if many else ""
+	page_label.visible = many
+	_previous.visible = many
+	_next.visible = many
 	_previous.disabled = page_index <= 0
 	_next.disabled = page_index + 1 >= pages.size()
+	_update_tapes()
 
 
 func _clear_content() -> void:
@@ -254,14 +309,18 @@ func _clear_content() -> void:
 	caption.text = ""
 	credit.text = ""
 	page_label.text = ""
-	_title.text = "Command Room cassette player"
+	_title.text = ""
 	_record = {}
-	_photo_hint.text = "Choose a collected tape at this player."
+	_showing = ""
+	_photo_hint.text = _empty_hint()
 	_photo_hint.visible = true
 	_source.visible = false
+	page_label.visible = false
+	_previous.visible = false
+	_next.visible = false
 	_previous.disabled = true
 	_next.disabled = true
-	_tapes.disabled = pending or not _authorized
+	_update_tapes()
 
 
 func _local_eligible() -> bool:
@@ -295,21 +354,33 @@ func _rebuild_library(force := false) -> void:
 	if not force and signature == _library_signature:
 		return
 	_library_signature = signature
-	var popup := _tapes.get_popup()
-	popup.clear()
-	var records := CassetteLibrary.metadata()
-	for i in records.size():
-		var record: Dictionary = records[i]
-		var available := collected.has(String(record.id))
-		popup.add_item("%s - %s" % [record.title, "Collected" if available else "Missing / locked"], i)
-		popup.set_item_disabled(i, not available)
-	_tapes.disabled = pending or not _authorized
+	_update_tapes()
+	if _showing == "":
+		_photo_hint.text = _empty_hint()
 
 
-func _on_tape_selected(index: int) -> void:
-	var records := CassetteLibrary.metadata()
-	if index >= 0 and index < records.size():
-		select_tape(String(records[index].id))
+## What the empty player says: pick a tape, or go and find one first.
+func _empty_hint() -> String:
+	if pending or not _authorized:
+		return ""
+	var collected: Array = services.state().repair.get("collected_cassettes", []) if services != null and services.has_game() else []
+	return "Pick a tape." if not collected.is_empty() else "No tapes yet. Find them around the base."
+
+
+## Shows each tape button's state: a padlock on a tape that has not been found, the tape picture on one that can be
+## played, and the play mark (with the accent fill) on the one that is playing.
+func _update_tapes() -> void:
+	if not _built:
+		return
+	var collected: Array = services.state().repair.get("collected_cassettes", []) if services != null and services.has_game() else []
+	for id: String in tape_buttons:
+		var tile := tape_buttons[id] as Button
+		var found := collected.has(id)
+		var playing := found and id == _showing
+		tile.disabled = not found or pending or not _authorized
+		tile.theme_type_variation = UiTheme.PRIMARY_BUTTON if playing else &""
+		StationKit.button_pic(tile, &"play" if playing else (&"tape" if found else &"lock"), 30.0)
+		tile.tooltip_text = "Playing now" if playing else ("Play this tape" if found else "Not found yet")
 
 
 func _on_action_resolved(result: ActionResult) -> void:
@@ -399,6 +470,37 @@ func _on_column_input(event: InputEvent, scroll: ScrollContainer) -> void:
 		KEY_END: scroll.scroll_vertical = int(scroll.get_v_scroll_bar().max_value)
 		_: return
 	scroll.accept_event()
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_fit_tapes()
+
+
+## Tape buttons are a picture over the name while the panel has the height for it; on a very small screen the picture
+## sits beside the name, so the photo and the words keep their room.
+func _fit_tapes() -> void:
+	var stacked := size.y >= 430.0
+	# The Esc key cap gives way to the tapes on a narrow panel (the close button's tooltip still names the key).
+	if _esc_cap != null:
+		_esc_cap.visible = size.x >= 1100.0
+	for id: String in tape_buttons:
+		var tile := tape_buttons[id] as Button
+		tile.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER if stacked else HORIZONTAL_ALIGNMENT_LEFT
+		tile.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP if stacked else VERTICAL_ALIGNMENT_CENTER
+		tile.custom_minimum_size.y = 78.0 if stacked else 48.0
+
+
+## Back / Next: a big button with an arrow and one word.
+func _pager_button(node_name: String, text: String, pic_kind: StringName) -> Button:
+	var b := Button.new()
+	b.name = node_name
+	b.text = text
+	StationKit.button_pic(b, pic_kind, 26.0)
+	b.custom_minimum_size = Vector2(0, 48)
+	b.add_theme_constant_override(&"h_separation", 8)
+	b.visible = false
+	return b
 
 
 func _label(node_name: String, text: String) -> Label:

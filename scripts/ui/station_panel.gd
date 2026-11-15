@@ -6,32 +6,64 @@ extends UiPanel
 ## rack build on it (PowerStationPanel, LifeSupportStationPanel, SolarStationPanel, SuitRackPanel).
 
 
-## One reading line: symbol, name, value with its unit, a status mark (✓ fine, ! attention, ✖ urgent) and a "?" button.
+const StationKit = preload("res://scripts/ui/stations/station_kit.gd")
+const HudKit = preload("res://scripts/ui/hud/hud_kit.gd")
+
+
+## One reading on one compact line: a pictogram, a short name, a level bar when the reading is "how full", the value,
+## a status mark (✓ fine, ! attention, ✖ urgent) and a "?" button (shown while the panel's help is on).
+## Colour is never the only cue: the mark changes shape with the level.
 class Reading extends HBoxContainer:
+	## The glyph of the reading; hidden when `picture` draws it instead.
 	var symbol_label: Label
+	## The pictogram of the reading (null when its glyph has none).
+	var picture: TextureRect
 	var name_label: Label
+	## How full the store is, as a bar; hidden until set_share() is given a share.
+	var bar: Control
 	var value_label: Label
 	var mark_label: Label
 	var explain: ExplainButton
 	var level: StringName = &"ok"
+	## The share last given to set_share(), or -1 when the reading has no bar.
+	var share := -1.0
 
 	## A new reading line. `explanation_id` is the id of the "?" button's explanation.
 	static func make(symbol: String, label: String, explanation_id: String) -> Reading:
 		var row := Reading.new()
+		row.add_theme_constant_override(&"separation", 10)
+		row.custom_minimum_size.y = 40.0
+		var kind: StringName = StationKit.glyph_pic(symbol)
 		row.symbol_label = Label.new()
+		row.symbol_label.name = "Symbol"
 		row.symbol_label.text = symbol
 		row.symbol_label.theme_type_variation = UiTheme.HEADING
+		row.symbol_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		row.symbol_label.custom_minimum_size.x = 34.0
+		row.symbol_label.visible = kind == &""
 		row.add_child(row.symbol_label)
+		if kind != &"":
+			row.picture = StationKit.picture(kind, 26.0, &"heading")
+			row.picture.name = "Picture"
+			row.picture.custom_minimum_size.x = 34.0
+			row.add_child(row.picture)
 		row.name_label = Label.new()
+		row.name_label.name = "Name"
 		row.name_label.text = label
 		row.name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(row.name_label)
+		row.bar = HudKit.Bar.new(UiTheme.palette().good, Vector2(110, 12), "Level")
+		row.bar.visible = false
+		row.add_child(row.bar)
 		row.value_label = Label.new()
-		row.value_label.theme_type_variation = UiTheme.READING
+		row.value_label.name = "Value"
 		row.value_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 		row.add_child(row.value_label)
 		row.mark_label = Label.new()
+		row.mark_label.name = "Mark"
+		row.mark_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		row.mark_label.custom_minimum_size.x = 24.0
 		row.add_child(row.mark_label)
 		row.explain = ExplainButton.make(explanation_id)
 		row.add_child(row.explain)
@@ -42,16 +74,31 @@ class Reading extends HBoxContainer:
 	func set_value(text: String, p_level: StringName) -> void:
 		level = p_level
 		value_label.text = text
+		var p := UiTheme.palette()
+		var colour: Color = p.good
 		match p_level:
 			&"urgent":
 				mark_label.text = "✖"
 				mark_label.theme_type_variation = UiTheme.URGENT
+				value_label.theme_type_variation = UiTheme.URGENT
+				colour = p.urgent
 			&"warn":
 				mark_label.text = "!"
 				mark_label.theme_type_variation = UiTheme.WARN
+				value_label.theme_type_variation = UiTheme.WARN
+				colour = p.warn
 			_:
 				mark_label.text = "✓"
 				mark_label.theme_type_variation = UiTheme.GOOD
+				value_label.theme_type_variation = &""
+		bar.set(&"color", colour)
+
+	## Shows how full the store is as a bar (0 = empty, 1 = full). A negative share hides the bar.
+	func set_share(p_share: float) -> void:
+		share = p_share
+		bar.visible = p_share >= 0.0
+		if p_share >= 0.0:
+			bar.set(&"share", clampf(p_share, 0.0, 1.0))
 
 
 ## One upgrade path in the "Upgrades" part of a station panel (owner request 2026-11-14): the track's name and V1..V4
@@ -105,11 +152,24 @@ var equipment_switches: Dictionary = {}
 ## The "Upgrades" rows by track id (AreaLevels), one per upgrade path this station serves.
 var upgrade_rows: Dictionary = {}
 
+## The "?" switch in the header: shows the help sentences, the notes and the "?" buttons of the readings.
+var help_button: Button
+
 var _built := false
 var _title: Label
 var _zone_label: Label
+var _zone_chip: PanelContainer
 var _power_label: Label
+var _power_chip: PanelContainer
 var _power_explain: ExplainButton
+## True while the help is shown (the "?" switch in the header).
+var _help_on := false
+## Controls shown only while the help is on (notes, "?" buttons).
+var _help_nodes: Array[Control] = []
+## The "what you can do here" sentences (inside the help).
+var _help_box: VBoxContainer
+## The big action buttons at the top of the panel.
+var _actions: HFlowContainer
 var _scroll: ScrollContainer
 var _body: VBoxContainer
 var _readings_box: VBoxContainer
@@ -133,6 +193,12 @@ func setup(p_services: GameServices) -> void:
 	_built = true
 	name = "Station_%s" % String(station_id).validate_node_name().replace(".", "_")
 	theme_type_variation = UiTheme.PANEL
+	# A station surface is a card in the middle of the view, as tall as what it shows (UiRoot.HUG), never the whole
+	# screen: the room stays visible around it.
+	if max_width == 0.0:
+		max_width = 1040.0
+	if max_height == 0.0:
+		max_height = -1.0
 	_build_frame()
 	_build_body()
 	_build_upgrades()
@@ -143,7 +209,28 @@ func setup(p_services: GameServices) -> void:
 		later.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_body.add_child(later)
 	(_readings_box.get_parent() as Control).visible = _readings_box.get_child_count() > 0
+	_actions.visible = _actions.get_child_count() > 0
+	_apply_help()
 	refresh()
+
+
+## True while the help (what you can do here, the notes, the "?" buttons) is shown.
+func is_help_shown() -> bool:
+	return _help_on
+
+
+## Shows or hides the help, as the "?" switch in the header does.
+func set_help_shown(on: bool) -> void:
+	_help_on = on
+	if help_button != null:
+		help_button.set_pressed_no_signal(on)
+	_apply_help()
+	refresh()
+
+
+## The sentences of "what you can do here", as the help shows them.
+func help_lines() -> PackedStringArray:
+	return _what_you_can_do()
 
 
 func panel_title() -> String:
@@ -151,8 +238,29 @@ func panel_title() -> String:
 
 
 func first_focus() -> Control:
-	var inner := _first_focusable(_body) if _body != null else null
+	if _body == null:
+		return _close_button
+	# The first control that can be used; if every one is greyed out, the first of those (its tooltip says why).
+	var inner := _first_shown_focusable(_body, true)
+	if inner == null:
+		inner = _first_shown_focusable(_body, false)
 	return inner if inner != null else _close_button
+
+
+## The first control in `node` that is shown and can take focus. `usable_only` skips greyed-out buttons.
+static func _first_shown_focusable(node: Node, usable_only: bool) -> Control:
+	for child in node.get_children():
+		if not child is Control:
+			continue
+		var c := child as Control
+		if not c.visible:
+			continue
+		if c.focus_mode != Control.FOCUS_NONE and not (usable_only and c is BaseButton and (c as BaseButton).disabled):
+			return c
+		var inner := _first_shown_focusable(c, usable_only)
+		if inner != null:
+			return inner
+	return null
 
 
 ## The zone (room) the station stands in.
@@ -183,18 +291,17 @@ func refresh() -> void:
 		return
 	var st := services.state()
 	var zone := station_zone()
-	if zone == ColonyZones.EXTERIOR:
-		_zone_label.text = "Outside the base"
-	else:
-		_zone_label.text = "In the %s" % zone if not zone.is_empty() else "Somewhere in the colony"
+	_zone_label.text = "Outside" if zone == ColonyZones.EXTERIOR else zone
+	_zone_chip.visible = not zone.is_empty()
 	var show_power := _shows_room_power() and st.zones.has(zone)
-	_power_label.visible = show_power
-	_power_explain.visible = show_power
+	_power_chip.visible = show_power
+	_power_explain.set_meta(&"help_off", not show_power)
+	_power_explain.visible = show_power and _help_on
 	if st.is_zone_powered(zone):
-		_power_label.text = "✓ This room has power"
+		_power_label.text = "✓ Power on"
 		_power_label.theme_type_variation = UiTheme.GOOD
 	else:
-		_power_label.text = "✖ This room has no power"
+		_power_label.text = "✖ No power"
 		_power_label.theme_type_variation = UiTheme.URGENT
 	_refresh_equipment_switches(st)
 	_refresh_body(st)
@@ -327,7 +434,7 @@ static func equipment_status(st: ColonyState, balance: GameBalance, id: String) 
 	if st.condition_of(id) < balance.equipment_min_condition:
 		return ["! Broken", &"warn"]
 	if not st.is_powered(id):
-		return ["✖ No power: shed", &"urgent"]
+		return ["✖ No power", &"urgent"]
 	if id == "electrolyser" or id == "co2_unit":
 		var status := String(st.oxygen_process.get(id, "off"))
 		if status != "running" and status != "feed_short":
@@ -349,63 +456,145 @@ func _build_frame() -> void:
 		margin.add_theme_constant_override(side, 12)
 	add_child(margin)
 	var column := VBoxContainer.new()
+	column.add_theme_constant_override(&"separation", 8)
 	margin.add_child(column)
 
+	# ---- header: picture, name, the "?" switch, the keys that close the panel, the close button
 	var header := HBoxContainer.new()
+	header.name = "Header"
+	header.add_theme_constant_override(&"separation", 10)
 	column.add_child(header)
+	var kind_pic: StringName = StationKit.kind_pic(kind)
+	if kind_pic != &"":
+		var picture: TextureRect = StationKit.picture(kind_pic, 40.0, &"heading")
+		picture.name = "Picture"
+		header.add_child(picture)
 	_title = Label.new()
-	_title.text = "%s  %s" % [StationPanels.symbol_of(kind), _title_text()]
+	_title.name = "Title"
+	_title.text = _title_text() if kind_pic != &"" else "%s  %s" % [StationPanels.symbol_of(kind), _title_text()]
 	_title.theme_type_variation = UiTheme.TITLE
 	_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	header.add_child(_title)
-	_close_button = Button.new()
-	_close_button.text = "Close"
+	help_button = StationKit.icon_button(&"help", "Help: what you can do here")
+	help_button.name = "Help"
+	help_button.toggle_mode = true
+	help_button.toggled.connect(set_help_shown)
+	header.add_child(help_button)
+	for key_text: String in [_key_name(&"interact", "E"), _key_name(&"back", "Esc")]:
+		header.add_child(UiTheme.key_cap(StationKit.cap_text(key_text)))
+	_close_button = StationKit.icon_button(&"close", "Close")
+	_close_button.name = "Close"
 	_close_button.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(_close_button)
 
+	# ---- chips: the room, and whether it has power
 	var info := HBoxContainer.new()
+	info.name = "Chips"
+	info.add_theme_constant_override(&"separation", 8)
 	column.add_child(info)
-	_zone_label = Label.new()
+	_zone_chip = StationKit.chip(&"home", "")
+	_zone_chip.name = "Room"
+	_zone_label = _zone_chip.find_child("Text", true, false) as Label
 	_zone_label.theme_type_variation = UiTheme.MUTED
-	_zone_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	info.add_child(_zone_label)
-	_power_label = Label.new()
-	info.add_child(_power_label)
+	info.add_child(_zone_chip)
+	_power_chip = StationKit.chip(&"bolt", "")
+	_power_chip.name = "RoomPower"
+	_power_chip.tooltip_text = "Rooms can be switched off at the power panel."
+	_power_label = _power_chip.find_child("Text", true, false) as Label
+	info.add_child(_power_chip)
 	_power_explain = ExplainButton.make("zones_power")
+	_help_only(_power_explain)
 	info.add_child(_power_explain)
 
 	_scroll = ScrollContainer.new()
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scroll.follow_focus = true
 	column.add_child(_scroll)
 	_body = VBoxContainer.new()
 	_body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_body.add_theme_constant_override(&"separation", 6)
 	_scroll.add_child(_body)
 
-	_add_heading(_body, "What you can do here")
+	# ---- help (off until the "?" switch): what you can do here, in sentences
+	var help_card := PanelContainer.new()
+	help_card.name = "Help"
+	help_card.theme_type_variation = UiTheme.CARD
+	_body.add_child(help_card)
+	_help_only(help_card)
+	_help_box = VBoxContainer.new()
+	help_card.add_child(_help_box)
 	for line in _what_you_can_do():
-		_add_text(_body, "•  " + line)
+		_add_text(_help_box, "•  " + line)
+
+	# ---- the big buttons: what you do here
+	_actions = HFlowContainer.new()
+	_actions.name = "Actions"
+	_actions.add_theme_constant_override(&"h_separation", 10)
+	_actions.add_theme_constant_override(&"v_separation", 8)
+	_body.add_child(_actions)
 
 	var readings_section := VBoxContainer.new()
+	readings_section.name = "Readings"
 	_body.add_child(readings_section)
-	_add_heading(readings_section, "Readings")
 	_readings_box = VBoxContainer.new()
+	_readings_box.add_theme_constant_override(&"separation", 2)
 	readings_section.add_child(_readings_box)
 
 	_cause = Label.new()
+	_cause.name = "Cause"
 	_cause.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_cause.visible = false
 	column.add_child(_cause)
 	_message = Label.new()
+	_message.name = "Message"
 	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message.visible = false
 	column.add_child(_message)
-	var hint := Label.new()
-	hint.theme_type_variation = UiTheme.MUTED
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "Press %s or %s to close." % [_key_name(&"interact", "E"), _key_name(&"back", "Esc")]
-	column.add_child(hint)
+
+
+## Marks `node` as part of the help: it is shown only while the "?" switch in the header is on.
+func _help_only(node: Control) -> Control:
+	_help_nodes.append(node)
+	node.visible = _help_on and not bool(node.get_meta(&"help_off", false))
+	return node
+
+
+func _apply_help() -> void:
+	var keep: Array[Control] = []
+	for node: Control in _help_nodes:
+		if is_instance_valid(node):
+			keep.append(node)
+			node.visible = _help_on and not bool(node.get_meta(&"help_off", false))
+	_help_nodes = keep
+
+
+## A sentence that explains (why, how it works): part of the help, hidden until the "?" switch is on.
+func _add_note(parent: Control, text: String, variation: StringName = UiTheme.MUTED) -> Label:
+	var l := _add_text(parent, text, variation)
+	_help_only(l)
+	return l
+
+
+## The box for the station's warnings, placed above the readings (problems first). Fill it with _fill_alerts().
+func _add_alerts_box() -> VBoxContainer:
+	var box := VBoxContainer.new()
+	box.name = "Alerts"
+	_body.add_child(box)
+	_body.move_child(box, _actions.get_index() + 1)
+	return box
+
+
+## A big action button at the top of the panel: a picture and one to three words. The first one is the station's
+## main action (`primary`); others are drawn plain.
+func _add_action(text: String, pic_kind: StringName, on_pressed := Callable(), primary := true) -> Button:
+	var b: Button = StationKit.action(text, pic_kind, primary)
+	if on_pressed.is_valid():
+		b.pressed.connect(on_pressed)
+	_actions.add_child(b)
+	_actions.visible = true
+	return b
 
 
 ## The words after the symbol in the header. Sun trackers add their number.
@@ -432,14 +621,14 @@ func _what_you_can_do() -> PackedStringArray:
 			var record: Dictionary = services.state().stations.get(String(station_id), {})
 			var role := String(record.get("specialty", ""))
 			var words := String(StationPanels.SPECIALTY_WORDS.get(StringName(role), "All crew members"))
-			return PackedStringArray(["Repair location reserved for %s." % words, "This room's puzzle will become available in a later task update."])
+			return PackedStringArray(["A repair spot for %s." % words.to_lower()])
 		"cassette_anchor":
 			var record: Dictionary = services.state().stations.get(String(station_id), {})
 			var id := String(record.get("cassette_id", station_id))
 			var title := String(CassetteCatalog.TAPES.get(id, {}).get("title", "Room"))
 			return PackedStringArray(["%s cassette - %s." % [title, "Collected" if CassetteCatalog.collected(services.state(), id) else "Missing"], CassetteCatalog.PLAY_INSTRUCTION])
 		"cassette_player_anchor":
-			return PackedStringArray([CassetteCatalog.PLAY_INSTRUCTION, "Use the player to choose a collected tape. Room repairs are not required."])
+			return PackedStringArray([CassetteCatalog.PLAY_INSTRUCTION, "Pick a tape you have found."])
 		"computer":
 			return PackedStringArray(["See the colony summary: stores, power and how long they last.",
 				"Look at the upgrade cards for the facilities."])
@@ -462,21 +651,19 @@ func _what_you_can_do() -> PackedStringArray:
 func _build_body() -> void:
 	match kind:
 		"computer":
-			_add_reading(&"battery", "⚡", "Battery (colony electricity)", "battery")
+			_add_reading(&"battery", "▮", "Battery", "battery")
 			_add_reading(&"parts", "⚙", "Spare parts", "parts")
-			_add_heading(_body, "Open")
-			var buttons := HBoxContainer.new()
-			_body.add_child(buttons)
-			computer_buttons["summary"] = _add_open_button(buttons, "Colony summary", func() -> UiPanel: return ColonySummaryPanel.new())
-			computer_buttons["upgrades"] = _add_open_button(buttons, "Upgrades", func() -> UiPanel: return UpgradeCardsPanel.new())
+			computer_buttons["summary"] = _add_open_button(_actions, "Colony summary", func() -> UiPanel: return ColonySummaryPanel.new(), &"chart")
+			computer_buttons["upgrades"] = _add_open_button(_actions, "Upgrades", func() -> UiPanel: return UpgradeCardsPanel.new(), &"up", false)
 			# Owner 2026-11-14: map off for now (goals big view replaces it)
-			#computer_buttons["blueprint"] = _add_open_button(buttons, "Blueprint map", func() -> UiPanel: return BlueprintPanel.new())
+			#computer_buttons["blueprint"] = _add_open_button(_actions, "Blueprint map", func() -> UiPanel: return BlueprintPanel.new())
 			# Scout update: the scout rover can be sent from the colony computer as well as from its bay outside.
-			computer_buttons["scout"] = _add_open_button(buttons, "Scout rover", func() -> UiPanel:
+			var make_scout := func() -> UiPanel:
 				var p := ScoutBayStationPanel.new()
 				p.station_id = station_id
 				p.kind = kind
-				return p)
+				return p
+			computer_buttons["scout"] = _add_open_button(_actions, "Scout rover", make_scout, &"rover", false)
 		"comms":
 			_add_heading(_body, "Messages from Earth")
 			var card := PanelContainer.new()
@@ -484,24 +671,22 @@ func _build_body() -> void:
 			_body.add_child(card)
 			var list := VBoxContainer.new()
 			card.add_child(list)
-			_add_text(list, "Mission control: \"Welcome to Mars! Keep the lights on and the air fresh.\" (example message)")
-			_add_text(list, "No new messages yet. Real messages arrive with the colony systems update.", UiTheme.MUTED)
+			_add_text(list, "Mission control: \"Welcome to Mars! Keep the lights on and the air fresh.\"")
+			_add_text(list, "No new messages.", UiTheme.MUTED)
 			var why := HBoxContainer.new()
 			_body.add_child(why)
+			_help_only(why)
 			var why_text := _add_text(why, "Earth is very far away. A radio message travels as fast as light, but it still takes "
-				+ "minutes to reach Earth, and the answer takes minutes to come back.")
+				+ "minutes to reach Earth, and the answer takes minutes to come back.", UiTheme.MUTED)
 			why_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			why.add_child(ExplainButton.make("sources"))
 			# Prompt 11: the colony radio's stage and its repair cards (installed at this console).
-			var radio := HBoxContainer.new()
-			_body.add_child(radio)
-			var radio_text := _add_text(radio, CommsStage.stage_text(CommsStage.stage(services.state())))
-			radio_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			_add_open_button(radio, "Radio repairs", func() -> UiPanel: return UpgradeCardsPanel.new())
+			_add_text(_body, CommsStage.stage_text(CommsStage.stage(services.state())))
+			_add_open_button(_actions, "Radio repairs", func() -> UiPanel: return UpgradeCardsPanel.new(), &"wrench")
 		"food":
-			_add_reading(&"food", "❀", "Food in store", "food")
-			_add_reading(&"food_use", "↓", "The crew eats", "stock_vs_flow")
-			_add_reading(&"food_left", "⧗", "Food lasts", "food")
+			_add_reading(&"food", "❀", "Food", "food")
+			_add_reading(&"food_use", "↓", "Crew eats", "stock_vs_flow")
+			_add_reading(&"food_left", "⧗", "Lasts", "food")
 		"heal":
 			var ids: Array = services.state().characters.keys()
 			ids.sort()
@@ -510,11 +695,10 @@ func _build_body() -> void:
 				var row := _add_reading(StringName("health_%s" % id), String(StationPanels.SPECIALTY_SYMBOLS.get(c.specialty, "●")), c.display_name, "health")
 				_crew_rows[id] = row
 		"board":
-			_add_text(_body, "This is the transceiver board, the main part of the colony's long-range radio. "
-				+ "It is damaged. Fixing it comes with a later update.")
+			_add_text(_body, "The main part of the colony's long-range radio. It is damaged.")
 		"survivor":
-			_add_text(_body, "A patient is resting here. Keeping the Med Bay powered keeps them warm and the machines running.")
 			_add_reading(&"med_bay_power", "⚡", "Med Bay power", "zones_power")
+			_add_note(_body, "A patient is resting here. Keeping the Med Bay powered keeps them warm and the machines running.")
 
 
 ## Updates the station's own readings. The special station panels replace it.
@@ -525,13 +709,13 @@ func _refresh_body(st: ColonyState) -> void:
 		"computer":
 			var battery := st.store(&"battery_kwh")
 			var cap := float(st.capacities.get(&"battery_kwh", 0.0))
-			_show_reading(&"battery", "%s of %s kWh" % [num(battery, 0), num(cap, 0)], stock_level(battery, cap))
-			_show_reading(&"parts", "%d parts" % st.parts, &"ok" if st.parts > 0 else &"warn")
+			_show_reading(&"battery", "%d %%" % roundi(100.0 * battery / maxf(cap, 1.0)), stock_level(battery, cap), battery / maxf(cap, 1.0))
+			_show_reading(&"parts", "%d" % st.parts, &"ok" if st.parts > 0 else &"warn")
 		"food":
 			var food := st.store(&"food_meals")
 			var cap := float(st.capacities.get(&"food_meals", 0.0))
 			var per_sol := crew * bal.meals_per_sol
-			_show_reading(&"food", "%s meals" % num(food, 0), stock_level(food, cap))
+			_show_reading(&"food", "%s meals" % num(food, 0), stock_level(food, cap), food / maxf(cap, 1.0))
 			_show_reading(&"food_use", "%s meals per sol" % num(per_sol, 1), &"ok")
 			var left := time_left_text(food, per_sol / GameConfig.SOL_HOURS)
 			_show_reading(&"food_left", left, _left_level(food, per_sol / GameConfig.SOL_HOURS))
@@ -556,6 +740,7 @@ func _refresh_body(st: ColonyState) -> void:
 					lvl = &"warn"
 					word = "Hurt"
 				row.set_value("%d %% health · %s" % [roundi(c.health), word], lvl)
+				row.set_share(c.health / 100.0)
 		"survivor":
 			var on := st.is_zone_powered("Med Bay")
 			_show_reading(&"med_bay_power", "On" if on else "Off", &"ok" if on else &"urgent")
@@ -577,13 +762,18 @@ func _add_reading(key: StringName, symbol: String, label: String, explanation_id
 	var row := Reading.make(symbol, label, explanation_id)
 	row.name = "Reading_%s" % String(key)
 	(parent if parent != null else _readings_box).add_child(row)
+	_help_only(row.explain)
 	readings[key] = row
 	return row
 
 
-func _show_reading(key: StringName, text: String, level: StringName) -> void:
+## Shows a reading's value and level. `share` (0..1) also draws it as a level bar: how full the store is.
+func _show_reading(key: StringName, text: String, level: StringName, share := -1.0) -> void:
 	if readings.has(key):
-		(readings[key] as Reading).set_value(text, level)
+		var row := readings[key] as Reading
+		row.set_value(text, level)
+		if share >= 0.0 or row.share >= 0.0:
+			row.set_share(share)
 
 
 ## The value text of a reading ("12 kW"), or "" if there is no such reading.
@@ -605,9 +795,10 @@ func _add_heading(parent: Control, text: String) -> Label:
 func _add_heading_with_help(parent: Control, text: String, explanation_id: String) -> Label:
 	var row := HBoxContainer.new()
 	parent.add_child(row)
+	row.custom_minimum_size.y = 40.0
 	var l := _add_heading(row, text)
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(ExplainButton.make(explanation_id))
+	row.add_child(_help_only(ExplainButton.make(explanation_id)))
 	return l
 
 
@@ -622,12 +813,13 @@ func _add_text(parent: Control, text: String, variation: StringName = &"") -> La
 	return l
 
 
-func _add_open_button(parent: Control, text: String, make_panel: Callable) -> Button:
-	var b := Button.new()
-	b.text = text
-	b.theme_type_variation = UiTheme.PRIMARY_BUTTON
+## A big button that opens another panel. `pic_kind` is its pictogram; the first one of a station is `primary`.
+func _add_open_button(parent: Control, text: String, make_panel: Callable, pic_kind: StringName = &"", primary := true) -> Button:
+	var b: Button = StationKit.action(text, pic_kind, primary)
 	b.pressed.connect(func() -> void: open_requested.emit(make_panel.call() as UiPanel))
 	parent.add_child(b)
+	if parent == _actions:
+		_actions.visible = true
 	return b
 
 
@@ -650,7 +842,7 @@ func _ask(action: StringName, params: Dictionary, on_answer: Callable) -> Action
 		_waiting[result.request_id] = on_answer
 		if not services.events.action_resolved.is_connected(_on_action_resolved):
 			services.events.action_resolved.connect(_on_action_resolved)
-		_show_message("Asked the host…", UiTheme.MUTED)
+		_show_message("One moment…", UiTheme.MUTED)
 		return result
 	on_answer.call(result)
 	return result
@@ -765,10 +957,10 @@ func _alerts_matching(st: ColonyState, prefixes: Array[String]) -> Array:
 	return out
 
 
-## Fills `box` with one line per alert ("✖ …", "! …", "• …"), or `none_text` when there are none.
+## Fills `box` with one line per alert ("✖ …", "! …", "• …"), or `none_text` when there are none ("" = no line).
 func _fill_alerts(box: VBoxContainer, alerts: Array, none_text: String) -> void:
 	var lines: Array = []
-	if alerts.is_empty():
+	if alerts.is_empty() and none_text != "":
 		lines.append(["✓ " + none_text, UiTheme.GOOD])
 	for a: Dictionary in alerts:
 		match String(a.level):
@@ -926,6 +1118,7 @@ func _build_upgrades() -> void:
 		row.button = Button.new()
 		row.button.name = "UpgradeButton"
 		row.button.theme_type_variation = UiTheme.PRIMARY_BUTTON
+		StationKit.button_pic(row.button, &"up", 22.0)
 		row.button.pressed.connect(_on_upgrade_pressed.bind(track))
 		buttons.add_child(row.button)
 		row.reason_label = _add_text(col, "", UiTheme.WARN)
@@ -1026,4 +1219,4 @@ func _fit_to_screen() -> void:
 	if _scroll == null or not is_inside_tree():
 		return
 	var screen := get_viewport_rect().size
-	_scroll.custom_minimum_size = Vector2(minf(760.0, screen.x * 0.55), minf(440.0, screen.y * 0.4))
+	_scroll.custom_minimum_size = Vector2(minf(760.0, screen.x * 0.55), minf(120.0, screen.y * 0.2))

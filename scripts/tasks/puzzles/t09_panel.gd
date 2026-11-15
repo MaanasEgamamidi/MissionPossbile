@@ -25,7 +25,7 @@ const DOSE_SRC := Rect2(8, 60, 169, 118)
 const RACK_TEX := Vector2(420, 154)
 const HOLE_X := [80.0, 145.0, 210.5, 276.0, 341.0]
 const HOLE_Y := 42.0
-const CUE_RACK := "Stand the tubes up [Enter]"
+const CUE_RACK := "Put the tube back [Enter]"
 const CUE_PICK := "Pick a tube to pour [Enter]"
 const CUE_POUR := "Pour into a glowing tube [Enter]"
 const POUR_S := 0.55
@@ -104,7 +104,7 @@ func pick(i: int) -> void:
 	var tubes: Array = puzzle.tubes
 	if not _all_racked():
 		if bool(racked[i]):
-			_nudge(i, "Stand the fallen tubes up first.")
+			_nudge(i, "Put the fallen tube back first.")
 		else:
 			send("rack", i)
 		return

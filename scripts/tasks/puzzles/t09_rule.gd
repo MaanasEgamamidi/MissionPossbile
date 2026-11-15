@@ -21,7 +21,9 @@ const REAGENTS := ["Zentra", "Morla", "Kivo", "Pluxa"]
 ## Designer balance: a short scramble keeps it at kid level (ages 9-12).
 const SCRAMBLE_STEPS := 9
 const MIN_MIXED_TUBES := 3
-const FALLEN_TUBES := 3
+## Tubes lying on the bench at the start. One (was 3; owner, UI overhaul 2026-11-15: "try opening with the tubes
+## already standing for a shorter first puzzle"): the rack still gets refilled, in one press, then the sorting starts.
+const FALLEN_TUBES := 1
 const STEP_BASE := 1000
 ## Share of the progress bar for putting the fallen tubes back (designer balance).
 const RACK_SHARE := 0.2

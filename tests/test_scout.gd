@@ -331,8 +331,11 @@ func _test_hud() -> void:
 	st().weather["phase"] = "warned"
 	st().weather["warning"] = {"starts_at_hours": st().sim_hours + 6.0, "severity": 0.5}
 	var advice := StormOutlook.warning_advice(st())
-	mc.say("Dust storm coming", advice, &"warn")
+	mc.say(StormOutlook.warning_title(st()), advice, &"warn", null, "Weather", StormOutlook.warning_line(st()), &"storm")
 	mc.say("Second", "Another message", &"info")
+	_check("mission control: the card shows a title of at most 5 words and one line of at most 9", mc.shown_title() == "Dust storm in 6 h"
+		and mc.shown_line() == "Go inside. Charge the battery." and mc.shown_line().split(" ", false).size() <= MissionControlCard.MAX_LINE_WORDS
+		and (mc.find_child("Text", true, false) as Label).text == mc.shown_line(), "%s | %s" % [mc.shown_title(), mc.shown_line()])
 	_check("mission control: a storm warning says when, what it does and what to do", mc.visible and mc.current_text().contains("6 h") and advice.contains("battery")
 		and advice.contains("not a forecast"), advice)
 	mc.dismiss()

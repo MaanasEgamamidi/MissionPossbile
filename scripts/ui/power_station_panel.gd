@@ -15,6 +15,7 @@ var switches: Dictionary = {}
 
 var _alerts_box: VBoxContainer
 var _forecast_box: VBoxContainer
+var _shed_heading: Control
 var _shed_why: Label
 var _shed_box: VBoxContainer
 ## Room switches waiting for the host: zone -> true.
@@ -53,28 +54,26 @@ func _shows_later_note() -> bool:
 
 
 func _what_you_can_do() -> PackedStringArray:
-	return PackedStringArray(["See how much power the sun gives and the colony asks for.",
-		"Switch rooms and machines on or off to make the battery last.",
-		"See which loads have no power and why."])
+	return PackedStringArray(["See how much power the sun gives and the colony uses.",
+		"Switch rooms and machines off to make the battery last.",
+		"See what has no power, and why."])
 
 
 func _build_body() -> void:
-	_add_heading(_body, "Warnings")
-	_alerts_box = VBoxContainer.new()
-	_alerts_box.name = "Alerts"
-	_body.add_child(_alerts_box)
+	_alerts_box = _add_alerts_box()
 
-	_add_reading(&"solar", "☀", "The sun gives (solar power)", "solar_power")
-	_add_reading(&"battery_flow", "⇅", "Battery right now", "stock_vs_flow")
-	_add_reading(&"load", "⚡", "The colony asks for (load)", "load")
-	_add_reading(&"served", "✓", "Power delivered", "power_deficit")
-	_add_reading(&"battery", "▮", "Battery (colony electricity)", "battery")
+	_add_reading(&"battery", "▮", "Battery", "battery")
+	_add_reading(&"solar", "☀", "Sun gives", "solar_power")
+	_add_reading(&"load", "⚡", "Colony uses", "load")
+	_add_reading(&"battery_flow", "⇅", "Battery now", "stock_vs_flow")
+	_add_reading(&"served", "✓", "Delivered", "power_deficit")
 
 	var forecast_card := PanelContainer.new()
 	forecast_card.theme_type_variation = UiTheme.CARD
 	_body.add_child(forecast_card)
 	var forecast_row := HBoxContainer.new()
 	forecast_card.add_child(forecast_row)
+	forecast_row.add_child(StationKit.picture(&"clock", 26.0, &"muted"))
 	_forecast_box = VBoxContainer.new()
 	_forecast_box.name = "Forecast"
 	_forecast_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -84,10 +83,10 @@ func _build_body() -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		_forecast_box.add_child(l)
-	forecast_row.add_child(ExplainButton.make("battery_forecast"))
+	forecast_row.add_child(_help_only(ExplainButton.make("battery_forecast")))
 
-	_add_heading_with_help(_body, "Room switches", "zones_power")
-	_add_text(_body, "Each room uses power while its lights are on. Switch off rooms nobody needs to make the battery last longer.", UiTheme.MUTED)
+	_add_heading_with_help(_body, "Rooms", "zones_power")
+	_add_note(_body, "Each room uses power while its lights are on. Switch off rooms nobody needs to make the battery last longer.")
 	var grid := GridContainer.new()
 	grid.columns = 2
 	grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -106,19 +105,20 @@ func _build_body() -> void:
 		switches[zone] = button
 
 	_add_heading_with_help(_body, "Machines", "load")
-	_add_text(_body, "Machines use power too. The two oxygen makers ask for more power the more oxygen they make.", UiTheme.MUTED)
+	_add_note(_body, "Machines use power too. The two oxygen makers ask for more power the more oxygen they make.")
 	var machines := VBoxContainer.new()
 	machines.name = "Machines"
 	_body.add_child(machines)
 	for id in EQUIPMENT_ORDER:
 		_add_equipment_switch(machines, id)
 
-	_add_heading_with_help(_body, "Loads without power", "load_shedding")
+	# Shown only while something has no power: a calm panel does not need the sentence "every load has power".
+	_shed_heading = _add_heading_with_help(_body, "No power", "load_shedding").get_parent() as Control
 	_shed_why = _add_text(_body, "")
 	_shed_box = VBoxContainer.new()
 	_shed_box.name = "Shed"
 	_body.add_child(_shed_box)
-	_add_text(_body, shedding_order_text(), UiTheme.MUTED)
+	_add_note(_body, shedding_order_text())
 
 
 ## The shedding order in one sentence.
@@ -150,10 +150,10 @@ func _refresh_body(st: ColonyState) -> void:
 		_show_reading(&"battery_flow", "0 kW · steady", &"ok")
 	_show_reading(&"load", "%s kW" % num(load), &"ok")
 	if st.shed.is_empty():
-		_show_reading(&"served", "%s kW · every load has power" % num(st.served_kw), &"ok")
+		_show_reading(&"served", "%s kW · all on" % num(st.served_kw), &"ok")
 	else:
 		_show_reading(&"served", "%s of %s kW · some loads have no power" % [num(st.served_kw), num(st.load_kw)], &"urgent")
-	_show_reading(&"battery", "%s of %s kWh (%d %%)" % [num(battery, 0), num(cap, 0), roundi(100.0 * battery / maxf(cap, 1.0))], StationPanel.stock_level(battery, cap))
+	_show_reading(&"battery", "%s of %s kWh (%d %%)" % [num(battery, 0), num(cap, 0), roundi(100.0 * battery / maxf(cap, 1.0))], StationPanel.stock_level(battery, cap), battery / maxf(cap, 1.0))
 
 	var forecast := ReserveForecast.compute(st, bal, services.clock())
 	var lines: Array = forecast.get("text", [])
@@ -176,6 +176,8 @@ func _refresh_body(st: ColonyState) -> void:
 		shed_alerts.append({"text": StationPanel.words(String(PowerModel.SHED_TEXT.get(id, id))), "level": "urgent"})
 	_fill_alerts(_shed_box, shed_alerts, "Nothing is shed.")
 	_shed_box.visible = not st.shed.is_empty()
+	_shed_heading.visible = not st.shed.is_empty()
+	_shed_why.visible = not st.shed.is_empty()
 
 
 func _on_switch_toggled(on: bool, zone: String) -> void:

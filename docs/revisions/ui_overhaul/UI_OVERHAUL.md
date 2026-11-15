@@ -199,3 +199,37 @@ near the suit rack) was not run before the branch, so its cause is unconfirmed (
 
 Drawing kits (`hud_kit.gd`, `goal_art.gd`, `menu_kit.gd`) fill polygons through a guard that drops doubled points and
 shapes with no area (the moon pictogram's tips were doubled: "triangulation failed").
+
+### Station surfaces, side panels and information panels (second session, checked in screenshots)
+
+| Screen | Before | After |
+|---|---|---|
+| Every station (shared frame, `scripts/ui/station_panel.gd`, pictograms in `scripts/ui/stations/station_kit.gd`) | Title + Close, "In the <room>", "This room has power", "What you can do here" bullets, "Readings" with a "?" per row, "Press E or Escape to close." | Pictogram + name, "?" toggle, E / Esc key caps, close; room and power as two chips; the main actions as large pictogram buttons at the top; readings as compact rows (pictogram, short name, level bar, value, mark); every explaining sentence behind "?"; the panel hugs its content |
+| Suit rack | about 75 words | about 12: "Put suit on / Take suit off", "Fill tank", two bars |
+| Power panel, life support | 60+ words above the fold, kPa and kW first | The state word first ("Safe · 21.2 kPa"), bars on stores, the long paragraphs behind "?" |
+| Greenhouse bed and the other stations | All buttons and notes always shown | Only the buttons that fit the state, at the top, with pictograms |
+| Cassette player | A drop-down of tapes, text Previous / Next, developer status lines | One picture button per tape (padlock = not found), pictogram Back / Next, short status lines |
+| Tape briefings (`data/cassette_briefings.json`) | 120-180 words per tape about puzzles "not installed in this build" | 43-53 words per tape: what the room is for and its two repairs by their action titles |
+| Mission Control card | Title, subtitle and a paragraph of about 50 words | Pictogram, a title of at most 5 words, one line of what to do, the OK key cap; the long text is in the P drawer's Messages |
+| Bottom dock | 12-unit words, 9-unit key caps, fixed size | 42-unit pictograms, 20-unit key caps and words, following the text-size setting; Build is dimmed with a padlock away from the solar field |
+| Crew (C) | about 25 words per card and a rule sentence | Portrait, symbol, one role word, and one of: "Play", a green "You" plate, an amber "Player 2" plate with a padlock; the rest behind "More" and "?" |
+| Cargo (I) | about 70 words | "3 / 6", one tile per slot with "Put down", six tape chips with a tick when found |
+| Power & life support drawer (P) | kW / kWh / kPa everywhere, about 20 room rows | A verdict of at most 9 words; one row per supply (icon, bar, OK / Low / Very low); numbers behind "123" or H |
+| Upgrade cards | about 150 words per card, intro and "Next level" lists always shown | At most 24 words on a card: picture, name, one line of what it gives, cost against what the colony has, the specialist's badge, one state (Installed / Upgrade / one short reason); the rest behind "More" and "?" |
+| Colony summary | about 250 words | Four tiles (picture, bar, one status word), "Details" closed by default |
+| Quiz | 28-word intro, status sentences on every question | 7-word intro, a large question, three large A / B / C answers, "Right!" or "Not quite. Try again!" |
+| Colony journal | One column of headings | Five boxes with a pictogram each; the story text is unchanged |
+
+Other changes of the second session: T09 opens with one fallen tube (was three; `FALLEN_TUBES` in `t09_rule.gd`);
+`tools/godot/capture_puzzles.gd` takes `--size 1920x1080` (all ten games were also shot and solved at that size);
+"Asked the host…" lines are now "One moment…".
+
+### Two suites that fail for reasons older than this branch (checked on `72070d4` in a separate worktree)
+
+- `test_game_scene` is timing dependent: on `72070d4` it gave 34/34 and then 29/34 on the next run; on the branch 28,
+  29, 33. In a failing run the player is still in the air and moving when the suit-rack checks start. Not a UI
+  matter; the first session's note that it might come from this branch was wrong.
+- `test_repair_anchors` gives 108/114 on `72070d4` and on the branch, with the same first failure: aiming at the
+  Command Room tape returns the T02 repair station (the broken rack's whole-model aim target covers the tape beside
+  it). That is a real aiming problem in the game, older than this branch, and worth its own fix.
+

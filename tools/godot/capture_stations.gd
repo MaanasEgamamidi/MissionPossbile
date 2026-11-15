@@ -5,6 +5,7 @@ extends SceneTree
 ## GameServices + UiRoot, no world (as tests/test_station_panels.gd and tools/godot/capture_puzzles.gd do). Every panel
 ## is opened through UiRoot the way E opens it, at 1280x720 and 1920x1080 real pixels (content scale off, as the layout
 ## tests lay out), and once more at 1280x720 with the largest text. UiLayoutCheck's findings are printed per shot.
+## A shot named "<panel>_help" is the same panel with its "?" switch on.
 ## Saves go to res://_test_saves/capture_stations and are deleted at the end; the player's settings are never written.
 
 const SAVE_DIR := "res://_test_saves/capture_stations"
@@ -16,6 +17,11 @@ const PLAN := [
 	["food", "food"], ["suits", "suits"], ["solar", "solar"], ["bed", "bed"], ["gym", "gym"], ["weather", "weather"],
 	["workbench", "workbench"], ["maintenance", "@maintenance"], ["cargo", "@cargo"], ["cargo_empty", "@cargo_empty"],
 	["cassette", "@cassette"], ["cassette_tape", "@cassette_tape"],
+	["garage", "garage"], ["lab", "lab"], ["salvage", "salvage"], ["sample_site", "sample_site"], ["scout_bay", "scout_bay"],
+	["drone_pad", "drone_pad"], ["rover_charger", "rover_charger"], ["ore_deposit", "ore_deposit"], ["record", "record"],
+	["upgrade_console", "upgrade_console"], ["board", "board"], ["survivor", "survivor"],
+	# "+help": the same panel with its "?" switch on (the sentences, the notes and the "?" buttons of the readings).
+	["power_help", "power+help"], ["lifesupport_help", "lifesupport+help"], ["suits_help", "suits+help"], ["bed_help", "bed+help"],
 ]
 
 var out_dir := ""
@@ -100,6 +106,11 @@ func _stand_at(id: String) -> void:
 
 
 func _make(what: String) -> UiPanel:
+	if what.ends_with("+help"):
+		var with_help := await _make(what.trim_suffix("+help"))
+		if with_help is StationPanel:
+			(with_help as StationPanel).set_help_shown(true)
+		return with_help
 	var me := services.local_character()
 	match what:
 		"@cargo", "@cargo_empty":

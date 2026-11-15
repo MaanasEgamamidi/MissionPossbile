@@ -50,25 +50,23 @@ func _build_body() -> void:
 	_ground = _add_text(_body, "")
 	_ground.name = "Ground"
 	_add_reading(&"taken", "#", "Samples taken here", "cargo")
-	_add_reading(&"sky", "◌", "Dust in the air (sky)", "panel_dust")
+	_add_reading(&"sky", "◌", "Dust in the air", "panel_dust")
 	_add_reading(&"time", "⧗", "Time for the label", "sol_clock")
-	_add_reading(&"pack", "▤", "Your pack", "cargo")
+	_add_reading(&"pack", "♻", "Your pack", "cargo")
 
-	_add_heading_with_help(_body, "Take a sample", "specialists")
+	take_button = _add_action("Take sample", &"pick", _on_take)
+	take_button.name = "TakeSample"
+	# Why the button is greyed out, right under it.
 	var row := HBoxContainer.new()
 	_body.add_child(row)
-	take_button = Button.new()
-	take_button.name = "TakeSample"
-	take_button.text = "Take a sample"
-	take_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	take_button.pressed.connect(_on_take)
-	row.add_child(take_button)
+	_body.move_child(row, _actions.get_index() + 1)
 	_take_reason = Label.new()
 	_take_reason.name = "TakeReason"
 	_take_reason.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_take_reason.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_take_reason.theme_type_variation = UiTheme.MUTED
 	row.add_child(_take_reason)
+	row.add_child(_help_only(ExplainButton.make("specialists")))
 
 	_label_box = VBoxContainer.new()
 	_label_box.name = "LastLabel"
@@ -81,7 +79,7 @@ func _build_body() -> void:
 	_label_lines.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_label_lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	card.add_child(_label_lines)
-	_add_text(_body, "Which rock lies at which site is made up for the game. The lab compares it with a real kind of reference.", UiTheme.MUTED)
+	_add_note(_body, "Which rock lies at which site is made up for the game. The lab compares it with a real kind of reference.")
 
 
 func _refresh_body(st: ColonyState) -> void:
