@@ -2,7 +2,7 @@ class_name VoiceSettingsPanel
 extends UiPanel
 ## Voice and microphone settings (Prompt 11), opened from Settings > Controls > "Voice and microphone…".
 ## Microphone state in words, the input device list, an input level meter (the microphone opens while this panel is
-## open; voice chat is always on, so in a game it is sent all the time), mute my microphone, the volume of everyone's
+## open and voice is enabled; V toggles the microphone, starting off), mute my microphone, the volume of everyone's
 ## voices, and for each other
 ## player a volume slider and a mute switch (for this session). Then how voice works: nearby inside, radio outside,
 ## the radio's stage and why it is slow. The microphone, mute and volume are saved with the other settings; per-player
@@ -115,10 +115,13 @@ func refresh() -> void:
 	if v != null:
 		_status.text = v.mic_state_text()
 	elif settings.voice_mic_muted:
-		_status.text = "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
+		_status.text = "Voice chat OFF. Your microphone is muted. Press %s in a colony to turn it on." % VoiceService.toggle_key_label()
 	else:
-		_status.text = "Voice uses the built-in microphone automatically when you enter a colony."
-	_status.theme_type_variation = UiTheme.WARN if _status.text.begins_with("✖") or _status.text.begins_with("⚠") else UiTheme.GOOD
+		_status.text = "Voice starts off in each colony. Press %s to enable the built-in microphone." % VoiceService.toggle_key_label()
+	var muted := v.mic_muted() if v != null else settings.voice_mic_muted
+	_mute_mic.set_pressed_no_signal(muted)
+	var warn := _status.text.begins_with("✖") or _status.text.begins_with("⚠")
+	_status.theme_type_variation = UiTheme.MUTED if muted else (UiTheme.WARN if warn else UiTheme.GOOD)
 	var st := services.state() if services != null and services.has_game() else null
 	# Suit radio (2026-11-15): the comms level decides no signal / delay / garble (scripts/voice/suit_radio.gd).
 	var suit_radio: Variant = load("res://scripts/voice/suit_radio.gd")
@@ -211,7 +214,7 @@ func _build() -> void:
 	_device.tooltip_text = "Voice stays on this computer's built-in microphone, even when a headset is connected."
 	_device.disabled = true
 	body.add_child(_device)
-	_meter_label = _label(body, "Input level: speak to see the bar move. Voice chat is always on: no key to hold.")
+	_meter_label = _label(body, "Input level: press %s to turn voice chat on, then speak. Press it again to turn voice chat off." % VoiceService.toggle_key_label())
 	_meter_label.theme_type_variation = UiTheme.MUTED
 	_meter = ProgressBar.new()
 	_meter.name = "Meter"
@@ -264,7 +267,8 @@ func _build() -> void:
 
 	var how := _label(body, "How voice works")
 	how.theme_type_variation = UiTheme.HEADING
-	_label(body, "Voice chat is always on: just talk. Inside the base, people near you hear you at once: clearly up to 5 m, fading out by 25 m. "
+	_label(body, "Voice chat starts off. Press %s once to turn your microphone on, then again to turn it off. No need to hold the key. " % VoiceService.toggle_key_label()
+		+ "Inside the base, people near you hear you at once: clearly up to 5 m, fading out by 25 m. "
 		+ "Walls stop your voice; an open door lets some of it through.")
 	_label(body, "If you or the listener is outside, your voice goes over the colony radio instead, to everyone on the map, "
 		+ "inside too. Outside there is almost no air to carry sound, so suits use the radio.")

@@ -47,6 +47,8 @@ var _server_list: VBoxContainer
 var _server_status: Label
 var _manual_toggle: Button
 var _manual_box: VBoxContainer
+var _games_tab: Button
+var _games_box: VBoxContainer
 var _browser := LanDiscovery.Browser.new()
 var _browser_failed := false
 const SEARCHING_TEXT := "Looking for games on your network… Ask a friend to choose Host a game."
@@ -135,14 +137,27 @@ func setup(p_services: GameServices) -> void:
 	_join_box = _sub_box(session)
 	_join_box.name = "JoinSetup"
 	_join_box.add_child(_label("Join a game on your network", UiTheme.HEADING))
-	_join_box.add_child(_label("Open games", UiTheme.HEADING))
+	# Two tabs: "Open games" (default, found on the network) and "Type an address" (the original manual form).
+	var tabs := HBoxContainer.new()
+	tabs.name = "JoinTabs"
+	tabs.add_theme_constant_override(&"separation", 8)
+	_join_box.add_child(tabs)
+	_games_tab = _button(tabs, "Open games")
+	_games_tab.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_games_tab.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_games_tab.pressed.connect(_set_manual_visible.bind(false))
+	_manual_toggle = _button(tabs, "Type an address")
+	_manual_toggle.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_manual_toggle.alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_manual_toggle.pressed.connect(_set_manual_visible.bind(true))
+	_games_box = VBoxContainer.new()
+	_games_box.name = "OpenGamesTab"
+	_join_box.add_child(_games_box)
 	_server_list = VBoxContainer.new()
 	_server_list.name = "OpenGames"
-	_join_box.add_child(_server_list)
+	_games_box.add_child(_server_list)
 	_server_status = _label(SEARCHING_TEXT, UiTheme.MUTED)
-	_join_box.add_child(_server_status)
-	_manual_toggle = _button(_join_box, "Type an address instead")
-	_manual_toggle.pressed.connect(func() -> void: _set_manual_visible(not _manual_box.visible))
+	_games_box.add_child(_server_status)
 	_manual_box = VBoxContainer.new()
 	_manual_box.name = "ManualAddress"
 	_manual_box.visible = false
@@ -153,6 +168,7 @@ func setup(p_services: GameServices) -> void:
 	_manual_box.add_child(_label("Port"))
 	_join_port = _field(_manual_box, str(NetSession.DEFAULT_PORT), "")
 	_join_start = _button(_manual_box, "Connect", UiTheme.PRIMARY_BUTTON)
+	_set_manual_visible(false)
 	_join_start.pressed.connect(_on_join)
 	_join_address.text_submitted.connect(func(_t: String) -> void: _on_join())
 	_join_port.text_submitted.connect(func(_t: String) -> void: _on_join())
@@ -250,9 +266,12 @@ func _exit_tree() -> void:
 	_browser.stop()
 
 
+## Switches the Join form between its tabs: the typed-address form (`on`) or the open games list.
 func _set_manual_visible(on: bool) -> void:
 	_manual_box.visible = on
-	_manual_toggle.text = "Hide the address form" if on else "Type an address instead"
+	_games_box.visible = not on
+	_manual_toggle.theme_type_variation = UiTheme.PRIMARY_BUTTON if on else &""
+	_games_tab.theme_type_variation = &"" if on else UiTheme.PRIMARY_BUTTON
 
 
 ## Listens for hosts while the Join form is on show, and rebuilds the list when it changes.
@@ -270,7 +289,7 @@ func _update_browser() -> void:
 			return
 		if not _browser.start():
 			_browser_failed = true
-			_server_status.text = "Could not look for games (another copy of the game may be open on this computer). Type the host's address instead."
+			_server_status.text = "Could not look for games (another copy of the game may be open on this computer). Use the Type an address tab instead."
 			return
 		_rebuild_server_list()
 	if _browser.poll():
@@ -285,16 +304,16 @@ func _rebuild_server_list() -> void:
 	var games := _browser.servers()
 	for g: Dictionary in games:
 		var full := int(g.players) >= int(g.max)
-		var b := _button(_server_list, "Join %s's PC   (%d/%d players)" % [g.name, int(g.players), int(g.max)],
+		var b := _button(_server_list, "Join %s   (%d/%d players)" % [g.name, int(g.players), int(g.max)],
 			UiTheme.PRIMARY_BUTTON)
 		b.name = "JoinGame"
 		b.tooltip_text = "%s, port %d" % [g.address, int(g.port)]
 		if not g.same_version:
 			b.disabled = true
-			b.text = "%s's PC has a different version of the game" % g.name
+			b.text = "%s has a different version of the game" % g.name
 		elif full:
 			b.disabled = true
-			b.text = "%s's PC is full (%d/%d players)" % [g.name, int(g.players), int(g.max)]
+			b.text = "%s is full (%d/%d players)" % [g.name, int(g.players), int(g.max)]
 		var address := String(g.address)
 		var port := int(g.port)
 		b.pressed.connect(func() -> void:

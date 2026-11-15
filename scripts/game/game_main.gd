@@ -356,7 +356,7 @@ func _on_net_joined(_peer: int) -> void:
 
 
 func _announce_hosting() -> void:
-	ui.show_subtitle("Hosting. Other players choose Join a game and click \"Join %s's PC\". The pause menu shows your address if they need to type it." % LanDiscovery.local_name(), 14.0, "Network", true)
+	ui.show_subtitle("Hosting. Other players choose Join a game and click \"Join %s\". The pause menu shows your address if they need to type it." % LanDiscovery.local_name(), 14.0, "Network", true)
 
 
 func _say_crew_change(peer: int, joined_now: bool) -> void:

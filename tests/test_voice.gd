@@ -758,16 +758,16 @@ func _test_settings_file() -> void:
 	var changes := [0]
 	s.changed.connect(func() -> void: changes[0] += 1)
 	s.voice_input_device = "USB Headset"
-	s.voice_mic_muted = true
+	s.voice_mic_muted = false
 	s.voice_volume = 1.4
 	var err := s.save(path)
 	var back := GameSettings.load_or_default(path)
 	var clamped := GameSettings.new()
 	clamped.voice_volume = 9.0
 	var fresh := GameSettings.new()
-	_check("settings: microphone, own mute and voice volume are saved with the other settings (defaults: default mic, not muted, 100 %)",
-		err == OK and back.voice_input_device == "USB Headset" and back.voice_mic_muted and is_equal_approx(back.voice_volume, 1.4) and changes[0] == 3
-		and clamped.voice_volume == 2.0 and fresh.voice_input_device == "" and not fresh.voice_mic_muted and fresh.voice_volume == 1.0, str(back.to_dict()))
+	_check("settings: microphone, own mute and voice volume are saved with the other settings (defaults: built-in mic, muted, 100 %)",
+		err == OK and back.voice_input_device == "USB Headset" and not back.voice_mic_muted and is_equal_approx(back.voice_volume, 1.4) and changes[0] == 3
+		and clamped.voice_volume == VoiceService.VOLUME_MAX and fresh.voice_input_device == "" and fresh.voice_mic_muted and fresh.voice_volume == 1.0, str(back.to_dict()))
 
 
 func _test_sources_and_privacy() -> void:
@@ -825,6 +825,8 @@ func _machine(branch: String, save_dir: String, synthetic: bool) -> Array:
 	v.settings = GameSettings.new()
 	holder.add_child(v)
 	v.setup(null, g, null)
+	if synthetic:
+		v.set_mic_muted(false)
 	return [g, v]
 
 
@@ -1115,6 +1117,7 @@ func _test_hud_and_panels() -> void:
 	v.settings = GameSettings.new()
 	root.add_child(v)
 	v.setup(null, g, null)
+	v.set_mic_muted(false)
 	var widget := VoiceHud.new()
 	hud.add_child(widget)
 	widget.setup(v)
