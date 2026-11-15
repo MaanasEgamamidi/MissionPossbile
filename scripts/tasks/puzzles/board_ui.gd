@@ -52,7 +52,9 @@ func setup(p_services: GameServices) -> void:
 		return
 	reset_requested.connect(func() -> void: send_move("reset", 0))
 	_build_board()
+	# The hint line is kept (tests and tools read it) but not shown: its text goes to the shell's cue bar.
 	hint_label = _label("Hint", UiTheme.HEADING)
+	hint_label.visible = false
 	play_area.add_child(hint_label)
 	_read_record()
 	if services != null and services.has_game() and not anchor_id.is_empty() and not succeeded:
@@ -98,6 +100,7 @@ func send_move(move_name: String, payload: int) -> void:
 func show_hint(text: String, warn := true) -> void:
 	hint_label.text = text
 	hint_label.theme_type_variation = UiTheme.WARN if warn else UiTheme.HEADING
+	flash(text, &"warn" if warn else &"good")
 
 
 func apply_host_state(record: Dictionary) -> void:

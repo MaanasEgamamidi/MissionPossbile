@@ -15,6 +15,13 @@ extends RefCounted
 ## the broken model, the prompt names the fault, and E opens the mini-game instead of the maintenance panel.
 
 const DIR := "res://scripts/tasks/puzzles/"
+## The mini-games' action titles (UI overhaul, 2026-11-15): what the repair is called on its panel, in the goals and in
+## the world prompt. RepairCatalog keeps its one-word internal titles.
+const TITLES := {
+	"T01": "Lock the Relay", "T02": "Patch the Relay", "T03": "Sync the Turbine", "T04": "Light the Power Bench",
+	"T06": "Water the Kale", "T08": "Glaze the Dome", "T09": "Sort the Lab Samples", "T10": "Revive the Med Bay",
+	"T11": "Clear the Landing Lines", "T12": "Seal the Airlock",
+}
 
 
 static func rule_path(task_id: String) -> String:
@@ -76,7 +83,7 @@ static func make_panel(task_id: String, station_id: StringName, services: GameSe
 	if panel == null:
 		return null
 	var room: Dictionary = RepairCatalog.ROOMS.get(String(record.get("room_id", "")), {})
-	panel.configure_task(record, String(record.get("title", "Repair task")), String(room.get("title", "")))
+	panel.configure_task(record, String(TITLES.get(task_id, record.get("title", "Repair task"))), String(room.get("title", "")))
 	panel.set_meta(&"station_surface", true)
 	panel.set_meta(&"station_id", station_id)
 	panel.setup(services)

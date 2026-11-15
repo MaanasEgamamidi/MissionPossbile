@@ -6,7 +6,8 @@ extends SceneTree
 ## member stands at the station, E's panel (StationPanels.for_station) opens, a shot is taken, the puzzle is played to
 ## the end through the panel's own keyboard path (the same keys the tests press), and the solved panel is shot.
 ## Saves go to res://_test_saves/capture_puzzles and are deleted at the end; the player's settings are never written.
-## Writes <out>/Tnn_start.png, <out>/Tnn_solved.png and <out>/T02_wrong_specialist.png.
+## Writes <out>/Tnn_start.png, <out>/Tnn_solved.png (just after the last move, before the shell's success mark),
+## <out>/Tnn_stamp.png (a second later, with the success mark) and <out>/T02_wrong_specialist.png ("--only wrong").
 
 const R01 := preload("res://scripts/tasks/puzzles/t01_rule.gd")
 const R02 := preload("res://scripts/tasks/puzzles/t02_rule.gd")
@@ -107,7 +108,10 @@ func _initialize() -> void:
 	var only := _arg("--only", "").split(",", false)
 	print("ADAPTER %s / %s" % [RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_method()])
 	services = GameServices.new()
-	var dir := ProjectSettings.globalize_path(SAVE_DIR)
+	# One save folder per --only list, so several captures can run at the same time.
+	var dir := ProjectSettings.globalize_path(SAVE_DIR + ("" if only.is_empty() else "_" + "_".join(only)))
+	# The shell closes itself after a repair; the captures keep it open to shoot it.
+	TaskPanel.auto_close_seconds = 0.0
 	DirAccess.make_dir_recursive_absolute(dir)
 	services.saves = SaveService.new(dir, "colony", 1)
 	root.add_child(services)
@@ -124,6 +128,9 @@ func _initialize() -> void:
 		print("%s solved=%s first_completed=%s progress=%s" % [id, panel.succeeded, _task().first_completed, _task().progress])
 		await _shot("%s_solved" % id)
 		await _scroll_shot("%s_solved_scrolled" % id)
+		# About a second later: the end of the puzzle's own animation, under the shell's success mark.
+		await _frames(70)
+		await _shot("%s_stamp" % id)
 	if only.is_empty() or only.has("wrong"):
 		# A biologist (crew_3) at the wires station: T02 needs the electrical specialist.
 		if await _open("T02", &"crew_3", 4271, false):

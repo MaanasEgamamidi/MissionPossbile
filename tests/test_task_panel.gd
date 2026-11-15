@@ -89,7 +89,7 @@ func _initialize() -> void:
 	sample.set_pending("stale")
 	_check("host wait disables puzzle controls but leaves cancel", sample.pending and activate.disabled and not sample.cancel_button.disabled)
 	sample.accept_host_result(ActionResult.failure("stale", &"bad_request", "Fault generation changed; refresh and retry."), {"fault_generation": 2, "progress": 0.0})
-	_check("stale response recovers and uses host generation", not sample.pending and not activate.disabled and sample.fault_generation == 2 and "rejected" in sample.status_label.text)
+	_check("stale response recovers and uses host generation", not sample.pending and not activate.disabled and sample.fault_generation == 2 and "retry" in sample.status_label.text)
 	_key(KEY_ESCAPE)
 	await _frames()
 	_check("Esc closes and restores capture", not ui.is_open() and ui.wanted_mouse_mode() == Input.MOUSE_MODE_CAPTURED)

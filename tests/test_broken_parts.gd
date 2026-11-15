@@ -160,11 +160,11 @@ func _parts() -> Array:
 	t11.add_child(_box("hg_dust__broken_b", Vector3(6, 0.02, 8), Vector3(27.0, 0.01, -3.0)))
 	return [
 		{"task_id": "T02", "node": t02, "zone": "Command Room", "hide_objects": ["cr_rack"], "effect_nodes": ["spray"],
-			"bounds": {"center": [25.1, 1.0, -17.4], "size": [0.9, 2.1, 0.7]}, "prompt": "[E] Fix the wires", "special": ""},
+			"bounds": {"center": [25.1, 1.0, -17.4], "size": [0.9, 2.1, 0.7]}, "prompt": "[E] Patch the relay", "special": ""},
 		{"task_id": "T12", "node": t12, "zone": "Airlock", "hide_objects": ["SFX_tunnel_inside"], "effect_nodes": ["vapour"],
-			"bounds": {"center": [22.0, 1.5, 10.47], "size": [3.6, 3.0, 0.4]}, "prompt": "[E] Repair the air leak", "special": "door_901"},
+			"bounds": {"center": [22.0, 1.5, 10.47], "size": [3.6, 3.0, 0.4]}, "prompt": "[E] Seal the airlock", "special": "door_901"},
 		{"task_id": "T11", "node": t11, "zone": "Hangar bay", "hide_objects": [], "effect_nodes": [],
-			"bounds": {"center": [22.0, 0.5, -3.0], "size": [16.0, 1.0, 10.0]}, "prompt": "[E] Clean the dusty hangar", "special": "dust"},
+			"bounds": {"center": [22.0, 0.5, -3.0], "size": [16.0, 1.0, 10.0]}, "prompt": "[E] Clear the landing lines", "special": "dust"},
 		{"task_id": "T09", "glb": "res://assets/broken_parts/not_made_yet.glb", "zone": "Med Bay", "hide_objects": ["mb_sink_counter"]},
 	]
 
@@ -290,7 +290,8 @@ func _test_prompts() -> void:
 	_check("station name in words", GameHud.repair_station_name({"name": "T01 - Comms"}) == "comms station" and GameHud.repair_station_name({}) == "station")
 	for task_id: String in BrokenParts.FALLBACK_PROMPTS:
 		var words := BrokenParts.prompt_for(task_id).to_lower()
-		_check("prompt %s names the problem" % task_id, words.begins_with("[e] ") and (words.contains("fix") or words.contains("repair") or words.contains("clean")), words)
+		# UI overhaul: each prompt is the repair's action title ("[E] Water the kale" = the goal "Water the Kale").
+		_check("prompt %s names the job (the repair's action title)" % task_id, words.begins_with("[e] ") and words.substr(4) == String(TutorialSystem.fix_def(task_id).get("text", "?")).to_lower(), words)
 	set_meta(&"hud", hud)
 
 
