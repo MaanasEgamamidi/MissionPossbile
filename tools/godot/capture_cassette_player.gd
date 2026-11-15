@@ -55,9 +55,8 @@ func _initialize() -> void:
 			var library := StationPanels.for_station(CassetteLibrary.PLAYER_ID, services) as CassettePlayerPanel
 			main.ui.open(library)
 			await _frames()
-			var menu := library._tapes.get_popup()
-			menu.position = Vector2i(library._tapes.get_global_rect().position + Vector2(0.0, library._tapes.size.y))
-			menu.popup()
+			# The tape picker is a row of picture buttons now (no drop-down to open): the panel as it opens shows which
+			# tapes are found and which are missing.
 			await _shot("library_collected_and_missing")
 			services.saves.delete_all()
 			quit(0)

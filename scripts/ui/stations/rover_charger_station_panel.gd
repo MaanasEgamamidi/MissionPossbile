@@ -27,20 +27,15 @@ func _what_you_can_do() -> PackedStringArray:
 
 
 func _build_body() -> void:
-	_add_reading(&"rover_battery", "⚡", "Rover battery", "battery")
+	charge_button = _add_action("Start charging", &"bolt", _on_charge)
+	charge_button.name = "Charge"
+	_add_reading(&"rover_battery", "▮", "Rover battery", "battery")
 	_add_reading(&"status", "↯", "Charging", "load")
 	_add_reading(&"parked", "⌂", "Rover parked", "cargo")
 	_add_reading(&"colony", "⚡", "Colony battery", "battery")
-	_add_reading(&"cost", "↓", "Charging takes from the colony battery", "load")
-	_add_reading(&"used", "Σ", "Taken for the rover so far", "stock_vs_flow")
-	var row := HBoxContainer.new()
-	_body.add_child(row)
-	charge_button = Button.new()
-	charge_button.name = "Charge"
-	charge_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	charge_button.pressed.connect(_on_charge)
-	row.add_child(charge_button)
-	_add_text(_body, "Some energy is lost as heat in the charger, so the rover gets a little less than the colony gives. The charger's numbers are game values.", UiTheme.MUTED)
+	_add_reading(&"cost", "⇣", "Charging takes", "load")
+	_add_reading(&"used", "Σ", "Taken so far", "stock_vs_flow")
+	_add_note(_body, "Some energy is lost as heat in the charger, so the rover gets a little less than the colony gives. The charger's numbers are game values.")
 
 
 func _refresh_body(st: ColonyState) -> void:

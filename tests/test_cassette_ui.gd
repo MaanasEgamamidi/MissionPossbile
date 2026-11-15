@@ -77,8 +77,9 @@ func _initialize() -> void:
 	_at_station(String(CassetteLibrary.PLAYER_ID))
 	var panel := _open()
 	await _frames()
-	var menu := panel._tapes.get_popup()
-	_check("player lists all six missing locked entries", menu.item_count == 6 and range(6).all(func(i: int) -> bool: return menu.is_item_disabled(i)))
+	# UI overhaul: the drop-down is now one picture button per tape; a tape that has not been found is greyed out.
+	var tiles: Array = panel.tape_buttons.values()
+	_check("player lists all six missing locked entries", tiles.size() == 6 and tiles.all(func(tile: Button) -> bool: return tile.disabled and tile.is_visible_in_tree() and tile.icon != null))
 	_check("opening library alone reveals no tape content", panel.photo.texture == null and panel.briefing_text.text.is_empty())
 	panel.select_tape("cassette_med_bay")
 	_check("uncollected direct selection fails closed", not ui.is_open() and panel.photo.texture == null and panel.briefing_text.text.is_empty())
@@ -92,7 +93,7 @@ func _initialize() -> void:
 		var result := services.request(&"cassette_collect", StringName(id))
 		_check("real pickup " + id, result.ok, result.message)
 	inventory.refresh()
-	_check("inventory updates shared pickup state without cargo change", inventory._cassette_rows.values().all(func(row: Label) -> bool: return "Collected" in row.text))
+	_check("inventory updates shared pickup state without cargo change", inventory._cassette_rows.values().all(func(row: Label) -> bool: return "Collected" in row.tooltip_text))
 	ui.close_all()
 	await _frames()
 	_at_station(String(CassetteLibrary.PLAYER_ID))
@@ -131,8 +132,12 @@ func _initialize() -> void:
 			var photo_column := panel.find_child("PhotoColumn", true, false) as ScrollContainer
 			var briefing_column := panel.find_child("BriefingColumn", true, false) as ScrollContainer
 			_check("both content panes retain useful visible height", photo_column.size.y >= 80.0 and briefing_column.size.y >= 80.0 and photo_column.size.x >= 150.0 and briefing_column.size.x >= 150.0, str(photo_column.size))
-			var menu_style := panel._tapes.get_theme_stylebox(&"normal") as StyleBoxFlat
-			_check("tape selector text has readable contrast", not panel._tapes.flat and menu_style != null and UiTheme.contrast(panel._tapes.get_theme_color(&"font_color"), menu_style.bg_color) >= 4.5)
+			var contrast_ok := true
+			for tile: Button in panel.tape_buttons.values():
+				var tile_style := tile.get_theme_stylebox(&"normal") as StyleBoxFlat
+				contrast_ok = contrast_ok and not tile.flat and tile_style != null and UiTheme.contrast(tile.get_theme_color(&"font_color"), tile_style.bg_color) >= 4.5
+			var playing := panel.tape_buttons["cassette_command_center"] as Button
+			_check("tape selector text has readable contrast", contrast_ok and playing.theme_type_variation == UiTheme.PRIMARY_BUTTON and not playing.disabled)
 			if scale.y > 1.0:
 				for column: ScrollContainer in [photo_column, briefing_column]:
 					column.grab_focus()

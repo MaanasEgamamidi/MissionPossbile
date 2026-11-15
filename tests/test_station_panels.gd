@@ -225,13 +225,13 @@ func _test_upgrades() -> void:
 		var b := up.install_buttons[i]
 		if not cost.contains("Needs %d parts — the colony has %d" % [d.cost_parts, st.parts]):
 			bad.append("%s cost '%s'" % [d.id, cost])
-		if not reason.begins_with("Locked:"):
+		if reason.is_empty() or reason.split(" ", false).size() > 6:           # UI overhaul: ONE short reason on the card
 			bad.append("%s reason '%s'" % [d.id, reason])
 		if not b.disabled or b.tooltip_text.is_empty() or not b.visible:
 			bad.append("%s install button" % d.id)
 	_check("cards show cost vs parts, the locked reason, and a disabled install button", bad.is_empty(), "; ".join(bad))
-	var tracking := up.reason_label(&"energy_solar_tracking").text
-	var automation := up.reason_label(&"energy_cleaner_automation").text
+	var tracking := "\n".join(up.requirement_lines(&"energy_solar_tracking"))          # UI overhaul: the full list is under "More"
+	var automation := "\n".join(up.requirement_lines(&"energy_cleaner_automation"))
 	_check("locked reasons in words: sector level, questions to answer, things to do", up.cost_label(&"energy_solar_tracking").text.begins_with("✓")
 		and tracking.contains("Energy level 1 needed") and tracking.contains("Answer: ") and automation.contains("Energy level 2 needed")
 		and automation.contains("Do: "), "%s | %s" % [tracking, automation])

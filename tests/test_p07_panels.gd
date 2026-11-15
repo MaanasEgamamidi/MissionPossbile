@@ -318,7 +318,12 @@ func _test_water_sliders() -> void:
 		str(services.sent))
 	_tick()
 	panel.refresh()
+	# UI overhaul: the sentences that explain are behind the "?" switch in the header (off when the panel opens).
+	var calm := _all_text(panel)
+	panel.help_button.button_pressed = true
 	var all := _all_text(panel)
+	_check("life support: the explaining sentences wait behind the ? switch", not calm.contains("L stays in the tank") and all.contains("L stays in the tank")
+		and panel.is_help_shown(), calm)
 	_check("life support: drinking comes first and the protected reserve is stated", all.contains("Drinking water always comes first")
 		and all.contains("%s L stays in the tank" % StationPanel.num(services.balance.water_reserve_l, 0)) and panel.cause_text().contains("Water allocation"),
 		panel.cause_text())
@@ -375,8 +380,10 @@ func _test_cabin_air() -> void:
 	var o2 := panel.readings[&"o2"] as StationPanel.Reading
 	var co2 := panel.readings[&"co2"] as StationPanel.Reading
 	var pressure := panel.readings[&"pressure"] as StationPanel.Reading
-	_check("cabin air: O2, CO2 and pressure in kPa with words", o2.value_label.text.ends_with("kPa · Safe") and co2.value_label.text.ends_with("kPa · Safe")
-		and pressure.value_label.text.ends_with("kPa · Safe") and o2.level == &"ok" and co2.level == &"ok",
+	# UI overhaul: the word comes first ("Safe · 21.2 kPa"), the number after it.
+	_check("cabin air: O2, CO2 and pressure as a word, then kPa", o2.value_label.text.begins_with("Safe · ") and co2.value_label.text.begins_with("Safe · ")
+		and pressure.value_label.text.begins_with("Safe · ") and o2.value_label.text.ends_with(" kPa") and co2.value_label.text.ends_with(" kPa")
+		and pressure.value_label.text.ends_with(" kPa") and o2.level == &"ok" and co2.level == &"ok",
 		"%s / %s / %s" % [o2.value_label.text, co2.value_label.text, pressure.value_label.text])
 	var saved := st.cabin_co2_kg
 	st.cabin_co2_kg = bal.gas_kg_for_kpa(0.7, GameBalance.MOLAR_CO2)
@@ -390,7 +397,8 @@ func _test_cabin_air() -> void:
 	_check("cabin air: raising CO2 changes the level and the word (High, then Dangerous)", warn_level == &"warn" and warn_text.contains("High")
 		and co2.level == &"urgent" and co2.value_label.text.contains("Dangerous") and co2.mark_label.text == "✖", "%s / %s" % [warn_text, co2.value_label.text])
 	_check("cabin air: the CO2 alert appears at the top in words", alert_seen, "\n".join(panel.alert_texts()))
-	_check("cabin air: says the room air is not the oxygen in the tanks", _all_text(panel).contains("Safe air in the rooms is not the same as the oxygen in the tanks"))
+	panel.set_help_shown(true)
+	_check("cabin air: the help says the room air is not the oxygen in the tanks", _all_text(panel).contains("Safe air in the rooms is not the same as the oxygen in the tanks"))
 	st.cabin_co2_kg = saved
 	_tick()
 	await _close(panel)
@@ -415,7 +423,7 @@ func _test_solar() -> void:
 	_check("solar: 'Clean this panel' sends one clean_panel and this tracker's dust goes to 0", services.sent_of(&"clean_panel").size() == 1 and services.sent.size() == 1
 		and float(st.panel_dust[index]) == 0.0 and others_same and panel.reading_text(&"dust").begins_with("0 %"), "%s / %s" % [st.panel_dust, panel.reading_text(&"dust")])
 	_check("solar: shows this panel's output, the whole array and the trackers", panel.reading_text(&"output").contains(" kW") and panel.reading_text(&"array").contains(" kW")
-		and panel.reading_text(&"tracking").begins_with("Yes") and panel.reading_text(&"cleaner").begins_with("Broken"),
+		and panel.reading_text(&"tracking").begins_with("Yes") and panel.reading_text(&"cleaner").begins_with("Broken") and panel.repair_button.visible,
 		"%s | %s | %s | %s" % [panel.reading_text(&"output"), panel.reading_text(&"array"), panel.reading_text(&"tracking"), panel.reading_text(&"cleaner")])
 
 	_check("solar: repair enabled for the electrical specialist while the cleaner is broken", me.specialty == &"electrical_comms" and not panel.repair_button.disabled,
@@ -436,7 +444,7 @@ func _test_solar() -> void:
 	panel.repair_button.pressed.emit()
 	panel.refresh()
 	_check("solar: the electrical specialist repairs the cleaner, then the button says why it is off", services.sent_of(&"repair_cleaner").size() == 1
-		and st.condition_of("cleaner") >= 1.0 and panel.repair_button.disabled and panel.repair_reason_text().contains("not broken")
+		and st.condition_of("cleaner") >= 1.0 and panel.repair_button.disabled and not panel.repair_button.visible and panel.repair_reason_text().contains("not broken")
 		and panel.cause_text().contains("Panel cleaner repaired"), "%s / %s" % [panel.repair_reason_text(), panel.cause_text()])
 	await _close(panel)
 
@@ -476,7 +484,7 @@ func _test_suit_rack() -> void:
 	services.session.advance(services.config.suit_check_seconds + 0.1)
 	panel.refresh()
 	_check("suit rack: after the check the suit is on and the button takes it off", me.suit_on and panel.reading_text(&"suit") == "On"
-		and panel.suit_button.text == "Take the suit off" and not panel.suit_button.disabled, "%s %s" % [me.suit_on, panel.suit_button.text])
+		and panel.suit_button.text == "Take suit off" and not panel.suit_button.disabled, "%s %s" % [me.suit_on, panel.suit_button.text])
 	me.suit_on = false
 	await _close(panel)
 

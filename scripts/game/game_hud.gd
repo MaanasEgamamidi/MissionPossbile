@@ -1,18 +1,29 @@
 class_name GameHud
 extends CanvasLayer
-## The in-game HUD: small and readable, at the edges only.
-##   top-left      sol and time with a sun or moon, then at most three urgent readings (or "Colony OK ✓")
-##   top-right     your crew member: name, specialty symbol and colour, health, body energy, suit and tank (bars)
-##   centre        crosshair (a ring appears when E would do something), under it what E does and the suit check bar
-##   top-centre    "PAUSED" while the game is paused, and messages (queued); after your own crew member died and the
-##                 med bay brought them back, a card says why (scripts/ui/hud/death_notice.gd)
-##   bottom        a key hint strip that fades after 30 s, network status on the left; subtitles show above the strip
+## The in-game HUD: pictures first, very few words, at the edges only (UI overhaul 2026-11-15).
+##   top-left      a sun or a moon and the sol number; a storm picture with its countdown only while a dust storm is
+##                 coming or blowing; then one green "Colony OK" chip, or up to three small warning chips (the picture
+##                 of what is low and a mark: triangle = low, octagon = very low)
+##                 (with the mission HUD's vitals strip there, only the room air: the strip has the supplies and the
+##                 crew corner the suit tank, so nothing is said twice)
+##   top-right     your crew member: badge, specialist symbol and ONE role word, then three picture bars (heart =
+##                 health, runner = body energy, helmet = suit air). A percentage shows only on a bar that is low; what
+##                 you carry shows only while you carry something
+##   centre        crosshair (a ring appears when E would do something), under it one large key cap and a short verb
+##                 phrase ("Use power panel"), and the suit check bar
+##   top-centre    "Paused" while the game is paused, and messages: at most two, one short line each (the mission
+##                 HUD shows them as its pop-ups instead when it is there); after your own crew member died and the med
+##                 bay brought them back, a card says why (scripts/ui/hud/death_notice.gd)
+##   bottom        a key hint strip that fades after 30 s (hidden when the mission HUD's dock is there), network status
+##                 on the left; subtitles show above the strip
+## Every picture that stands in for words carries those words as its tooltip and accessible name (HudKit.say); the
+## full sentences stay available to code and tests (cue_text(), shown_readings(), current_messages()).
 ## It only reads state and listens to events; it never changes anything. It refreshes 4 times a second.
 
 ## Most urgent readings shown at once.
 const MAX_READINGS := 3
 ## Messages on screen at once; more wait their turn.
-const MAX_MESSAGES := 3
+const MAX_MESSAGES := 2
 ## Seconds of play before the key hint strip fades away.
 const HINT_SECONDS := 30.0
 const REFRESH_SECONDS := 0.25
@@ -21,6 +32,10 @@ const EDGE := 24
 ## Suit tank share (percent) below which the tank counts as low / very low while the suit is worn.
 const SUIT_WARN := 30.0
 const SUIT_URGENT := 10.0
+## Health and body energy (percent) below which the bar counts as low / very low and shows its number.
+const HEALTH_WARN := 60.0
+const HEALTH_URGENT := 30.0
+const BODY_ENERGY_WARN := 25.0
 
 ## Plain names of station kinds, as used in "[E] Use …". An empty name gives a plain "[E] Use" (owner 2026-11-14:
 ## nothing in the world says "fix" or "broken / damaged"; salvage donors just say "Use").
@@ -30,6 +45,16 @@ const STATION_NAMES := {
 	"heal": "med station", "survivor": "patient", "solar": "sun tracker",
 	"scout_bay": "scout bay", "ore_deposit": "ore deposit", "salvage": "", "sample_site": "sample site",
 }
+## The short phrase shown beside the key cap for a long cue (cue_text() keeps the full words).
+const SHORT_CUES := {
+	"Suit check: put the suit on": "Put suit on", "Suit check: take the suit off": "Take suit off",
+	"Check on the patient": "Check patient", "Pick up the tape": "Pick up tape",
+	"Hold ladder; W/S climb, E or Space release": "Grab ladder",
+}
+## The picture of each reading on the top-left warning chips, and the short word the cabin air ones need.
+const READING_ICONS := {&"battery_kwh": &"power", &"oxygen_kg": &"air", &"water_l": &"water", &"food_meals": &"food",
+	&"cabin_o2": &"air", &"cabin_co2": &"air", &"suit_tank": &"helmet"}
+const READING_WORDS := {&"cabin_o2": "Room", &"cabin_co2": "CO₂"}
 ## Seconds a colony system alert stays in the message line.
 const ALERT_SECONDS := 6.0
 ## Upgrade update (2026-11-14): the "why you were brought back" card, top centre after a respawn in the med bay.
@@ -38,6 +63,8 @@ const DeathNoticeScript := preload("res://scripts/ui/hud/death_notice.gd")
 const BrokenParts := preload("res://scripts/tasks/broken_part_presenter.gd")
 ## Tutorial mode (2026-11-14): stations other than tapes and broken spots show no "[E]" prompt.
 const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
+## UI overhaul (2026-11-15): pictograms, level bars and self-sizing labels.
+const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
 ## Upgrade paths plan phase 1 (2026-11-15).
 const ScheduleGate := preload("res://scripts/schedule/schedule_gate.gd")
 const OreCatalog := preload("res://scripts/science/ore_catalog.gd")
@@ -49,36 +76,48 @@ var services: GameServices
 var death_notice: PanelContainer
 
 var _root: Control
+## Sun or moon, then "Sol 1".
+var _clock_icon: HudKit.Icon
 var _time: Label
-var _reading_rows: Array[HBoxContainer] = []
-var _ok_line: Label
+## The storm picture and its countdown ("in 6 h"), shown only while a dust storm is coming or blowing.
+var _hazard_row: HBoxContainer
+var _hazard_icon: HudKit.Icon
+var _hazard: Label
+## One warning chip per low reading: the picture, a short word where the picture is not enough, and a mark.
+var _reading_rows: Array[PanelContainer] = []
+## The full words of the chips now shown ("⚡ Colony electricity 12 % ! Low"): shown_readings() and the tooltips.
+var _reading_texts := PackedStringArray()
+var _ok_chip: PanelContainer
 var _crew_badge: CrewPortrait
+## ONE role word ("Electrical").
 var _crew_name: Label
-var _crew_specialty: Label
-## The specialty symbol before the specialty words, in the crew member's accent colour (CrewLooks).
+## The specialty symbol before the role word, in the crew member's accent colour (CrewLooks).
 var _crew_specialty_icon: Label
-var _health_text: Label
-var _health_bar: ProgressBar
-var _stamina_text: Label
-var _stamina_bar: ProgressBar
-var _suit: Label
+var _who_row: HBoxContainer
+## The three vitals, each {"row", "icon", "bar", "text", "mark"} (see _vital_row()).
+var _health: Dictionary = {}
+var _stamina: Dictionary = {}
+var _suit: Dictionary = {}
+var _held_row: HBoxContainer
 var _held_line: Label
-var _no_crew: Label
+var _no_crew: HBoxContainer
+var _no_crew_key: Label
 var _crew_box: VBoxContainer
 var _crosshair: Crosshair
 var _cue: Label
 var _cue_key: Label
 var _cue_panel: PanelContainer
+## Extra keys under the cue while looking at a ladder ("W S climb").
+var _cue_extra: PanelContainer
 var _cue_full := ""
-var _suit_bar: ProgressBar
 var _corner_left: PanelContainer
 var _corner_right: PanelContainer
 var _centre_margin: MarginContainer
-## The message line. Shows up to MAX_MESSAGES messages, one per line, oldest first.
-var _message: Label
+## The message lines: MAX_MESSAGES rows, one short line each, oldest first. [{"row", "label"}]
+var _message_rows: Array[Dictionary] = []
 var _message_panel: PanelContainer
 var _progress_box: Control
-var _progress: ProgressBar
+var _progress: HudKit.Bar
 var _hint_panel: PanelContainer
 var _hint: Label
 var _status_panel: PanelContainer
@@ -99,9 +138,15 @@ var last_alert_text := ""
 ## Scout update: when set (by the mission-control HUD), colony alerts go to its pop-ups instead of the message line:
 ## func(alert_id: StringName, level: StringName, text: String).
 var alert_sink := Callable()
+## UI overhaul: when set (by the mission-control HUD), messages show as its pop-ups, so there is one place to look.
+## The queue here still runs (current_messages(), waiting_messages()); only the top-centre lines stay hidden.
+## func(text: String, seconds: float).
+var message_sink := Callable()
 ## Screen units at the top kept free for the vitals bar; messages then show just under it.
 var top_reserved := 0.0
-var _hazard: Label
+## UI overhaul: true while the mission HUD's vitals strip shows the four supplies (electricity, oxygen, water, food).
+## The warning chips here then show only the room air (the suit tank has its bar in the crew corner): nothing twice.
+var supplies_on_strip := false
 # interim power menu, kept so game_main works until UiRoot hosts station surfaces
 var _menu: Control
 var _menu_station: StringName = &""
@@ -141,8 +186,9 @@ func set_held(item_id: StringName) -> void:
 	_refresh_crew()
 
 
-## Shows a message at the bottom for `seconds`. Messages queue: up to three show at once, the rest wait.
-## The same text twice in a row is shown once (its time is extended).
+## Shows a message for `seconds`. Messages queue: up to MAX_MESSAGES show at once, the rest wait.
+## The same text twice in a row is shown once (its time is extended). The screen shows one short line of it
+## (HudKit.short_line); current_messages() and the Power drawer's message list keep the full text.
 func show_message(text: String, seconds := 3.0) -> void:
 	if text.strip_edges() == "":
 		return
@@ -158,6 +204,7 @@ func show_message(text: String, seconds := 3.0) -> void:
 		_showing.append({"text": text, "left": seconds})
 	else:
 		_waiting.append({"text": text, "seconds": seconds})
+	_note_message(text, seconds)
 	_update_messages()
 
 
@@ -177,10 +224,20 @@ func show_alert(text: String, seconds := ALERT_SECONDS) -> void:
 	if _showing.size() >= MAX_MESSAGES:
 		_showing.pop_front()
 	_showing.append({"text": t, "left": seconds})
+	_note_message(t, seconds)
 	_update_messages()
 
 
-## Messages on screen now, oldest first.
+## A new message: it goes to the mission HUD's pop-ups when that is there, else into the message list the Power
+## drawer shows in full (ToastStack.recent()).
+func _note_message(text: String, seconds: float) -> void:
+	if message_sink.is_valid():
+		message_sink.call(text, seconds)
+	else:
+		ToastStack.remember(text, &"info")
+
+
+## Messages on screen now, oldest first (full text).
 func current_messages() -> PackedStringArray:
 	var out := PackedStringArray()
 	for m: Dictionary in _showing:
@@ -193,6 +250,16 @@ func waiting_messages() -> PackedStringArray:
 	var out := PackedStringArray()
 	for m: Dictionary in _waiting:
 		out.append(String(m.text))
+	return out
+
+
+## The short lines the top-centre message box shows now (empty while the mission HUD shows messages as pop-ups).
+func shown_message_lines() -> PackedStringArray:
+	var out := PackedStringArray()
+	if _message_panel.visible:
+		for r: Dictionary in _message_rows:
+			if (r.row as Control).visible:
+				out.append((r.label as Label).text)
 	return out
 
 
@@ -209,9 +276,20 @@ func set_status(text: String) -> void:
 	_status_panel.visible = text != ""
 
 
-## The interaction cue under the crosshair ("[E] Use power panel"), or "".
+## The interaction cue under the crosshair in full words ("[E] Use power panel"), or "". The screen shows the key
+## cap and shown_cue().
 func cue_text() -> String:
 	return _cue_full
+
+
+## The short phrase now shown beside the key cap ("Use power panel", "Put suit on"), or "".
+func shown_cue() -> String:
+	return _cue.text if _cue_panel.visible else ""
+
+
+## The short phrase the screen shows for a cue's full words (without the key).
+static func short_cue(body: String) -> String:
+	return String(SHORT_CUES.get(body, body))
 
 
 ## Up to MAX_READINGS readings that are low right now, most urgent first.
@@ -264,21 +342,20 @@ static func low_readings(p_services: GameServices) -> Array[Dictionary]:
 	return out
 
 
-## Texts of the readings now shown in the top-left (empty when "Colony OK" is shown).
+## The full words of one low reading: "⚡ Colony electricity 12 % ! Low".
+static func reading_words(r: Dictionary) -> String:
+	return "%s %s %s %s %s" % [String(r.symbol), String(r.name), String(r.value), "✖" if r.level == &"urgent" else "!", String(r.word)]
+
+
+## The readings now shown as warning chips in the top-left, in full words: "⚡ Colony electricity 12 % ! Low"
+## (empty when "Colony OK" is shown). Each chip shows the picture and a mark; these words are its tooltip.
 func shown_readings() -> PackedStringArray:
-	var out := PackedStringArray()
-	for row in _reading_rows:
-		if row.visible:
-			var parts := PackedStringArray()
-			for l in row.get_children():
-				parts.append((l as Label).text)
-			out.append(" ".join(parts))
-	return out
+	return _reading_texts.duplicate()
 
 
-## True while the one quiet "Colony OK ✓" line is shown.
+## True while the one quiet "Colony OK" chip is shown.
 func colony_ok_shown() -> bool:
-	return _ok_line.visible
+	return _ok_chip.visible
 
 
 # ------------------------------------------------------------------ interim power menu (game_main uses these)
@@ -368,124 +445,16 @@ func _build() -> void:
 	column.name = "Column"
 	margin.add_child(column)
 
-	# ---- top row: colony corner, then pause banner and messages in the middle, then your crew member
+	# ---- top row: the colony corner on the left, your crew member on the right
 	var top := HBoxContainer.new()
 	top.name = "Top"
 	top.add_theme_constant_override(&"separation", 20)
 	column.add_child(top)
-	var left := _hud_box(top, "TopLeft")
-	_corner_left = left
-	left.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	var left_box := VBoxContainer.new()
-	left_box.add_theme_constant_override(&"separation", 6)
-	left.add_child(left_box)
-	_time = Label.new()
-	_time.name = "Time"
-	_time.theme_type_variation = UiTheme.HEADING
-	left_box.add_child(_time)
-	# The crew's day (2026-11-15): the current block under the clock.
-	var schedule_chip: Control = ScheduleChipScript.new()
-	schedule_chip.call(&"setup", services)
-	left_box.add_child(schedule_chip)
-	# Scout update: a dust storm on its way or running ("⚠ Dust storm in 6 h").
-	_hazard = Label.new()
-	_hazard.name = "Hazard"
-	_hazard.theme_type_variation = UiTheme.WARN
-	_hazard.visible = false
-	left_box.add_child(_hazard)
-	for i in MAX_READINGS:
-		var row := HBoxContainer.new()
-		row.name = "Reading%d" % i
-		for part in ["Symbol", "Value", "Word"]:
-			var l := Label.new()
-			l.name = part
-			row.add_child(l)
-		row.visible = false
-		left_box.add_child(row)
-		_reading_rows.append(row)
-	_ok_line = Label.new()
-	_ok_line.name = "ColonyOk"
-	_ok_line.text = "Colony OK ✓"
-	_ok_line.theme_type_variation = UiTheme.GOOD
-	left_box.add_child(_ok_line)
-
+	_build_colony_corner(top)
 	var top_space := Control.new()
 	top_space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	top.add_child(top_space)
-
-	var right := _hud_box(top, "TopRight")
-	_corner_right = right
-	right.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	var right_box := VBoxContainer.new()
-	right.add_child(right_box)
-	_crew_box = VBoxContainer.new()
-	_crew_box.name = "Crew"
-	_crew_box.add_theme_constant_override(&"separation", 8)
-	right_box.add_child(_crew_box)
-	var who := HBoxContainer.new()
-	who.name = "Who"
-	who.add_theme_constant_override(&"separation", 12)
-	_crew_box.add_child(who)
-	_crew_badge = CrewPortrait.new()
-	_crew_badge.name = "Badge"
-	_crew_badge.prefer_rig = false
-	_crew_badge.custom_minimum_size = Vector2(56, 56)
-	_crew_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	who.add_child(_crew_badge)
-	var who_text := VBoxContainer.new()
-	who_text.add_theme_constant_override(&"separation", 0)
-	who.add_child(who_text)
-	_crew_name = Label.new()
-	_crew_name.name = "Name"
-	_crew_name.theme_type_variation = UiTheme.HEADING
-	who_text.add_child(_crew_name)
-	var specialty_row := HBoxContainer.new()
-	specialty_row.name = "SpecialtyRow"
-	specialty_row.add_theme_constant_override(&"separation", 6)
-	who_text.add_child(specialty_row)
-	_crew_specialty_icon = Label.new()
-	_crew_specialty_icon.name = "SpecialtyIcon"
-	_crew_specialty_icon.theme_type_variation = UiTheme.MUTED
-	# A monochrome symbol font: the default fallback draws ⚡ and ⛏ as colour emoji, which ignore the accent colour.
-	var symbols := SystemFont.new()
-	symbols.font_names = PackedStringArray(["Segoe UI Symbol", "Noto Sans Symbols 2", "Noto Sans Symbols", "DejaVu Sans"])
-	symbols.allow_system_fallback = false   # otherwise the text server still picks Segoe UI Emoji for ⚡
-	symbols.fallbacks = [ThemeDB.fallback_font]
-	_crew_specialty_icon.add_theme_font_override(&"font", symbols)
-	specialty_row.add_child(_crew_specialty_icon)
-	_crew_specialty = Label.new()
-	_crew_specialty.name = "Specialty"
-	_crew_specialty.theme_type_variation = UiTheme.MUTED
-	specialty_row.add_child(_crew_specialty)
-	var bars := GridContainer.new()
-	bars.name = "Bars"
-	bars.columns = 2
-	bars.add_theme_constant_override(&"v_separation", 6)
-	_crew_box.add_child(bars)
-	# Radiation dose (2026-11-15): mSv toward the 600 mSv limit, under the bars.
-	var dose_badge: Control = DoseBadgeScript.new()
-	dose_badge.set(&"services", services)
-	_crew_box.add_child(dose_badge)
-	_health_text = Label.new()
-	_health_text.name = "HealthText"
-	bars.add_child(_health_text)
-	_health_bar = _bar(bars, "HealthBar")
-	_stamina_text = Label.new()
-	_stamina_text.name = "BodyEnergyText"
-	bars.add_child(_stamina_text)
-	_stamina_bar = _bar(bars, "BodyEnergyBar")
-	_suit = Label.new()
-	_suit.name = "Suit"
-	bars.add_child(_suit)
-	_suit_bar = _bar(bars, "SuitTankBar")
-	_suit_bar.theme_type_variation = UiTheme.BAR_COOL
-	_held_line = Label.new()
-	_held_line.name = "Held"
-	_held_line.theme_type_variation = UiTheme.MUTED
-	_crew_box.add_child(_held_line)
-	_no_crew = Label.new()
-	_no_crew.name = "NoCrew"
-	right_box.add_child(_no_crew)
+	_build_crew_corner(top)
 
 	# ---- top centre, on its own layer so it can never push the corners apart: the pause banner, then messages.
 	# Messages sit here, away from the subtitles and key hints at the bottom, so nothing ever overlaps.
@@ -498,32 +467,33 @@ func _build() -> void:
 	var centre_column := VBoxContainer.new()
 	centre_column.name = "TopCentre"
 	_centre_margin.add_child(centre_column)
-	_banner_panel = _hud_box(centre_column, "Paused")
+	_banner_panel = HudKit.Card.new("Paused", 16, 22, 8, true)
 	_banner_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	var banner_box := VBoxContainer.new()
-	banner_box.add_theme_constant_override(&"separation", 2)
-	_banner_panel.add_child(banner_box)
-	_banner = Label.new()
-	_banner.name = "Banner"
-	_banner.text = "⏸ PAUSED"
-	_banner.theme_type_variation = UiTheme.TITLE
+	centre_column.add_child(_banner_panel)
+	_banner = HudKit.Txt.new("⏸ Paused", 30.0, AstraStyle.TEXT, "Banner", true)
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	banner_box.add_child(_banner)
-	var banner_note := Label.new()
-	banner_note.name = "BannerNote"
-	banner_note.text = "The colony clock is stopped."
-	banner_note.theme_type_variation = UiTheme.MUTED
-	banner_note.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	banner_box.add_child(banner_note)
+	_banner_panel.add_child(_banner)
+	HudKit.say(_banner_panel, "Paused. The colony clock is stopped.")
 	_banner_panel.visible = false
-	_message_panel = PanelContainer.new()
-	_message_panel.name = "Messages"
-	_message_panel.theme_type_variation = UiTheme.TOAST
+	_message_panel = HudKit.Card.new("Messages", 14, 14, 8, true)
 	_message_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	centre_column.add_child(_message_panel)
-	_message = Label.new()
-	_message.name = "Message"
-	_message_panel.add_child(_message)
+	var message_box := VBoxContainer.new()
+	message_box.name = "Lines"
+	message_box.add_theme_constant_override(&"separation", 6)
+	_message_panel.add_child(message_box)
+	for i in MAX_MESSAGES:
+		var row := HBoxContainer.new()
+		row.name = "Line%d" % i
+		row.add_theme_constant_override(&"separation", 10)
+		message_box.add_child(row)
+		var icon := HudKit.Icon.new(&"info", AstraStyle.C_O2, 22.0, "Symbol")
+		icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		row.add_child(icon)
+		var line := HudKit.Txt.new("", 20.0, AstraStyle.TEXT, "Message")
+		row.add_child(line)
+		row.visible = false
+		_message_rows.append({"row": row, "label": line})
 	_message_panel.visible = false
 	# Upgrade update: why you died, after the med bay brought you back. Its own place at the top centre; messages
 	# move under it while it shows.
@@ -588,35 +558,46 @@ func _build() -> void:
 	below.anchor_right = 1.0
 	below.anchor_top = 0.5
 	below.anchor_bottom = 1.0
-	below.offset_top = 36.0
-	below.add_theme_constant_override(&"separation", 14)
+	below.offset_top = 40.0
+	below.add_theme_constant_override(&"separation", 10)
 	_root.add_child(below)
-	_cue_panel = PanelContainer.new()
-	_cue_panel.name = "CuePanel"
-	_cue_panel.theme_type_variation = UiTheme.CHIP
+	# One large key cap and a short verb phrase: readable from the couch.
+	_cue_panel = HudKit.Card.new("CuePanel", 18, 14, 8, true)
 	_cue_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	below.add_child(_cue_panel)
 	var cue_row := HBoxContainer.new()
+	cue_row.add_theme_constant_override(&"separation", 14)
 	_cue_panel.add_child(cue_row)
-	var cap := UiTheme.key_cap("E")
-	cap.name = "CueKey"
-	_cue_key = cap.get_node("Key") as Label
+	var cap := HudKit.key_cap("E", 30.0, "CueKey")
+	_cue_key = cap.get_node("KeyText") as Label
 	cue_row.add_child(cap)
-	_cue = Label.new()
-	_cue.name = "Cue"
+	_cue = HudKit.Txt.new("", 30.0, AstraStyle.TEXT, "Cue", true)
 	cue_row.add_child(_cue)
 	_cue_panel.visible = false
-	var progress_panel := _hud_box(below, "SuitCheck")
+	_cue_extra = HudKit.Card.new("CueExtra", 12, 12, 5, true)
+	_cue_extra.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	below.add_child(_cue_extra)
+	var extra_row := HBoxContainer.new()
+	extra_row.add_theme_constant_override(&"separation", 8)
+	_cue_extra.add_child(extra_row)
+	extra_row.add_child(HudKit.key_cap("W", 18.0, "Up"))
+	extra_row.add_child(HudKit.key_cap("S", 18.0, "Down"))
+	extra_row.add_child(HudKit.Txt.new("climb", 20.0, AstraStyle.TEXT_2, "Word"))
+	HudKit.say(_cue_extra, "W and S climb the ladder. E or Space lets go.")
+	_cue_extra.visible = false
+	var progress_panel := HudKit.Card.new("SuitCheck", 16, 16, 10, true)
 	progress_panel.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	below.add_child(progress_panel)
+	var progress_row := HBoxContainer.new()
+	progress_row.add_theme_constant_override(&"separation", 12)
+	progress_panel.add_child(progress_row)
+	progress_row.add_child(HudKit.Icon.new(&"helmet", AstraStyle.C_O2, 30.0, "Symbol"))
 	var progress_inner := VBoxContainer.new()
-	progress_inner.custom_minimum_size.x = 360.0
-	progress_panel.add_child(progress_inner)
-	var progress_label := Label.new()
-	progress_label.text = "Suit check…"
-	progress_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	progress_inner.add_child(progress_label)
-	_progress = _bar(progress_inner, "Progress")
-	_progress.theme_type_variation = UiTheme.BAR_COOL
+	progress_inner.add_theme_constant_override(&"separation", 4)
+	progress_row.add_child(progress_inner)
+	progress_inner.add_child(HudKit.Txt.new("Suit check", 20.0, AstraStyle.TEXT, "Word"))
+	_progress = HudKit.Bar.new(AstraStyle.C_O2, Vector2(300, 16), "Progress")
+	progress_inner.add_child(_progress)
 	_progress_box = progress_panel          # the whole box shows and hides with the check
 	_progress_box.visible = false
 
@@ -625,31 +606,165 @@ func _build() -> void:
 	_fit_all()
 
 
+## Top left: sun or moon and the sol, a storm countdown when one is coming, then "Colony OK" or the warning chips.
+func _build_colony_corner(top: HBoxContainer) -> void:
+	var left := HudKit.Card.new("TopLeft", 16, 14, 10)
+	top.add_child(left)
+	_corner_left = left
+	left.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var left_box := VBoxContainer.new()
+	left_box.add_theme_constant_override(&"separation", 8)
+	left.add_child(left_box)
+	var clock := HBoxContainer.new()
+	clock.name = "Clock"
+	clock.add_theme_constant_override(&"separation", 10)
+	left_box.add_child(clock)
+	_clock_icon = HudKit.Icon.new(&"sun", AstraStyle.C_POWER, 30.0, "DayNight")
+	clock.add_child(_clock_icon)
+	_time = HudKit.Txt.new("Sol 1", 26.0, AstraStyle.TEXT, "Time", true)
+	clock.add_child(_time)
+	# Scout update: a dust storm on its way or blowing: the storm picture and "in 6 h" / "6 h left".
+	_hazard_row = HBoxContainer.new()
+	_hazard_row.name = "Hazard"
+	_hazard_row.add_theme_constant_override(&"separation", 6)
+	clock.add_child(_hazard_row)
+	var gap := Control.new()
+	gap.custom_minimum_size.x = 8
+	_hazard_row.add_child(gap)
+	_hazard_icon = HudKit.Icon.new(&"storm", AstraStyle.WARN, 28.0, "Symbol")
+	_hazard_row.add_child(_hazard_icon)
+	_hazard = HudKit.Txt.new("", 22.0, AstraStyle.WARN, "Countdown", true)
+	_hazard_row.add_child(_hazard)
+	_hazard_row.visible = false
+	# The crew's day (2026-11-15): the current block under the clock.
+	var schedule_chip: Control = ScheduleChipScript.new()
+	schedule_chip.call(&"setup", services)
+	left_box.add_child(schedule_chip)
+	var chips := HBoxContainer.new()
+	chips.name = "Readings"
+	chips.add_theme_constant_override(&"separation", 6)
+	left_box.add_child(chips)
+	for i in MAX_READINGS:
+		var chip := HudKit.Card.new("Reading%d" % i, 12, 8, 4, true)
+		chip.tone = &"warn"
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 5)
+		chip.add_child(row)
+		row.add_child(HudKit.Icon.new(&"power", AstraStyle.TEXT, 24.0, "Symbol"))
+		row.add_child(HudKit.Txt.new("", 18.0, AstraStyle.TEXT, "Value"))
+		row.add_child(HudKit.Icon.new(&"warn", AstraStyle.WARN, 20.0, "Mark"))
+		chip.visible = false
+		chips.add_child(chip)
+		_reading_rows.append(chip)
+	_ok_chip = HudKit.Card.new("ColonyOk", 12, 10, 4, true)
+	_ok_chip.tone = &"good"
+	_ok_chip.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	var ok_row := HBoxContainer.new()
+	ok_row.add_theme_constant_override(&"separation", 6)
+	_ok_chip.add_child(ok_row)
+	ok_row.add_child(HudKit.Icon.new(&"check", AstraStyle.GOOD, 20.0, "Symbol"))
+	ok_row.add_child(HudKit.Txt.new("Colony OK", 20.0, AstraStyle.GOOD, "Word"))
+	HudKit.say(_ok_chip, "Colony OK: nothing is low.")
+	chips.add_child(_ok_chip)
+
+
+## Top right: who you are (badge, specialist symbol, one role word) and three picture bars.
+func _build_crew_corner(top: HBoxContainer) -> void:
+	var right := HudKit.Card.new("TopRight", 16, 14, 10)
+	top.add_child(right)
+	_corner_right = right
+	right.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var right_box := VBoxContainer.new()
+	right.add_child(right_box)
+	_crew_box = VBoxContainer.new()
+	_crew_box.name = "Crew"
+	_crew_box.add_theme_constant_override(&"separation", 7)
+	right_box.add_child(_crew_box)
+	_who_row = HBoxContainer.new()
+	_who_row.name = "Who"
+	_who_row.add_theme_constant_override(&"separation", 10)
+	_crew_box.add_child(_who_row)
+	_crew_badge = CrewPortrait.new()
+	_crew_badge.name = "Badge"
+	_crew_badge.prefer_rig = false
+	_crew_badge.custom_minimum_size = Vector2(44, 44)
+	_crew_badge.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_who_row.add_child(_crew_badge)
+	_crew_specialty_icon = HudKit.Txt.new("", 26.0, AstraStyle.TEXT, "SpecialtyIcon")
+	# A monochrome symbol font: the default fallback draws ⚡ and ⛏ as colour emoji, which ignore the accent colour.
+	_crew_specialty_icon.add_theme_font_override(&"font", AstraStyle.symbol_font())
+	_who_row.add_child(_crew_specialty_icon)
+	_crew_name = HudKit.Txt.new("", 24.0, AstraStyle.TEXT, "Name", true)
+	_who_row.add_child(_crew_name)
+	_health = _vital_row(_crew_box, "Health", &"heart", AstraStyle.GOOD)
+	_stamina = _vital_row(_crew_box, "BodyEnergy", &"run", AstraStyle.ACCENT)
+	_suit = _vital_row(_crew_box, "SuitTank", &"helmet", AstraStyle.C_O2)
+	# Radiation dose (2026-11-15): mSv toward the 600 mSv limit, under the vitals.
+	var dose_badge: Control = DoseBadgeScript.new()
+	dose_badge.set(&"services", services)
+	_crew_box.add_child(dose_badge)
+	_held_row = HBoxContainer.new()
+	_held_row.name = "Held"
+	_held_row.add_theme_constant_override(&"separation", 8)
+	_crew_box.add_child(_held_row)
+	_held_row.add_child(HudKit.Icon.new(&"cargo", AstraStyle.C_PARTS, 26.0, "Symbol"))
+	_held_line = HudKit.Txt.new("", 20.0, AstraStyle.TEXT, "HeldText")
+	_held_row.add_child(_held_line)
+	_held_row.visible = false
+	_no_crew = HBoxContainer.new()
+	_no_crew.name = "NoCrew"
+	_no_crew.add_theme_constant_override(&"separation", 10)
+	right_box.add_child(_no_crew)
+	_no_crew.add_child(HudKit.Icon.new(&"crew", AstraStyle.TEXT_2, 30.0, "Symbol"))
+	var crew_cap := HudKit.key_cap("C", 22.0, "CrewKey")
+	_no_crew_key = crew_cap.get_node("KeyText") as Label
+	_no_crew.add_child(crew_cap)
+	_no_crew.add_child(HudKit.Txt.new("Pick crew", 22.0, AstraStyle.TEXT, "Word"))
+
+
+## One vital: a picture, a level bar, and a percentage with a mark that show only while it is low.
+func _vital_row(parent: Control, row_name: String, kind: StringName, color: Color) -> Dictionary:
+	var row := HBoxContainer.new()
+	row.name = row_name
+	row.add_theme_constant_override(&"separation", 8)
+	parent.add_child(row)
+	var icon := HudKit.Icon.new(kind, color, 26.0, "Symbol")
+	row.add_child(icon)
+	var bar := HudKit.Bar.new(color, Vector2(150, 16), row_name + "Bar")
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(bar)
+	var text := HudKit.Txt.new("", 20.0, AstraStyle.TEXT, row_name + "Text", true)
+	text.visible = false
+	row.add_child(text)
+	var mark := HudKit.Icon.new(&"warn", AstraStyle.WARN, 20.0, "Mark")
+	mark.visible = false
+	row.add_child(mark)
+	return {"row": row, "icon": icon, "bar": bar, "text": text, "mark": mark, "color": color}
+
+
+## Fills one vital row: the bar always, the number and the mark only while `level` is not &"ok".
+func _show_vital(v: Dictionary, percent: float, level: StringName, words: String) -> void:
+	var c: Color = v.color if level == &"ok" else HudKit.level_color(level)
+	(v.bar as HudKit.Bar).share = percent / 100.0
+	(v.bar as HudKit.Bar).color = c
+	(v.icon as HudKit.Icon).color = c
+	var text := v.text as Label
+	text.visible = level != &"ok"
+	text.text = "%d %%" % roundi(percent)
+	(text as HudKit.Txt).tint(c)
+	var mark := v.mark as HudKit.Icon
+	mark.visible = level != &"ok"
+	mark.kind = StringName(HudKit.LEVEL_MARK.get(level, &"warn"))
+	mark.color = c
+	HudKit.say(v.row as Control, words)
+
+
 func _hud_box(parent: Control, box_name: String) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.name = box_name
 	p.theme_type_variation = UiTheme.HUD_PANEL
 	parent.add_child(p)
 	return p
-
-
-func _bar(parent: Control, bar_name: String) -> ProgressBar:
-	var b := ProgressBar.new()
-	b.name = bar_name
-	b.min_value = 0.0
-	b.max_value = 100.0
-	b.show_percentage = false
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	b.custom_minimum_size = Vector2(170.0, 16.0)
-	parent.add_child(b)
-	return b
-
-
-func _side_spacer(parent: Control) -> void:
-	var s := Control.new()
-	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	parent.add_child(s)
 
 
 func _ignore_mouse(node: Node) -> void:
@@ -698,8 +813,16 @@ func _tick_messages(delta: float) -> void:
 
 
 func _update_messages() -> void:
-	_message.text = "\n".join(current_messages())
-	_message_panel.visible = not _showing.is_empty()
+	for i in _message_rows.size():
+		var r: Dictionary = _message_rows[i]
+		var on := i < _showing.size()
+		(r.row as Control).visible = on
+		if on:
+			var full := String(_showing[i].text)
+			(r.label as Label).text = HudKit.short_line(full)
+			HudKit.say(r.row as Control, full)
+	# With the mission HUD the same messages are its pop-ups: one place to look.
+	_message_panel.visible = not _showing.is_empty() and not message_sink.is_valid()
 	_place_messages()
 
 
@@ -710,34 +833,74 @@ func refresh() -> void:
 	var c := services.clock()
 	var hour := c.hour_of_sol()
 	var day := c.is_daylight()
-	_time.text = "%s Sol %d · %02d:%02d · %s" % ["☀" if day else "☾", c.sol_index + 1, int(hour), int(fmod(hour, 1.0) * 60.0), "day" if day else "night"]
+	_clock_icon.kind = &"sun" if day else &"moon"
+	_clock_icon.color = AstraStyle.C_POWER if day else AstraStyle.TEXT_2
+	_time.text = "Sol %d" % (c.sol_index + 1)
+	HudKit.say(_time.get_parent() as Control, "Sol %d · %02d:%02d · %s" % [c.sol_index + 1, int(hour), int(fmod(hour, 1.0) * 60.0), "day" if day else "night"])
 	var low := low_readings(services)
+	_ok_chip.visible = low.is_empty()
+	if supplies_on_strip:
+		# the suit tank has its own bar in the crew corner, so only the room air is left for these chips
+		var on_strip: Array = [&"suit_tank"]
+		for s: Dictionary in ColonySummaryPanel.STOCKS:
+			on_strip.append(s.key)
+		var rest: Array[Dictionary] = []
+		for r: Dictionary in low:
+			if not on_strip.has(r.key):
+				rest.append(r)
+		low = rest
+	_reading_texts = PackedStringArray()
 	for i in _reading_rows.size():
-		var row := _reading_rows[i]
-		row.visible = i < low.size()
-		if not row.visible:
+		var chip := _reading_rows[i]
+		chip.visible = i < low.size()
+		if not chip.visible:
 			continue
 		var r: Dictionary = low[i]
-		var variation := ReadingRow.variation_of(r.level)
-		(row.get_node("Symbol") as Label).text = String(r.symbol)
-		(row.get_node("Value") as Label).text = "%s %s" % [r.name, r.value]
-		var word := row.get_node("Word") as Label
-		word.text = "%s %s" % ["✖" if r.level == &"urgent" else "!", r.word]
-		for l in row.get_children():
-			(l as Label).theme_type_variation = variation
-	_ok_line.visible = low.is_empty()
+		var urgent: bool = r.level == &"urgent"
+		var col := HudKit.level_color(r.level)
+		(chip as HudKit.Card).tone = &"danger" if urgent else &"warn"
+		var row := chip.get_child(0)
+		var symbol := row.get_node("Symbol") as HudKit.Icon
+		symbol.kind = StringName(READING_ICONS.get(r.key, &"dot"))
+		symbol.color = col
+		var value := row.get_node("Value") as Label
+		value.text = String(READING_WORDS.get(r.key, ""))
+		value.visible = value.text != ""
+		var mark := row.get_node("Mark") as HudKit.Icon
+		mark.kind = &"danger" if urgent else &"warn"
+		mark.color = col
+		var words := reading_words(r)
+		_reading_texts.append(words)
+		HudKit.say(chip, words)
 	var storm := StormOutlook.now(services.state())
-	_hazard.visible = String(storm.phase) != "calm"
-	_hazard.text = ("⚠ " if String(storm.phase) == "warned" else "✖ ") + String(storm.text)
-	_hazard.theme_type_variation = UiTheme.WARN if String(storm.phase) == "warned" else UiTheme.URGENT
+	var warned := String(storm.phase) == "warned"
+	_hazard_row.visible = String(storm.phase) != "calm"
+	if _hazard_row.visible:
+		var hc := AstraStyle.WARN if warned else AstraStyle.DANGER
+		_hazard_icon.color = hc
+		_hazard.text = storm_words(storm)
+		(_hazard as HudKit.Txt).tint(hc)
+		HudKit.say(_hazard_row, String(storm.text))
 	_refresh_crew()
 	_banner_panel.visible = services.session.paused
 	var me := services.local_character()
 	var p := services.session.suit_check_progress(me.id) if me != null else -1.0
 	_progress_box.visible = p >= 0.0
 	if p >= 0.0:
-		_progress.value = p * 100.0
+		_progress.share = p
 	_update_cue()
+
+
+## The countdown beside the storm picture: "in 6 h" while it is on its way, "6 h left" while it blows, "now" else.
+static func storm_words(storm: Dictionary) -> String:
+	var text := String(storm.get("text", ""))
+	match String(storm.get("phase", "calm")):
+		"warned":
+			return text.trim_prefix("Dust storm ")
+		"storm":
+			var tail := text.trim_prefix("Dust storm").trim_prefix(" · ")
+			return tail if tail != "" else "now"
+	return ""
 
 
 func _refresh_crew() -> void:
@@ -747,34 +910,43 @@ func _refresh_crew() -> void:
 	_crew_box.visible = me != null
 	_no_crew.visible = me == null
 	if me == null:
-		_no_crew.text = "No crew member. Press %s to choose one." % _key(&"crew", "C")
+		_no_crew_key.text = _key(&"crew", "C")
+		HudKit.say(_no_crew, "No crew member. Press %s to choose one." % _key(&"crew", "C"))
 		return
 	if _badge_for != me.id:
 		_badge_for = me.id
 		_crew_badge.setup(me, CrewPortrait.crew_index(services.state(), me.id))
-	_crew_name.text = me.display_name
+	_crew_name.text = role_word(me)
 	_crew_specialty_icon.text = CrewPortrait.specialty_symbol(me.specialty)
-	_crew_specialty_icon.add_theme_color_override(&"font_color", CrewPortrait.specialty_color(me.specialty))
-	_crew_specialty.text = CrewPortrait.specialty_words(me.specialty)
-	_health_text.text = "Health %d %%" % roundi(me.health)
-	_health_bar.value = me.health
-	_health_bar.theme_type_variation = UiTheme.bar_of(&"urgent" if me.health < 30.0 else (&"warn" if me.health < 60.0 else &"ok"))
-	_stamina_text.text = "Body energy %d %%" % roundi(me.stamina)
-	_stamina_bar.value = me.stamina
-	_suit.text = "Suit %s · tank %d %%" % ["on" if me.suit_on else "off", roundi(me.suit_charge)]
-	_suit_bar.value = me.suit_charge
+	(_crew_specialty_icon as HudKit.Txt).tint(CrewPortrait.specialty_color(me.specialty))
+	HudKit.say(_who_row, "%s · %s" % [me.display_name, CrewPortrait.specialty_words(me.specialty)])
+	var health: StringName = &"urgent" if me.health < HEALTH_URGENT else (&"warn" if me.health < HEALTH_WARN else &"ok")
+	_show_vital(_health, me.health, health, "Health %d %%" % roundi(me.health))
+	_show_vital(_stamina, me.stamina, &"warn" if me.stamina < BODY_ENERGY_WARN else &"ok", "Body energy %d %%" % roundi(me.stamina))
 	# The tank only matters while the suit is worn: then a low tank turns the bar to the warning colours.
 	var tank: StringName = &"ok"
 	if me.suit_on and me.suit_charge < SUIT_URGENT:
 		tank = &"urgent"
 	elif me.suit_on and me.suit_charge < SUIT_WARN:
 		tank = &"warn"
-	_suit_bar.theme_type_variation = UiTheme.BAR_COOL if tank == &"ok" else UiTheme.bar_of(tank)
+	_show_vital(_suit, me.suit_charge, tank, "Suit %s · tank %d %%" % ["on" if me.suit_on else "off", roundi(me.suit_charge)])
+	# Suit off: an open helmet with a line through it, and the bar steps back (the tank is not in use).
+	(_suit.icon as HudKit.Icon).kind = &"helmet" if me.suit_on else &"helmet_off"
+	(_suit.bar as Control).modulate.a = 1.0 if me.suit_on else 0.45
+	_held_row.visible = _held != &""
 	if _held != &"":
-		_held_line.text = "In your hands: %s" % _item_name(_held).to_lower()
-	else:
-		_held_line.text = "Hands empty"
+		_held_line.text = _item_name(_held)
+		HudKit.say(_held_row, "In your hands: %s" % _item_name(_held).to_lower())
 	_place_messages()          # the corner boxes may have changed size
+
+
+## ONE short word for a crew member's job: "Electrical", "Medical", "Biology", "Geology" (the name tag's word).
+static func role_word(c: CharacterState) -> String:
+	var i := CrewLooks.index_of(c.specialty)
+	if i >= 0:
+		return String(CrewLooks.look(i).get("tag", "Crew"))
+	var words := c.display_name.strip_edges().split(" ", false)
+	return words[0] if words.size() > 0 else "Crew"
 
 
 func _update_cue() -> void:
@@ -815,8 +987,10 @@ func _update_cue() -> void:
 		text = "[%s] %s" % [key, body]
 	_cue_full = text
 	_cue_key.text = key
-	_cue.text = body
+	_cue.text = short_cue(body)
 	_cue_panel.visible = text != ""
+	_cue_extra.visible = text != "" and kind == "ladder"
+	HudKit.say(_cue_panel, text)
 	# the crosshair grows a ring when E would do something with what you are looking at
 	_crosshair.active = kind in ["station", "item", "ladder"] and body != ""
 
@@ -845,8 +1019,6 @@ static func repair_station_name(rec: Dictionary) -> String:
 
 func _hint_line() -> String:
 	# Owner 2026-11-14: the M map is hidden for now; J shows the goals (and the map in big mode).
-	#return "%s map · %s cargo · %s crew · %s pause · %s sources" % [_key(&"map", "M"), _key(&"inventory", "I"), _key(&"crew", "C"),
-	#	_key(&"back", "Esc"), _key(&"source_register", "Shift+Backspace")]
 	return "%s goals · %s cargo · %s crew · %s pause · %s sources" % [_key(&"goals", "J"), _key(&"inventory", "I"), _key(&"crew", "C"),
 		_key(&"back", "Esc"), _key(&"source_register", "Shift+Backspace")]
 
@@ -944,7 +1116,7 @@ func _screen_size() -> Vector2:
 ## Messages go in the gap between the two top corners. When the corners leave no real gap (small screen, large
 ## text), the messages move to just under them instead and may be wider.
 func _place_messages() -> void:
-	if _centre_margin == null or _message == null:
+	if _centre_margin == null or _message_panel == null:
 		return
 	var screen := _screen_size()
 	var left := _corner_left.get_combined_minimum_size()
@@ -964,4 +1136,6 @@ func _place_messages() -> void:
 		death_notice.position = Vector2(roundf((screen.x - w) * 0.5), roundf(top))
 		top += death_notice.size.y + 10.0
 	_centre_margin.add_theme_constant_override(&"margin_top", roundi(top))
-	_fit_text(_message, max_w - 46.0)
+	# One short line each; a line still wider than the room it has (large text on a small screen) wraps.
+	for r: Dictionary in _message_rows:
+		_fit_text(r.label as Label, max_w - 70.0)

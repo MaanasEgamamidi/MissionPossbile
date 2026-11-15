@@ -235,8 +235,8 @@ func _panel_checks() -> void:
 		await _frames(2)
 		presses += 1
 	_check("keyboard solves the board through the host", float(_task().progress) >= 1.0 and bool(_task().first_completed), "presses %d progress %s" % [presses, _task().progress])
-	_check("panel shows the host's completion", bool(panel.get("succeeded")) and "Complete" in panel.status_label.text)
-	_check("hint names the water", "flowing" in (panel.get("hint_label") as Label).text, (panel.get("hint_label") as Label).text)
+	_check("panel shows the host's completion", bool(panel.get("succeeded")) and "has water" in panel.status_label.text, panel.status_label.text)
+	_check("hint names the water", "has water" in (panel.get("hint_label") as Label).text, (panel.get("hint_label") as Label).text)
 	print("INFO keyboard presses %d, used Q %s" % [presses, used_q])
 	ui.close_all()
 	await _frames()

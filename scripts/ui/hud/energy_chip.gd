@@ -1,10 +1,14 @@
 extends PanelContainer
 ## The battery chip under the vitals bar (owner request 2026-11-14: when the sun goes down the solar panels stop and
-## the battery drains fast). It shows a sun or a moon, how full the battery is, and while the battery goes down how
-## fast and for how long it lasts: "☾ Battery 64 % · falling 4.2 kW, ~9 h left". It turns amber below WARN_PCT and red
-## below URGENT_PCT. The numbers come from PowerModel.outlook() (the energy model's own forecast) when the game has
-## it, else from the colony state. Read only.
+## the battery drains fast).
+## UI overhaul (2026-11-15): pictures instead of a sentence. It shows a sun or a moon, a battery, an arrow (up while
+## it charges, down while it drains) and, only while it drains, how long it lasts ("~9 h"). Below WARN_PCT it turns
+## amber and adds the battery share and a triangle mark; below URGENT_PCT red with an octagon mark.
+## The whole sentence ("☾ Battery 64 % · falling 4.2 kW, ~9 h left") is still what text() returns, and it is the
+## chip's tooltip and accessible name. The numbers come from PowerModel.outlook() (the energy model's own forecast)
+## when the game has it, else from the colony state. Read only.
 
+const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
 ## Battery share (percent) below which the chip turns amber / red.
 const WARN_PCT := 30.0
 const URGENT_PCT := 15.0
@@ -17,26 +21,33 @@ var services: GameServices
 ## What the chip shows now (see reading()).
 var current: Dictionary = {}
 
-var _symbol: Label
-var _text: Label
-var _style: StyleBoxFlat
+var _sky: HudKit.Icon
+var _battery: HudKit.Icon
+var _arrow: HudKit.Icon
+var _text: HudKit.Txt
+var _mark: HudKit.Icon
+var _color := AstraStyle.TEXT
+var _tone := "-"
 
 
 func _init() -> void:
 	name = "EnergyChip"
 	mouse_filter = Control.MOUSE_FILTER_PASS
-	_style = AstraStyle.pill(Color(AstraStyle.GLASS, 0.82), AstraStyle.RADIUS_SM, 12, 4, AstraStyle.LINE)
-	add_theme_stylebox_override(&"panel", _style)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 8)
+	row.add_theme_constant_override(&"separation", 6)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(row)
-	_symbol = AstraStyle.label("☀", 17, AstraStyle.C_POWER, "Symbol", true)
-	_symbol.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(_symbol)
-	_text = AstraStyle.label("", 14, AstraStyle.TEXT, "Text")
-	_text.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_sky = HudKit.Icon.new(&"sun", AstraStyle.C_POWER, 22.0, "Symbol")
+	row.add_child(_sky)
+	_battery = HudKit.Icon.new(&"battery", AstraStyle.TEXT, 24.0, "Battery")
+	row.add_child(_battery)
+	_arrow = HudKit.Icon.new(&"up", AstraStyle.GOOD, 14.0, "Arrow")
+	row.add_child(_arrow)
+	_text = HudKit.Txt.new("", 18.0, AstraStyle.TEXT, "Text", true)
 	row.add_child(_text)
+	_mark = HudKit.Icon.new(&"warn", AstraStyle.WARN, 18.0, "Mark")
+	row.add_child(_mark)
+	_restyle()
 
 
 func setup(p_services: GameServices) -> void:
@@ -44,9 +55,14 @@ func setup(p_services: GameServices) -> void:
 	refresh()
 
 
-## The whole line as shown ("☾ Battery 64 % · falling 4.2 kW, ~9 h left").
+## The whole line in words ("☾ Battery 64 % · falling 4.2 kW, ~9 h left"): the chip's tooltip and accessible name.
 func text() -> String:
-	return "%s %s" % [_symbol.text, _text.text]
+	return "%s %s" % ["☀" if bool(current.get("sun_up", true)) else "☾", String(current.get("text", ""))]
+
+
+## The few words the chip itself shows beside its pictures ("~9 h", "25 % · ~3 h"), or "".
+func shown_words() -> String:
+	return _text.text if _text.visible else ""
 
 
 ## &"ok", &"warn" (below WARN_PCT) or &"urgent" (below URGENT_PCT).
@@ -54,26 +70,59 @@ func level() -> StringName:
 	return StringName(current.get("level", &"ok"))
 
 
-## The colour the text has now.
+## The colour the chip's words and battery have now.
 func text_color() -> Color:
-	return _text.get_theme_color(&"font_color")
+	return _color
 
 
 func refresh() -> void:
 	if services == null or not services.has_game():
 		return
 	current = reading(services)
-	_symbol.text = "☀" if bool(current.sun_up) else "☾"
-	AstraStyle.set_color(_symbol, AstraStyle.C_POWER if bool(current.sun_up) else AstraStyle.TEXT_2)
-	_text.text = String(current.text)
-	var c := AstraStyle.TEXT
+	var sun_up := bool(current.sun_up)
+	_sky.kind = &"sun" if sun_up else &"moon"
+	_sky.color = AstraStyle.C_POWER if sun_up else AstraStyle.TEXT_2
+	_color = AstraStyle.TEXT
 	match level():
-		&"urgent": c = AstraStyle.DANGER
-		&"warn": c = AstraStyle.WARN
-	AstraStyle.set_color(_text, c)
-	_style.border_color = AstraStyle.LINE if level() == &"ok" else Color(c, 0.7)
-	_style.bg_color = Color(AstraStyle.GLASS, 0.82) if level() == &"ok" else Color(c.r * 0.2 + 0.05, c.g * 0.12 + 0.06, c.b * 0.12 + 0.12, 0.9)
-	tooltip_text = String(current.get("tip", ""))
+		&"urgent": _color = AstraStyle.DANGER
+		&"warn": _color = AstraStyle.WARN
+	var net := float(current.net_kw)
+	var draining := net < -0.05
+	_arrow.visible = absf(net) > 0.05
+	_arrow.kind = &"down" if draining else &"up"
+	_arrow.color = (AstraStyle.DANGER if level() == &"urgent" else AstraStyle.WARN) if draining else AstraStyle.GOOD
+	_battery.color = _color
+	# UI overhaul: the battery share is on the vitals strip right above (electricity), so the chip never repeats it:
+	# colour and mark say low, and the only words are how long the battery lasts while it drains.
+	var words := PackedStringArray()
+	if draining:
+		words.append(hours_words(float(current.hours_left)))
+	_text.text = " · ".join(words)
+	_text.visible = _text.text != ""
+	_text.tint(_color)
+	_mark.visible = level() != &"ok"
+	_mark.kind = StringName(HudKit.LEVEL_MARK.get(level(), &"warn"))
+	_mark.color = _color
+	_restyle()
+	HudKit.say(self, "%s. %s" % [text(), String(current.get("tip", ""))])
+
+
+func _restyle() -> void:
+	var tone := "%s|%s" % [level(), UiTheme.is_high_contrast()]
+	if tone == _tone:
+		return
+	_tone = tone
+	var c := _color
+	var plain := level() == &"ok"
+	var style := AstraStyle.pill(Color(AstraStyle.GLASS_SOLID if UiTheme.is_high_contrast() else AstraStyle.GLASS, 0.9) if plain
+		else Color(c.r * 0.2 + 0.05, c.g * 0.12 + 0.06, c.b * 0.12 + 0.12, 0.93), AstraStyle.RADIUS_SM, 12, 4,
+		(AstraStyle.LINE_STRONG if UiTheme.is_high_contrast() else AstraStyle.LINE) if plain else Color(c, 0.8))
+	add_theme_stylebox_override(&"panel", style)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_restyle()
 
 
 ## True when the energy model has PowerModel.outlook(state, balance, phase).

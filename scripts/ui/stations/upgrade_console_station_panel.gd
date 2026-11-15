@@ -20,11 +20,16 @@ func panel_title() -> String:
 
 
 func _what_you_can_do() -> PackedStringArray:
-	var record: Dictionary = services.state().stations.get(String(station_id), {}) if services != null else {}
-	var line := String(record.get("description", "Upgrade this area."))
+	# Upgrade paths plan (2026-11-15): builds are chosen at the section's core spot, one a day in the Plan block.
 	var spot := "its section's core spot"
 	for track: String in upgrade_tracks():
 		spot = AreaLevels.spot_words(track)
 		break
-	return PackedStringArray([line, "Each level adds more to this area, and it does more for the colony.",
+	return PackedStringArray(["Each level adds more to this area, and it does more for the colony.",
 		"The colony chooses one build a day at %s, in the Plan block at 20:00." % spot])
+
+
+## The console's one short line ("Plant more of the Garden dome.") above its upgrade strip.
+func _build_body() -> void:
+	var record: Dictionary = services.state().stations.get(String(station_id), {}) if services != null else {}
+	_add_text(_body, String(record.get("description", "Upgrade this area.")))

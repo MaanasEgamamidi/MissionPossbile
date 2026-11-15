@@ -39,14 +39,26 @@ static func supports_resume() -> bool:
 	return true
 
 
-## Seeded starting dust per area id.
-static func start_dust(seed_value: int) -> Dictionary:
+## Areas that start clean on the first run (owner's concept: "fewer patches on the first run"), so the first repair is
+## four patches and later ones are all six. The middle column, so dust still shows at both ends of the hangar floor.
+const FIRST_RUN_CLEAN := ["back_middle", "front_middle"]
+
+
+## Seeded starting dust per area id. first_run: the FIRST_RUN_CLEAN areas start clean.
+static func start_dust(seed_value: int, first_run: bool = false) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash([seed_value, "T11 hangar dust"])
 	var out := {}
 	for area: Dictionary in AREAS:
 		out[area.id] = float(rng.randi_range(2, 4)) * STROKE
+		if first_run and FIRST_RUN_CLEAN.has(area.id):
+			out[area.id] = 0.0
 	return out
+
+
+## True until the task has been completed once.
+static func is_first_run(task: Dictionary) -> bool:
+	return not bool(task.get("first_completed", false))
 
 
 ## The dust the hangar should show now, per area id (0.0 clean .. 1.0): the puzzle's levels while the spot is
@@ -63,7 +75,7 @@ static func area_dust(task: Dictionary) -> Dictionary:
 ## The host's puzzle state for a task record: its saved state when valid for this seed, else the seeded dust.
 static func state_of(task: Dictionary) -> Dictionary:
 	var seed_value := int(task.get("puzzle_seed", 0))
-	var start := start_dust(seed_value)
+	var start := start_dust(seed_value, is_first_run(task))
 	var saved: Variant = task.get("puzzle_state", {})
 	if saved is Dictionary and _whole((saved as Dictionary).get("seed")) == seed_value:
 		var step := _whole((saved as Dictionary).get("step"))
@@ -119,12 +131,12 @@ static func validate(task: Dictionary, move: Dictionary) -> Dictionary:
 		"reset":
 			if payload != 0:
 				return refused
-			areas = start_dust(int(current.seed))
+			areas = start_dust(int(current.seed), is_first_run(task))
 		_:
 			return refused
 	var start_total := 0.0
 	var left := 0.0
-	var start := start_dust(int(current.seed))
+	var start := start_dust(int(current.seed), is_first_run(task))
 	for area: Dictionary in AREAS:
 		start_total += float(start[area.id])
 		left += float(areas[area.id])

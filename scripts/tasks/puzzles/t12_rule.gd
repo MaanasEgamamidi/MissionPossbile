@@ -7,22 +7,24 @@ extends RefCounted
 ## clears T12.maintenance_fault. LocalPressure (S04) reads exactly that flag, so the leak stops and the exit vestibule
 ## repressurises on its own clock. Nothing here changes S04's rules.
 ##
-## Seeded from task.puzzle_seed: which of the 6 door-edge sections leaks, and which number (1..5) sits on each of the
-## five seal points along that edge (a shuffle, never plain 1-2-3-4-5 or 5-4-3-2-1, so the player has to look).
+## UI overhaul (2026-11-15, concept "Seal the Airlock"): three press points instead of five. The order rule is unchanged.
+##
+## Seeded from task.puzzle_seed: which of the 6 door-edge sections leaks, and which number (1..POINTS) sits on each of
+## the seal points along that edge (a shuffle, never plain 1-2-3 or 3-2-1, so the order has to be shown).
 ## The time limit is the panel's (a client-side clock); when it runs out the panel asks for `reset`.
 ## Moves {"move", "value"}: value = step * STEP_BASE + payload; step = puzzle_state.step (moves accepted so far), so a
 ## doubled, replayed or stale request is refused.
-##   press  payload = number 1..5      the number clicked; must be pressed + 1 -> complete when 5 is pressed
+##   press  payload = number 1..POINTS the number clicked; must be pressed + 1 -> complete when POINTS is pressed
 ##   reset  payload = 0                peel the half-pressed seal off (pressed > 0, not complete): back to 0 pressed
 ## Pure and static: validate() never uses randomness or the clock.
 
 const SECTIONS := ["Top edge", "Left side", "Centre seam, high", "Centre seam, low", "Right side", "Floor edge"]
 ## Vertical sections run top-to-bottom; the others left-to-right (spot 0 = top or left end).
 const VERTICAL := [false, true, true, true, true, false]
-const POINTS := 5
+const POINTS := 3
 const STEP_BASE := 1000
 ## Designer balance for the progress bar: each pressed point.
-const PRESS_SHARE := 0.18
+const PRESS_SHARE := 0.3
 
 
 static func supports_resume() -> bool:
@@ -49,7 +51,7 @@ static func initial_state(puzzle_seed: int) -> Dictionary:
 	return {"seed": puzzle_seed, "step": 0, "leak": leak, "order": order, "pressed": 0}
 
 
-## True for 1-2-3-4-5 or 5-4-3-2-1 (no looking needed).
+## True for 1-2-3 or 3-2-1 (no looking needed).
 static func _is_plain(order: Array) -> bool:
 	var up := true
 	var down := true
@@ -73,11 +75,17 @@ static func current_state(task: Dictionary) -> Dictionary:
 	var state := start.duplicate(true)
 	state.step = int(ps.step)
 	state.pressed = clampi(int(ps.get("pressed", 0)), 0, mini(POINTS, int(state.step)))
+	# A seal saved half-pressed when the door had five points (before 2026-11-15) can read as all pressed without the
+	# repair being complete: peel it off, so the player fits it again instead of being stuck.
+	if int(state.pressed) >= POINTS and float(task.get("progress", 0.0)) < 1.0:
+		state.pressed = 0
 	return state
 
 
 static func validate(task: Dictionary, move: Dictionary) -> Dictionary:
 	var refused := {"accepted": false}
+	if float(task.get("progress", 0.0)) >= 1.0:
+		return refused
 	var state := current_state(task)
 	var value := int(move.get("value", -1))
 	if value < 0 or value / STEP_BASE != int(state.step) or int(state.pressed) >= POINTS:
@@ -108,7 +116,7 @@ static func spot_of(state: Dictionary, number: int) -> int:
 	return -1
 
 
-## The spot of the next number to press, or -1 when all five are pressed.
+## The spot of the next number to press, or -1 when all are pressed.
 static func next_point(state: Dictionary) -> int:
 	var n := int(state.pressed)
 	return -1 if n >= POINTS else spot_of(state, n + 1)

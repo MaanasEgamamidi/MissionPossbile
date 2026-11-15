@@ -135,7 +135,7 @@
  "upgrades": {
   "title": "Upgrades",
   "short": "Upgrades make the colony's rooms and machines better.",
-  "long": "Each upgrade costs parts and may need a certain specialist. Some upgrades need another one first. In this game, building means upgrading what is already there, not adding new buildings. Upgrades are installed in a later update.",
+  "long": "Each upgrade costs parts and may need a certain specialist. Some upgrades need another one first. In this game, building means upgrading what is already there, not adding new buildings.",
   "source_ids": [],
   "claim_ids": ["colony_premise"]
  },

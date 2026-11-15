@@ -1,12 +1,14 @@
 extends SceneTree
 ## Screenshots of the ten repair mini-games (T01 T02 T03 T04 T06 T08 T09 T10 T11 T12) for the owner, plus T02 opened by
 ## the wrong specialist (the scrambled panel). Needs a real window (headless cannot draw):
-##   godot --path . --resolution 1280x720 --script res://tools/godot/capture_puzzles.gd -- [--out <dir>] [--only T01,T03]
+##   godot --path . --script res://tools/godot/capture_puzzles.gd -- [--out <dir>] [--only T01,T03] [--size 1920x1080]
+## (the window is 1280x720 unless --size is given)
 ## Each game is started the way tests/test_puzzle_tNN.gd start theirs (GameServices + UiRoot, no world): the right crew
 ## member stands at the station, E's panel (StationPanels.for_station) opens, a shot is taken, the puzzle is played to
 ## the end through the panel's own keyboard path (the same keys the tests press), and the solved panel is shot.
 ## Saves go to res://_test_saves/capture_puzzles and are deleted at the end; the player's settings are never written.
-## Writes <out>/Tnn_start.png, <out>/Tnn_solved.png and <out>/T02_wrong_specialist.png.
+## Writes <out>/Tnn_start.png, <out>/Tnn_solved.png (just after the last move, before the shell's success mark),
+## <out>/Tnn_stamp.png (a second later, with the success mark) and <out>/T02_wrong_specialist.png ("--only wrong").
 
 const R01 := preload("res://scripts/tasks/puzzles/t01_rule.gd")
 const R02 := preload("res://scripts/tasks/puzzles/t02_rule.gd")
@@ -20,6 +22,8 @@ const R11 := preload("res://scripts/tasks/puzzles/t11_rule.gd")
 const R12 := preload("res://scripts/tasks/puzzles/t12_rule.gd")
 const SAVE_DIR := "res://_test_saves/capture_puzzles"
 const SCREEN := Vector2i(1280, 720)
+## The window size in use: SCREEN, or "--size 1920x1080".
+var screen := SCREEN
 ## Task -> [crew member who plays it (their specialty fits the task), game seed used by the task's panel test].
 const PLAN := {
 	"T01": [&"crew_1", 4171], "T02": [&"crew_1", 4271], "T03": [&"crew_1", 4371], "T04": [&"crew_1", 4471],
@@ -100,14 +104,20 @@ func _scroll_shot(label: String) -> void:
 func _initialize() -> void:
 	root.mode = Window.MODE_WINDOWED
 	root.content_scale_mode = Window.CONTENT_SCALE_MODE_DISABLED
-	root.size = SCREEN
+	var wanted := _arg("--size", "").split("x", false)
+	if wanted.size() == 2 and int(wanted[0]) >= 640 and int(wanted[1]) >= 360:
+		screen = Vector2i(int(wanted[0]), int(wanted[1]))
+	root.size = screen
 	PlayerInput.ensure_actions()
 	out_dir = _arg("--out", ProjectSettings.globalize_path("res://docs/revisions/evidence/minigames"))
 	DirAccess.make_dir_recursive_absolute(out_dir)
 	var only := _arg("--only", "").split(",", false)
 	print("ADAPTER %s / %s" % [RenderingServer.get_video_adapter_name(), RenderingServer.get_current_rendering_method()])
 	services = GameServices.new()
-	var dir := ProjectSettings.globalize_path(SAVE_DIR)
+	# One save folder per --only list, so several captures can run at the same time.
+	var dir := ProjectSettings.globalize_path(SAVE_DIR + ("" if only.is_empty() else "_" + "_".join(only)))
+	# The shell closes itself after a repair; the captures keep it open to shoot it.
+	TaskPanel.auto_close_seconds = 0.0
 	DirAccess.make_dir_recursive_absolute(dir)
 	services.saves = SaveService.new(dir, "colony", 1)
 	root.add_child(services)
@@ -124,6 +134,9 @@ func _initialize() -> void:
 		print("%s solved=%s first_completed=%s progress=%s" % [id, panel.succeeded, _task().first_completed, _task().progress])
 		await _shot("%s_solved" % id)
 		await _scroll_shot("%s_solved_scrolled" % id)
+		# About a second later: the end of the puzzle's own animation, under the shell's success mark.
+		await _frames(70)
+		await _shot("%s_stamp" % id)
 	if only.is_empty() or only.has("wrong"):
 		# A biologist (crew_3) at the wires station: T02 needs the electrical specialist.
 		if await _open("T02", &"crew_3", 4271, false):
@@ -173,7 +186,7 @@ func _open(id: String, crew: StringName, seed_value: int, right_specialist := tr
 	var settings := GameSettings.new()
 	settings.reduce_motion = true
 	ui.setup(services, settings)
-	root.size = SCREEN
+	root.size = screen
 	await _frames()
 	panel = StationPanels.for_station(station_id, services) as TaskPanel
 	if panel == null:
@@ -221,6 +234,8 @@ func _solve_t02() -> void:
 	for i in R02.PAIRS:
 		await _press(left_buttons[i])
 		await _press(right_buttons[(lay.right as Array).find(lay.left[i])])
+	# On a fast display the 90 frames before the stamp shot can be shorter than the shell's STAMP_DELAY.
+	await create_timer(0.3).timeout
 
 
 func _solve_t03() -> void:
@@ -231,6 +246,8 @@ func _solve_t03() -> void:
 		panel.set("ring_start_ms", Time.get_ticks_msec() - int(lay.rings[ring].first_ms))
 		_key(KEY_ENTER)
 		await _frames()
+	# A light panel runs at a high frame rate: wait in time, so the stamp shot really comes after the success mark.
+	await create_timer(0.4).timeout
 
 
 func _solve_t04() -> void:
@@ -247,6 +264,8 @@ func _solve_t04() -> void:
 			guard += 1
 		_key(KEY_ENTER)
 		await _frames(2)
+	# On a fast display the 90 frames before the stamp shot can be shorter than the shell's STAMP_DELAY.
+	await create_timer(0.3).timeout
 
 
 func _next_turn_t06(task: Dictionary) -> Array:
@@ -304,6 +323,8 @@ func _solve_t08() -> void:
 			await _frames(1)
 		_key(KEY_ENTER)
 		await _frames(2)
+	# A light panel runs at a high frame rate: wait in time, so the stamp shot really comes after the success mark.
+	await create_timer(0.4).timeout
 
 
 ## Shortest list of [from, to] pours that sorts the tubes (copied from tests/test_puzzle_t09.gd).
@@ -356,6 +377,8 @@ func _solve_t10() -> void:
 		await _press(leads[kind])
 		await _press(sockets[(start.sockets as Array).find(kind)])
 	await _press(panel.get("test_button"))
+	# On a fast display the 90 frames before the stamp shot can be shorter than the shell's STAMP_DELAY.
+	await create_timer(0.3).timeout
 
 
 static func _next_stroke(task: Dictionary) -> Array:
@@ -387,6 +410,10 @@ func _solve_t11() -> void:
 
 
 func _solve_t12() -> void:
+	# Find the leaking seam, fit the new seal, then press the points in their order.
+	await _press(panel.get("seam_buttons")[int(R12.current_state(_task()).leak)])
+	await _press(panel.get("gasket_button"))
+	await _frames(4)
 	for i in R12.POINTS:
 		await _press(panel.get("press_buttons")[R12.next_point(R12.current_state(_task()))])
 

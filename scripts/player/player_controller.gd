@@ -52,6 +52,8 @@ const RUNNING_LANDING_SPEED: float = 1.0
 const LAND_INTERRUPT_AFTER_S: float = 0.2
 ## How far behind the first thing the aim ray hits a broken part's target may still be (see aimed_target).
 const PART_REACH_SLACK_M: float = 0.6
+## How deep inside a part's whole-model target a smaller station still wins the aim (see _station_inside_part).
+const PART_INNER_DEPTH_M: float = 1.5
 ## Current locomotion choice: idle, walk or sprint.
 var _locomotion: StringName = &"idle"
 ## Prompt 10: the seat anchor this body sits on (null when standing), its vehicle, and the standing collision
@@ -217,6 +219,12 @@ func aimed_target() -> Dictionary:
 		if not part_hit.is_empty() and (part_hit.collider as Node).has_meta("part_reach") \
 				and start.distance_to(part_hit.position) <= start.distance_to(hit.position) + PART_REACH_SLACK_M:
 			hit = part_hit
+	# A part's whole-model target is a big box and can wrap a small station inside it (the Command Room tape sits in
+	# the broken T02 rack). The specific station inside the box wins over the box itself.
+	if not hit.is_empty() and (hit.collider as Node).has_meta("part_reach"):
+		var inner := _station_inside_part(start, query.to, hit)
+		if not inner.is_empty():
+			hit = inner
 	if hit.is_empty() or (hit.position as Vector3).distance_to(global_position + Vector3.UP * tuning.eye_height_m) > tuning.reach_m:
 		return empty
 	var node: Node = hit.collider
@@ -239,6 +247,27 @@ func aimed_target() -> Dictionary:
 			if station != null:
 				return {"kind": "station", "id": StringName(station.get_meta("station_id")), "node": station}
 	return empty
+
+## The first non-part station hit behind a part's whole-model target, within PART_INNER_DEPTH_M of it and not behind a
+## solid surface (beyond PART_REACH_SLACK_M); empty when there is none.
+func _station_inside_part(start: Vector3, to: Vector3, part_hit: Dictionary) -> Dictionary:
+	var part_dist := start.distance_to(part_hit.position)
+	var inner_query := PhysicsRayQueryParameters3D.create(start, to, Layers.STATION)
+	inner_query.exclude = [get_rid(), (part_hit.collider as CollisionObject3D).get_rid()]
+	inner_query.collide_with_areas = true
+	inner_query.collide_with_bodies = false
+	var inner := get_world_3d().direct_space_state.intersect_ray(inner_query)
+	if inner.is_empty() or (inner.collider as Node).has_meta("part_reach") or not (inner.collider as Node).has_meta("station_id"):
+		return {}
+	var inner_dist := start.distance_to(inner.position)
+	if inner_dist > part_dist + PART_INNER_DEPTH_M:
+		return {}
+	var solid_query := PhysicsRayQueryParameters3D.create(start, inner.position, Layers.WORLD | Layers.DOOR)
+	solid_query.exclude = [get_rid()]
+	var solid := get_world_3d().direct_space_state.intersect_ray(solid_query)
+	if not solid.is_empty() and start.distance_to(solid.position) + PART_REACH_SLACK_M < inner_dist:
+		return {}
+	return inner
 
 ## Station sensing node of a map object, or null if that object is not a station.
 func _station_node(object_name: String) -> Node:

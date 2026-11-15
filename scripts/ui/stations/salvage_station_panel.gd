@@ -55,23 +55,17 @@ func _what_you_can_do() -> PackedStringArray:
 
 
 func _build_body() -> void:
-	_add_reading(&"taken", "♻", "Parts taken out of this donor", "parts")
+	look_button = _add_action("Look it over", &"zoom", _on_look)
+	look_button.name = "Look"
+	_add_reading(&"taken", "♻", "Parts taken out", "parts")
 	_add_reading(&"pack", "▤", "Your pack", "cargo")
 	_add_text(_body, String(_donor().get("story", "")))
-	var look_row := HBoxContainer.new()
-	_body.add_child(look_row)
-	look_button = Button.new()
-	look_button.name = "Look"
-	look_button.text = "Look it over"
-	look_button.pressed.connect(_on_look)
-	look_row.add_child(look_button)
-	var hint := _add_text(look_row, "With the salvage inspection upgrade, looking it over marks every part that fits.", UiTheme.MUTED)
-	hint.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_add_note(_body, "With the salvage inspection upgrade, looking it over marks every part that fits.")
 	_add_heading_with_help(_body, "Parts", "parts")
 	_parts_box = VBoxContainer.new()
 	_parts_box.name = "Parts"
 	_body.add_child(_parts_box)
-	_add_text(_body, "Which parts fit is made up for the game. Taking a part out uses nothing from the colony stores.", UiTheme.MUTED)
+	_add_note(_body, "Which parts fit is made up for the game. Taking a part out uses nothing from the colony stores.")
 
 
 func _refresh_body(st: ColonyState) -> void:

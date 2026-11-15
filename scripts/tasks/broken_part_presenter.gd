@@ -43,6 +43,8 @@ const GROUP := &"broken_part_presenter"
 ## Seconds of the whole transition, when the broken model starts shrinking, when the intact one is back, and how
 ## long the warm glow lasts.
 const SECONDS := 1.0
+## Longest the fix waits for this machine's player to close the mini-game before it plays anyway, seconds.
+const HOLD_MAX := 5.0
 const SHRINK_FROM := 0.15
 const SWAP_AT := 0.35
 const GLOW_SECONDS := 0.4
@@ -56,10 +58,10 @@ const INTACT_LEAVES: Array[String] = ["TunnelDoorInner_L", "TunnelDoorInner_R"]
 const DUST_POLL := 0.2
 ## Prompts while broken when the data file has none (the brief's table). Only these ten may say fix / repair.
 const FALLBACK_PROMPTS := {
-	"T01": "[E] Fix the radio signal", "T02": "[E] Fix the wires", "T03": "[E] Fix the power dials",
-	"T04": "[E] Repair the power circuit", "T06": "[E] Fix the broken pipe", "T08": "[E] Repair the broken glass",
-	"T09": "[E] Fix the test-tube rack", "T10": "[E] Fix the unplugged equipment", "T11": "[E] Clean the dusty hangar",
-	"T12": "[E] Repair the air leak",
+	"T01": "[E] Lock the relay", "T02": "[E] Patch the relay", "T03": "[E] Sync the turbine",
+	"T04": "[E] Light the power bench", "T06": "[E] Water the kale", "T08": "[E] Glaze the dome",
+	"T09": "[E] Sort the lab samples", "T10": "[E] Revive the Med Bay", "T11": "[E] Clear the landing lines",
+	"T12": "[E] Seal the airlock",
 }
 
 static var _data: Array = []
@@ -86,6 +88,8 @@ var transitions_started := 0
 var last_burst: Node3D
 
 var _holder: Node3D
+## task id -> seconds its fix has waited for the mini-game to close (see _panel_holds).
+var _hold := {}
 var _state_id := 0
 var _completed := {}
 var _dust_left := 0.0
@@ -333,8 +337,12 @@ func step(delta: float) -> void:
 	for task_id: String in parts:
 		var p: Dictionary = parts[task_id]
 		var done := _first_completed(st, task_id)
-		if done != bool(_completed.get(task_id, false)):
+		# The fix plays when this machine's player can see it: while their mini-game for this part is still open
+		# (its own success mark is showing), the sparkle burst and the swap wait for it to close.
+		if done != bool(_completed.get(task_id, false)) and not (done and bool(p.shows_broken) and float(p.anim) < 0.0
+				and _panel_holds(task_id, delta)):
 			_completed[task_id] = done
+			_hold.erase(task_id)
 			if done and bool(p.shows_broken) and float(p.anim) < 0.0:
 				_start_transition(p)
 			elif float(p.anim) < 0.0:
@@ -345,6 +353,17 @@ func step(delta: float) -> void:
 			_follow_door(p)
 		if bool(p.shows_broken) and p.dust != null and read_dust and float(p.anim) < 0.0:
 			_update_dust(p, st)
+
+
+## True while this machine's player still has the mini-game of `task_id` open on top (at most HOLD_MAX seconds):
+## the world waits to show the fix until they are looking at it again.
+func _panel_holds(task_id: String, delta: float) -> bool:
+	var ui: Variant = game.get(&"ui") if game != null and is_instance_valid(game) else null
+	var top: Variant = (ui as Object).call(&"top") if ui is Object and (ui as Object).has_method(&"top") else null
+	if not (top is TaskPanel) or (top as TaskPanel).task_id != task_id:
+		return false
+	_hold[task_id] = float(_hold.get(task_id, 0.0)) + delta
+	return float(_hold[task_id]) < HOLD_MAX
 
 
 ## Puts a part in its broken or intact look at once.
@@ -723,7 +742,11 @@ func _start_transition(p: Dictionary) -> void:
 	var bounds: AABB = p.bounds
 	if bounds.size == Vector3.ZERO and p.model != null:
 		bounds = _bounds_of([p.model])
-	last_burst = SparkleBurst.spawn(_holder, bounds, int(p.mask), _use_cpu())
+	# Raised to chest height of the player by the part when it is lower than that, so the burst is easy to see.
+	var chest_y := NAN
+	if services != null and services.has_game():
+		chest_y = SparkleBurst.chest_y_near(services.state(), bounds, services.local_character())
+	last_burst = SparkleBurst.spawn(_holder, bounds, int(p.mask), _use_cpu(), Color(0.0, 0.0, 0.0, 0.0), chest_y)
 	var glow := StandardMaterial3D.new()
 	glow.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	glow.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA

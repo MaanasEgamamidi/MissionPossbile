@@ -4,7 +4,7 @@ extends StationPanel
 ##   Water      clean water and wastewater, water quality, the recycler, and where spare water goes (two sliders)
 ##   Oxygen     the oxygen reserve in its tanks with its forecast, and the two oxygen makers side by side:
 ##              the electrolyser (uses water) and the CO2-oxygen unit (uses Mars air, no water)
-##   Cabin air  O2, CO2 and the total pressure in kPa, the CO2 scrubber and the cabin fans
+##   Air        O2, CO2 and the total pressure of the room air (a word first, then kPa), the CO2 scrubber and the fans
 ## Problems with these systems are listed at the top in words. Every control is its own request to the host.
 
 ## Alerts shown at the top of this panel.
@@ -72,16 +72,13 @@ func _shows_later_note() -> bool:
 
 
 func _what_you_can_do() -> PackedStringArray:
-	return PackedStringArray(["Look after the water: the recycler and where spare water goes.",
-		"Run the two oxygen makers that fill the oxygen tanks.", "Keep the cabin air safe to breathe."])
+	return PackedStringArray(["Look after the water and send spare water where it is needed.",
+		"Run the two oxygen makers that fill the oxygen tanks.", "Keep the air safe to breathe."])
 
 
 func _build_body() -> void:
 	var bal := services.balance
-	_add_heading(_body, "Warnings")
-	_alerts_box = VBoxContainer.new()
-	_alerts_box.name = "Alerts"
-	_body.add_child(_alerts_box)
+	_alerts_box = _add_alerts_box()
 
 	# ---- water
 	_add_heading_with_help(_body, "Water", "water")
@@ -89,16 +86,18 @@ func _build_body() -> void:
 	water.name = "Water"
 	_body.add_child(water)
 	_add_reading(&"water", "≈", "Clean water", "water", water)
-	_add_reading(&"wastewater", "≋", "Wastewater (used water)", "wastewater", water)
-	_add_reading(&"quality", "◇", "Water quality", "water_quality", water)
+	_add_reading(&"wastewater", "≋", "Used water", "wastewater", water)
+	_add_reading(&"quality", "✧", "Water quality", "water_quality", water)
 	_water_forecast = _add_text(water, "", UiTheme.MUTED)
 	_add_equipment_switch(water, "recycler")
 
-	_add_heading_with_help(water, "Where spare water goes", "water_allocation")
+	_add_heading_with_help(water, "Send spare water", "water_allocation")
 	for key: String in ALLOCATIONS:
 		var row := HBoxContainer.new()
 		row.name = "Allocation_%s" % key
 		water.add_child(row)
+		row.add_theme_constant_override(&"separation", 10)
+		row.add_child(StationKit.picture(&"sprout" if key == "greenhouse_l_per_hour" else &"water", 24.0, &"heading"))
 		var label := Label.new()
 		label.text = String(ALLOCATIONS[key])
 		label.custom_minimum_size.x = 0.0
@@ -122,16 +121,16 @@ func _build_body() -> void:
 		row.add_child(value)
 		sliders[key] = s
 		_slider_values[key] = value
-	_reserve_note = _add_text(water, "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the electrolyser. If there is not enough for both, they get the same share." % num(bal.water_reserve_l, 0), UiTheme.MUTED)
+	_reserve_note = _add_note(water, "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the electrolyser. If there is not enough for both, they get the same share." % num(bal.water_reserve_l, 0))
 
 	# ---- oxygen
 	_add_heading_with_help(_body, "Oxygen", "oxygen")
 	var oxygen := VBoxContainer.new()
 	oxygen.name = "Oxygen"
 	_body.add_child(oxygen)
-	_add_reading(&"oxygen", "O₂", "Oxygen reserve (in the tanks)", "oxygen", oxygen)
+	_add_reading(&"oxygen", "⛑", "Oxygen tanks", "oxygen", oxygen)
 	_oxygen_forecast = _add_text(oxygen, "", UiTheme.MUTED)
-	_add_text(oxygen, "Two machines can fill the oxygen tanks. Either, both or neither may run. Only the electrolyser uses water.")
+	_add_note(oxygen, "Two machines can fill the oxygen tanks. Either, both or neither may run. Only the electrolyser uses water.")
 	var pair := HBoxContainer.new()
 	pair.name = "Processes"
 	oxygen.add_child(pair)
@@ -139,16 +138,16 @@ func _build_body() -> void:
 	_add_process_card(pair, "co2_unit", "co2_oxygen_unit", "Uses Mars air and power, no water.")
 
 	# ---- cabin air
-	_add_heading_with_help(_body, "Cabin air", "cabin_air")
+	_add_heading_with_help(_body, "Air in the rooms", "cabin_air")
 	var cabin := VBoxContainer.new()
 	cabin.name = "Cabin"
 	_body.add_child(cabin)
-	_add_reading(&"o2", "O₂", "Oxygen in the cabin air", "cabin_air", cabin)
-	_add_reading(&"co2", "CO₂", "Carbon dioxide in the cabin air", "co2_scrubber", cabin)
-	_add_reading(&"pressure", "◎", "Air pressure in the cabin", "pressure", cabin)
+	_add_reading(&"o2", "O₂", "Oxygen", "cabin_air", cabin)
+	_add_reading(&"co2", "CO₂", "Carbon dioxide", "co2_scrubber", cabin)
+	_add_reading(&"pressure", "◎", "Air pressure", "pressure", cabin)
 	_add_equipment_switch(cabin, "scrubber")
 	_add_equipment_switch(cabin, "cabin_fans")
-	_add_text(cabin, "Safe air in the rooms is not the same as the oxygen in the tanks. The tanks are the reserve; a regulator lets oxygen from them into the rooms when the cabin air needs it.", UiTheme.MUTED)
+	_add_note(cabin, "Safe air in the rooms is not the same as the oxygen in the tanks. The tanks are the reserve; a regulator lets oxygen from them into the rooms when the cabin air needs it.")
 
 
 func _add_process_card(parent: Control, id: String, explanation_id: String, uses: String) -> void:
@@ -161,14 +160,17 @@ func _add_process_card(parent: Control, id: String, explanation_id: String, uses
 	card.add_child(box)
 	var labels := {}
 	var head := HBoxContainer.new()
+	head.custom_minimum_size.y = 40.0
+	head.add_theme_constant_override(&"separation", 10)
 	box.add_child(head)
+	head.add_child(StationKit.picture(&"water" if id == "electrolyser" else &"air", 26.0, &"heading"))
 	labels["title"] = _add_heading(head, StationPanel.equipment_name(id))
 	(labels["title"] as Label).size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	head.add_child(ExplainButton.make(explanation_id))
-	labels["uses"] = _add_text(box, uses)
+	head.add_child(_help_only(ExplainButton.make(explanation_id)))
+	labels["uses"] = _add_note(box, uses)
 	var button := CheckButton.new()
 	button.name = "Switch_%s" % id
-	button.text = "Switched on"
+	button.text = "Run"
 	button.set_pressed_no_signal(services.state().is_on(id))
 	button.toggled.connect(_on_equipment_toggled.bind(id))
 	box.add_child(button)
@@ -177,9 +179,9 @@ func _add_process_card(parent: Control, id: String, explanation_id: String, uses
 	_equipment_status[id] = switch_status
 	switch_status.visible = false
 	labels["status"] = _add_text(box, "")
-	labels["made"] = _add_text(box, "")
-	labels["power"] = _add_text(box, "")
-	labels["water"] = _add_text(box, "")
+	labels["made"] = _add_text(box, "", UiTheme.MUTED)
+	labels["power"] = _add_text(box, "", UiTheme.MUTED)
+	labels["water"] = _add_text(box, "", UiTheme.MUTED)
 	_process_labels[id] = labels
 
 
@@ -213,12 +215,12 @@ func _refresh_body(st: ColonyState) -> void:
 	# water
 	var water := st.store(&"water_l")
 	var water_cap := float(st.capacities.get(&"water_l", 0.0))
-	_show_reading(&"water", "%s of %s L" % [num(water, 0), num(water_cap, 0)], &"urgent" if water <= 0.0 else (&"warn" if water < bal.water_reserve_l else &"ok"))
+	_show_reading(&"water", "%s of %s L" % [num(water, 0), num(water_cap, 0)], &"urgent" if water <= 0.0 else (&"warn" if water < bal.water_reserve_l else &"ok"), water / maxf(water_cap, 1.0))
 	var waste := st.store(&"wastewater_l")
 	var waste_cap := float(st.capacities.get(&"wastewater_l", 0.0))
-	_show_reading(&"wastewater", "%s of %s L" % [num(waste, 0), num(waste_cap, 0)], &"warn" if waste_cap > 0.0 and waste >= bal.wastewater_warn_fraction * waste_cap else &"ok")
+	_show_reading(&"wastewater", "%s of %s L" % [num(waste, 0), num(waste_cap, 0)], &"warn" if waste_cap > 0.0 and waste >= bal.wastewater_warn_fraction * waste_cap else &"ok", waste / maxf(waste_cap, 1.0))
 	var q := st.water_quality
-	_show_reading(&"quality", "%s %% · %s" % [num(q * 100.0, 0), quality_word(q, bal)], &"ok" if q >= bal.electrolyser_min_quality else &"warn")
+	_show_reading(&"quality", "%s · %s %%" % [quality_word(q, bal), num(q * 100.0, 0)], &"ok" if q >= bal.electrolyser_min_quality else &"warn")
 	_water_forecast.text = _forecast_line(forecast, 3)
 	for key: String in sliders:
 		var s := sliders[key] as HSlider
@@ -236,7 +238,7 @@ func _refresh_body(st: ColonyState) -> void:
 		oxygen_level = &"urgent"
 	elif oxygen < bal.oxygen_reserve_warn_kg:
 		oxygen_level = &"warn"
-	_show_reading(&"oxygen", "%s of %s kg" % [num(oxygen, 1), num(oxygen_cap, 0)], oxygen_level)
+	_show_reading(&"oxygen", "%s of %s kg" % [num(oxygen, 1), num(oxygen_cap, 0)], oxygen_level, oxygen / maxf(oxygen_cap, 1.0))
 	_oxygen_forecast.text = _forecast_line(forecast, 2)
 	for id: String in _process_labels:
 		var labels: Dictionary = _process_labels[id]
@@ -255,11 +257,11 @@ func _refresh_body(st: ColonyState) -> void:
 	# cabin air
 	var kpa := StationPanel.cabin_kpa(st, bal)
 	var o2_lvl := StationPanel.o2_level(float(kpa.o2), bal)
-	_show_reading(&"o2", "%s kPa · %s" % [num(float(kpa.o2), 1), StationPanel.o2_word(o2_lvl)], o2_lvl)
+	_show_reading(&"o2", "%s · %s kPa" % [StationPanel.o2_word(o2_lvl), num(float(kpa.o2), 1)], o2_lvl)
 	var co2_lvl := StationPanel.co2_level(float(kpa.co2), bal)
-	_show_reading(&"co2", "%s kPa · %s" % [num(float(kpa.co2), 2), StationPanel.co2_word(co2_lvl)], co2_lvl)
+	_show_reading(&"co2", "%s · %s kPa" % [StationPanel.co2_word(co2_lvl), num(float(kpa.co2), 2)], co2_lvl)
 	var total := float(kpa.total)
-	_show_reading(&"pressure", "%s kPa · %s" % [num(total, 1), "Safe" if total >= bal.pressure_warn_kpa else "Low"], &"ok" if total >= bal.pressure_warn_kpa else &"warn")
+	_show_reading(&"pressure", "%s · %s kPa" % ["Safe" if total >= bal.pressure_warn_kpa else "Low", num(total, 1)], &"ok" if total >= bal.pressure_warn_kpa else &"warn")
 
 
 ## Line `index` of the reserve forecast text, or "".

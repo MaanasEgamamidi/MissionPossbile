@@ -171,7 +171,7 @@ func _refresh_body(st: ColonyState) -> void:
 		_newer_text.text = "Newer data is ready (%s). This game keeps its data so its dust events stay the same; the new data is used from the next new game or load." % newer
 		_newer_text.visible = true
 	elif not published.is_empty():
-		_newer_text.text = "The archive has published an update (%s). It needs the bundle build tool before the game can use it; until then the game keeps its validated data." % ", ".join(PackedStringArray(published.keys()))
+		_newer_text.text = "The Mars weather archive has newer data (%s). This game keeps the data it started with." % ", ".join(PackedStringArray(published.keys()))
 		_newer_text.visible = true
 	else:
 		_newer_text.visible = false

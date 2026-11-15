@@ -24,7 +24,7 @@ const MESSAGES := {
 	&"not_at_hub": "Go to the Med Bay to change crew member.",
 	&"not_available_yet": "This station is not working yet.",
 	&"paused": "The game is paused.",
-	&"pending": "Asked the host. Waiting for the answer.",
+	&"pending": "One moment…",
 	&"offline": "Not connected to the host.",
 }
 

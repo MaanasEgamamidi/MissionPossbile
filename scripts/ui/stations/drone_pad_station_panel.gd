@@ -62,22 +62,23 @@ func _enter_tree() -> void:
 
 func _build_body() -> void:
 	_add_reading(&"level", "✈", "Drone level", "upgrades")
-	_add_reading(&"battery", "⚡", "Battery", "battery")
+	# Merged 2026-11-15: the drone helper's controls (flights per sol, V2-V4 abilities) in the UI overhaul's style
+	# (action buttons with pictures, notes, readings with a bar).
+	_add_reading(&"battery", "▮", "Battery", "battery")
 	_add_reading(&"flights", "◷", "Flights left today", "upgrades")
 	_add_reading(&"range", "◎", "Reach on one battery (radio range)", "upgrades")
 	_status = _add_text(_body, "", UiTheme.HEADING)
 	_status.name = "DroneStatus"
-	_launch_note = _add_text(_body, "", UiTheme.MUTED)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 10)
-	_body.add_child(row)
-	fly_button = _button(row, "TakeControl", "✈ Take control (E)", take_control)
-	fly_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	hand_back_button = _button(row, "HandBack", "Hand it back", func() -> void: _ask_free(&"drone_land"))
-	recall_button = _button(row, "Recall", "Call it home", func() -> void: _ask(&"drone_recall", {}, _on_answer))
+	_launch_note = _add_note(_body, "")
+	fly_button = _add_action("Take control (E)", &"drone", take_control)
+	fly_button.name = "TakeControl"
+	hand_back_button = _add_action("Hand it back", &"back", func() -> void: _ask_free(&"drone_land"), false)
+	hand_back_button.name = "HandBack"
+	recall_button = _add_action("Call it home", &"home", func() -> void: _ask(&"drone_recall", {}, _on_answer), false)
+	recall_button.name = "Recall"
 
 	_add_heading(_body, "Revisit an explored spot (V2)")
-	_revisit_note = _add_text(_body, "", UiTheme.MUTED)
+	_revisit_note = _add_note(_body, "")
 	var r1 := HBoxContainer.new()
 	r1.add_theme_constant_override(&"separation", 10)
 	_body.add_child(r1)
@@ -85,7 +86,7 @@ func _build_body() -> void:
 	revisit_button = _button(r1, "Revisit", "Fly there", func() -> void: send(&"revisit", _picked(spot_pick)))
 
 	_add_heading(_body, "Find a known ore (V3)")
-	_find_note = _add_text(_body, "", UiTheme.MUTED)
+	_find_note = _add_note(_body, "")
 	var r2 := HBoxContainer.new()
 	r2.add_theme_constant_override(&"separation", 10)
 	_body.add_child(r2)
@@ -93,7 +94,7 @@ func _build_body() -> void:
 	find_button = _button(r2, "Find", "Find it", func() -> void: send(&"find", _picked(find_pick)))
 
 	_add_heading(_body, "Scan anywhere for an ore (V4)")
-	_scan_note = _add_text(_body, "", UiTheme.MUTED)
+	_scan_note = _add_note(_body, "")
 	var r3 := HBoxContainer.new()
 	r3.add_theme_constant_override(&"separation", 10)
 	_body.add_child(r3)
@@ -140,7 +141,7 @@ func _refresh_body(st: ColonyState) -> void:
 	if docked and b < 0.999:
 		charge = " · charging, %s to full" % _time_words(DroneSystem.seconds_to_full(st))
 	_show_reading(&"battery", "%d %% · %d s of flight%s" % [floori(b * 100.0), roundi(DroneSystem.seconds_left(st)), charge],
-		&"ok" if b >= 0.999 else (&"warn" if b >= 0.5 else &"urgent"))
+		&"ok" if b >= 0.999 else (&"warn" if b >= 0.5 else &"urgent"), b)
 	var left := DroneSystem.flights_left_today(st)
 	_show_reading(&"flights", "%d of %d" % [left, DroneSystem.flights_per_sol(st)], &"ok" if left > 0 else &"warn")
 	_show_reading(&"range", "about %d m out and back · radio %d m" % [roundi(DroneSystem.reach_m(st)), roundi(DroneSystem.range_m(st))], &"ok")
@@ -232,7 +233,7 @@ func take_control() -> ActionResult:
 func _ask_free(action: StringName) -> void:
 	var r := services.request(action)
 	if r.pending:
-		_show_message("Asked the host…", UiTheme.MUTED)
+		_show_message("One moment…", UiTheme.MUTED)
 	elif r.ok:
 		_on_answer(r)
 	else:

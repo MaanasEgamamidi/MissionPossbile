@@ -99,7 +99,7 @@ func accept_host_result(result: ActionResult, record := {}) -> void:
 		_after_reclaim()
 		return
 	if result.ok and action == &"task_claim" and not succeeded:
-		status_label.text = "Ready. You are at the controls."
+		status_label.text = ""        # no words needed: the equipment is in front of the player
 		return
 	if result.ok or succeeded:
 		if succeeded:

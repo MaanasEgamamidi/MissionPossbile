@@ -2,6 +2,10 @@ extends SceneTree
 ## Runs the real game scene with the full map for a few seconds and saves evidence screenshots.
 ## Needs a window (no --headless). Saves go to a folder inside the project, not user://.
 ## Run: godot --path . --resolution 1920x1080 --script res://tools/godot/capture_game.gd -- --out <folder>
+## HUD shots only (UI overhaul): add `--hud` and, to pick the window size, `--size 1280x720` (default 1920x1080):
+##   godot --path . --script res://tools/godot/capture_game.gd -- --hud --size 1280x720 --out <folder>
+## It saves hud_calm, hud_busy, hud_low, hud_scout_card and hud_large_contrast (text x1.5, high contrast) as
+## <name>_<width>.png: the HUD with nothing going on, with everything going on, and with supplies and vitals low.
 
 var out_dir := ""
 var main: GameMain
@@ -33,6 +37,15 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(save_dir)
 	for f in DirAccess.get_files_at(save_dir):
 		DirAccess.remove_absolute(save_dir.path_join(f))
+
+	if args.has("--hud"):
+		var size := Vector2i(1920, 1080)
+		for i in args.size():
+			if args[i] == "--size" and i + 1 < args.size():
+				var wh := args[i + 1].split("x")
+				size = Vector2i(int(wh[0]), int(wh[1]))
+		await _hud_shots(save_dir, size)
+		return
 
 	var t0 := Time.get_ticks_msec()
 	main = (load("res://scenes/game.tscn") as PackedScene).instantiate() as GameMain
@@ -118,6 +131,97 @@ func _initialize() -> void:
 	player.teleport(Vector3(-18.0, 0.3, 33.0), 0.79)
 	await _frames(60)
 	await _shot("09_outdoors_third_person")
+
+	main.services.saves.delete_all()
+	quit(0)
+
+
+# ---------------------------------------------------------------- HUD shots (UI overhaul)
+
+## The in-game HUD in its main states, over the real map. `size` is the window size in pixels.
+func _hud_shots(save_dir: String, size: Vector2i) -> void:
+	root.mode = Window.MODE_WINDOWED
+	root.size = size
+	main = (load("res://scenes/game.tscn") as PackedScene).instantiate() as GameMain
+	main.save_directory = save_dir
+	main.show_menu = false
+	main.check_weather_updates = false
+	root.add_child(main)
+	await _frames(90)
+	root.size = size
+	var tag := "_%d" % size.x
+	var player := main.player
+	var st := main.services.state()
+	var me := st.character_of_peer(SessionService.HOST_PEER)
+	var mh := main.mission_hud
+	main.settings.reduce_motion = true          # no fades: every shot shows the settled HUD
+	main.settings.apply(self)
+
+	# 1. nothing going on: inside the base, third person
+	player.set_first_person(false)
+	await _frames(40)
+	await _shot("hud_calm" + tag)
+
+	# 2. everything going on: outside by the broken-down rover, the scout out, a storm warned, pop-ups, an [E] prompt
+	me.suit_on = true
+	st.scout["built"] = true
+	ScoutSystem.ensure(st)
+	ScoutSystem.send(st, "east_plain", "crew_4")
+	st.scout["position"] = [34.0, 0.0, 33.0]
+	player.teleport(Vector3(30.0, 0.0, 26.0), deg_to_rad(-150.0))
+	player.camera_rig().rotation.x = deg_to_rad(-8.0)
+	await _frames(30)
+	st.weather["phase"] = "warned"
+	st.weather["warning"] = {"starts_at_hours": st.sim_hours + 6.0, "severity": 0.6, "text": "test"}
+	main.services.events.system_alert.emit(&"capture_cleaner", &"warn",
+		"Panel cleaner is broken. Dust stays on the panels, so they make less power. An electrical specialist can repair it at a sun tracker.")
+	main.services.events.system_alert.emit(WeatherSystem.ALERT_ID, &"warn", "Dust warning: test")
+	main.services.events.system_alert.emit(&"capture_info", &"good", "New scout report: the east plain.")
+	await _frames(20)
+	mh.refresh()
+	main.set_process(false)                     # keep the prompt: game_main sets the target every frame
+	main.hud.set_target({"kind": "station", "id": &"pw_panel", "node": null})
+	await _shot("hud_busy" + tag)
+	main.set_process(true)
+
+	# 3. the scout's report (Mission Control) with the mast camera's picture
+	mh.mission_control.dismiss()
+	st.scout["position"] = [40.0, 0.0, 40.0]
+	st.scout["status"] = "surveying"
+	st.scout["survey_left_h"] = 0.02
+	st.scout["yaw"] = deg_to_rad(90.0)
+	await _frames(240)
+	mh.refresh()
+	await _shot("hud_scout_card" + tag)
+	mh.mission_control.dismiss()
+
+	# 4. supplies and vitals low, something in the hands
+	main.services.set_process(false)            # no simulation ticks: the low values stay as set
+	st.weather["phase"] = "calm"
+	st.weather.erase("warning")
+	st.stores[&"battery_kwh"] = float(st.capacities[&"battery_kwh"]) * 0.12
+	st.stores[&"oxygen_kg"] = 1.0
+	st.stores[&"water_l"] = float(st.capacities[&"water_l"]) * 0.9
+	st.battery_kw = -4.2
+	me.health = 24.0
+	me.stamina = 18.0
+	me.suit_charge = 8.0
+	main.set_process(false)
+	main.hud.set_target({"kind": "item", "id": &"crate_1", "node": null})
+	main.hud.set_held(&"crate_1")
+	main.hud.refresh()
+	mh.refresh()
+	await _frames(20)
+	await _shot("hud_low" + tag)
+
+	# 5. the same with large text and high contrast
+	main.settings.text_scale = 1.5
+	main.settings.high_contrast = true
+	main.settings.apply(self)
+	main.hud.refresh()
+	mh.refresh()
+	await _frames(20)
+	await _shot("hud_large_contrast" + tag)
 
 	main.services.saves.delete_all()
 	quit(0)

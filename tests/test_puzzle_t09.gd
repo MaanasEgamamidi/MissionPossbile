@@ -123,7 +123,7 @@ func _rule_checks() -> void:
 			all_good = false
 			detail = "seed %d sorted=%s path=%s mixed=%d fallen=%d" % [s, Rule.is_sorted(start.tubes), path, mixed, fallen]
 		worst = maxi(worst, path.size())
-	_check("60 seeds: scrambled, always solvable, 3 tubes fallen", all_good, detail)
+	_check("60 seeds: scrambled, always solvable, %d tube(s) fallen" % Rule.FALLEN_TUBES, all_good, detail)
 	_check("kid-sized: every seed solves in at most 12 pours", worst <= 12, "longest shortest solution %d" % worst)
 	_check("seeds give different layouts", layouts.size() >= 40, "%d distinct of 60" % layouts.size())
 	var task := {"puzzle_seed": 77, "puzzle_state": {}}
@@ -282,6 +282,6 @@ func _panel_checks() -> void:
 		await _press(buttons[int(p[0])])
 		await _press(buttons[int(p[1])])
 	_check("keyboard path solves T09 through the session", bool(task.first_completed) and float(task.progress) >= 1.0, panel.status_label.text)
-	_check("panel shows the host's success", panel.succeeded and "Fixed" in panel.status_label.text)
+	_check("panel shows the host's success", panel.succeeded and panel.status_label.text == panel.solved_text() and "sorted" in panel.status_label.text, panel.status_label.text)
 	ui.close_all()
 	await _frames()

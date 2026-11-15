@@ -1,7 +1,8 @@
 class_name StoryLogPanel
 extends UiPanel
-## The colony journal (L): what Mission Control asks now (with the step's checklist), Mission Control's log, the
-## colony goal, and the optional story of the first crew. It only reads state.campaign and state.discoveries and sends
+## The colony journal (L), as five boxes with a pictogram and a heading each: what Mission Control asks now (with the
+## step's checklist), Mission Control's log, hearing a finished step again, the colony goal, and the optional story of
+## the first crew. It only reads state.campaign and state.discoveries and sends
 ## ordinary requests:
 ##   * "Show a hint" (local), "Answer here" opens the question of a knowledge step (QuizPanel finds the station in reach;
 ##     the whiteboard tutorial has no question steps, so it stays hidden there),
@@ -9,6 +10,8 @@ extends UiPanel
 ##     counts twice),
 ##   * the story lists each discovery with its clue records: found ones with their text, fiction label and the real
 ##     science they touch (source ids from the register), missing ones with where to look. Solving it is optional.
+
+const MenuKit := preload("res://scripts/ui/menu_kit.gd")
 
 ## The presenter that owns the hint count, or null (then the panel counts its own hint requests).
 var presenter: TutorialPresenter
@@ -62,23 +65,30 @@ func first_focus() -> Control:
 
 
 func _build() -> void:
+	var ts := UiTheme.text_scale()
 	var margin := MarginContainer.new()
 	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
 		margin.add_theme_constant_override(side, 12)
 	add_child(margin)
 	var column := VBoxContainer.new()
 	column.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	column.add_theme_constant_override(&"separation", 10)
 	margin.add_child(column)
 	var header := HBoxContainer.new()
+	header.name = "Header"
+	header.add_theme_constant_override(&"separation", 12)
 	column.add_child(header)
+	header.add_child(MenuKit.picture(&"book", 34.0 * ts, &"heading"))
 	var title := Label.new()
-	title.text = "✎  Colony journal"
+	title.text = "Colony journal"
 	title.theme_type_variation = UiTheme.TITLE
 	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
+	header.add_child(UiTheme.key_cap("Esc"))
 	_close = Button.new()
 	_close.name = "Close"
 	_close.text = "Close"
+	_close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_close.pressed.connect(func() -> void: close_requested.emit())
 	header.add_child(_close)
 
@@ -86,48 +96,49 @@ func _build() -> void:
 	_scroll.name = "Scroll"
 	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scroll.follow_focus = true
 	_scroll.custom_minimum_size = Vector2(0, 320)
 	column.add_child(_scroll)
 	var body := VBoxContainer.new()
 	body.name = "Body"
 	body.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	body.add_theme_constant_override(&"separation", 8)
+	body.add_theme_constant_override(&"separation", 10)
 	_scroll.add_child(body)
 
 	# ---- now
-	_heading(body, "Now")
-	_stage_label = _text(body, "", UiTheme.HEADING)
-	_objective_label = _text(body, "")
-	_cue_label = _text(body, "", UiTheme.GOOD)
-	_explain_label = _text(body, "", UiTheme.MUTED)
-	_hint_label = _text(body, "", UiTheme.WARN)
-	_list_label = _text(body, "")
+	var now := _section(body, "Now", &"play")
+	_stage_label = _text(now, "")
+	_objective_label = _text(now, "")
+	_cue_label = _text(now, "", UiTheme.GOOD)
+	_explain_label = _text(now, "", UiTheme.MUTED)
+	_hint_label = _text(now, "", UiTheme.WARN)
+	_list_label = _text(now, "")
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override(&"separation", 12)
-	body.add_child(row)
+	now.add_child(row)
 	hint_button = Button.new()
 	hint_button.name = "Hint"
 	hint_button.text = "Show a hint"
+	hint_button.icon = MenuKit.pic(&"flash", 22.0 * ts)
 	hint_button.pressed.connect(_on_hint)
 	row.add_child(hint_button)
 	answer_button = Button.new()
 	answer_button.name = "Answer"
-	answer_button.text = "Answer the question here"
+	answer_button.text = "Answer the question"
+	answer_button.icon = MenuKit.pic(&"bubble", 22.0 * ts, &"primary_text")
 	answer_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
 	answer_button.pressed.connect(_on_answer)
 	row.add_child(answer_button)
-	_answer_note = _text(body, "", UiTheme.MUTED)
+	_answer_note = _text(now, "", UiTheme.MUTED)
 
 	# ---- Mission Control's log
-	_heading(body, "%s says" % TutorialSystem.speaker())
-	_log_label = _text(body, "", UiTheme.MUTED)
+	_log_label = _text(_section(body, "%s says" % TutorialSystem.speaker(), &"bubble"), "", UiTheme.MUTED)
 
 	# ---- reminders
-	_heading(body, "Reminders")
-	_text(body, "Hear Mission Control again for a step you have finished. Nothing counts twice.", UiTheme.MUTED)
+	var reminders := _section(body, "Hear a step again", &"reset")
 	var rrow := HBoxContainer.new()
 	rrow.add_theme_constant_override(&"separation", 12)
-	body.add_child(rrow)
+	reminders.add_child(rrow)
 	replay_option = OptionButton.new()
 	replay_option.name = "ReplayStage"
 	replay_option.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -135,6 +146,7 @@ func _build() -> void:
 	replay_button = Button.new()
 	replay_button.name = "Replay"
 	replay_button.text = "Remind me"
+	replay_button.icon = MenuKit.pic(&"sound", 22.0 * ts)
 	replay_button.pressed.connect(_on_replay)
 	rrow.add_child(replay_button)
 	stop_button = Button.new()
@@ -142,37 +154,51 @@ func _build() -> void:
 	stop_button.text = "Stop reminder"
 	stop_button.pressed.connect(_on_stop_replay)
 	rrow.add_child(stop_button)
-	_replay_note = _text(body, "", UiTheme.MUTED)
+	_replay_note = _text(reminders, "", UiTheme.MUTED)
 
 	# ---- campaign goal
-	_heading(body, "Colony goal")
-	_text(body, String((TutorialSystem.data().get("certification", {}) as Dictionary).get("words", "")), UiTheme.MUTED)
+	var goal := _section(body, "Colony goal", &"star")
+	_text(goal, String((TutorialSystem.data().get("certification", {}) as Dictionary).get("words", "")), UiTheme.MUTED)
 	_goal_box = VBoxContainer.new()
 	_goal_box.name = "Goal"
-	body.add_child(_goal_box)
+	goal.add_child(_goal_box)
 
 	# ---- story
-	_heading(body, "The first crew's story (optional)")
-	_text(body, String(TutorialSystem.lore().get("premise", "")))
-	_text(body, "Solving it is never needed. Records hide in old consoles and broken machines: read them, or inspect salvage donors.", UiTheme.MUTED)
+	var story := _section(body, "The first crew's story (optional)", &"pencil")
+	_text(story, String(TutorialSystem.lore().get("premise", "")))
+	_text(story, "Solving it is never needed. Records hide in old consoles and broken machines: read them, or inspect salvage donors.", UiTheme.MUTED)
 	_story_box = VBoxContainer.new()
 	_story_box.name = "Story"
 	_story_box.add_theme_constant_override(&"separation", 6)
-	body.add_child(_story_box)
+	story.add_child(_story_box)
 
 	_message = Label.new()
 	_message.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_message.visible = false
 	column.add_child(_message)
-	var keys := Label.new()
-	keys.theme_type_variation = UiTheme.MUTED
-	keys.text = "Press Esc to close."
-	column.add_child(keys)
 
 
-func _heading(parent: Control, text: String) -> Label:
-	var l := _text(parent, text, UiTheme.HEADING)
-	return l
+## A section of the journal: a box with a pictogram and a heading. Returns the column its lines go in.
+func _section(parent: Control, text: String, kind: StringName) -> VBoxContainer:
+	var card := PanelContainer.new()
+	card.name = "Section_" + String(kind)
+	card.theme_type_variation = UiTheme.CARD
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	parent.add_child(card)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 6)
+	card.add_child(col)
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override(&"separation", 10)
+	col.add_child(head)
+	head.add_child(MenuKit.picture(kind, 26.0 * UiTheme.text_scale(), &"heading"))
+	var l := Label.new()
+	l.text = text
+	l.theme_type_variation = UiTheme.HEADING
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(l)
+	return col
 
 
 func _text(parent: Control, text: String, variation: StringName = &"") -> Label:
@@ -312,7 +338,7 @@ func _refresh_replay(st: ColonyState) -> void:
 	replay_button.disabled = done.is_empty()
 	stop_button.visible = false
 	if done.is_empty():
-		_show(_replay_note, "Finish a step first; then you can hear it again here.")
+		_show(_replay_note, "Finish a step first.")
 	elif _replay_note.text.begins_with("Finish"):
 		_show(_replay_note, "")
 
@@ -331,7 +357,7 @@ func _on_stop_replay() -> void:
 func _send(action: StringName, params: Dictionary) -> void:
 	var result := services.request(action, &"", params)
 	if result.pending:
-		_message.text = "Asked the host…"
+		_message.text = "One moment…"
 	elif result.ok and action == &"tutorial_replay":
 		_message.text = ""
 		_show(_replay_note, String(result.changes.get("text", "")))

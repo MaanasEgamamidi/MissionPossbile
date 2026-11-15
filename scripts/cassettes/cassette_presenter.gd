@@ -29,12 +29,16 @@ const SparkleBurst := preload("res://scripts/tasks/sparkle_burst.gd")
 const GuideSparkles := preload("res://scripts/guide/guide_sparkles.gd")
 ## Seconds a picked-up tape takes to shrink away under its sparkles.
 const VANISH_SECONDS := 0.35
-## Idle gold sparkles around a tape not yet found: count (half on Low), half size of the box they twinkle in (centred
-## IDLE_LIFT above the tape's resting spot, so they sit just over the surface), seconds each lives.
-const IDLE_SPARKLES := 20
-const IDLE_EXTENTS := Vector3(0.28, 0.09, 0.28)
-const IDLE_LIFT := 0.12
+## Idle gold sparkles around a tape not yet found: count (half on Low), half size of the box they twinkle in, seconds
+## each lives. The box starts IDLE_LIFT above the tape's resting spot and reaches up to just over chest height
+## (owner 2026-11-15: a column of sparkles rising from the tape reads from across a room; the low cloud did not), and
+## is never thinner than IDLE_EXTENTS.y.
+const IDLE_SPARKLES := 28
+const IDLE_EXTENTS := Vector3(0.28, 0.12, 0.28)
+const IDLE_LIFT := 0.06
 const IDLE_LIFETIME := 1.6
+## The column tops out this far above chest height, metres.
+const IDLE_OVER_CHEST := 0.12
 const PLAYER_REACH := Vector3(0.62, 0.34, 0.42)
 
 var services: GameServices
@@ -55,6 +59,8 @@ var _seen := {}
 var _vanish := {}
 ## cassette id -> world pose of the tape (sparkles).
 var _tape_pose := {}
+## cassette id -> world height of a crew member's chest when they stand by the tape (the sparkles reach it).
+var _chest_y := {}
 ## cassette id -> the tape's idle gold sparkles (GPUParticles3D, a child of its station).
 var _idle := {}
 
@@ -74,6 +80,7 @@ func setup(p_services: GameServices, collision: Node3D) -> void:
 		var model := _cassette(cassette_id)
 		_place(station, model, entries.get(cassette_id, {}), TAPE_REACH, 0.06)
 		_tape_pose[cassette_id] = prop_pose(entries.get(cassette_id, {}), station.position)
+		_chest_y[cassette_id] = floor_y(entries.get(cassette_id, {}), station.position) + SparkleBurst.CHEST_HEIGHT
 		cassette_nodes[cassette_id] = station
 	var player := stations.get_node_or_null(NodePath(CassetteCatalog.PLAYER_ID)) as Area3D
 	if player != null:
@@ -90,12 +97,15 @@ func setup(p_services: GameServices, collision: Node3D) -> void:
 	for cassette_id: String in cassette_nodes:
 		var station := cassette_nodes[cassette_id] as Area3D
 		var pose: Transform3D = _tape_pose[cassette_id]
-		var sparkles := TapeTrails.idle_sparkles(idle_amount, IDLE_EXTENTS, IDLE_LIFETIME)
+		# A column from just over the tape up to a little above chest height.
+		var bottom := pose.origin.y + IDLE_LIFT
+		var half_height := maxf(IDLE_EXTENTS.y, (float(_chest_y[cassette_id]) + IDLE_OVER_CHEST - bottom) * 0.5)
+		var sparkles := TapeTrails.idle_sparkles(idle_amount, Vector3(IDLE_EXTENTS.x, half_height, IDLE_EXTENTS.z), IDLE_LIFETIME)
 		sparkles.name = "TapeSparkles"
 		sparkles.layers = mask
 		sparkles.emitting = false
 		# Stations sit under the identity "Stations" node, so local = world offsets.
-		sparkles.position = pose.origin - station.position + Vector3(0, IDLE_LIFT, 0)
+		sparkles.position = Vector3(pose.origin.x, bottom + half_height, pose.origin.z) - station.position
 		station.add_child(sparkles)
 		_idle[cassette_id] = sparkles
 	services.events.state_changed.connect(func(_reason: StringName) -> void: refresh())
@@ -162,7 +172,7 @@ func _sparkle(cassette_id: String) -> void:
 	var mask := (1 << 20) - 1
 	if trails != null:
 		mask = int(trails.call(&"_layers"))
-	last_burst = SparkleBurst.spawn(self, bounds, mask, _use_cpu(), TAPE_GLOW)
+	last_burst = SparkleBurst.spawn(self, bounds, mask, _use_cpu(), TAPE_GLOW, float(_chest_y.get(cassette_id, NAN)))
 	bursts_started += 1
 	_vanish[cassette_id] = 0.0
 
@@ -192,6 +202,13 @@ func _end_vanish(cassette_id: String) -> void:
 func _use_cpu() -> bool:
 	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
 	return level == GraphicsQuality.Level.LOW
+
+## World height of the floor under a prop: its station entry's "position" is the floor spot the player stands on;
+## without one the station's sensing sphere is taken to hang 1 m above the floor (as prop_pose does).
+static func floor_y(entry: Dictionary, station_position: Vector3) -> float:
+	if entry.has("position"):
+		return float((entry.position as Array)[1])
+	return station_position.y - 1.0
 
 ## World position (on its support surface) and yaw of a prop, from its station entry. Without "prop_position" the prop
 ## sits on the floor under the station.
