@@ -327,7 +327,7 @@ func select(id: String) -> void:
 func _show_selected(st: ColonyState) -> void:
 	_style_rows()
 	var g := _goal(selected_id)
-	map.markers = markers_for(st, g)
+	map.goal_markers = markers_for(st, g)
 	_caption.text = caption_for(st, g)
 	_caption_who.visible = String(g.get("kind", "")) == "fix"
 	_caption_who.set(&"spec", String(g.get("spec", "")))
@@ -336,7 +336,7 @@ func _show_selected(st: ColonyState) -> void:
 	if _fitted_for != selected_id:
 		_fitted_for = selected_id
 		map.selected_zone = _zone_of(g)
-		map.fit_plan(_fit_rect(map.markers))
+		map.fit_plan(_fit_rect(map.goal_markers))
 	map.queue_redraw()
 
 
@@ -494,14 +494,14 @@ static func _plan(a: Variant) -> Vector2:
 ## The blueprint plan with bigger room names and the selected goal's markers on top.
 class GoalMap extends BlueprintView:
 	const Art := preload("res://scripts/ui/hud/goal_art.gd")
-	var markers: Array = []
+	var goal_markers: Array = []
 	var _fit := Rect2()
 
 	func _ready() -> void:
 		set_process(true)
 
 	func _process(_delta: float) -> void:
-		if not markers.is_empty() and is_visible_in_tree() and not reduce_motion():
+		if not goal_markers.is_empty() and is_visible_in_tree() and not reduce_motion():
 			queue_redraw()
 
 	## True when the player asked for less motion (UiRoot's settings): the rings around the marks stand still.
@@ -541,7 +541,7 @@ class GoalMap extends BlueprintView:
 		var pulse := -1.0 if reduce_motion() else 0.5 + 0.5 * sin(Time.get_ticks_msec() / 1000.0 * 4.0)
 		var r_dot := maxf(7.0, fs * 0.45)
 		# The marks are GoalArt's: the legend under the map draws the very same ones.
-		for m: Dictionary in markers:
+		for m: Dictionary in goal_markers:
 			var at := world_to_view(m.at as Vector2)
 			var done := bool(m.done)
 			match String(m.kind):

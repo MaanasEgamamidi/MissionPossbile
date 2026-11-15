@@ -304,7 +304,7 @@ func _on_menu_host(port: int, continue_save: bool) -> void:
 			_main_menu.show_notice("The saved colony could not be opened (%s). Untick \"Continue my saved colony\" to host a new one." % loaded.status)
 			return
 	else:
-		if services.saves.has_save() and not _confirm_new:
+		if services.saves.has_save() and not _confirm_new and not (_main_menu != null and _main_menu.new_colony_confirmed()):
 			_confirm_new = true
 			_main_menu.show_notice("Hosting a new colony replaces your saved one (the old save is kept as a backup). Press Start hosting again to go ahead, or tick \"Continue my saved colony\".")
 			return
@@ -617,7 +617,8 @@ func _sync_items() -> void:
 	for id: String in st.items:
 		var rec: Dictionary = st.items[id]
 		var holder := String(rec.get("holder", ""))
-		var node := _item_nodes.get(id) as CarryItem
+		var cached: Variant = _item_nodes.get(id)
+		var node := cached as CarryItem if is_instance_valid(cached) else null
 		if node == null:
 			node = CarryItem.make_crate(StringName(id))
 			add_child(node)

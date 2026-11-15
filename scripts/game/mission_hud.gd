@@ -585,9 +585,9 @@ func _layout() -> void:
 	var ds := dock.get_combined_minimum_size()
 	dock.size = ds
 	dock.position = Vector2((screen.x - ds.x) * 0.5, screen.y - EDGE - ds.y)
-	var bs := build_chip.get_combined_minimum_size()
-	build_chip.size = bs
-	build_chip.position = Vector2((screen.x - bs.x) * 0.5, dock.position.y - bs.y - 10.0)
+	var bcs := build_chip.get_combined_minimum_size()
+	build_chip.size = bcs
+	build_chip.position = Vector2((screen.x - bcs.x) * 0.5, dock.position.y - bcs.y - 10.0)
 	if feed.visible:
 		var fs := feed.get_combined_minimum_size()
 		feed.size = fs

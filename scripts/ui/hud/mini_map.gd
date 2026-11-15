@@ -95,31 +95,8 @@ class MapCanvas extends Control:
 		var scale := minf(sz.x, sz.y) / (HALF * 2.0)
 		var font := AstraStyle.symbol_font()
 		var fsize := AstraStyle.fs(11)
-		# ground
-		var ground := Rect2(map.to_canvas(CENTRE - Vector2(HALF, HALF), sz), Vector2(HALF * 2.0, HALF * 2.0) * scale)
-		draw_rect(ground, Color(0.43, 0.26, 0.17))
-		for c: Array in [[Vector2(70, 72), 12.0], [Vector2(-38, 70), 7.0], [Vector2(55, 60), 5.0], [Vector2(-20, -25), 6.0]]:
-			draw_circle(map.to_canvas(c[0], sz), float(c[1]) * scale, Color(0.33, 0.19, 0.12))
-			draw_arc(map.to_canvas(c[0], sz), float(c[1]) * scale, 0.0, TAU, 32, Color(0.6, 0.4, 0.28, 0.7), 1.2, true)
-		# dome and rooms
-		var dome_c := map.to_canvas(Vector2(15.0, -4.0), sz)
-		var pts := PackedVector2Array()
-		for i in 49:
-			var a := TAU * i / 48.0
-			pts.append(dome_c + Vector2(cos(a) * 27.3, sin(a) * 16.3) * scale)
-		draw_colored_polygon(pts, Color(0.95, 0.62, 0.35, 0.18))
-		draw_polyline(pts, Color(0.95, 0.75, 0.55, 0.7), 1.2, true)
-		# the garden dome (greenhouse) east of the base
-		var gd := map.to_canvas(Vector2(50.0, 27.0), sz)
-		draw_circle(gd, 11.0 * scale, Color(0.55, 0.85, 0.6, 0.2))
-		draw_arc(gd, 11.0 * scale, 0.0, TAU, 32, Color(0.6, 0.9, 0.65, 0.7), 1.2, true)
-		for r: Rect2 in MiniMap._rooms:
-			var a := map.to_canvas(r.position, sz)
-			draw_rect(Rect2(a, r.size * scale), Color(0.85, 0.9, 1.0, 0.22))
-			draw_rect(Rect2(a, r.size * scale), Color(0.85, 0.9, 1.0, 0.35), false, 1.0)
-		for t: Vector2 in MiniMap._trackers:
-			var p := map.to_canvas(t, sz)
-			draw_rect(Rect2(p - Vector2(2.5, 2.5), Vector2(5, 5)), AstraStyle.C_POWER)
+		texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
+		TerrainCartography.draw_surface(self, func(xz: Vector2) -> Vector2: return map.to_canvas(xz, sz))
 		# survey sites
 		for s: Dictionary in ScoutSystem.sites():
 			var sp := map.to_canvas(_xz(s.position), sz)

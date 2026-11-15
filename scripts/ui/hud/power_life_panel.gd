@@ -1,15 +1,15 @@
 class_name PowerLifePanel
 extends UiPanel
 ## "Power & life support": the drawer that opens on the right when you click a supply on the vitals bar or press P.
-## UI overhaul (2026-11-15): it leads with states, like the HUD strip.
-##   * One sentence of at most nine words with a mark: is the colony making enough power right now?
-##   * One row per supply (battery, oxygen, water, food, room air): picture, name, level bar and a word (OK / Low /
-##     Very low) with the low mark (triangle = low, octagon = very low). Then making against using as two bars.
-##   * "Switched off": only the rooms and machines that are off or without power (nothing to read while all is well).
-##   * The numbers with their units (kWh, kW, kg per sol, kPa, the kW of every room and machine) are behind the "123"
-##     button or key H (show_numbers), the same key that switches the HUD strip to its numbers look.
-##   * "Also in store": spare parts, science score and ore (once counters on the strip).
-##   * "Messages": the last pop-ups and Mission Control messages in full (the HUD shows one short line of each).
+## Layout and behaviour from Uday's UI rebuild, drawn with the HUD's own pieces (HudKit pictograms, bars and text):
+##   * Making, using and the battery as three bars on one scale, then one verdict sentence with a mark.
+##   * Tabs: Supply (what makes power: the sun trackers, the battery when it covers a gap), Demand (every room and
+##     machine that draws power, on or off), Life support (oxygen, water, food and the room air as states, then what
+##     else is in store), Messages (the last pop-ups and Mission Control messages in full; hidden while empty).
+##   * Live readings update persistent rows: a row only appears or disappears when its source does, so the open tab
+##     and its scroll position stay put while the numbers change.
+##   * The numbers with their units are behind the "123" button or key H (show_numbers), the same key that switches
+##     the HUD strip to its numbers look. Without them the rows say states and words.
 ## It only shows: rooms and machines are switched at the power panel in the Power Room, by someone standing there.
 ## The ? opens the science. Text and pictures follow the text size setting (HudKit).
 
@@ -18,22 +18,29 @@ const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
 ## Share of dust on the panels from which "Making" says "Dusty".
 const DUSTY := 0.3
 const MESSAGE_ICONS := {&"good": &"check", &"info": &"info", &"warn": &"warn", &"danger": &"danger"}
+const TAB_SUPPLY := 0
+const TAB_DEMAND := 1
+const TAB_LIFE := 2
+const TAB_MESSAGES := 3
 
-## True: every row also shows its numbers with units, and every room and machine is listed with its kW.
+## True: every row also shows its numbers with units. False: states and words.
 var numbers := false
 
 var _verdict: HudKit.Txt
 var _verdict_icon: HudKit.Icon
 var _verdict_box: PanelContainer
-var _rows: Dictionary = {}          # row id -> {"icon", "name_col", "nums", "bar", "word", "mark"}
-var _loads_title: HudKit.Txt
+var _rows: Dictionary = {}          # state row id -> {"row", "icon", "name_col", "nums", "bar", "word", "mark", "color"}
+var _lines: Dictionary = {}         # list line key -> {"row", "icon", "title", "sub", "value", "seen"}
+var _pages: TabContainer
+var _sources: VBoxContainer
 var _loads: VBoxContainer
+var _life: VBoxContainer
 var _counts: HFlowContainer
-var _messages_title: HudKit.Txt
 var _messages: VBoxContainer
 var _numbers_button: Button
 var _close: Button
-var _sig := ""
+var _counts_sig := ""
+var _messages_sig := ""
 var _verdict_tone := ""
 
 
@@ -41,7 +48,7 @@ func setup(p_services: GameServices) -> void:
 	super.setup(p_services)
 	name = "PowerLifePanel"
 	align_right = true
-	max_width = 640
+	max_width = 700
 	accent_line = false
 	add_theme_stylebox_override(&"panel", AstraStyle.glass(AstraStyle.RADIUS, 18, 16, true))
 	var box := VBoxContainer.new()
@@ -87,73 +94,63 @@ func setup(p_services: GameServices) -> void:
 	_close.pressed.connect(func() -> void: close_requested.emit())
 	head.add_child(_close)
 
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll.follow_focus = true
-	box.add_child(scroll)
-	var content := VBoxContainer.new()
-	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	content.add_theme_constant_override(&"separation", 10)
-	scroll.add_child(content)
+	# making, using and the battery on one card
+	var meters := AstraStyle.panel(AstraStyle.pill(Color(1, 1, 1, 0.04), AstraStyle.RADIUS_SM + 2, 14, 12, AstraStyle.LINE), "Balance")
+	box.add_child(meters)
+	var meter_list := VBoxContainer.new()
+	meter_list.add_theme_constant_override(&"separation", 10)
+	meters.add_child(meter_list)
+	_state_row(meter_list, "making", &"sun", "Making", AstraStyle.C_POWER)
+	_state_row(meter_list, "using", &"power", "Using", AstraStyle.ACCENT)
+	_state_row(meter_list, "battery_kwh", &"battery", "Battery", AstraStyle.GOOD)
 
 	# the verdict: one mark and one short sentence
 	_verdict_box = AstraStyle.panel(AstraStyle.pill(Color(AstraStyle.GOOD, 0.12), AstraStyle.RADIUS_SM, 12, 8), "Verdict")
 	_verdict_box.mouse_filter = Control.MOUSE_FILTER_PASS
-	content.add_child(_verdict_box)
+	box.add_child(_verdict_box)
 	var vrow := HBoxContainer.new()
 	vrow.add_theme_constant_override(&"separation", 12)
 	vrow.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_verdict_box.add_child(vrow)
-	_verdict_icon = HudKit.Icon.new(&"check", AstraStyle.GOOD, 36.0, "Mark")
+	_verdict_icon = HudKit.Icon.new(&"check", AstraStyle.GOOD, 32.0, "Mark")
 	vrow.add_child(_verdict_icon)
-	_verdict = HudKit.Txt.new("", 22.0, AstraStyle.TEXT, "Text")
+	_verdict = HudKit.Txt.new("", 20.0, AstraStyle.TEXT, "Text")
 	_verdict.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_verdict.custom_minimum_size.x = 200
 	_verdict.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	vrow.add_child(_verdict)
 
-	# the supplies as states
-	var states := AstraStyle.panel(AstraStyle.pill(Color(1, 1, 1, 0.04), AstraStyle.RADIUS_SM + 2, 14, 12, AstraStyle.LINE), "Supplies")
-	content.add_child(states)
-	var list := VBoxContainer.new()
-	list.add_theme_constant_override(&"separation", 10)
-	states.add_child(list)
-	for s: Dictionary in VitalsBar.STOCKS:
-		_state_row(list, String(s.key), s.icon, "Battery" if s.key == &"battery_kwh" else String(s.name), s.color)
-	_state_row(list, "cabin", &"home", "Room air", AstraStyle.C_O2)
-	content.add_child(_section("Power right now"))
-	var flow := AstraStyle.panel(AstraStyle.pill(Color(1, 1, 1, 0.04), AstraStyle.RADIUS_SM + 2, 14, 12, AstraStyle.LINE), "Balance")
-	content.add_child(flow)
-	var flow_list := VBoxContainer.new()
-	flow_list.add_theme_constant_override(&"separation", 10)
-	flow.add_child(flow_list)
-	_state_row(flow_list, "making", &"sun", "Making", AstraStyle.C_POWER)
-	_state_row(flow_list, "using", &"power", "Using", AstraStyle.ACCENT)
-
-	_loads_title = _section("Switched off")
-	content.add_child(_loads_title)
-	_loads = VBoxContainer.new()
-	_loads.name = "Loads"
-	_loads.add_theme_constant_override(&"separation", 6)
-	content.add_child(_loads)
+	# the tabs
+	_pages = UiComposition.tabs(box)
+	_pages.name = "Pages"
+	var supply := UiComposition.page(_pages, "Supply")
+	var demand := UiComposition.page(_pages, "Demand")
+	var life := UiComposition.page(_pages, "Life support")
+	var messages := UiComposition.page(_pages, "Messages")
+	supply.add_child(_section("Making power"))
+	_sources = _list(supply, "Sources")
+	demand.add_child(_section("Using power"))
+	_loads = _list(demand, "Loads")
 	var note := HudKit.Txt.new("Switch things at the Power Room panel.", 16.0, AstraStyle.TEXT_2, "Note")
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	HudKit.say(note, "Rooms and machines are switched at the power panel in the Power Room, by someone standing there.")
 	note.mouse_filter = Control.MOUSE_FILTER_PASS
-	content.add_child(note)
-	content.add_child(_section("Also in store"))
+	demand.add_child(note)
+	life.add_child(_section("Life support today"))
+	_life = _list(life, "Supplies")
+	for s: Dictionary in VitalsBar.STOCKS:
+		if s.key != &"battery_kwh":
+			_state_row(_life, String(s.key), s.icon, String(s.name), s.color)
+	_state_row(_life, "cabin", &"home", "Room air", AstraStyle.C_O2)
+	life.add_child(_section("Also in store"))
 	_counts = HFlowContainer.new()
 	_counts.name = "Counts"
 	_counts.add_theme_constant_override(&"h_separation", 10)
 	_counts.add_theme_constant_override(&"v_separation", 6)
-	content.add_child(_counts)
-	_messages_title = _section("Messages")
-	content.add_child(_messages_title)
-	_messages = VBoxContainer.new()
-	_messages.name = "Messages"
-	_messages.add_theme_constant_override(&"separation", 8)
-	content.add_child(_messages)
+	life.add_child(_counts)
+	messages.add_child(_section("Latest messages"))
+	_messages = _list(messages, "MessageList")
+	_pages.set_tab_hidden(TAB_MESSAGES, true)
 
 
 func panel_title() -> String:
@@ -169,12 +166,11 @@ func show_numbers(on: bool) -> void:
 	numbers = on
 	if _numbers_button.button_pressed != on:
 		_numbers_button.set_pressed_no_signal(on)
-	_sig = ""
 	refresh()
 
 
-## The state word a row shows now ("OK", "Low", "Very low", "Dusty"...). Row ids: the four stock keys, "cabin",
-## "making", "using".
+## The state word a row shows now ("OK", "Low", "Very low", "Dusty"...). Row ids: "battery_kwh", the three life
+## support stock keys, "cabin", "making", "using".
 func state_word(row_id: String) -> String:
 	return (_rows[row_id].word as Label).text if _rows.has(row_id) else ""
 
@@ -182,6 +178,20 @@ func state_word(row_id: String) -> String:
 ## The verdict sentence now shown (nine words at most).
 func verdict_text() -> String:
 	return _verdict.text
+
+
+## The tabs (Supply, Demand, Life support, Messages), for tests and tools.
+func pages() -> TabContainer:
+	return _pages
+
+
+func _list(parent: Control, node_name: String) -> VBoxContainer:
+	var l := VBoxContainer.new()
+	l.name = node_name
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.add_theme_constant_override(&"separation", 10)
+	parent.add_child(l)
+	return l
 
 
 ## One state row: picture, name (numbers under it in the numbers look), level bar, state word, low mark.
@@ -248,21 +258,50 @@ func _section(text: String) -> HudKit.Txt:
 	return HudKit.Txt.new(text, 16.0, AstraStyle.TEXT_3, "", true)
 
 
-## A line of the lists: mark, words (wrapping), and a value on the right.
-func _line(parent: Control, icon_kind: StringName, color: Color, title: String, value: String, value_color: Color) -> void:
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 10)
-	parent.add_child(row)
-	var icon := HudKit.Icon.new(icon_kind, color, 22.0)
-	icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
-	row.add_child(icon)
-	var t := HudKit.Txt.new(title, 18.0, AstraStyle.TEXT)
-	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	t.custom_minimum_size.x = 120
-	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	row.add_child(t)
-	if value != "":
-		row.add_child(HudKit.Txt.new(value, 18.0, value_color, "", true))
+## A persistent line of the lists: mark, name with a description under it (both wrapping), and a value on the right.
+## The same `parent` and `title` reuse the same row, so live updates only change its words and colours.
+func _line(parent: Control, icon_kind: StringName, color: Color, title: String, sub: String, value: String, value_color: Color) -> Control:
+	var key := "%s/%s" % [parent.get_instance_id(), title]
+	var e: Dictionary = _lines.get(key, {})
+	if e.is_empty():
+		var row := HBoxContainer.new()
+		row.name = title.validate_node_name()
+		row.add_theme_constant_override(&"separation", 12)
+		row.mouse_filter = Control.MOUSE_FILTER_PASS
+		parent.add_child(row)
+		var icon := HudKit.Icon.new(icon_kind, color, 24.0, "Symbol")
+		icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		row.add_child(icon)
+		var col := VBoxContainer.new()
+		col.add_theme_constant_override(&"separation", 2)
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(col)
+		var t := HudKit.Txt.new(title, 18.0, AstraStyle.TEXT, "Name")
+		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		t.custom_minimum_size.x = 120
+		col.add_child(t)
+		var d := HudKit.Txt.new(sub, 16.0, AstraStyle.TEXT_2, "Description")
+		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(d)
+		var v := HudKit.Txt.new(value, 18.0, value_color, "Amount", true)
+		v.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		v.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		row.add_child(v)
+		e = {"row": row, "icon": icon, "title": t, "sub": d, "value": v}
+		_lines[key] = e
+	e["seen"] = true
+	(e.row as Control).show()
+	(e.icon as HudKit.Icon).kind = icon_kind
+	(e.icon as HudKit.Icon).color = color
+	(e.title as Label).text = title
+	(e.sub as Label).text = sub
+	(e.sub as Label).visible = sub != ""
+	(e.value as Label).text = value
+	(e.value as Label).visible = value != ""
+	(e.value as Label).custom_minimum_size.x = roundf(96.0 * HudKit.scale()) if value != "" else 0.0
+	(e.value as HudKit.Txt).tint(value_color)
+	return e.row
 
 
 func refresh() -> void:
@@ -272,6 +311,25 @@ func refresh() -> void:
 	var b := services.balance
 	var forecast := ReserveForecast.compute(st, b, services.clock())
 	var day := services.clock().is_daylight()
+
+	# making, using and the battery, on one scale
+	var dust := 0.0
+	for d: Variant in st.panel_dust:
+		dust += float(d)
+	dust = dust / maxf(1.0, st.panel_dust.size())
+	var top := maxf(maxf(st.solar_kw, st.load_kw), 0.1)
+	var dusty := day and dust >= DUSTY
+	_set_row("making", st.solar_kw / top, &"warn" if dusty else &"ok", "Night" if not day else ("Dusty" if dusty else "Sun"),
+		"+%s kW · dust %d %%" % [ColonySummaryPanel.num(st.solar_kw), roundi(dust * 100.0)] if day else "0 kW · no sunlight",
+		"Making %s kW. %s" % [ColonySummaryPanel.num(st.solar_kw), ("Dust on the panels: %d %%." % roundi(dust * 100.0)) if day else "Night: no sunlight, no power."])
+	_set_row("using", st.load_kw / top, &"urgent" if st.power_deficit else &"ok", "Too much" if st.power_deficit else "",
+		"%s kW" % ColonySummaryPanel.num(st.load_kw) + (" · battery +%s kW" % ColonySummaryPanel.num(-st.battery_kw) if st.battery_kw < -0.05 else ""),
+		"Using %s kW." % ColonySummaryPanel.num(st.load_kw))
+	var cap := float(st.capacities.get(&"battery_kwh", 0.0))
+	var stored := st.store(&"battery_kwh")
+	var bat_level := ColonySummaryPanel.level_of(services, &"battery_kwh")
+	_set_row("battery_kwh", stored / cap if cap > 0.0 else 0.0, bat_level, ColonySummaryPanel.level_word(bat_level),
+		"%d/%d kWh" % [roundi(stored), roundi(cap)])
 
 	# the verdict
 	var verdict := "Making exactly what you use."
@@ -291,7 +349,7 @@ func refresh() -> void:
 		full = "Using more than you make: the battery is draining%s." % (" and lasts about %s at this rate" % left if left != "" else "")
 		if not day:
 			full += " It is night: the panels make nothing until sunrise."
-		if left != "" and (numbers or ColonySummaryPanel.level_of(services, &"battery_kwh") != &"ok"):
+		if left != "" and (numbers or bat_level != &"ok"):
 			verdict += " About %s left." % left
 		tone = &"warn"
 	_verdict.text = verdict
@@ -303,19 +361,17 @@ func refresh() -> void:
 		_verdict_icon.color = vc
 		_verdict_box.add_theme_stylebox_override(&"panel", AstraStyle.pill(Color(vc, 0.14), AstraStyle.RADIUS_SM, 12, 8, Color(vc, 0.6)))
 
-	# the supplies
+	# the life support supplies as states
 	for s: Dictionary in VitalsBar.STOCKS:
 		var key: StringName = s.key
-		var amount := st.store(key)
-		var cap := float(st.capacities.get(key, 0.0))
-		var level := ColonySummaryPanel.level_of(services, key)
-		var nums := ""
 		if key == &"battery_kwh":
-			nums = "%d/%d kWh" % [roundi(amount), roundi(cap)]
-		else:
-			var per_sol := float(st.rates.get(String(key), 0.0)) * GameConfig.SOL_HOURS
-			nums = "%s %s · %s%s %s/sol" % [VitalsBar._amount(key, amount), s.unit, "+" if per_sol >= 0.0 else "", ColonySummaryPanel.num(per_sol), s.unit]
-		_set_row(String(key), amount / cap if cap > 0.0 else 0.0, level, ColonySummaryPanel.level_word(level), nums)
+			continue
+		var amount := st.store(key)
+		var scap := float(st.capacities.get(key, 0.0))
+		var level := ColonySummaryPanel.level_of(services, key)
+		var per_sol := float(st.rates.get(String(key), 0.0)) * GameConfig.SOL_HOURS
+		var nums := "%s %s · %s%s %s/sol" % [VitalsBar._amount(key, amount), s.unit, "+" if per_sol >= 0.0 else "", ColonySummaryPanel.num(per_sol), s.unit]
+		_set_row(String(key), amount / scap if scap > 0.0 else 0.0, level, ColonySummaryPanel.level_word(level), nums)
 	var kpa := StationPanel.cabin_kpa(st, b)
 	var o2_level := StationPanel.o2_level(float(kpa.o2), b)
 	var co2_level := StationPanel.co2_level(float(kpa.co2), b)
@@ -329,79 +385,97 @@ func refresh() -> void:
 		"Room air: oxygen %s kPa (%s), carbon dioxide %s kPa (%s)." % [StationPanel.num(float(kpa.o2), 1),
 		StationPanel.o2_word(o2_level).to_lower(), StationPanel.num(float(kpa.co2), 2), StationPanel.co2_word(co2_level).to_lower()])
 
-	# making against using, on one scale
-	var dust := 0.0
-	for d: Variant in st.panel_dust:
-		dust += float(d)
-	dust = dust / maxf(1.0, st.panel_dust.size())
-	var top := maxf(maxf(st.solar_kw, st.load_kw), 0.1)
-	var dusty := day and dust >= DUSTY
-	_set_row("making", st.solar_kw / top, &"warn" if dusty else &"ok", "Night" if not day else ("Dusty" if dusty else "Sun"),
-		"+%s kW · dust %d %%" % [ColonySummaryPanel.num(st.solar_kw), roundi(dust * 100.0)] if day else "0 kW · no sunlight",
-		"Making %s kW. %s" % [ColonySummaryPanel.num(st.solar_kw), ("Dust on the panels: %d %%." % roundi(dust * 100.0)) if day else "Night: no sunlight, no power."])
-	_set_row("using", st.load_kw / top, &"urgent" if st.power_deficit else &"ok", "Too much" if st.power_deficit else "",
-		"%s kW" % ColonySummaryPanel.num(st.load_kw) + (" · battery +%s kW" % ColonySummaryPanel.num(-st.battery_kw) if st.battery_kw < -0.05 else ""),
-		"Using %s kW." % ColonySummaryPanel.num(st.load_kw))
-
-	# the lists: rebuilt only when something in them changed
-	var recent := ToastStack.recent()
-	var sig := "%s|%s|%s|%s|%s|%s|%s" % [numbers, JSON.stringify(st.zones), JSON.stringify(st.equipment), st.parts,
-		JSON.stringify(st.scout.get("ores", {})), ScoutSystem.science_points(st), JSON.stringify(recent)]
-	if sig == _sig:
-		return
-	_sig = sig
-	for holder: Control in [_loads, _counts, _messages]:
-		for c in holder.get_children():
-			holder.remove_child(c)
-			c.queue_free()
-	_loads_title.text = "Using power" if numbers else "Switched off"
+	# Supply and Demand: persistent rows (live telemetry must not reset the open tab or its scroll position)
+	for e: Dictionary in _lines.values():
+		e["seen"] = false
+	_line(_sources, &"sun", AstraStyle.C_POWER, "Sun trackers (%d)" % ColonyState.TRACKER_COUNT,
+		("Electricity while the Sun shines · dust on the panels %d %%" % roundi(dust * 100.0)) if day else "Night: no sunlight, no power",
+		"+%s kW" % ColonySummaryPanel.num(st.solar_kw) if numbers else ("Dusty" if dusty else ("Making" if day else "Night")),
+		AstraStyle.WARN if dusty else AstraStyle.C_POWER)
+	if st.battery_kw < -0.05:
+		_line(_sources, &"battery", AstraStyle.GOOD, "Battery", "Covering the gap",
+			"+%s kW" % ColonySummaryPanel.num(-st.battery_kw) if numbers else "Draining", AstraStyle.GOOD)
 	var zones: Array = st.zones.keys()
 	zones.sort()
 	for zone: String in zones:
 		var on := st.is_zone_powered(zone)
 		var kw := b.load_of_zone(zone)
-		if kw <= 0.0 or (on and not numbers):
+		if kw <= 0.0:
 			continue
 		_line(_loads, &"dot" if on else &"close", AstraStyle.ACCENT if on else AstraStyle.TEXT_3, zone,
-			("%s kW" % ColonySummaryPanel.num(kw) if on else "Off") if numbers else "Off", AstraStyle.TEXT if on else AstraStyle.TEXT_2)
+			"Lights and room systems" if on else "Switched off",
+			("%s kW" % ColonySummaryPanel.num(kw) if numbers else "On") if on else "Off", AstraStyle.TEXT if on else AstraStyle.TEXT_2)
 	for id: String in ColonyState.EQUIPMENT_IDS:
 		var e: Dictionary = st.equipment.get(id, {})
 		if e.is_empty():
 			continue
 		var on2 := bool(e.get("on", false))
 		var powered := bool(e.get("powered", false))
-		if on2 and powered and not numbers:
-			continue
+		var row: Control
 		if on2 and not powered:
-			_line(_loads, &"danger", AstraStyle.DANGER, StationPanel.equipment_name(id), "No power!", AstraStyle.DANGER)
+			row = _line(_loads, &"danger", AstraStyle.DANGER, StationPanel.equipment_name(id), "Switched on but getting no power", "No power!", AstraStyle.DANGER)
 		else:
-			_line(_loads, &"dot" if on2 else &"close", AstraStyle.C_O2 if on2 else AstraStyle.TEXT_3, StationPanel.equipment_name(id),
-				"%s kW" % ColonySummaryPanel.num(float(e.get("kw", 0.0))) if on2 else "Off", AstraStyle.TEXT if on2 else AstraStyle.TEXT_2)
+			row = _line(_loads, &"dot" if on2 else &"close", AstraStyle.C_O2 if on2 else AstraStyle.TEXT_3, StationPanel.equipment_name(id),
+				"Running" if on2 else "Switched off",
+				("%s kW" % ColonySummaryPanel.num(float(e.get("kw", 0.0))) if numbers else "On") if on2 else "Off",
+				AstraStyle.TEXT if on2 else AstraStyle.TEXT_2)
 		# the science name of the oxygen machines is the line's tooltip
-		if StationPanel.equipment_tip(id) != "":
-			(_loads.get_child(_loads.get_child_count() - 1) as Control).tooltip_text = StationPanel.equipment_tip(id)
-	if _loads.get_child_count() == 0:
-		_line(_loads, &"check", AstraStyle.GOOD, "Everything is switched on.", "", AstraStyle.TEXT)
-	for c: Dictionary in VitalsBar.extra_counts(st):
-		var chip := AstraStyle.panel(AstraStyle.pill(Color(c.color, 0.14), AstraStyle.RADIUS_SM, 10, 4, Color(c.color, 0.4)), "")
-		chip.mouse_filter = Control.MOUSE_FILTER_PASS
-		HudKit.say(chip, "%s: %s. %s" % [c.name, c.value, c.note])
-		var h := HBoxContainer.new()
-		h.add_theme_constant_override(&"separation", 8)
-		h.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		chip.add_child(h)
-		var sym := HudKit.Txt.new(String(c.symbol), 20.0, c.color)
-		sym.add_theme_font_override(&"font", AstraStyle.symbol_font())
-		h.add_child(sym)
-		h.add_child(HudKit.Txt.new(String(c.value), 20.0, AstraStyle.TEXT, "", true))
-		h.add_child(HudKit.Txt.new(String(c.name), 18.0, AstraStyle.TEXT_2))
-		_counts.add_child(chip)
-	_messages_title.visible = not recent.is_empty()
-	for i in range(recent.size() - 1, -1, -1):          # newest first
-		var m: Dictionary = recent[i]
-		var kind := StringName(m.get("kind", &"info"))
-		_line(_messages, StringName(MESSAGE_ICONS.get(kind, &"info")),
-			HudKit.level_color(kind, AstraStyle.GOOD if kind == &"good" else AstraStyle.C_O2), String(m.text), "", AstraStyle.TEXT)
+		row.tooltip_text = StationPanel.equipment_tip(id)
+	for e: Dictionary in _lines.values():
+		if not bool(e.get("seen", false)):
+			(e.row as Control).hide()
+
+	# store chips and messages: rebuilt only when they changed (they are not live telemetry)
+	var counts := VitalsBar.extra_counts(st)
+	var counts_sig := JSON.stringify(counts)
+	if counts_sig != _counts_sig:
+		_counts_sig = counts_sig
+		_clear(_counts)
+		for c: Dictionary in counts:
+			var chip := AstraStyle.panel(AstraStyle.pill(Color(c.color, 0.14), AstraStyle.RADIUS_SM, 10, 4, Color(c.color, 0.4)), "")
+			chip.mouse_filter = Control.MOUSE_FILTER_PASS
+			HudKit.say(chip, "%s: %s. %s" % [c.name, c.value, c.note])
+			var h := HBoxContainer.new()
+			h.add_theme_constant_override(&"separation", 8)
+			h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			chip.add_child(h)
+			var sym := HudKit.Txt.new(String(c.symbol), 20.0, c.color)
+			sym.add_theme_font_override(&"font", AstraStyle.symbol_font())
+			h.add_child(sym)
+			h.add_child(HudKit.Txt.new(String(c.value), 20.0, AstraStyle.TEXT, "", true))
+			h.add_child(HudKit.Txt.new(String(c.name), 18.0, AstraStyle.TEXT_2))
+			_counts.add_child(chip)
+	var recent := ToastStack.recent()
+	var messages_sig := JSON.stringify(recent)
+	if messages_sig != _messages_sig:
+		_messages_sig = messages_sig
+		_clear(_messages)
+		for i in range(recent.size() - 1, -1, -1):          # newest first
+			var m: Dictionary = recent[i]
+			var kind := StringName(m.get("kind", &"info"))
+			_message_line(_messages, StringName(MESSAGE_ICONS.get(kind, &"info")),
+				HudKit.level_color(kind, AstraStyle.GOOD if kind == &"good" else AstraStyle.C_O2), String(m.text))
+		_pages.set_tab_hidden(TAB_MESSAGES, recent.is_empty())
+
+
+func _message_line(parent: Control, icon_kind: StringName, color: Color, text: String) -> void:
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", 10)
+	parent.add_child(row)
+	var icon := HudKit.Icon.new(icon_kind, color, 22.0)
+	icon.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	row.add_child(icon)
+	var t := HudKit.Txt.new(text, 18.0, AstraStyle.TEXT)
+	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	t.custom_minimum_size.x = 120
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(t)
+
+
+static func _clear(holder: Control) -> void:
+	for c in holder.get_children():
+		holder.remove_child(c)
+		c.queue_free()
 
 
 func _unhandled_key_input(event: InputEvent) -> void:

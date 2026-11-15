@@ -8,10 +8,11 @@ extends Control
 
 ## The player clicked a zone (room, dome plaza, garden dome or exterior).
 signal room_selected(zone: String)
+signal location_selected(location: Dictionary)
 
 const MANIFEST_PATH := "res://data/colony_manifest.json"
-const ZOOM_MIN := 0.5
-const ZOOM_MAX := 10.0
+const ZOOM_MIN := 0.18
+const ZOOM_MAX := 12.0
 ## Pixels the mouse must move with the button down before a click becomes a drag.
 const DRAG_THRESHOLD := 5.0
 ## Share of the view the whole plan fills at zoom 1.
@@ -56,6 +57,13 @@ var zoom := 1.0
 var pan := Vector2.ZERO
 ## Zone last clicked, or "".
 var selected_zone := ""
+var selected_location := ""
+var show_structures := false
+var show_locations := true
+var show_crew := true
+var show_contours := false
+var markers: Array[Dictionary] = []
+var _hovered := ""
 ## Filled by every draw: room name -> {"rect": Rect2 (view pixels), "dim": bool}.
 var drawn_rooms: Dictionary = {}
 ## Filled by every draw: every legend symbol that was drawn -> true.
@@ -93,12 +101,13 @@ static func legend() -> Array:
 	out.append(["!", "A cache (orange circle): things left behind when someone was brought back to the Med Bay."])
 	for kind: String in StationPanels.all_kinds():
 		out.append([StationPanels.symbol_of(kind), "Station: %s." % StationPanels.name_of(kind).to_lower()])
-	out.append([DUSTY_WORD, "Under a sun tracker ☀: its solar panel is more than %d %% covered in dust, so it makes less power." % roundi(DUSTY_SHARE * 100.0)])
+	out.append([DUSTY_WORD, "! (dusty when zoomed in), under ☀: its solar panel is more than %d %% covered in dust, so it makes less power." % roundi(DUSTY_SHARE * 100.0)])
 	out.append(["↑", "North arrow. The top of the map is north (N)."])
 	return out
 
 
 func _init() -> void:
+	texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS
 	focus_mode = Control.FOCUS_ALL
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -220,10 +229,15 @@ func _gui_input(event: InputEvent) -> void:
 				grab_focus()
 			else:
 				if _pressed and not _dragging:
-					select_at(mb.position)
+					select_location_at(mb.position)
 				_pressed = false
 				_dragging = false
 			accept_event()
+	elif event is InputEventMouseMotion and not _pressed:
+		var hit := location_at((event as InputEventMouseMotion).position)
+		_hovered = String(hit.get("id", ""))
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if not hit.is_empty() else Control.CURSOR_DRAG
+		queue_redraw()
 	elif event is InputEventMouseMotion and _pressed:
 		var mm := event as InputEventMouseMotion
 		if not _dragging and mm.position.distance_to(_press_pos) > DRAG_THRESHOLD:
@@ -259,15 +273,22 @@ func _draw() -> void:
 	var text_colour := get_theme_color(&"font_color", &"Label")
 	var k := plan_scale()
 	var st: ColonyState = services.state() if services != null and services.has_game() else null
-	draw_rect(Rect2(Vector2.ZERO, size), PLAN_COLOURS["background"])
+	draw_rect(Rect2(Vector2.ZERO, size), UiTheme.palette().field)
+	TerrainCartography.draw_surface(self, func(xz: Vector2) -> Vector2: return world_to_view(Vector2(xz.x, -xz.y)))
+	if show_contours:
+		var a := view_to_world(Vector2.ZERO)
+		var b := view_to_world(size)
+		TerrainCartography.draw_contours(self, func(xz: Vector2) -> Vector2: return world_to_view(Vector2(xz.x, -xz.y)), Rect2(Vector2(a.x, -a.y), Vector2(b.x - a.x, a.y - b.y)), k)
 
 	# pads outside
 	for pad: Dictionary in _pads:
 		var centre := world_to_view(Vector2(float(pad.x), float(pad.y)))
 		var r := float(pad.r) * k
 		var dim := st != null and bool(pad.room) and not st.is_zone_powered(String(pad.name))
-		draw_arc(centre, r, 0.0, TAU, 64, PLAN_COLOURS["line_dim"] if dim else PLAN_COLOURS["pad"], 2.0, true)
-		_text(font, centre + Vector2(0, -r - 4.0), String(pad.name), fs, text_colour)
+		if show_structures:
+			draw_arc(centre, r, 0.0, TAU, 64, Color(1, 1, 1, 0.4), 1.0, true)
+		if k > 4.0:
+			_text(font, centre + Vector2(0, -r - 4.0), String(pad.name), fs, text_colour)
 		symbols_used["◌"] = true
 		if dim:
 			_text(font, centre, "✖", fs, text_colour)
@@ -285,7 +306,8 @@ func _draw() -> void:
 			var py := float(_dome.cy) + float(_dome.ry) * signf(sy) * pow(absf(sy), 2.0 / n)
 			pts.append(world_to_view(Vector2(px, py)))
 		var plaza_dim := st != null and not st.is_zone_powered(ColonyZones.PLAZA)
-		draw_polyline(pts, PLAN_COLOURS["line_dim"] if plaza_dim else PLAN_COLOURS["dome"], 2.0, true)
+		if show_structures:
+			draw_polyline(pts, Color(1, 1, 1, 0.4), 1.0, true)
 		symbols_used["◯"] = true
 		if plaza_dim:
 			var top := world_to_view(Vector2(float(_dome.cx), float(_dome.cy) + float(_dome.ry)))
@@ -297,12 +319,14 @@ func _draw() -> void:
 		var room_name := String(room.name)
 		var rect := room_rect(room_name)
 		var powered := st == null or st.is_zone_powered(room_name)
-		draw_rect(rect, PLAN_COLOURS["room"] if powered else PLAN_COLOURS["room_dim"])
-		draw_rect(rect, PLAN_COLOURS["line"] if powered else PLAN_COLOURS["line_dim"], false, 1.5)
+		if show_structures:
+			draw_rect(rect, Color(0.7, 0.9, 0.95, 0.08) if powered else Color(0, 0, 0, 0.5))
+		if show_structures:
+			draw_rect(rect, Color(1, 1, 1, 0.3), false, 1.0)
 		drawn_rooms[room_name] = {"rect": rect, "dim": not powered}
 		symbols_used["▭"] = true
 		var label_size := font.get_string_size(room_name, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
-		if label_size.x < rect.size.x - 4.0 and label_size.y * 2.2 < rect.size.y:
+		if show_structures and label_size.x < rect.size.x - 4.0 and label_size.y * 2.2 < rect.size.y:
 			_text(font, rect.get_center() + Vector2(0, -label_size.y * 0.6), room_name, fs, text_colour)
 		if not powered:
 			_text(font, rect.get_center() + Vector2(0, fs * 0.5), "✖", fs, text_colour)
@@ -312,11 +336,29 @@ func _draw() -> void:
 			symbols_used["▢"] = true
 
 	if st != null:
-		if show_stations:
-			_draw_stations(st, font, fs, text_colour, k)
-		if show_items:
-			_draw_items(st, font, fs)
-		_draw_crew(st, font, fs)
+		if show_locations:
+			if show_stations:
+				_draw_stations(st, font, fs, text_colour, k)
+			if show_items:
+				_draw_items(st, font, fs)
+		else:
+			markers.clear()
+		if show_crew:
+			_draw_crew(st, font, fs)
+		if ScoutSystem.is_built(st) and ScoutSystem.is_out(st):
+			var from := world_to_view(godot_to_plan(CharacterState._v3(st.scout.get("position", [0, 0, 0]))))
+			var to := world_to_view(godot_to_plan(CharacterState._v3(st.scout.get("leg_to", [0, 0, 0]))))
+			draw_dashed_line(from, to, Color(0.65, 0.9, 0.87, 0.8), 2, 7)
+			_text(font, (from + to) * 0.5, "Scout · active leg", maxi(12, fs - 3), text_colour)
+	# Metric scale is derived from the same coordinate transform as all locations.
+	var metres := pow(10.0, floor(log(140.0 / k) / log(10.0)))
+	if metres * k < 60: metres *= 5
+	var origin := Vector2(24, size.y - 30)
+	var ink: Color = UiTheme.palette().text
+	draw_line(origin, origin + Vector2(metres * k, 0), ink, 2)
+	for x in [0.0, metres * k]:
+		draw_line(origin + Vector2(x, -4), origin + Vector2(x, 4), ink, 1)
+	_text(font, origin + Vector2(metres * k * 0.5, -14), "%.1f m" % metres, maxi(12, fs - 2), ink)
 
 	# north arrow, top right
 	var arrow_at := Vector2(size.x - fs * 1.5, fs * 1.4)
@@ -330,25 +372,108 @@ func _draw() -> void:
 			draw_style_box(focus, Rect2(Vector2.ZERO, size))
 
 
-func _draw_stations(st: ColonyState, font: Font, fs: int, text_colour: Color, k: float) -> void:
+## Only existing station records are indexed. Undiscovered ore remains hidden.
+func locations() -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	if services == null or not services.has_game(): return out
+	var st := services.state()
 	for id: String in st.stations:
 		var rec: Dictionary = st.stations[id]
 		var kind := String(rec.get("kind", ""))
-		var at := world_to_view(godot_to_plan(CharacterState._v3(rec.get("position", [0, 0, 0]))))
-		var symbol := StationPanels.symbol_of(kind)
-		_text(font, at, symbol, fs, PLAN_COLOURS["station"])
+		if kind == "ore_deposit" and not ScoutSystem.is_revealed(st, id): continue
+		var pos := godot_to_plan(CharacterState._v3(rec.get("position", [0, 0, 0])))
+		out.append({"id": id, "kind": kind, "name": String(rec.get("name", StationPanels.name_of(kind))), "position": pos, "zone": zone_at_plan(pos)})
+	return out
+
+func zone_at_plan(pos: Vector2) -> String:
+	return services.zones.zone_at(pos.x, pos.y) if services != null and services.zones != null else ColonyZones.EXTERIOR
+
+func location_at(pixel: Vector2) -> Dictionary:
+	var best := 20.0
+	var found := {}
+	for marker: Dictionary in markers:
+		var d := pixel.distance_to(marker.pixel)
+		if d < best:
+			best = d
+			found = marker
+	return found
+
+func select_location_at(pixel: Vector2) -> void:
+	var hit := location_at(pixel)
+	if hit.is_empty():
+		selected_location = ""
+		select_at(pixel)
+	elif int(hit.get("count", 1)) > 1:
+		zoom_by(1.8, pixel)
+	else:
+		focus_location(hit, false)
+
+func focus_location(location: Dictionary, move := true) -> void:
+	selected_location = String(location.id)
+	selected_zone = String(location.zone)
+	if move: centre_on(location.position)
+	location_selected.emit(location)
+	queue_redraw()
+
+func _draw_stations(st: ColonyState, font: Font, fs: int, text_colour: Color, k: float) -> void:
+	markers.clear()
+	var labels: Array[Rect2] = []
+	var entries := locations()
+	# Selected marker is drawn first, so its label has priority over nearby labels.
+	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return String(a.id) == selected_location and String(b.id) != selected_location)
+	for rec: Dictionary in entries:
+		var at := world_to_view(rec.position)
+		if not Rect2(Vector2.ZERO, size).grow(40).has_point(at): continue
+		var merged := false
+		if k < NAME_SCALE:
+			for marker: Dictionary in markers:
+				if at.distance_to(marker.pixel) < 28 and String(rec.id) != selected_location and String(marker.id) != selected_location:
+					marker.count = int(marker.count) + 1
+					merged = true
+					break
+		if not merged:
+			var marker := rec.duplicate()
+			marker.pixel = at
+			marker.count = 1
+			markers.append(marker)
+		var symbol := StationPanels.symbol_of(String(rec.kind))
 		symbols_used[symbol] = true
-		var below := 1.0
-		if kind == "solar":
-			var index := int(rec.get("tracker", -1))
+		if String(rec.kind) == "solar":
+			var index := int(st.stations[String(rec.id)].get("tracker", -1))
 			var dusty := index >= 0 and index < st.panel_dust.size() and float(st.panel_dust[index]) > DUSTY_SHARE
 			dusty_trackers[index] = dusty
-			if dusty:
-				_text(font, at + Vector2(0, fs * below), DUSTY_WORD, fs, text_colour)
-				symbols_used[DUSTY_WORD] = true
-				below += 1.0
-		if k >= NAME_SCALE:
-			_text(font, at + Vector2(0, fs * below), StationPanels.short_name_of(kind), fs, text_colour)
+			if dusty: symbols_used[DUSTY_WORD] = true
+	for marker: Dictionary in markers:
+		var at: Vector2 = marker.pixel
+		var selected := String(marker.id) == selected_location
+		var hovered := String(marker.id) == _hovered
+		var colour: Color = UiTheme.palette().accent if selected or hovered else UiTheme.palette().text
+		draw_circle(at, 11, Color(UiTheme.palette().panel, 0.92))
+		draw_arc(at, 11, 0, TAU, 32, colour, 1.5, true)
+		if int(marker.count) > 1:
+			_text(font, at, str(marker.count), maxi(13, fs - 3), colour)
+		else:
+			draw_circle(at, 3, colour)
+		if selected: draw_arc(at, 16, 0, TAU, 32, colour, 2, true)
+		if selected or hovered or k >= NAME_SCALE:
+			var title := String(marker.name)
+			var span := font.get_string_size(title, HORIZONTAL_ALIGNMENT_LEFT, -1, fs)
+			var box := Rect2(at + Vector2(18, -span.y * 0.5), span + Vector2(14, 8))
+			box.position.x = clampf(box.position.x, 8, maxf(8, size.x - box.size.x - 8))
+			box.position.y = clampf(box.position.y, 8, maxf(8, size.y - box.size.y - 8))
+			var collision := false
+			for other: Rect2 in labels:
+				if other.grow(5).intersects(box): collision = true
+			if not collision or selected or hovered:
+				draw_style_box(_label_background(), box)
+				draw_line(at + Vector2(11, 0), box.position + Vector2(0, box.size.y * 0.5), colour, 1)
+				_text(font, box.get_center(), title, fs, colour)
+				labels.append(box)
+
+func _label_background() -> StyleBoxFlat:
+	var style := StyleBoxFlat.new()
+	style.bg_color = Color(0.025, 0.055, 0.065, 0.94)
+	return style
 
 
 func _draw_items(st: ColonyState, font: Font, fs: int) -> void:

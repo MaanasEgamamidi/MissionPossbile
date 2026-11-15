@@ -90,7 +90,7 @@ static func area_m(state: ColonyState) -> float:
 
 
 ## True when the suit radio sends at all (Communication upgraded past the tutorial fix).
-static func has_signal(state: ColonyState) -> bool:
+static func has_radio_signal(state: ColonyState) -> bool:
 	return delay_s(state) >= 0.0
 
 
@@ -102,7 +102,7 @@ static func in_comms_reach(state: ColonyState, actor: CharacterState, zones: Col
 		return false
 	if not bool(VoiceRouter.participant(state, actor, zones).outside):
 		return true
-	return has_signal(state)
+	return has_radio_signal(state)
 
 
 # ---------------------------------------------------------------- places
@@ -152,7 +152,7 @@ static func decide(state: ColonyState, speaker: Dictionary, listener: Dictionary
 			out.reason = g.reason
 			out.via_door = g.via_door
 			return out
-	if not has_signal(state):
+	if not has_radio_signal(state):
 		out.reason = "no_signal"
 		return out
 	out.route = ROUTE_RADIO
@@ -175,7 +175,7 @@ static func speaker_status(state: ColonyState, me: Dictionary, others: Array, zo
 	if others.is_empty():
 		if bool(me.get("outside", false)):
 			st.radio = true
-			if not has_signal(state):
+			if not has_radio_signal(state):
 				st.no_signal = true
 			elif not near_comms(state, me, zones):
 				st.delay_s = maxf(0.0, delay_s(state))
@@ -237,7 +237,7 @@ static func speaking_text(status: Dictionary) -> String:
 ## The idle hint before talking.
 static func idle_text(state: ColonyState, me: Dictionary, zones: ColonyZones) -> String:
 	if bool(me.get("outside", false)):
-		if not has_signal(state):
+		if not has_radio_signal(state):
 			return "You are outside and the suit radio has no signal: nobody can hear you. Upgrade Communication in the Command Room."
 		if near_comms(state, me, zones):
 			return "Hold V to talk: your suit radio carries your voice, clear and at once."
@@ -250,7 +250,7 @@ static func idle_text(state: ColonyState, me: Dictionary, zones: ColonyZones) ->
 ## Shown for a few seconds after going outside or coming in.
 static func transition_text(state: ColonyState, now_outside: bool) -> String:
 	if now_outside:
-		if not has_signal(state):
+		if not has_radio_signal(state):
 			return "You are outside now. " + NO_SIGNAL_TEXT + ": nobody can hear you."
 		var d := delay_s(state)
 		if d <= 0.0 and garble(state) <= 0.0:
@@ -289,7 +289,7 @@ static func unheard_text(speaker_name: String, reason: String) -> String:
 ## One line for the comms panels: "Suit radio V2: delay 30 s away from the Command Room, crackly."
 static func status_text(state: ColonyState) -> String:
 	var lvl := level(state)
-	if not has_signal(state):
+	if not has_radio_signal(state):
 		return "Suit radio (Communication V%d): no signal outside or out of earshot. Upgrade Communication to use it." % lvl
 	var d := delay_s(state)
 	var g := garble(state)
