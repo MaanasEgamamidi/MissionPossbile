@@ -457,7 +457,7 @@ static func specialist_cue(state: ColonyState, specialty: String, local_id: Stri
 			return "%s The %s specialist (played by another player) does this step." % [sym, words]
 	if switching_disabled:
 		return "%s This step is for the %s specialist. Ask the player of that crew member." % [sym, words]
-	return "%s This step needs the %s specialist. Switch at the hub crew screen (C)." % [sym, words]
+	return "%s This step needs the %s specialist. Switch crew member in the Med Bay (C)." % [sym, words]
 
 
 ## What the campaign still needs before the certification sol can start: [{"id", "text"}].

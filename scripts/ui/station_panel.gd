@@ -540,7 +540,7 @@ func _refresh_body(st: ColonyState) -> void:
 				if c == null:
 					continue
 				var row := _crew_rows[id] as Reading
-				var who := "resting at the hub"
+				var who := "resting in the Med Bay"
 				if c.owner_peer == services.local_peer():
 					who = "you"
 				elif c.owner_peer != 0:

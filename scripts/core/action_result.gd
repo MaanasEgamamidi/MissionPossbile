@@ -21,7 +21,7 @@ const MESSAGES := {
 	&"character_taken": "Another player is already that crew member.",
 	&"already_yours": "You are already that crew member.",
 	&"switch_disabled": "With four players, everyone keeps their own crew member.",
-	&"not_at_hub": "Go to the hub to change crew member.",
+	&"not_at_hub": "Go to the Med Bay to change crew member.",
 	&"not_available_yet": "This station is not working yet.",
 	&"paused": "The game is paused.",
 	&"pending": "Asked the host. Waiting for the answer.",

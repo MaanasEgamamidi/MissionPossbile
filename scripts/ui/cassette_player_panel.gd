@@ -2,6 +2,13 @@ class_name CassettePlayerPanel
 extends UiPanel
 ## Content stays blank until the current host authorizes this actor at the physical player.
 ## Every tape/page change is independently authorized. Local validation closes stale readers immediately.
+## Voice-over (owner 2026-11-15: "we just need a reader / voice-over on this"): each page the host lets this player see
+## is read aloud by the computer's own text-to-speech voice (scripts/voice/narration.gd; no audio files). Previous/Next
+## reads the new page, and closing the panel, choosing another tape, any interruption or the "Voice" button stops it.
+## The tape text and the host actions are unchanged; the words always stay on screen.
+
+const Narration := preload("res://scripts/voice/narration.gd")
+const VOICE_KIND := &"cassette"
 
 var station_id: StringName = CassetteLibrary.PLAYER_ID
 var selected_cassette := ""
@@ -19,6 +26,7 @@ var _tapes: MenuButton
 var _previous: Button
 var _next: Button
 var _source: LinkButton
+var _voice: Button
 var _photo_hint: Label
 var _record := {}
 var _pending_id := ""
@@ -97,6 +105,13 @@ func setup(p_services: GameServices) -> void:
 	_next.text = "Next"
 	_next.pressed.connect(func() -> void: read_page(page_index + 1))
 	right.add_child(_next)
+	_voice = Button.new()
+	_voice.name = "VoiceToggle"
+	_voice.toggle_mode = true
+	_voice.focus_mode = Control.FOCUS_ALL
+	_voice.toggled.connect(_on_voice_toggled)
+	right.add_child(_voice)
+	_update_voice_button()
 	_status = _label("AuthorizationStatus", "Waiting for the player...")
 	right.add_child(_status)
 	close_button = Button.new()
@@ -243,11 +258,13 @@ func _show_briefing() -> void:
 	page_label.text = "Page %d / %d" % [page_index + 1, pages.size()]
 	_previous.disabled = page_index <= 0
 	_next.disabled = page_index + 1 >= pages.size()
+	_speak_page()
 
 
 func _clear_content() -> void:
 	if not _built:
 		return
+	_narration().stop(VOICE_KIND)
 	photo.texture = null
 	photo.visible = false
 	briefing_text.text = ""
@@ -355,6 +372,60 @@ func _exit_tree() -> void:
 		var callback: Callable = connection[1]
 		if sig.is_connected(callback):
 			sig.disconnect(callback)
+
+
+# ---------------------------------------------------------------- voice-over
+
+func _narration() -> Narration:
+	return Narration.shared() as Narration
+
+
+## Reads the page on screen aloud (the tape's title first on its first page). Only the authorized page is read.
+func _speak_page() -> void:
+	if not _built or _record.is_empty() or not _authorized or not is_visible_in_tree():
+		return
+	var pages: Array = _record.get("pages", [])
+	if page_index < 0 or page_index >= pages.size():
+		return
+	var text := String(pages[page_index])
+	if page_index == 0:
+		text = "%s. %s" % [String(_record.get("title", "")), text]
+	_narration().say(text, VOICE_KIND)
+
+
+func _update_voice_button() -> void:
+	if _voice == null:
+		return
+	var n := _narration()
+	if not n.available():
+		_voice.set_pressed_no_signal(false)
+		_voice.disabled = true
+		_voice.text = "Voice: not available"
+		_voice.tooltip_text = "This computer has no text-to-speech voice. The words are all on screen."
+		return
+	_voice.disabled = false
+	_voice.set_pressed_no_signal(n.voice_on())
+	_voice.text = "Voice: On" if n.voice_on() else "Voice: Off"
+	_voice.tooltip_text = "Reads each tape page aloud. Press to turn the voice off or on (also in Settings, Audio)."
+
+
+func _on_voice_toggled(on: bool) -> void:
+	var n := _narration()
+	n.set_voice_on(on)
+	_update_voice_button()
+	if on:
+		_speak_page()
+	else:
+		n.stop(VOICE_KIND)
+	# Remember the choice like the Settings panel does (not in headless test runs, which must not touch the file).
+	if n.settings != null and DisplayServer.get_name() != "headless":
+		n.settings.save()
+
+
+func _notification(what: int) -> void:
+	# Another panel covering this one (or the panel being hidden) silences the tape.
+	if what == NOTIFICATION_VISIBILITY_CHANGED and _built and not is_visible_in_tree():
+		_narration().stop(VOICE_KIND)
 
 
 func _open_source() -> void:

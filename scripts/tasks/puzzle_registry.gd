@@ -102,7 +102,7 @@ static func unreadable_line(services: GameServices, specialty: String) -> String
 	var players := maxi(services.session.peers.size(), st.active_characters().size())
 	if players >= 4:
 		return head + " Ask the player of that crew member to come here."
-	return head + " Press %s to swap to them at the Med Bay hub." % _key_name(&"crew", "C")
+	return head + " Press %s to swap to them in the Med Bay." % _key_name(&"crew", "C")
 
 
 static func _key_name(action: StringName, fallback: String) -> String:

@@ -70,7 +70,7 @@
 				{"id": "fix_all", "kind": "fixes",
 					"text": "Fix the base: fix every broken spot on the list.",
 					"explain": "Look at a broken spot and press E to start fixing it. A job with a specialist symbol can only be done by that specialist. A room is restored when all its broken spots are fixed.",
-					"hints": ["Look at a broken spot and press E.", "A ⚡, ✚ or ⛏ job needs that specialist. Press C at the Med Bay hub to swap to them."],
+					"hints": ["Look at a broken spot and press E.", "A ⚡, ✚ or ⛏ job needs that specialist. Press C in the Med Bay to swap to them."],
 					"hints_team": ["Look at a broken spot and press E.", "A ⚡, ✚ or ⛏ job needs that specialist. Ask the player of that crew member."]}
 			]
 		}

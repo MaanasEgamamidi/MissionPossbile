@@ -10,7 +10,8 @@ const TEXT_SCALES: Array[float] = [1.0, 1.25, 1.5]
 ## Names of the stored values, in file order.
 const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov_degrees", &"mouse_sensitivity",
 	&"invert_y", &"toggle_sprint", &"reduce_motion", &"high_contrast", &"graphics_quality",
-	&"voice_input_device", &"voice_mic_muted", &"voice_volume", &"reduce_flashes", &"warning_sound_muted", &"warning_sound_volume"]
+	&"voice_input_device", &"voice_mic_muted", &"voice_volume", &"reduce_flashes", &"warning_sound_muted", &"warning_sound_volume",
+	&"narrator_voice", &"narrator_volume"]
 
 ## Size of all menus and the HUD (0.75 to 2.0).
 @export var ui_scale := 1.0:
@@ -81,6 +82,20 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 		v = clampf(v, 0.0, 1.0)
 		if v != warning_sound_volume:
 			warning_sound_volume = v
+			emit_changed()
+## Owner 2026-11-15: the narrator voice reads the cassette tapes and the opening story aloud (the computer's own
+## text-to-speech voice, scripts/voice/narration.gd). On by default; the words always show on screen as well.
+@export var narrator_voice := true:
+	set(v):
+		if v != narrator_voice:
+			narrator_voice = v
+			emit_changed()
+## Loudness of the narrator voice (0 to 1; sent to the OS voice as 0 to 100).
+@export var narrator_volume := 0.9:
+	set(v):
+		v = clampf(v, 0.0, 1.0)
+		if v != narrator_volume:
+			narrator_volume = v
 			emit_changed()
 ## Stronger colours and borders.
 @export var high_contrast := false:

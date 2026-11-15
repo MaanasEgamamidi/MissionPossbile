@@ -234,6 +234,7 @@ func _begin_play() -> void:
 	area_stages = AreaStages.attach_all(self, world, services, self)
 	# 2026-11-14: broken parts: broken models, the fix sparkle, T12 door leaves, T11 hangar dust (loaded by path).
 	load("res://scripts/tasks/broken_part_presenter.gd").call(&"attach", self, world, services, self)
+	load("res://scripts/world/dome_plants_presenter.gd").call(&"attach", self, world, services, self)   # 2026-11-15: Garden dome plants look a bit dead until T08 (dome glass) is fixed
 	load("res://scripts/cinematics/cinematics_presenter.gd").call(&"attach", self, world, services, self)   # 2026-11-14: new-game intro + "base operational" tour
 	if check_weather_updates and DisplayServer.get_name() != "headless":
 		var refresh := WeatherRefresh.new()
@@ -741,7 +742,7 @@ func _on_character_recovered(character_id: StringName, info: Dictionary) -> void
 	var mine := _local_character()
 	if mine != null and mine.id == character_id and player != null:
 		player.teleport(mine.position + Vector3(0.0, 0.05, 0.0), mine.yaw)
-	var text := "%s was brought back to the hub. Cost: %.1f meals and %.1f L of water." % [
+	var text := "%s was brought back to the Med Bay. Cost: %.1f meals and %.1f L of water." % [
 		services.state().character(character_id).display_name, float(info.get("meals", 0.0)), float(info.get("water_l", 0.0))]
 	if String(info.get("cache_id", "")) != "":
 		var p := _v3(info.get("cache_position", []))

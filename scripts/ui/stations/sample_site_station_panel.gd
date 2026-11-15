@@ -102,7 +102,7 @@ func _refresh_body(st: ColonyState) -> void:
 	if me == null:
 		reason = "Choose a crew member first."
 	elif me.specialty != ScienceActions.FIELD_SPECIALTY:
-		reason = "Only the field engineering and geology specialist ⛏ can take a sample. Change crew member at the hub."
+		reason = "Only the field engineering and geology specialist ⛏ can take a sample. Change crew member in the Med Bay."
 	elif taken >= limit:
 		reason = "This site has given all the samples it can. Try another site."
 	elif used >= slots:

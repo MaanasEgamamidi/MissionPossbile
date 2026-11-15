@@ -90,7 +90,7 @@ static func legend() -> Array:
 	for sp: StringName in SPECIALTY_INITIALS:
 		out.append([String(SPECIALTY_INITIALS[sp]), "Crew member: %s (%s circle)." % [String(StationPanels.SPECIALTY_WORDS[sp]).to_lower(), String(CrewLooks.look(CrewLooks.index_of(sp)).colour_word)]])
 	out.append(["■", "Something on the ground that you can pick up."])
-	out.append(["!", "A cache (orange circle): things left behind when someone was brought back to the hub."])
+	out.append(["!", "A cache (orange circle): things left behind when someone was brought back to the Med Bay."])
 	for kind: String in StationPanels.all_kinds():
 		out.append([StationPanels.symbol_of(kind), "Station: %s." % StationPanels.name_of(kind).to_lower()])
 	out.append([DUSTY_WORD, "Under a sun tracker ☀: its solar panel is more than %d %% covered in dust, so it makes less power." % roundi(DUSTY_SHARE * 100.0)])

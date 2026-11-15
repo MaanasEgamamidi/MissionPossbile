@@ -24,6 +24,9 @@ const TAPE_GLOW_SHADER := preload("res://materials/specialist_gold.gdshader")
 const TAPE_GLOW := Color(1.0, 0.75, 0.2)
 const TapeTrails := preload("res://scripts/cassettes/tape_trail_presenter.gd")
 const SparkleBurst := preload("res://scripts/tasks/sparkle_burst.gd")
+## Owner 2026-11-15: the first-week gold sparkle guide line (gold + sparkles always mean "this works / go this way"),
+## made here next to the tape trails; group &"guide_sparkles" (the coming H key finds it there).
+const GuideSparkles := preload("res://scripts/guide/guide_sparkles.gd")
 ## Seconds a picked-up tape takes to shrink away under its sparkles.
 const VANISH_SECONDS := 0.35
 ## Idle gold sparkles around a tape not yet found: count (half on Low), half size of the box they twinkle in (centred
@@ -39,6 +42,8 @@ var cassette_nodes: Dictionary = {}
 var _refresh_left := 0.0
 ## The gold guide lines to the tapes (tape_trail_presenter.gd), made in setup.
 var trails: Node3D
+## The gold sparkle guide line of the first week (scripts/guide/guide_sparkles.gd), made in setup.
+var guide: Node3D
 ## Sparkle bursts played since setup, and the last one (checks).
 var bursts_started := 0
 var last_burst: Node3D
@@ -76,6 +81,9 @@ func setup(p_services: GameServices, collision: Node3D) -> void:
 	trails = TapeTrails.new()
 	add_child(trails)
 	trails.call(&"setup", services)
+	guide = GuideSparkles.new()
+	add_child(guide)
+	guide.call(&"setup", services)
 	var mask := int(trails.call(&"_layers"))
 	# Low graphics preset: still GPU particles (cheap), half as many.
 	var idle_amount := int(IDLE_SPARKLES * 0.5) if _use_cpu() else IDLE_SPARKLES

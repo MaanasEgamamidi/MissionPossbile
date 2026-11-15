@@ -35,7 +35,7 @@ func setup(p_services: GameServices) -> void:
 	rule_row.name = "Rule"
 	var rule := Label.new()
 	rule.name = "RuleText"
-	rule.text = "You can change crew member at the hub. Crew nobody plays wait there and use no supplies."
+	rule.text = "You can change crew member in the Med Bay. Crew nobody plays wait there and use no supplies."
 	rule.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	rule.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rule_row.add_child(rule)
@@ -99,7 +99,7 @@ func reason_text(id: StringName) -> String:
 	return (_cards[id].reason as Label).text if _cards.has(id) else ""
 
 
-## The status words of a card ("You", "Free — waiting at the hub", "Played by player 2").
+## The status words of a card ("You", "Free — waiting in the Med Bay", "Played by player 2").
 func status_text(id: StringName) -> String:
 	return (_cards[id].status as Label).text if _cards.has(id) else ""
 
@@ -122,7 +122,7 @@ func refusal_reason(id: StringName) -> String:
 		if not services.session.safe_to_switch(mine):
 			return "Return to a safe atmosphere before changing crew member."
 		if not services.session.is_at_hub(mine.position):
-			return "Walk to the hub to change crew member."
+			return "Walk to the Med Bay to change crew member."
 	return ""
 
 
@@ -146,7 +146,7 @@ func refresh() -> void:
 			status.text = "You"
 			status.theme_type_variation = UiTheme.GOOD
 		elif c.owner_peer == 0:
-			status.text = "Free — waiting at the hub"
+			status.text = "Free — waiting in the Med Bay"
 			status.theme_type_variation = UiTheme.MUTED
 		else:
 			status.text = "Played by player %d" % c.owner_peer

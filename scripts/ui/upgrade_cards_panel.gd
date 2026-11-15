@@ -224,7 +224,7 @@ func _refresh_card(st: ColonyState, def: UpgradeDefinition, install: Button) -> 
 	var all: Array = []
 	for r in reqs:
 		all.append([bool(r.ok), String(r.text), String(r.kind)])
-	all.append([installer_ok, "Installed by: %s%s" % [ProgressionSystem.installer_words(def), "" if installer_ok else " (switch crew member at the hub)"], "installer"])
+	all.append([installer_ok, "Installed by: %s%s" % [ProgressionSystem.installer_words(def), "" if installer_ok else " (switch crew member in the Med Bay)"], "installer"])
 	all.append([here != &"", "Install at: the %s%s" % [ProgressionSystem.install_place_words(def), "" if here != &"" else " (you are not there)"], "station"])
 	for j in lines.size():
 		var l := lines[j] as Label

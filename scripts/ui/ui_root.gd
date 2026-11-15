@@ -30,6 +30,8 @@ const PANEL_SIZES := {
 }
 ## Seconds a panel takes to fade in (none with the "reduce motion" setting).
 const FADE_SECONDS := 0.12
+## The shared narrator voice (OS text-to-speech); setup() hands it the player's settings.
+const Narration := preload("res://scripts/voice/narration.gd")
 
 var services: GameServices
 var settings: GameSettings
@@ -100,6 +102,8 @@ func setup(p_services: GameServices, p_settings: GameSettings) -> void:
 	services = p_services
 	settings = p_settings if p_settings != null else GameSettings.new()
 	_subtitle.settings = settings
+	# Owner 2026-11-15: the narrator voice (tapes, intro story) follows the player's own on/off and volume settings.
+	(Narration.shared() as Narration).settings = settings
 	PlayerInput.ensure_actions()
 	if services != null and not services.events.system_alert.is_connected(_on_system_alert):
 		services.events.system_alert.connect(_on_system_alert)

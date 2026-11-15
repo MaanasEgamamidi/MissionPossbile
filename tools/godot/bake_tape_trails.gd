@@ -18,6 +18,13 @@ extends SceneTree
 ##      path, or CLEAR_WANT_M), then the lines are spread side by side where they share a corridor: lane order from a
 ##      left-to-right walk of the tree, so lines never cross, spacing from the corridor's width, eased in and out.
 ##   5. Points rounded to cm; heights from the floor under each point.
+## Owner 2026-11-15 (first-week sparkle guide; gold + sparkles always mean "this works / go this way"): the walk grid of
+## step 2 is also saved, as data/walk_grid.bin (WALK_OUT), so the game can draw a gold sparkle line from anywhere to
+## anything on it (scripts/guide/walk_paths.gd + guide_sparkles.gd). Format: FileAccess.store_var of a Dictionary
+##   {"version": 1, "origin": Vector2 (x, z of cell 0's corner), "cell": m, "cols", "rows",
+##    "walk": bytes (1 = a standing body fits there), "height_cm": signed 16-bit little-endian per cell (the drawn floor,
+##    0 where not walkable), "clear_cm": byte per cell (clearance to the nearest blocked cell, cm, capped at 255),
+##    "sizes": {key: uncompressed byte count}}, each byte array ZSTD-compressed (PackedByteArray.compress).
 ## Run: godot --headless --path . --script res://tools/godot/bake_tape_trails.gd [-- --png <file.png>]
 
 const MANIFEST := "res://data/colony_manifest.json"
@@ -25,6 +32,9 @@ const COLLIDERS := "res://data/colliders.json"
 const TERRAIN := "res://data/terrain_height.res"
 const PROP_CACHE := "res://data/prop_collision_cache.bin"
 const OUT := "res://data/tape_trails.json"
+## The walk grid for the runtime guide lines (owner 2026-11-15), see the header.
+const WALK_OUT := "res://data/walk_grid.bin"
+const WALK_VERSION := 1
 ## Just inside the base: the airlock side of the exit tunnel's inner door (EnvironmentCollision door 901, z 10.30-10.65).
 const START := Vector3(22.0, 0.03, 9.0)
 ## Inside of the exit tunnel (EnvironmentCollision door leaves span x 20.2..23.8; the shell ends at z 15.16) and a
@@ -86,6 +96,7 @@ func _initialize() -> void:
 	space = root.world_3d.direct_space_state
 	_sample_grid()
 	_clearance()
+	_write_walk_grid()
 	var start := _nearest_walkable(START, 2.0)
 	if start < 0:
 		push_error("bake_tape_trails: no walkable cell near the start %s" % START)
@@ -741,6 +752,46 @@ func _write(trails: Dictionary, lengths: Dictionary, start: Vector3) -> void:
 	var f := FileAccess.open(OUT, FileAccess.WRITE)
 	f.store_string("\n".join(lines) + "\n")
 	f.close()
+
+
+## The walk grid for the game's guide lines (owner 2026-11-15): data/walk_grid.bin, format in the header. Heights are
+## the drawn floor (the plaza deck sits at DomeDeck.Y), as _floor_at gives them for the trails.
+func _write_walk_grid() -> void:
+	var n := cols * rows
+	var heights := PackedByteArray()
+	heights.resize(n * 2)
+	var clear_cm := PackedByteArray()
+	clear_cm.resize(n)
+	for i in n:
+		var h := 0.0
+		var c := 0
+		if walk[i] == 1:
+			h = floor_y[i]
+			var p := _cell_pos(i)
+			if zones.zone_at_world(p) == ColonyZones.PLAZA:
+				h = maxf(h, DomeDeck.Y)
+			c = clampi(int(round(clear[i] * 100.0)), 0, 255)
+		heights.encode_s16(i * 2, clampi(int(round(h * 100.0)), -32768, 32767))
+		clear_cm[i] = c
+	var data := {
+		"version": WALK_VERSION,
+		"origin": Vector2(BOUNDS.position.x, BOUNDS.position.y),
+		"cell": CELL,
+		"cols": cols,
+		"rows": rows,
+		"walk": walk.compress(FileAccess.COMPRESSION_ZSTD),
+		"height_cm": heights.compress(FileAccess.COMPRESSION_ZSTD),
+		"clear_cm": clear_cm.compress(FileAccess.COMPRESSION_ZSTD),
+		"sizes": {"walk": walk.size(), "height_cm": heights.size(), "clear_cm": clear_cm.size()},
+	}
+	var f := FileAccess.open(WALK_OUT, FileAccess.WRITE)
+	if f == null:
+		push_error("bake_tape_trails: cannot write %s" % WALK_OUT)
+		return
+	f.store_var(data)
+	var bytes := f.get_length()
+	f.close()
+	print("walk grid: %s, %d x %d cells of %.2f m, %d bytes" % [WALK_OUT, cols, rows, CELL, bytes])
 
 
 static func _n(v: float) -> String:

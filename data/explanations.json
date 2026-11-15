@@ -79,7 +79,7 @@
  "health": {
   "title": "Health",
   "short": "Health shows how well your crew member is, from 0 to 100.",
-  "long": "Health goes down if the colony runs out of oxygen, water or food. If health reaches zero, your crew member is brought back to the hub. The med station is where the crew is looked after.",
+  "long": "Health goes down if the colony runs out of oxygen, water or food. If health reaches zero, your crew member is brought back to the Med Bay. The med station is where the crew is looked after.",
   "source_ids": [],
   "claim_ids": ["crew_rates"]
  },
@@ -127,8 +127,8 @@
  },
  "crew_switching": {
   "title": "Changing crew member",
-  "short": "You can change which crew member you play when you are at the hub.",
-  "long": "Walk to the hub to change crew member. You cannot take a crew member another player is using. With four players, everyone keeps their own crew member. A crew member keeps their cargo, health and suit when someone else takes over.",
+  "short": "You can change which crew member you play when you are in the Med Bay.",
+  "long": "Walk to the Med Bay to change crew member. You cannot take a crew member another player is using. With four players, everyone keeps their own crew member. A crew member keeps their cargo, health and suit when someone else takes over.",
   "source_ids": [],
   "claim_ids": []
  },
@@ -141,7 +141,7 @@
  },
  "recovery": {
   "title": "Being brought back",
-  "short": "If a crew member's health reaches zero, they are brought back to the hub.",
+  "short": "If a crew member's health reaches zero, they are brought back to the Med Bay.",
   "long": "Being brought back costs the colony some food and water. Anything you were carrying is left where it happened, as a cache. A cache is a pile of dropped things you can go back and collect. Your crew member starts again with some health.",
   "source_ids": [],
   "claim_ids": ["crew_rates"]

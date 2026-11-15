@@ -2,8 +2,11 @@ class_name SettingsPanel
 extends UiPanel
 ## Display, Controls, Graphics and Audio tabs share live settings and keyboard focus.
 ## Audio exposes warning mute/volume; voice and microphone keep their existing controls.
+## Audio also has the narrator voice (owner 2026-11-15): on/off and volume for the OS text-to-speech reader.
 ## Changes apply at once and are saved when the panel closes (settings and key bindings).
 ## While it waits for a new key, the panel cannot close and the key it catches never reaches the game.
+
+const Narration := preload("res://scripts/voice/narration.gd")
 
 ## The settings being edited. UiRoot fills this in from its own settings when it is left empty.
 var settings: GameSettings
@@ -22,6 +25,9 @@ var _reduce_flashes: CheckButton
 var _warning_muted: CheckButton
 var _warning_volume: HSlider
 var _warning_volume_label: Label
+var _narrator: CheckButton
+var _narrator_volume: HSlider
+var _narrator_volume_label: Label
 var _mouse: HSlider
 var _mouse_label: Label
 var _invert_y: CheckButton
@@ -270,6 +276,21 @@ func _build_audio(box: VBoxContainer) -> void:
 		_apply())
 	var note := _label(box, "Danger banners and countdowns remain visible with sound muted. Voice and microphone controls are in the Controls tab.")
 	note.theme_type_variation = UiTheme.MUTED
+	# Owner 2026-11-15: the narrator voice reads the tapes and the opening story aloud (the computer's own voice).
+	_narrator = _check(box, "Narrator voice (reads the tapes and the opening story aloud)", func(on: bool) -> void:
+		settings.narrator_voice = on
+		_apply())
+	_narrator.name = "NarratorVoice"
+	_narrator_volume_label = _label(box, "")
+	_narrator_volume = _slider(box, 0.0, 1.0, 0.05)
+	_narrator_volume.name = "NarratorVolume"
+	_narrator_volume.value_changed.connect(func(value: float) -> void:
+		settings.narrator_volume = value
+		_apply())
+	var narrator := Narration.shared() as Narration
+	var narrator_note := _label(box, "The words always show on screen too." if narrator.available()
+		else "This computer has no text-to-speech voice, so the narrator stays silent. The words always show on screen.")
+	narrator_note.theme_type_variation = UiTheme.MUTED
 
 
 func _build_controls(box: VBoxContainer) -> void:
@@ -365,6 +386,8 @@ func _read_settings() -> void:
 	_reduce_flashes.set_pressed_no_signal(settings.reduce_flashes)
 	_warning_muted.set_pressed_no_signal(settings.warning_sound_muted)
 	_warning_volume.set_value_no_signal(settings.warning_sound_volume)
+	_narrator.set_pressed_no_signal(settings.narrator_voice)
+	_narrator_volume.set_value_no_signal(settings.narrator_volume)
 	_mouse.set_value_no_signal(settings.mouse_sensitivity)
 	_invert_y.set_pressed_no_signal(settings.invert_y)
 	_fov.set_value_no_signal(settings.fov_degrees)
@@ -384,6 +407,7 @@ func _update_value_labels() -> void:
 	_fov_label.text = "Field of view: %d°" % roundi(settings.fov_degrees)
 	_quality_info.text = GraphicsQuality.DESCRIPTIONS[settings.graphics_quality]
 	_warning_volume_label.text = "Warning sound volume: %d %%" % roundi(settings.warning_sound_volume * 100.0)
+	_narrator_volume_label.text = "Narrator voice volume: %d %%" % roundi(settings.narrator_volume * 100.0)
 
 
 func _update_bindings() -> void:

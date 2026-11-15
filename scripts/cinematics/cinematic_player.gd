@@ -10,10 +10,26 @@ extends Node
 ##     rooms VIEW_ONLY) and the rest COLD, and the manager clears hidden zone layers from this camera as from any
 ##     current camera. On exit both are resumed and ZoneManager.snap() puts every room back for the player;
 ##   * E, Space or Esc skips (that key is then held away from the player until it is let go).
+##   * Narrator (owner 2026-11-15: "add a narrator speaking during the first cutscene before the player gets a chance
+##     to actually move"): in the new-game intro only (NARRATED_SEQUENCES), each Mission Control caption is read aloud
+##     by the computer's own text-to-speech voice (scripts/voice/narration.gd, no audio files) the moment it appears.
+##     When a line is longer than its caption window, the caption WAITS for the voice: the camera slows and then holds
+##     just before the caption's "until" (never inside the fade to black), for at most NARRATION_HOLD_MAX_S per line,
+##     so the story is never cut mid-sentence. Skipping (or any other stop) stops the voice at once. With the voice off
+##     or unavailable, timing is exactly as authored in data/cinematics.json.
 
 signal finished(reason: StringName)
 
 const Rail := preload("res://scripts/cinematics/cinematic_rail.gd")
+const Narration := preload("res://scripts/voice/narration.gd")
+## Sequences whose captions the narrator reads (the tour's room labels are not story lines).
+const NARRATED_SEQUENCES: Array[String] = ["intro"]
+const NARRATION_KIND := &"narrator"
+## The camera slows to this share of normal speed in the last NARRATION_SLOW_S before a caption would end while its
+## line is still being read, then holds; a line holds the timeline for at most NARRATION_HOLD_MAX_S (design balance).
+const NARRATION_SLOW_RATE := 0.35
+const NARRATION_SLOW_S := 1.0
+const NARRATION_HOLD_MAX_S := 12.0
 ## Between GameHud (10) and UiRoot (20): menus and the critical alert banner stay on top.
 const OVERLAY_LAYER := 15
 ## Every render layer (1..20): zones, the first-person-hidden layer (so the player's own head shows) and the sun layer.
@@ -57,6 +73,10 @@ var _hint: Label
 var _card: Label
 var _card_sub: Label
 var _fade_out_left := 0.0
+## The narrator reads this run's captions; the caption index it is reading (-1: none yet in this segment).
+var _narrate := false
+var _spoken_caption := -1
+var _hold_spent := 0.0
 
 
 func _ready() -> void:
@@ -77,6 +97,9 @@ func play(p_seq: Dictionary, p_game: Node, p_services: GameServices, p_settings:
 	playing = true
 	in_end_card = false
 	_hold_keys = false
+	_narrate = NARRATED_SEQUENCES.has(String(seq.get("id", ""))) and _narration().can_speak()
+	_spoken_caption = -1
+	_hold_spent = 0.0
 	camera = Camera3D.new()
 	camera.name = "CinematicCamera"
 	camera.near = 0.05
@@ -127,6 +150,10 @@ func stop(reason: StringName) -> void:
 		return
 	playing = false
 	result = reason
+	if _narrate:
+		_narration().stop(NARRATION_KIND)
+	_narrate = false
+	_spoken_caption = -1
 	if camera != null:
 		camera.current = false
 	var p := _player()
@@ -201,9 +228,9 @@ func advance(delta: float) -> void:
 		if end_card_left <= 0.0:
 			stop(&"done")
 		return
-	seg_time += delta
 	var seg: Dictionary = segs[seg_index]
 	var length := Rail.seg_seconds(seg)
+	seg_time += _narration_step(seg, length, delta)
 	if seg_time >= length:
 		if seg_index + 1 < segs.size():
 			_enter_segment(seg_index + 1)
@@ -230,6 +257,8 @@ func advance(delta: float) -> void:
 func _enter_segment(i: int) -> void:
 	seg_index = i
 	seg_time = 0.0
+	_spoken_caption = -1
+	_hold_spent = 0.0
 	var seg: Dictionary = Rail.segments(seq)[i]
 	camera.fov = float(seg.get("fov", float((Rail.data().get("camera", {}) as Dictionary).get("fov", 62.0))))
 	camera.global_transform = Rail.pose(seg, 0.0, still)
@@ -255,19 +284,54 @@ func _enter_end_card() -> void:
 func _update_caption(seg: Dictionary) -> void:
 	var text := String(seg.get("caption", ""))
 	var speaker := ""
+	var index := 0 if text != "" else -1
 	if seg.has("captions"):
 		text = ""
-		for c: Dictionary in seg.captions:
+		index = -1
+		var caps: Array = seg.captions
+		for ci in caps.size():
+			var c: Dictionary = caps[ci]
 			if seg_time >= float(c.get("t", 0.0)) and seg_time < float(c.get("until", 1e9)):
 				text = String(c.get("text", ""))
 				speaker = String(c.get("speaker", ""))
+				index = ci
 	caption_text = text
 	caption_speaker = speaker
+	# The narrator starts each line the moment its caption appears.
+	if _narrate and index >= 0 and index != _spoken_caption and text != "":
+		_spoken_caption = index
+		_hold_spent = 0.0
+		_narration().say(text, NARRATION_KIND)
 	if _caption != null:
 		_caption.text = text
 		_caption.visible = text != ""
 		_speaker.text = speaker.to_upper()
 		_speaker.visible = speaker != "" and text != ""
+
+
+# ---------------------------------------------------------------- narrator
+
+func _narration() -> Narration:
+	return Narration.shared() as Narration
+
+
+## How far the timeline moves this frame: `delta`, unless the narrator is still reading a line whose caption is about
+## to end. Then the camera slows and holds just before the caption's "until" (and before the cut's fade to black) until
+## the voice finishes, or NARRATION_HOLD_MAX_S has passed for this line.
+func _narration_step(seg: Dictionary, length: float, delta: float) -> float:
+	if not _narrate or _spoken_caption < 0 or _hold_spent >= NARRATION_HOLD_MAX_S:
+		return delta
+	if not _narration().is_speaking(NARRATION_KIND):
+		return delta
+	var until := length
+	var caps: Array = seg.get("captions", [])
+	if _spoken_caption < caps.size():
+		until = float((caps[_spoken_caption] as Dictionary).get("until", length))
+	var hold_at := minf(until, length - _fade_seconds()) - 0.02
+	if seg_time + delta < hold_at - NARRATION_SLOW_S:
+		return delta
+	_hold_spent += delta
+	return clampf(minf(delta * NARRATION_SLOW_RATE, hold_at - seg_time), 0.0, delta)
 
 
 # ---------------------------------------------------------------- safety

@@ -83,7 +83,7 @@ func setup(p_services: GameServices) -> void:
 	var explain_row := HBoxContainer.new()
 	explain_row.name = "CacheExplain"
 	var explain := Label.new()
-	explain.text = "A cache is the cargo left behind when a crew member was brought back to the hub. Walk there to pick it up again."
+	explain.text = "A cache is the cargo left behind when a crew member was brought back to the Med Bay. Walk there to pick it up again."
 	explain.theme_type_variation = UiTheme.MUTED
 	explain.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	explain.size_flags_horizontal = Control.SIZE_EXPAND_FILL
