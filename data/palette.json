@@ -7059,28 +7059,28 @@
    "explicit_colour": false,
    "render_rgb_linear": null
   },
-  "gr_leaf_brn": {
+  "gr_wheat": {
    "rgb_linear": [
-    0.194618,
-    0.102242,
-    0.025187
+    0.473531,
+    0.450786,
+    0.111932
    ],
-   "hex": "#7a5a2c",
+   "hex": "#b7b35e",
    "emission": 0,
-   "roughness": 0.7,
+   "roughness": 0.55,
    "metallic": 0.0,
    "alpha": null,
    "alpha_source": null,
    "note": null,
    "mat_class": "leaf",
    "base_linear": [
-    0.194618,
-    0.102242,
-    0.025187
+    0.473531,
+    0.450786,
+    0.111932
    ],
-   "rough0": 0.75,
+   "rough0": 0.55,
    "metal0": 0.0,
-   "var": 0.2,
+   "var": 0.15,
    "wear": 0.0,
    "grime": 0.15,
    "bump": 0.02,
@@ -7122,47 +7122,6 @@
    "rough0": 0.5,
    "metal0": 0.0,
    "var": 0.18,
-   "wear": 0.0,
-   "grime": 0.15,
-   "bump": 0.02,
-   "bscale": 140.0,
-   "dust_k": 1.0,
-   "edge_color": [
-    0.55,
-    0.56,
-    0.57
-   ],
-   "edge_metal": 1.0,
-   "edge_rough": 0.35,
-   "coat": 0.0,
-   "emit_k": 1.0,
-   "tint": 1.0,
-   "ior": 1.5,
-   "explicit_colour": false,
-   "render_rgb_linear": null
-  },
-  "gr_wheat": {
-   "rgb_linear": [
-    0.473531,
-    0.450786,
-    0.111932
-   ],
-   "hex": "#b7b35e",
-   "emission": 0,
-   "roughness": 0.55,
-   "metallic": 0.0,
-   "alpha": null,
-   "alpha_source": null,
-   "note": null,
-   "mat_class": "leaf",
-   "base_linear": [
-    0.473531,
-    0.450786,
-    0.111932
-   ],
-   "rough0": 0.55,
-   "metal0": 0.0,
-   "var": 0.15,
    "wear": 0.0,
    "grime": 0.15,
    "bump": 0.02,
@@ -7548,88 +7507,6 @@
    ],
    "edge_metal": 0.0,
    "edge_rough": 0.55,
-   "coat": 0.0,
-   "emit_k": 1.0,
-   "tint": 1.0,
-   "ior": 1.5,
-   "explicit_colour": false,
-   "render_rgb_linear": null
-  },
-  "en_soot": {
-   "rgb_linear": [
-    0.006995,
-    0.006512,
-    0.006049
-   ],
-   "hex": "#141312",
-   "emission": 0,
-   "roughness": 0.95,
-   "metallic": 0.0,
-   "alpha": null,
-   "alpha_source": null,
-   "note": null,
-   "mat_class": "paint",
-   "base_linear": [
-    0.02,
-    0.02,
-    0.02
-   ],
-   "rough0": 0.95,
-   "metal0": 0.0,
-   "var": 0.25,
-   "wear": 0.0,
-   "grime": 0.0,
-   "bump": 0.04,
-   "bscale": 40.0,
-   "dust_k": 1.0,
-   "edge_color": [
-    0.55,
-    0.56,
-    0.57
-   ],
-   "edge_metal": 1.0,
-   "edge_rough": 0.35,
-   "coat": 0.0,
-   "emit_k": 1.0,
-   "tint": 1.0,
-   "ior": 1.5,
-   "explicit_colour": false,
-   "render_rgb_linear": null
-  },
-  "en_smoke": {
-   "rgb_linear": [
-    0.046665,
-    0.036889,
-    0.033105
-   ],
-   "hex": "#3d3633",
-   "emission": 0,
-   "roughness": 0.9,
-   "metallic": 0.0,
-   "alpha": null,
-   "alpha_source": null,
-   "note": null,
-   "mat_class": "paint",
-   "base_linear": [
-    0.046665,
-    0.036889,
-    0.033105
-   ],
-   "rough0": 0.92,
-   "metal0": 0.0,
-   "var": 0.2,
-   "wear": 0.0,
-   "grime": 0.0,
-   "bump": 0.02,
-   "bscale": 30.0,
-   "dust_k": 1.0,
-   "edge_color": [
-    0.55,
-    0.56,
-    0.57
-   ],
-   "edge_metal": 1.0,
-   "edge_rough": 0.35,
    "coat": 0.0,
    "emit_k": 1.0,
    "tint": 1.0,
@@ -9819,47 +9696,6 @@
    ],
    "edge_metal": 1.0,
    "edge_rough": 0.35,
-   "coat": 0.0,
-   "emit_k": 1.0,
-   "tint": 1.0,
-   "ior": 1.5,
-   "explicit_colour": false,
-   "render_rgb_linear": null
-  },
-  "sh_led_dead": {
-   "rgb_linear": [
-    0.62396,
-    0.590619,
-    0.527115
-   ],
-   "hex": "#cfcac0",
-   "emission": 0,
-   "roughness": 0.35,
-   "metallic": 0.0,
-   "alpha": null,
-   "alpha_source": null,
-   "note": null,
-   "mat_class": "plastic",
-   "base_linear": [
-    0.62396,
-    0.590619,
-    0.527115
-   ],
-   "rough0": 0.35,
-   "metal0": 0.0,
-   "var": 0.05,
-   "wear": 0.0,
-   "grime": 0.2,
-   "bump": 0.008,
-   "bscale": 260.0,
-   "dust_k": 1.0,
-   "edge_color": [
-    0.55,
-    0.56,
-    0.57
-   ],
-   "edge_metal": 0.0,
-   "edge_rough": 0.55,
    "coat": 0.0,
    "emit_k": 1.0,
    "tint": 1.0,

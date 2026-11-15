@@ -119,7 +119,20 @@ func _test_map(session: SessionService) -> void:
 			for surface in mi.mesh.get_surface_count():
 				outside_unchanged = outside_unchanged and mi.get_surface_override_material(surface) == null
 	_check("outside finishes preserved", outside_unchanged)
-	_check("drains, wire and footprints located", removed >= 7)
+	_check("drain grates, wire and footprints located", removed >= 5)
+	# 2026-11-14: drain tiles keep a whole floor (hiding them left holes to the sand)
+	var drain_tiles := 0
+	var drain_floors_whole := true
+	for mi in world.find_children("*", "MeshInstance3D", true, false):
+		if String(mi.get_meta("gc_asset", "")) == "gr_floor_drain":
+			drain_tiles += 1
+			var plain := world.find_child("gr_floor", true, false) as MeshInstance3D
+			drain_floors_whole = drain_floors_whole and mi.visible and plain != null and mi.mesh == plain.mesh
+	_check("greenhouse drain tiles drawn as whole floor tiles", drain_tiles == 3 and drain_floors_whole and int(stats.floors) == 3)
+	var deck := DomeDeck.build(world, "res://data/colony_manifest.json")
+	var deck_aabb := deck.get_aabb()
+	_check("dome plaza has a deck floor over the hall footprint", deck.mesh.get_surface_count() == 1 and deck_aabb.size.x > 50.0
+		and deck_aabb.size.z > 30.0 and absf(deck_aabb.position.y - DomeDeck.Y) < 0.001 and deck.layers != 0)
 	_check("greenhouse has cleaning equipment", world.find_child("GreenhouseCleaningTools", true, false) != null)
 	SuitDisplays.build(world)
 	var visual := PlayerVisual.new()

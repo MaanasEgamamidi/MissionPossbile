@@ -2,11 +2,19 @@ class_name HabitatFinish
 extends RefCounted
 ## Scoped corrections from Game Functionality errors. Like SuitDisplays, modifies only instantiated derivatives.
 ## Source .blend/.glb files, palette generation, outdoor finishes and gameplay colliders remain authored inputs.
-const REMOVE := ["ak_dust_trail", "ak_dust_drift", "qt_cable", "ls_drain", "gr_floor_drain"]
+const REMOVE := ["ak_dust_trail", "ak_dust_drift", "qt_cable", "ls_drain"]
+## Floor tiles whose drain grate goes: the tile is drawn as its plain twin. (Hiding the whole tile left 2 m holes down
+## to the sand in the Greenhouse; owner 2026-11-14: "have floor be normal".)
+const PLAIN_FLOOR := {"gr_floor_drain": "gr_floor"}
 var _materials := {}
-var stats := {"cleaned": 0, "removed": 0, "soil": 0, "chess": 0}
+var stats := {"cleaned": 0, "removed": 0, "soil": 0, "chess": 0, "floors": 0}
 
 func apply(world: Node) -> Dictionary:
+	var plain_meshes := {}
+	for node in world.find_children("*", "MeshInstance3D", true, false):
+		var a := String(node.get_meta("gc_asset", ""))
+		if a in PLAIN_FLOOR.values() and not plain_meshes.has(a):
+			plain_meshes[a] = (node as MeshInstance3D).mesh
 	for node in world.find_children("*", "MeshInstance3D", true, false):
 		var mi := node as MeshInstance3D
 		if mi.mesh == null:
@@ -17,6 +25,9 @@ func apply(world: Node) -> Dictionary:
 			mi.visible = false
 			stats.removed += 1
 			continue
+		if PLAIN_FLOOR.has(asset) and plain_meshes.has(PLAIN_FLOOR[asset]):
+			mi.mesh = plain_meshes[PLAIN_FLOOR[asset]]
+			stats.floors += 1
 		var indoor := ColonyZones.AREA_ZONE.has(area) and area not in ["Dome plaza", "Garden Dome"]
 		if asset.begins_with("rf_tile"):
 			indoor = true  # underside ceiling tiles; roof slabs/exterior retain their dust

@@ -21,12 +21,13 @@ const EDGE := 24
 const SUIT_WARN := 30.0
 const SUIT_URGENT := 10.0
 
-## Plain names of station kinds, as used in "[E] Use …".
+## Plain names of station kinds, as used in "[E] Use …". An empty name gives a plain "[E] Use" (owner 2026-11-14:
+## nothing in the world says "fix" or "broken / damaged"; salvage donors just say "Use").
 const STATION_NAMES := {
 	"suits": "suit rack", "power": "power panel", "computer": "colony computer", "comms": "comms console",
 	"food": "greenhouse console", "board": "transceiver board", "lifesupport": "life support console",
 	"heal": "med station", "survivor": "patient", "solar": "sun tracker",
-	"scout_bay": "scout bay", "ore_deposit": "ore deposit", "salvage": "damaged machine", "sample_site": "sample site",
+	"scout_bay": "scout bay", "ore_deposit": "ore deposit", "salvage": "", "sample_site": "sample site",
 }
 ## Seconds a colony system alert stays in the message line.
 const ALERT_SECONDS := 6.0
@@ -763,7 +764,8 @@ func _update_cue() -> void:
 		elif station_kind == "survivor":
 			body = "Check on the patient"
 		else:
-			body = "Use %s" % String(STATION_NAMES.get(station_kind, "station"))
+			var nm := String(STATION_NAMES.get(station_kind, "station"))
+			body = "Use" if nm == "" else "Use %s" % nm
 	elif kind == "ladder":
 		body = "Hold ladder; W/S climb, E or Space release"
 	elif _held != &"":

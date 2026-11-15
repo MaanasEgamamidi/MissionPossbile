@@ -104,6 +104,8 @@ func _ready() -> void:
 		# Racks and stands show the crew's own suit, not the old white one modelled into the map.
 		SuitDisplays.build(world)
 		HabitatFinish.new().apply(world)
+		# The plaza floor between the rooms and the glass hall, as the browser game draws it (not an object of the map).
+		DomeDeck.build(world, MANIFEST_PATH)
 	_add_ground()
 	if world != null:
 		# Everything else solid that is drawn (rovers, tanks, machines, hall frames and curb, dome shell...) gets its own
