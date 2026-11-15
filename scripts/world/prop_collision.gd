@@ -60,7 +60,7 @@ const VERSION := 4   # 4: ladder rails are authored by WorldCollision; no convex
 const CACHE_INPUTS: Array[String] = ["res://assets/colony/colony.glb", "res://assets/colony/environment.glb",
 	"res://assets/colony/terrain.glb", "res://data/terrain_height.res", "res://scripts/world/prop_collision.gd",
 	"res://scripts/world/environment_collision.gd", "res://scripts/world/suit_displays.gd", "res://scripts/world/world_collision.gd",
-	"res://scripts/world/door_controller.gd", "res://scenes/world/colony_world.tscn"]
+	"res://scripts/world/door_controller.gd", "res://scenes/world/colony_world.tscn", "res://scripts/world/habitat_finish.gd"]
 
 
 ## Adds a StaticBody3D "Props" under `collision`. `manifest_path`/`colliders_path` are the WorldCollision inputs;

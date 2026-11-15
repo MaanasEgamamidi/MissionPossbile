@@ -6,8 +6,20 @@ const REMOVE := ["ak_dust_trail", "ak_dust_drift", "qt_cable", "ls_drain"]
 ## Floor tiles whose drain grate goes: the tile is drawn as its plain twin. (Hiding the whole tile left 2 m holes down
 ## to the sand in the Greenhouse; owner 2026-11-14: "have floor be normal".)
 const PLAIN_FLOOR := {"gr_floor_drain": "gr_floor"}
+## Greenhouse plant trays hidden for performance (owner 2026-11-15: the room had ~1.6M plant triangles; cut about half).
+## The upper two tiers of the four ordinary racks and the upper seedling-rack trays go; the bottom tiers stay. The
+## BP09 rack (gr_rack.002) and the wilt-story rack keep all their trays. Trays are deco (no colliders of their own).
+const HIDE_PLANTS := ["gr_tray_butter_y", "gr_tray_plug", "gr_tray_butter_m_001", "gr_tray_butter_y_001",
+	"gr_tray_basil", "gr_tray_plug_001", "gr_tray_butter_m_002", "gr_tray_plug_002",
+	"gr_micro_pea_001", "gr_micro_radish_001", "gr_plug_tray", "gr_plug_tray_001", "gr_plug_tray_002", "gr_tray_kale_001"]
+## Greenhouse beds that keep their planter (and its collider) but lose their crop: drawn as empty, unplanted beds.
+const EMPTY_BEDS := ["gr_potato_bed", "gr_wheat_bed", "gr_straw_gutter_001"]
+## Greenhouse plant assets (gc_asset prefixes) that lose shadow casting and get a draw distance.
+const GREENHOUSE_PLANTS := ["gr_tray", "gr_plug_tray", "gr_micro", "gr_straw_gutter", "gr_pepper_row", "gr_potato_bed",
+	"gr_wheat_bed", "gr_lemon_tree", "gr_seedling_rack"]
+const CROP_MATERIALS :=["gr_leaf", "gr_stem", "gr_flower", "gr_fruit", "gr_wheat"]
 var _materials := {}
-var stats := {"cleaned": 0, "removed": 0, "soil": 0, "chess": 0, "floors": 0}
+var stats := {"cleaned": 0, "removed": 0, "soil": 0, "chess": 0, "floors": 0, "greenhouse_lowered": 0}
 
 func apply(world: Node) -> Dictionary:
 	var plain_meshes := {}
@@ -21,10 +33,21 @@ func apply(world: Node) -> Dictionary:
 			continue
 		var asset := String(mi.get_meta("gc_asset", ""))
 		var area := String(mi.get_meta("area", ""))
-		if asset in REMOVE:
+		if asset in REMOVE or (area == "Greenhouse" and String(mi.name) in HIDE_PLANTS):
 			mi.visible = false
 			stats.removed += 1
 			continue
+		if area == "Greenhouse" and String(mi.name) in EMPTY_BEDS:
+			_strip_crop(mi)
+		if area == "Greenhouse":
+			# Lower quality in the greenhouse only (owner 2026-11-15): coarser LODs sooner everywhere in the room; the
+			# plants also cast no shadows and are not drawn from beyond the room's own size. (Walls and roof keep their
+			# shadows and range so no sunlight leaks in and the building still shows from outside.)
+			mi.lod_bias = 0.25
+			if _starts_with_any(asset, GREENHOUSE_PLANTS):
+				mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+				mi.visibility_range_end = 28.0
+			stats.greenhouse_lowered += 1
 		if PLAIN_FLOOR.has(asset) and plain_meshes.has(PLAIN_FLOOR[asset]):
 			mi.mesh = plain_meshes[PLAIN_FLOOR[asset]]
 			stats.floors += 1
@@ -72,6 +95,25 @@ func _clean_material(original: ShaderMaterial, cement: bool, chair: bool) -> Sha
 		mat.set_shader_parameter("class_id", 2)
 	_materials[key] = mat
 	return mat
+
+static func _starts_with_any(text: String, prefixes: Array) -> bool:
+	for prefix: String in prefixes:
+		if text.begins_with(prefix):
+			return true
+	return false
+
+## Rebuilds the bed's mesh without its crop surfaces (CROP_MATERIALS prefixes); the planter, soil and frame stay.
+func _strip_crop(mi: MeshInstance3D) -> void:
+	var mesh := ArrayMesh.new()
+	for surface in mi.mesh.get_surface_count():
+		var material := mi.mesh.surface_get_material(surface)
+		var mat_name := String(material.resource_name) if material != null else ""
+		if _starts_with_any(mat_name, CROP_MATERIALS):
+			continue
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, mi.mesh.surface_get_arrays(surface))
+		mesh.surface_set_material(mesh.get_surface_count() - 1, material)
+	mi.mesh = mesh
+	stats.removed += 1
 
 func _add_soil(planter: MeshInstance3D) -> void:
 	var soil := BoxMesh.new()
