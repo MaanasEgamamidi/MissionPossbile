@@ -18,7 +18,8 @@ static func register(service: ActionService) -> void:
 		TutorialSystem.advance_tutorial(ctx.state, ctx.balance, ctx.session.events)
 		return {"fixed": fixed, "text": "Demo: all %d tutorial repairs fixed." % TutorialSystem.required_fixes().size()}
 	service.register(demo)
-	# Demo cheat (P): Communication track to its top level and every radio card installed. With "summon", the other
+	# Demo cheat (P): Communication track to its top level, every radio card installed, and only the comms area's repairs
+	# fixed (nothing else). With "summon", the other
 	# human player's character is moved 1 m behind and 1 m left of the host (the client takes the host's pose through
 	# the replicated character_recovered event, flagged demo_teleport).
 	var comms := ActionService.Definition.new()
@@ -38,8 +39,9 @@ static func register(service: ActionService) -> void:
 			if not st.has_upgrade(card):
 				st.upgrades[card] = {"installed": true, "by": "demo", "at_hours": st.sim_hours, "parts": 0,
 					"station": CommsStage.INSTALL_STATION, "sector": "energy"}
-		fix_all_areas(ctx, ["med_bay"])  # the Med Bay stays broken: T10 is the two-player demo task
-		var text := "Demo: radio communication maxed out; every area fixed except the Med Bay."
+		fix_rooms(ctx, ["command_center"])  # only the comms area (T01 comms, T02 wires); every other area stays broken
+		TutorialSystem.advance_tutorial(st, ctx.balance, ctx.session.events)
+		var text := "Demo: radio communication maxed out; the comms area is fixed."
 		if bool(ctx.request.params.get("summon", false)):
 			var me := st.character_of_peer(ctx.request.peer_id)
 			var other: CharacterState = null
@@ -72,6 +74,16 @@ static func register(service: ActionService) -> void:
 		definition.check = func(ctx: ActionService.Context) -> ActionResult: return ctx.session.repair_runtime.check(ctx)
 		definition.apply = func(ctx: ActionService.Context) -> Dictionary: return ctx.session.repair_runtime.apply(ctx)
 		service.register(definition)
+
+
+## Demo cheat (P): only the repairs of the rooms in `rooms` (RepairCatalog.ROOMS ids) finished. Returns how many changed.
+static func fix_rooms(ctx: ActionService.Context, rooms: Array) -> int:
+	var fixed := 0
+	for room_id: String in rooms:
+		for task_id: String in (RepairCatalog.ROOMS.get(room_id, {}) as Dictionary).get("tasks", []):
+			if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
+				fixed += 1
+	return fixed
 
 
 ## Demo cheats: every repair in every area finished, so every room looks fixed, except the tasks of the rooms in
