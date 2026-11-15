@@ -27,6 +27,8 @@ var _player_rows := {}             # peer -> {"label", "slider", "mute"}
 var _players_sig := ""
 var _stage_label: Label
 var _metering: VoiceService
+var _device_name := ""
+var _device_refresh_at := 0
 
 
 func setup(p_services: GameServices) -> void:
@@ -34,6 +36,7 @@ func setup(p_services: GameServices) -> void:
 	if settings == null:
 		settings = GameSettings.new()
 	name = "VoiceSettingsPanel"
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	theme_type_variation = UiTheme.PANEL
 	_build()
 	_read_settings()
@@ -100,19 +103,21 @@ func _process(_delta: float) -> void:
 	if _metering == null:
 		_set_metering(true)
 	var v := _voice()
-	_meter.value = (v.input_level() * 100.0) if v != null else 0.0
+	# A perceptual scale makes ordinary speech visible without changing the transmitted audio gain.
+	_meter.value = (sqrt(v.input_level()) * 100.0) if v != null else 0.0
 
 
 func refresh() -> void:
 	if _status == null:
 		return
 	var v := _voice()
+	_refresh_device()
 	if v != null:
 		_status.text = v.mic_state_text()
 	elif settings.voice_mic_muted:
 		_status.text = "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
 	else:
-		_status.text = "Voice starts when you are in a colony with other players. Pick your microphone here."
+		_status.text = "Voice uses the built-in microphone automatically when you enter a colony."
 	_status.theme_type_variation = UiTheme.WARN if _status.text.begins_with("✖") else UiTheme.GOOD
 	var st := services.state() if services != null and services.has_game() else null
 	# Suit radio (2026-11-15): the comms level decides no signal / delay / garble (scripts/voice/suit_radio.gd).
@@ -199,19 +204,12 @@ func _build() -> void:
 	scroll.add_child(body)
 
 	_status = _label(body, "")
-	_label(body, "Microphone")
+	_label(body, "Built-in microphone (always used)")
 	_device = OptionButton.new()
 	_device.name = "Device"
 	_device.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	_device.tooltip_text = "Which microphone the game listens to."
-	_device.item_selected.connect(func(i: int) -> void:
-		var device := _device.get_item_text(i)
-		var value := "" if device == "Default" else device
-		settings.voice_input_device = value
-		var v := _voice()
-		if v != null:
-			v.set_input_device(value)
-		refresh())
+	_device.tooltip_text = "Voice stays on this computer's built-in microphone, even when a headset is connected."
+	_device.disabled = true
 	body.add_child(_device)
 	_meter_label = _label(body, "Input level: speak to see the bar move. Voice chat is always on: no key to hold.")
 	_meter_label.theme_type_variation = UiTheme.MUTED
@@ -223,6 +221,15 @@ func _build() -> void:
 	_meter.custom_minimum_size = Vector2(240.0, 14.0)
 	_meter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(_meter)
+	var retry := Button.new()
+	retry.text = "Retry built-in microphone"
+	retry.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	retry.pressed.connect(func() -> void:
+		var v := _voice()
+		if v != null:
+			v.retry_microphone()
+		refresh())
+	body.add_child(retry)
 	_mute_mic = CheckButton.new()
 	_mute_mic.name = "MuteMic"
 	_mute_mic.text = "Mute my microphone"
@@ -279,22 +286,27 @@ func _build() -> void:
 
 
 func _read_settings() -> void:
-	_device.clear()
-	var devices := AudioServer.get_input_device_list()
-	if not devices.has("Default"):
-		_device.add_item("Default")
-	for d: String in devices:
-		_device.add_item(d)
-	var want := settings.voice_input_device if settings.voice_input_device != "" else "Default"
-	var chosen := 0
-	for i in _device.item_count:
-		if _device.get_item_text(i) == want:
-			chosen = i
-	_device.select(chosen)
+	_refresh_device()
 	_mute_mic.set_pressed_no_signal(settings.voice_mic_muted)
 	_volume.set_value_no_signal(settings.voice_volume)
 	_update_volume_label()
 	refresh()
+
+
+func _refresh_device() -> void:
+	var now := Time.get_ticks_msec()
+	if _device_name != "" and now < _device_refresh_at:
+		return
+	_device_refresh_at = now + 5000
+	var device := VoiceService.built_in_device(AudioServer.get_input_device_list())
+	var label := device if device != "" else "Built-in microphone unavailable"
+	if label == _device_name:
+		return
+	_device_name = label
+	_device.clear()
+	_device.add_item(label)
+	_device.select(0)
+	settings.voice_input_device = device
 
 
 func _update_volume_label() -> void:

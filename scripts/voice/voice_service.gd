@@ -1,6 +1,6 @@
 class_name VoiceService
 extends Node
-## Private voice for the colony (Prompt 11): push-to-talk capture, Opus encoding, sending over the game's own ENet
+## Private voice for the colony (Prompt 11): open-mic capture, Opus encoding, sending over the game's own ENet
 ## session (NetSession.send_voice, channel 2), receiving, the timed buffer (VoiceScheduler), routing (VoiceRouter),
 ## decoding and playing. A presenter: GameMain adds it in _begin_play() and calls setup(world, services, game).
 ##
@@ -33,7 +33,9 @@ const OPUS_COMPLEXITY := 10
 const MIC_HANG_S := 3.0
 ## An open microphone that gives no samples for this long is reported as "no signal".
 const MIC_SIGNAL_TIMEOUT_S := 3.0
-## A microphone that is missing, failed or silent is looked for again this often, seconds (plugging one in works).
+## Digital silence (including a Windows/hardware mute) is not proof that a microphone works.
+const MIC_SILENCE_PEAK := 0.000001
+## Retry unavailable/stalled capture and watch device/sample-rate changes at this interval, in seconds.
 const MIC_RETRY_S := 5.0
 ## Height of a speaker's voice above their feet, metres (engineering).
 const MOUTH_HEIGHT_M := 1.6
@@ -86,8 +88,11 @@ var _encoder: Object
 var _audio_chunk := 882
 var _mic_state: StringName = &""
 var _mic_active := false
-var _mic_since := 0.0
 var _mic_frames_seen := false
+var _mic_last_frames := 0.0
+var _mic_last_sound := 0.0
+var _mic_device := ""
+var _encoder_input_rate := 0
 var _want_input_until := -1.0
 var _meter_requests := 0
 var _level := 0.0
@@ -225,6 +230,7 @@ static func library_problem() -> String:
 func _ready() -> void:
 	add_to_group(GROUP)
 	process_mode = Node.PROCESS_MODE_ALWAYS          # voice keeps working while the game is paused
+	process_priority = -100                       # drain voice before ordinary gameplay work
 
 
 ## Presenter entry point. `world` may be null (tests); `game` is GameMain or null.
@@ -275,6 +281,7 @@ func _make_encoder() -> void:
 		_library_problem = "the encoder could not be created"
 		return
 	var in_rate := int(AudioServer.get_input_mix_rate())
+	_encoder_input_rate = in_rate
 	# create_sampler(input mix rate, Opus sample rate, channels, noise suppression), as the TwoVoIP helper calls it
 	var ok_sampler := bool(_encoder.call(&"create_sampler", in_rate, VoiceScheduler.SAMPLE_RATE, VoiceScheduler.CHANNELS, false))
 	var ok_encoder := bool(_encoder.call(&"create_opus_encoder", OPUS_BITRATE, OPUS_COMPLEXITY, true))
@@ -301,20 +308,20 @@ func _probe_mic() -> void:
 		_set_mic_state(&"headless")
 	elif not bool(ProjectSettings.get_setting("audio/driver/enable_input", false)):
 		_set_mic_state(&"input_off")
-	elif AudioServer.get_input_device_list().is_empty():
+	elif built_in_device(AudioServer.get_input_device_list()).is_empty():
 		_set_mic_state(&"no_device")
 	else:
-		_set_mic_state(&"ready")
+		_set_mic_state(&"available")
 
 
-## &"ready", &"synthetic" (tests), &"headless", &"no_library", &"input_off", &"no_device", &"failed" or &"no_signal".
+## available/opening, ready (sound received), quiet (silent PCM), or a concrete capture failure.
 func mic_state() -> StringName:
 	return _mic_state
 
 
 ## True when this computer can send voice (a working or synthetic microphone, not muted).
 func can_capture() -> bool:
-	return (_mic_state == &"ready" or _mic_state == &"synthetic") and not mic_muted()
+	return _mic_state in [&"ready", &"quiet", &"synthetic"] and not mic_muted()
 
 
 func mic_muted() -> bool:
@@ -327,6 +334,8 @@ func set_mic_muted(on: bool) -> void:
 	if on:
 		_stop_transmit()
 		_stop_mic()
+	else:
+		retry_microphone()
 
 
 ## The microphone's state in words for the HUD and the voice settings.
@@ -334,8 +343,12 @@ func mic_state_text() -> String:
 	if mic_muted():
 		return "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
 	match _mic_state:
+		&"available", &"opening":
+			return "Opening the built-in microphone. Speak to check the input level."
 		&"ready":
-			return "✓ Microphone ready. Voice chat is always on: just talk."
+			return "✓ Built-in microphone receiving audio. Voice chat is on: just talk."
+		&"quiet":
+			return "✖ No sound detected. Speak, then check the microphone mute key and system input volume."
 		&"synthetic":
 			return "✓ Test sound instead of a microphone (synthetic input)."
 		&"headless":
@@ -345,11 +358,11 @@ func mic_state_text() -> String:
 		&"input_off":
 			return "✖ No microphone: microphone input is switched off in this build. You can still listen."
 		&"no_device":
-			return "✖ No microphone found. Plug one in and pick it here. You can still listen."
+			return "✖ Built-in microphone not found. Enable it in system sound settings. You can still listen."
 		&"failed":
-			return "✖ No microphone: it could not be opened. It may be in use, or blocked in Windows privacy settings. You can still listen."
+			return "✖ Microphone could not open. Check microphone permission in Windows settings. Retrying automatically."
 		&"no_signal":
-			return "✖ No microphone signal. Check it is plugged in and allowed in Windows privacy settings. You can still listen."
+			return "✖ Microphone stopped delivering audio. Check system microphone access. Retrying automatically."
 	return "✖ No microphone. You can still listen."
 
 
@@ -357,27 +370,51 @@ func mic_state_text() -> String:
 func mic_short_text() -> String:
 	if mic_muted():
 		return "✖ Microphone muted"
+	if _mic_state == &"quiet":
+		return "✖ Microphone silent — check the system mute key"
+	if _mic_state in [&"available", &"opening"]:
+		return "Opening built-in microphone…"
 	if can_capture():
 		return ""
 	return "✖ No microphone — you can still listen"
 
 
-## Microphones the computer offers.
+## Godot exposes endpoint names, not hardware form factors. Recognize the built-in endpoint names used by
+## Windows laptop drivers; never fall back to Default, USB, Bluetooth or a virtual input.
+static func built_in_device(devices: PackedStringArray) -> String:
+	for device: String in devices:
+		var label := device.to_lower().replace("_", " ").replace("-", " ")
+		var external := false
+		for word: String in ["usb", "bluetooth", "airpods", "headset", "iphone", "virtual", "webcam", "brio", "voicemeeter", "cable"]:
+			if label.contains(word):
+				external = true
+				break
+		if external:
+			continue
+		if label.contains("microphone array") or label.contains("internal mic") or label.contains("built in mic"):
+			return device
+	return ""
+
+
+## Only the built-in microphone is offered, even if the system default changes to a headset.
 func input_devices() -> PackedStringArray:
-	return AudioServer.get_input_device_list()
+	var device := built_in_device(AudioServer.get_input_device_list())
+	return PackedStringArray([device]) if device != "" else PackedStringArray()
 
 
-## Picks a microphone (saved in the settings). Restarts capture if it was open.
-func set_input_device(device: String) -> void:
-	if settings != null:
-		settings.voice_input_device = device
-	var was := _mic_active
+## Older settings/callers cannot select an external microphone. Resolve the built-in input on this computer.
+func set_input_device(_device: String) -> void:
+	retry_microphone()
+
+
+func retry_microphone() -> void:
+	_stop_transmit()
 	_stop_mic()
-	if device != "" and AudioServer.get_input_device_list().has(device):
-		AudioServer.input_device = device
-	if _mic_state == &"failed" or _mic_state == &"no_signal" or _mic_state == &"no_device":
-		_probe_mic()
-	if was:
+	if settings != null:
+		settings.voice_input_device = built_in_device(AudioServer.get_input_device_list())
+	_probe_mic()
+	_mic_retry_left = MIC_RETRY_S
+	if not mic_muted():
 		_start_mic(_now())
 
 
@@ -409,18 +446,32 @@ func _set_mic_state(s: StringName) -> void:
 
 
 func _start_mic(now: float) -> void:
-	if _mic_active or synthetic_input or _mic_state not in [&"ready", &"no_signal"] or mic_muted():
+	if _mic_active or synthetic_input or _mic_state not in [&"available", &"ready", &"quiet", &"no_signal"] or mic_muted():
 		return
-	var device := settings.voice_input_device if settings != null else ""
-	if device != "" and AudioServer.get_input_device_list().has(device):
-		AudioServer.input_device = device
+	var device := built_in_device(AudioServer.get_input_device_list())
+	if device.is_empty():
+		_set_mic_state(&"no_device")
+		return
+	AudioServer.input_device = device
+	if settings != null:
+		settings.voice_input_device = device
 	var err := AudioServer.set_input_device_active(true)
 	if err != OK:
 		_set_mic_state(&"failed")
 		return
 	_mic_active = true
-	_mic_since = now
+	_mic_device = device
 	_mic_frames_seen = false
+	_mic_last_frames = now
+	_mic_last_sound = now
+	# Some drivers only report their actual input rate after opening the endpoint.
+	if _encoder_input_rate != int(AudioServer.get_input_mix_rate()):
+		_make_encoder()
+	if not _library:
+		_stop_mic()
+		_set_mic_state(&"no_library")
+		return
+	_set_mic_state(&"opening")
 
 
 ## Looks for the microphone again every MIC_RETRY_S while it is missing or failed, so voice starts by itself once a
@@ -432,18 +483,44 @@ func _retry_mic(delta: float) -> void:
 	_mic_retry_left = MIC_RETRY_S
 	if synthetic_input or not _library or mic_muted():
 		return
-	if _mic_state in [&"failed", &"no_device"]:
-		_probe_mic()
-	elif _mic_state == &"no_signal" and _mic_active and not _mic_frames_seen:
-		# reopen the device: some drivers only start delivering after a fresh open
-		_stop_mic()
-		_start_mic(_now())
+	var device := built_in_device(AudioServer.get_input_device_list())
+	if _mic_state in [&"failed", &"no_device", &"no_signal"] \
+			or (_mic_active and (_mic_device != device or AudioServer.input_device != device \
+			or _encoder_input_rate != int(AudioServer.get_input_mix_rate()))):
+		retry_microphone()
 
 
 func _stop_mic() -> void:
+	_stop_transmit()
 	if _mic_active:
 		AudioServer.set_input_device_active(false)
 	_mic_active = false
+	_level = 0.0
+	if _mic_state in [&"opening", &"ready", &"quiet", &"no_signal"]:
+		_set_mic_state(&"available")
+
+
+func _observe_input(chunk: PackedVector2Array, now: float) -> void:
+	_mic_frames_seen = true
+	_mic_last_frames = now
+	var peak := 0.0
+	for sample: Vector2 in chunk:
+		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
+	_level = maxf(_level * 0.85, minf(peak, 1.0))
+	if peak > MIC_SILENCE_PEAK:
+		_mic_last_sound = now
+		if not synthetic_input:
+			_set_mic_state(&"ready")
+
+
+func _check_mic_health(now: float) -> void:
+	if not _mic_active or synthetic_input:
+		return
+	if now - _mic_last_frames > MIC_SIGNAL_TIMEOUT_S:
+		_set_mic_state(&"no_signal")
+		_stop_transmit()
+	elif _mic_frames_seen and now - _mic_last_sound > MIC_SIGNAL_TIMEOUT_S:
+		_set_mic_state(&"quiet")
 
 
 ## Open mic: voice chat is always on, so the microphone always wants to send (tests may override it).
@@ -456,6 +533,11 @@ func _ptt_held() -> bool:
 func _next_chunk() -> PackedVector2Array:
 	if synthetic_input:
 		return _synthetic.pop_front() if not _synthetic.is_empty() else PackedVector2Array()
+	# A driver may switch to Default when an endpoint disappears. Never consume that replacement input.
+	if _mic_active and AudioServer.input_device != _mic_device:
+		_stop_mic()
+		_set_mic_state(&"no_device")
+		return PackedVector2Array()
 	if not _mic_active or AudioServer.get_input_frames_available() < _audio_chunk:
 		return PackedVector2Array()
 	return AudioServer.get_input_frames(_audio_chunk)
@@ -487,20 +569,13 @@ func _capture(now: float) -> void:
 		if chunk.is_empty():
 			break
 		got_audio = true
-		_mic_frames_seen = true
-		if _mic_state == &"no_signal":
-			_set_mic_state(&"ready")
-		var peak := 0.0
-		for v: Vector2 in chunk:
-			peak = maxf(peak, maxf(absf(v.x), absf(v.y)))
-		_level = maxf(_level * 0.85, minf(peak, 1.0))
+		_observe_input(chunk, now)
 		_encoder.call(&"process_pre_encoded_chunk", chunk, VoiceScheduler.FRAME_SAMPLES, false, false)
 		if _transmitting:
 			_send_frame()
 	if not got_audio:
 		_level *= 0.9
-	if _mic_active and not _mic_frames_seen and now - _mic_since > MIC_SIGNAL_TIMEOUT_S:
-		_set_mic_state(&"no_signal")
+	_check_mic_health(now)
 	if _transmitting and not talk:
 		_stop_transmit()
 
