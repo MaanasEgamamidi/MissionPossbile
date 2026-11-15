@@ -9,6 +9,11 @@ extends RefCounted
 const MESSAGE := "✖ Radio down: Lock the Relay"
 
 
+## Owner 2026-11-15: crew voice works from the very start for every player; the tutorial's radio-down gate no longer
+## silences it. Set true to bring the gate back.
+const GATE_VOICE := false
+
+
 ## True while crew voice chat is off in this colony.
 static func voice_down(state: ColonyState) -> bool:
-	return state != null and TutorialSystem.crew_radio_down(state)
+	return GATE_VOICE and state != null and TutorialSystem.crew_radio_down(state)
