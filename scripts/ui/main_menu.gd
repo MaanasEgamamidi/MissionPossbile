@@ -285,16 +285,16 @@ func _rebuild_server_list() -> void:
 	var games := _browser.servers()
 	for g: Dictionary in games:
 		var full := int(g.players) >= int(g.max)
-		var b := _button(_server_list, "Join %s's PC   (%d/%d players)" % [g.name, int(g.players), int(g.max)],
+		var b := _button(_server_list, "Join %s   (%d/%d players)" % [g.name, int(g.players), int(g.max)],
 			UiTheme.PRIMARY_BUTTON)
 		b.name = "JoinGame"
 		b.tooltip_text = "%s, port %d" % [g.address, int(g.port)]
 		if not g.same_version:
 			b.disabled = true
-			b.text = "%s's PC has a different version of the game" % g.name
+			b.text = "%s has a different version of the game" % g.name
 		elif full:
 			b.disabled = true
-			b.text = "%s's PC is full (%d/%d players)" % [g.name, int(g.players), int(g.max)]
+			b.text = "%s is full (%d/%d players)" % [g.name, int(g.players), int(g.max)]
 		var address := String(g.address)
 		var port := int(g.port)
 		b.pressed.connect(func() -> void:

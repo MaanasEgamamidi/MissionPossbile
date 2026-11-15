@@ -14,9 +14,9 @@ const BEACON_INTERVAL_S := 1.0
 const FORGET_AFTER_S := 4.0
 
 
-## The name other players see: the person signed in on this computer, or the computer's name.
+## The name other players see: this computer's name, or the person signed in if it has none.
 static func local_name() -> String:
-	for key: String in ["USERNAME", "USER", "COMPUTERNAME", "HOSTNAME"]:
+	for key: String in ["COMPUTERNAME", "HOSTNAME", "USERNAME", "USER"]:
 		var v := OS.get_environment(key).strip_edges()
 		if v != "":
 			return v.left(24)
