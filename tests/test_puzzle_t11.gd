@@ -104,6 +104,17 @@ func _rule_checks() -> void:
 		levels_ok = levels_ok and dust.size() == RULE.AREAS.size()
 	_check("start dust is 0.5, 0.75 or 1.0 in all six areas", levels_ok)
 	_check("different seeds give different hangars", looks.size() >= 30, str(looks.size()))
+	var first_ok := true
+	for s in 40:
+		var first := RULE.start_dust(s * 31 + 7, true)
+		var full := RULE.start_dust(s * 31 + 7)
+		for id: String in first:
+			first_ok = first_ok and (float(first[id]) == 0.0 if RULE.FIRST_RUN_CLEAN.has(id) else first[id] == full[id])
+	_check("first run: the middle column starts clean, the other four match the full start", first_ok)
+	var first_task := {"puzzle_seed": 99, "puzzle_state": {}, "progress": 0.0}
+	var again_task := {"puzzle_seed": 99, "puzzle_state": {}, "progress": 0.0, "first_completed": true}
+	_check("state_of uses the short start until the task is first completed", RULE.state_of(first_task).areas == RULE.start_dust(99, true)
+		and RULE.state_of(again_task).areas == RULE.start_dust(99))
 	var plan_ok := true
 	var longest := 0
 	for s in 40:
@@ -132,7 +143,7 @@ func _rule_checks() -> void:
 		var level := float(st.areas[RULE.AREAS[i].id])
 		if level > 0.5 and thick < 0:
 			thick = i
-		if level <= 0.5 and loose < 0:
+		if level > 0.0 and level <= 0.5 and loose < 0:
 			loose = i
 	_check("seed 99 has thick and loose areas", thick >= 0 and loose >= 0)
 	_check("vacuum on thick dust is refused", not RULE.validate(task, {"move": "vacuum", "value": SHIFT + thick}).accepted)
@@ -150,7 +161,7 @@ func _rule_checks() -> void:
 	_check("negative value is refused", not RULE.validate(after, {"move": "brush", "value": -2}).accepted)
 	_check("forged reset payload is refused", not RULE.validate(after, {"move": "reset", "value": 2 * SHIFT + 1}).accepted)
 	var reset := RULE.validate(after, {"move": "reset", "value": 2 * SHIFT})
-	_check("reset brings the seeded dust back", reset.accepted and reset.puzzle_state.areas == RULE.start_dust(99) and reset.progress == 0.0)
+	_check("reset brings the seeded dust back", reset.accepted and reset.puzzle_state.areas == RULE.start_dust(99, true) and reset.progress == 0.0)
 	var json_copy := {"puzzle_seed": 99, "puzzle_state": JSON.parse_string(JSON.stringify(vac.puzzle_state)), "progress": vac.progress}
 	_check("state survives JSON numbers", RULE.state_of(json_copy).areas == vac.puzzle_state.areas and int(RULE.state_of(json_copy).step) == 1)
 	var more := (vac.puzzle_state.areas as Dictionary).duplicate()
@@ -163,7 +174,7 @@ func _rule_checks() -> void:
 	for area: Dictionary in RULE.AREAS:
 		zero[area.id] = 0.0
 	_check("an all-clean unfinished board is ignored (no dead end)", int(RULE.state_of({"puzzle_seed": 99, "puzzle_state": {"seed": 99, "step": 4, "areas": zero}, "progress": 0.5}).step) == 0)
-	_check("area_dust gives the seeded dust on a new game", RULE.area_dust({"puzzle_seed": 99, "puzzle_state": {}}) == RULE.start_dust(99))
+	_check("area_dust gives the seeded dust on a new game", RULE.area_dust({"puzzle_seed": 99, "puzzle_state": {}}) == RULE.start_dust(99, true))
 	_check("area_dust is all clean once completed", RULE.area_dust({"puzzle_seed": 99, "puzzle_state": {}, "first_completed": true}) == zero)
 
 

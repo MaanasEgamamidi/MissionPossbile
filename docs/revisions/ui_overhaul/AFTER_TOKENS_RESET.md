@@ -24,7 +24,11 @@ Branch `maanas/ui`, pushed and merged into `main`. Full record: `UI_OVERHAUL.md`
   that station (`player_controller.gd` `_station_inside_part`); `test_repair_anchors` 116/116.
 - `test_game_scene` suit-rack approach retries free spots until the player stands still on the floor; 34/34.
 
+- T11 first run starts with the middle column clean (four patches); later breakdowns have all six.
+
 ## Next, in priority order
+
+**The detailed, sized list with step-by-step instructions is `INCOMPLETE.md` in this folder.** Short version:
 
 1. **Small leftovers**
    - T02 wrong specialist: the concept wants the electrical badge where the first plug would be; the shell's generic

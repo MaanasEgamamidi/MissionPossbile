@@ -258,7 +258,11 @@ func _test_dust(p: BrokenParts, w: Dictionary) -> void:
 		task.puzzle_state = {}
 		var areas: Array = rule.get_script_constant_map().AREAS
 		var by_id: Dictionary = rule.call(&"area_dust", task)
-		_check("T11 rule start: every area dusty", HangarDust.levels_from_task(task).size() == areas.size() and HangarDust.levels_from_task(task).all(func(v: float) -> bool: return v > 0.0))
+		var first_clean: Array = rule.get_script_constant_map().FIRST_RUN_CLEAN
+		var start_ok := HangarDust.levels_from_task(task).size() == areas.size()
+		for area: Dictionary in areas:
+			start_ok = start_ok and ((float(by_id[area.id]) == 0.0) == first_clean.has(area.id))
+		_check("T11 rule start (first run): every area dusty except the first-run clean ones", start_ok, str(by_id))
 		var cleaned := by_id.duplicate()
 		cleaned["back_left"] = 0.0
 		task.puzzle_state = {"seed": int(task.puzzle_seed), "step": 3, "areas": cleaned}
