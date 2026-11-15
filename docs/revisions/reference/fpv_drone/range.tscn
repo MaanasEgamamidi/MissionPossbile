@@ -1,0 +1,55 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://range.gd" id="1_range"]
+[ext_resource type="Script" path="res://flight_controller.gd" id="2_flight"]
+[ext_resource type="PackedScene" path="res://assets/fpv_racer.glb" id="3_racer"]
+[ext_resource type="Script" path="res://flight_hud.gd" id="4_hud"]
+
+[sub_resource type="SphereShape3D" id="Sphere_hull"]
+radius = 0.28
+
+[node name="Dryline" type="Node3D"]
+script = ExtResource("1_range")
+
+[node name="Drone" type="CharacterBody3D" parent="."]
+position = Vector3(0, 2.65, 16)
+motion_mode = 1
+collision_layer = 2
+script = ExtResource("2_flight")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Drone"]
+shape = SubResource("Sphere_hull")
+
+[node name="PitchPivot" type="Node3D" parent="Drone"]
+
+[node name="Racer" parent="Drone/PitchPivot" instance=ExtResource("3_racer")]
+position = Vector3(0, -0.16, 0)
+rotation = Vector3(0, 3.141593, 0)
+
+[node name="FPV" type="Camera3D" parent="Drone/PitchPivot"]
+position = Vector3(0, 0.045, -0.28)
+current = true
+fov = 76.0
+near = 0.035
+
+[node name="ChaseArm" type="SpringArm3D" parent="Drone"]
+position = Vector3(0, 0.65, 0)
+rotation = Vector3(-0.22, 0, 0)
+spring_length = 2.8
+margin = 0.15
+
+[node name="Chase" type="Camera3D" parent="Drone/ChaseArm"]
+position = Vector3(0, 0, 2.8)
+fov = 68.0
+near = 0.05
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="FlightHUD" type="Control" parent="HUD"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("4_hud")
