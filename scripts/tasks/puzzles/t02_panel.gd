@@ -1,135 +1,202 @@
 extends "res://scripts/tasks/puzzles/electric_ui.gd"
-## T02 Wires mini-game: the open wiring rack in the Command Room (BP03). Four cables on the left, four shuffled plugs
-## on the right. Every pair has a letter, a colour word and a shape (A red triangle, B blue circle, C yellow square,
-## D pink diamond), so colour is never the only cue. Connect by dragging a cable onto a plug, or by picking a cable
-## and then a plug (mouse, or Tab / arrows + Enter). Cables are drawn as soft curves with a dark edge, and each cable
-## carries its shape at the middle so crossings stay readable. The host rule (t02_rule.gd) checks every connection;
-## a wrong one is explained and the cable comes back out, a right one locks.
+## T02 "Patch the Relay" mini-game (Command Room wiring rack, BP03; electrical specialist only). UI overhaul
+## 2026-11-15: the equipment is the interface, in the spirit of Among Us "Fix Wiring". One wide apparatus in a bay:
+## four cables come out of a conduit on the left, each ending in a chunky plug (the pair's colour, with its shape
+## stamped on the body); in the middle a patch bay with four shape-keyed sockets (the hollow shape in the hole, in the
+## pair's colour); on the right the relay. A seated plug sits in its socket, the socket lights up and a lit trace
+## (with moving sparks, so never colour alone) runs from it to the relay; the relay's lens lights once all four are in.
+## Pairs: Rule.SHAPES (triangle, circle, square, diamond) in Rule.COLORS; the plug of left terminal i carries pair
+## layout.left[i], the socket of right terminal j pair layout.right[j].
+## Controls: click a plug, then its socket, or drag the plug onto the socket; Tab / arrow keys move between plugs and
+## sockets, Enter / Space picks and places. The host rule (t02_rule.gd) checks every connection; a wrong socket is
+## refused (gentle amber shake, the plug goes back), a right one locks.
+## Public members read by tests and tools/godot/capture_puzzles.gd: left_buttons (plugs), right_buttons (sockets).
 
 const Rule := preload("res://scripts/tasks/puzzles/t02_rule.gd")
+## Rule.SHAPES (electric_ui order: triangle, circle, square, diamond) as Kit shape kinds.
+const KIT_SHAPE := [Kit.TRIANGLE, Kit.CIRCLE, Kit.SQUARE, Kit.DIAMOND]
 
+## The design space the apparatus is laid out in (scaled uniformly to fit the board).
+const DESIGN := Vector2(1000, 460)
+const ROW_Y := [80.0, 180.0, 280.0, 380.0]
+const TRUNK := Rect2(26, 22, 46, 416)
+## Plug sprite: 512 x 222, cord on the left, prongs on the right; drawn PLUG_W wide.
+const PLUG_SRC := Vector2(512, 222)
+const PLUG_W := 176.0
+const DOCK_X := 112.0
+## Socket sprite: 511 x 512, the hole centred with radius about 0.325 of the width.
+const SOCKET_X := 520.0
+const SOCKET_W := 90.0
+const HOLE_R := 0.3
+const BAY_PLATE := Rect2(436, 18, 168, 424)
+## Relay sprite: 294 x 512, the lens centred at (145, 227) with radius 60.
+const RELAY_SRC := Vector2(294, 512)
+const RELAY_RECT := Rect2(764, 40, 190, 330.9)
+const LENS := Vector2(145.5, 227.5)
+const LENS_R := 58.0
+## Where each socket's trace enters the relay, and the x of its vertical run (top to bottom by row).
+const ENTRY_Y := [250.0, 280.0, 310.0, 340.0]
+const RUN_X := [700.0, 668.0, 636.0, 700.0]
+const CABLE_EDGE := Color(0.05, 0.06, 0.08)
+const TRACE_OFF := Color(0.24, 0.27, 0.31)
+## Seconds for a plug to slide in, for the light to run to the relay, and for a refused plug to shake.
+const SEAT_SECONDS := 0.18
+const TRACE_SECONDS := 0.45
+const SHAKE_SECONDS := 0.6
+
+## The plugs (left terminals) and the sockets (right terminals), by terminal index.
 var left_buttons: Array[Button] = []
 var right_buttons: Array[Button] = []
+## The apparatus (one drawn control) and the marks drawn over the buttons.
 var canvas: DrawBox
-var hint_label: Label
+var marks: DrawBox
 
 var _layout: Dictionary = {"left": [0, 1, 2, 3], "right": [0, 1, 2, 3]}
 var _links: Array = [-1, -1, -1, -1]
+var _shown_links: Array = []
 var _selected := -1
 var _drag_left := -1
 var _drag_active := false
 var _drag_from := Vector2.ZERO
 var _mouse := Vector2.ZERO
 var _attempt := Vector2i(-1, -1)
+var _k := 1.0
+var _origin := Vector2.ZERO
+var _seat := PackedFloat32Array([1, 1, 1, 1])
+var _trace := PackedFloat32Array([0, 0, 0, 0])
+var _shake_socket := -1
+var _shake_left := 0.0
 
 
 func setup(p_services: GameServices) -> void:
-	task_title = "Fix the wires"
-	instructions = "Plug each cable on the left into the plug with the same letter and shape on the right. Drag a cable across, or pick a cable and then its plug. Keyboard: Tab or the arrow keys to move, Enter to pick."
+	task_title = "Patch the Relay"
+	instructions = ("Every plug has a shape. Put each plug into the socket with the same shape. "
+		+ "Click a plug and then its socket, or drag it across. Keyboard: Tab or arrow keys to move, Enter to pick.")
 	super.setup(p_services)
 	if ui_ready:
 		return
-	name = "WiresPanel"
-	var board := HBoxContainer.new()
-	board.name = "WiringBoard"
-	board.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	play_area.add_child(board)
-	var left_column := VBoxContainer.new()
-	left_column.name = "Cables"
-	board.add_child(left_column)
+	name = "RelayPanel"
 	canvas = DrawBox.new()
-	canvas.name = "CableCanvas"
+	canvas.name = "PatchBay"
+	canvas.custom_minimum_size = Vector2(900, 420)
 	canvas.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	canvas.custom_minimum_size = Vector2(200, 0)
-	canvas.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	canvas.painter = _draw_cables
-	board.add_child(canvas)
-	var right_column := VBoxContainer.new()
-	right_column.name = "Plugs"
-	board.add_child(right_column)
+	canvas.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	canvas.painter = _paint_equipment
+	Kit.smooth(canvas)
+	play_area.add_child(canvas)
 	for i in Rule.PAIRS:
-		var lb := make_button("Cable%d" % i, "")
-		lb.custom_minimum_size = Vector2(190, 52)
-		lb.action_mode = BaseButton.ACTION_MODE_BUTTON_RELEASE
-		lb.pressed.connect(_on_left_pressed.bind(i))
-		lb.button_down.connect(_on_left_down.bind(i))
-		left_buttons.append(lb)
-		left_column.add_child(_terminal_row(lb, i, true))
-		var rb := make_button("Plug%d" % i, "")
-		rb.custom_minimum_size = Vector2(190, 52)
-		rb.pressed.connect(_on_right_pressed.bind(i))
-		right_buttons.append(rb)
-		right_column.add_child(_terminal_row(rb, i, false))
-	hint_label = _label("Hint", UiTheme.HEADING)
-	play_area.add_child(hint_label)
+		var plug := _hit_button("Plug%d" % i)
+		plug.action_mode = BaseButton.ACTION_MODE_BUTTON_RELEASE
+		plug.pressed.connect(_on_left_pressed.bind(i))
+		plug.button_down.connect(_on_left_down.bind(i))
+		left_buttons.append(plug)
+	for j in Rule.PAIRS:
+		var socket := _hit_button("Socket%d" % j)
+		socket.pressed.connect(_on_right_pressed.bind(j))
+		right_buttons.append(socket)
+	for i in Rule.PAIRS:
+		var up := posmod(i - 1, Rule.PAIRS)
+		var down := posmod(i + 1, Rule.PAIRS)
+		left_buttons[i].focus_neighbor_top = NodePath("../Plug%d" % up)
+		left_buttons[i].focus_neighbor_bottom = NodePath("../Plug%d" % down)
+		left_buttons[i].focus_neighbor_right = NodePath("../Socket%d" % i)
+		right_buttons[i].focus_neighbor_top = NodePath("../Socket%d" % up)
+		right_buttons[i].focus_neighbor_bottom = NodePath("../Socket%d" % down)
+		right_buttons[i].focus_neighbor_left = NodePath("../Plug%d" % i)
+	marks = DrawBox.new()
+	marks.name = "Marks"
+	marks.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	marks.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	marks.painter = _paint_marks
+	canvas.add_child(marks)
+	canvas.resized.connect(_place)
 	reset_requested.connect(func() -> void:
 		_selected = -1
 		send_move("reset", 0))
+	set_cue("Match the shapes [Enter]")
 	ui_ready = true
 	refresh_from_host()
 
 
-func _terminal_row(button: Button, index: int, left: bool) -> HBoxContainer:
-	var row := HBoxContainer.new()
-	row.name = ("CableRow%d" if left else "PlugRow%d") % index
-	var chip := make_symbol_chip(0, Color.WHITE)
-	chip.name = "Symbol"
-	if left:
-		row.add_child(chip)
-		row.add_child(button)
-	else:
-		row.add_child(button)
-		row.add_child(chip)
-	return row
+func _hit_button(node_name: String) -> Button:
+	var b := Button.new()
+	b.name = node_name
+	b.flat = true
+	b.focus_mode = Control.FOCUS_ALL
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.focus_entered.connect(_repaint)
+	b.focus_exited.connect(_repaint)
+	b.mouse_entered.connect(_repaint)
+	b.mouse_exited.connect(_repaint)
+	canvas.add_child(b)
+	return b
 
 
+## The keyboard starts on the first plug still out.
 func first_focus() -> Control:
-	return cancel_button if pending or left_buttons.is_empty() else left_buttons[0]
+	if pending or left_buttons.is_empty():
+		return cancel_button
+	for i in Rule.PAIRS:
+		if int(_links[i]) < 0 and not succeeded:
+			return left_buttons[i]
+	return left_buttons[0]
 
 
 func _pair_name(pair: int) -> String:
-	return "%s %s %s" % [Rule.LETTERS[pair], Rule.NAMES[pair], Rule.SHAPE_NAMES[pair]]
+	return "%s %s" % [Rule.NAMES[pair], Rule.SHAPE_NAMES[pair]]
 
 
 func _on_host_state(seed_value: int, _puzzle: Dictionary, record: Dictionary) -> void:
 	_layout = Rule.layout(seed_value)
 	_links = Rule.links_of(record)
+	var less := wants_less_motion()
+	var fresh := 0
+	for i in Rule.PAIRS:
+		var seated := int(_links[i]) >= 0
+		var was := _shown_links.size() == Rule.PAIRS and int(_shown_links[i]) >= 0
+		if seated and not was and _shown_links.size() == Rule.PAIRS:
+			fresh += 1
+			_seat[i] = 1.0 if less else 0.0
+			_trace[i] = 1.0 if less else 0.0
+		elif not seated:
+			_seat[i] = 1.0
+			_trace[i] = 0.0
+		elif _shown_links.size() != Rule.PAIRS:
+			_seat[i] = 1.0
+			_trace[i] = 1.0
+		if seated and _selected == i:
+			_selected = -1
+	_shown_links = _links.duplicate()
 	for i in Rule.PAIRS:
 		var lp := int(_layout.left[i])
+		left_buttons[i].tooltip_text = "Plug, %s%s" % [_pair_name(lp), " (in)" if int(_links[i]) >= 0 else ""]
 		var rp := int(_layout.right[i])
-		var locked := int(_links[i]) >= 0
-		left_buttons[i].text = "%s %s cable%s" % [Rule.LETTERS[lp], Rule.NAMES[lp], "  - locked" if locked else ("  - picked" if _selected == i else "")]
-		right_buttons[i].text = "%s %s plug%s" % [Rule.LETTERS[rp], Rule.NAMES[rp], "  - locked" if _links.has(i) else ""]
-		_set_chip(left_buttons[i], lp)
-		_set_chip(right_buttons[i], rp)
-	var done := 0
-	for j: int in _links:
-		done += 1 if j >= 0 else 0
-	if succeeded:
-		hint_label.text = "All four cables are in. The wires work again!"
-	elif _selected >= 0:
-		hint_label.text = "Now pick the plug for the %s cable." % _pair_name(int(_layout.left[_selected]))
-	else:
-		hint_label.text = "Cables connected: %d of %d. Match the letter and the shape." % [done, Rule.PAIRS]
-	canvas.queue_redraw()
+		right_buttons[i].tooltip_text = "Socket, %s%s" % [_pair_name(rp), " (full)" if _links.has(i) else ""]
+	if fresh > 0 and not succeeded:
+		_say("Click! It fits.", &"good")
+	_place()
+	_repaint()
 
 
-func _set_chip(button: Button, pair: int) -> void:
-	var chip := button.get_parent().get_node("Symbol") as DrawBox
-	var shape: int = Rule.SHAPES[pair]
-	var color: Color = Rule.COLORS[pair]
-	chip.painter = paint_symbol_chip.bind(shape, color)
-	chip.queue_redraw()
+func _on_solved() -> void:
+	_selected = -1
+	_say("The relay is live!", &"good")
+
+
+func _say(text: String, kind: StringName) -> void:
+	status_label.text = text
+	status_label.theme_type_variation = UiTheme.GOOD if kind == &"good" else (UiTheme.WARN if kind == &"warn" else &"")
+	flash(text, kind)
 
 
 func _on_left_pressed(i: int) -> void:
 	if _drag_active:
 		return
 	if int(_links[i]) >= 0:
-		hint_label.text = "That cable is already plugged in and locked."
+		_say("That plug is in already.", &"")
 		return
 	_selected = -1 if _selected == i else i
-	refresh_from_host()
+	_repaint()
 
 
 func _on_left_down(i: int) -> void:
@@ -142,8 +209,11 @@ func _on_left_down(i: int) -> void:
 
 
 func _on_right_pressed(j: int) -> void:
+	if _links.has(j):
+		_say("That socket is full.", &"")
+		return
 	if _selected < 0:
-		hint_label.text = "Pick a cable on the left first."
+		_say("Pick a plug first.", &"")
 		return
 	var i := _selected
 	_selected = -1
@@ -164,7 +234,7 @@ func _input(event: InputEvent) -> void:
 		if not _drag_active and _mouse.distance_to(_drag_from) > 10.0:
 			_drag_active = true
 			_selected = -1
-		canvas.queue_redraw()
+		_repaint()
 	elif event is InputEventMouseButton and (event as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT and not event.is_pressed():
 		var from := _drag_left
 		var was_active := _drag_active
@@ -173,16 +243,14 @@ func _input(event: InputEvent) -> void:
 			var target := _right_under((event as InputEventMouseButton).global_position)
 			if target >= 0:
 				_connect(from, target)
-			else:
-				hint_label.text = "Drop the cable onto a plug on the right."
-			# Let the left button's own release run first, then clear the flag.
+			# Let the plug button's own release run first, then clear the flag.
 			set_deferred(&"_drag_active", false)
-		canvas.queue_redraw()
+		_repaint()
 
 
 func _right_under(global_point: Vector2) -> int:
 	for j in right_buttons.size():
-		if right_buttons[j].get_global_rect().grow(6.0).has_point(global_point):
+		if right_buttons[j].get_global_rect().grow(10.0).has_point(global_point):
 			return j
 	return -1
 
@@ -193,50 +261,258 @@ func _explain_rejection(_move: Dictionary) -> String:
 	if i < 0 or j < 0:
 		return ""
 	if int(_links[i]) >= 0:
-		return "That cable is already plugged in and locked."
+		return "That plug is in already."
 	if _links.has(j):
-		return "That plug already has a cable in it. Try another plug."
-	var want := int(_layout.left[i])
-	var got := int(_layout.right[j])
-	return "Not that one: the %s cable needs the %s plug, but this plug is %s. The cable comes back out - try again." % [_pair_name(want), _pair_name(want), _pair_name(got)]
+		return "That socket is full."
+	_shake_socket = j
+	_shake_left = SHAKE_SECONDS
+	_repaint()
+	return "Not that one. Match the shape!"
+
+
+func _process(delta: float) -> void:
+	super._process(delta)
+	if canvas == null or not canvas.is_visible_in_tree():
+		return
+	var less := wants_less_motion()
+	for i in Rule.PAIRS:
+		_seat[i] = 1.0 if less else move_toward(_seat[i], 1.0, delta / SEAT_SECONDS)
+		if _seat[i] >= 1.0 and int(_links[i]) >= 0:
+			_trace[i] = 1.0 if less else move_toward(_trace[i], 1.0, delta / TRACE_SECONDS)
+	if _shake_left > 0.0:
+		_shake_left -= delta
+		if _shake_left <= 0.0:
+			_shake_socket = -1
+	_repaint()
+
+
+func _repaint() -> void:
+	if canvas == null or marks == null:
+		return
+	canvas.queue_redraw()
+	marks.queue_redraw()
+
+
+# ---------------------------------------------------------------- layout
+
+func _p(v: Vector2) -> Vector2:
+	return _origin + v * _k
+
+
+func _r(rect: Rect2) -> Rect2:
+	return Rect2(_p(rect.position), rect.size * _k)
+
+
+func _place() -> void:
+	if canvas == null or canvas.size.x <= 0.0 or canvas.size.y <= 0.0:
+		return
+	_k = minf(canvas.size.x / DESIGN.x, canvas.size.y / DESIGN.y)
+	_origin = ((canvas.size - DESIGN * _k) * 0.5).round()
+	for i in Rule.PAIRS:
+		var rect := _plug_rect(i, 1.0).grow(6.0)
+		if int(_links[i]) >= 0:
+			rect.size.x = minf(rect.size.x, _socket_rect(int(_links[i])).position.x - rect.position.x - 4.0)
+		left_buttons[i].position = rect.position
+		left_buttons[i].size = rect.size
+	for j in Rule.PAIRS:
+		var rect := _socket_rect(j).grow(6.0)
+		right_buttons[j].position = rect.position
+		right_buttons[j].size = rect.size
+
+
+## The plug of left terminal i, where it is drawn: in its dock, or (seat 0..1 of the way) in its socket.
+func _plug_rect(i: int, seat: float) -> Rect2:
+	var h := PLUG_W * PLUG_SRC.y / PLUG_SRC.x
+	var dock := Rect2(DOCK_X, float(ROW_Y[i]) - h * 0.5, PLUG_W, h)
+	var j := int(_links[i])
+	if j < 0:
+		return _r(dock)
+	var socket := _socket_design(j)
+	# The prongs disappear under the socket's frame, the nose stops at the hole's rim.
+	var seated := Rect2(socket.position.x + SOCKET_W * 0.2 - PLUG_W, socket.get_center().y - h * 0.5, PLUG_W, h)
+	return _r(Rect2(seated.position - Vector2(36.0 * (1.0 - seat), 0.0), dock.size))
+
+
+func _socket_design(j: int) -> Rect2:
+	return Rect2(SOCKET_X - SOCKET_W * 0.5, float(ROW_Y[j]) - SOCKET_W * 0.5, SOCKET_W, SOCKET_W)
+
+
+func _socket_rect(j: int) -> Rect2:
+	var rect := _r(_socket_design(j))
+	if j == _shake_socket and _shake_left > 0.0 and not wants_less_motion():
+		rect.position.x += sin(_shake_left * 40.0) * 6.0 * (_shake_left / SHAKE_SECONDS)
+	return rect
+
+
+## Where the cable of left terminal i leaves the conduit.
+func _cable_root(i: int) -> Vector2:
+	return _p(Vector2(TRUNK.end.x - 4.0, float(ROW_Y[i])))
+
+
+## The trace from socket j to the relay, as a polyline.
+func _trace_path(j: int) -> PackedVector2Array:
+	var y := float(ROW_Y[j])
+	var entry := float(ENTRY_Y[j])
+	var x := float(RUN_X[j])
+	var start := SOCKET_X + SOCKET_W * 0.5 - 2.0
+	var end := RELAY_RECT.position.x + 24.0
+	return PackedVector2Array([_p(Vector2(start, y)), _p(Vector2(x, y)), _p(Vector2(x, entry)), _p(Vector2(end, entry))])
 
 
 # ---------------------------------------------------------------- drawing
 
-func _end_y(button: Button) -> float:
-	return button.get_global_rect().get_center().y - canvas.get_global_rect().position.y
-
-
-func _draw_cables(box: Control) -> void:
-	var w := box.size.x
-	box.draw_rect(Rect2(Vector2.ZERO, box.size), BOARD_BG)
-	box.draw_rect(Rect2(Vector2.ZERO, box.size), METAL, false, 4.0)
-	# Terminal posts on both edges.
-	for k in Rule.PAIRS:
-		if k < left_buttons.size():
-			box.draw_circle(Vector2(8, _end_y(left_buttons[k])), 7.0, METAL_DARK)
-			box.draw_circle(Vector2(w - 8, _end_y(right_buttons[k])), 7.0, METAL_DARK)
+func _paint_equipment(c: Control) -> void:
+	Kit.bay(c, Rect2(Vector2.ZERO, c.size))
+	if _k <= 0.0:
+		return
+	_draw_relay(c)
+	_draw_traces(c)
+	# The patch bay plate with its four sockets.
+	Kit.housing(c, _r(BAY_PLATE), 16.0 * _k)
+	for j in Rule.PAIRS:
+		_draw_socket(c, j)
+	# The conduit the cables come out of.
+	Kit.box(c, _r(TRUNK), Kit.METAL_DARK, 12.0 * _k, Kit.BAY_LIP, 2.0)
+	Kit.hazard_stripes(c, _r(Rect2(TRUNK.position.x + 6.0, TRUNK.position.y + 6.0, TRUNK.size.x - 12.0, 14.0)), 3)
 	for i in Rule.PAIRS:
-		if i >= left_buttons.size() or int(_links[i]) < 0:
+		var at := _p(Vector2(TRUNK.end.x - 6.0, float(ROW_Y[i])))
+		c.draw_circle(at, 13.0 * _k, Kit.INK)
+		c.draw_circle(at, 9.0 * _k, Kit.METAL)
+	# Empty dock clips for the plugs that are in.
+	for i in Rule.PAIRS:
+		var dock := _r(Rect2(DOCK_X + 30.0, float(ROW_Y[i]) - 30.0, PLUG_W - 60.0, 60.0))
+		Kit.box(c, dock, Color(0, 0, 0, 0.18), 10.0 * _k, Color(Kit.BAY_LIP, 0.6), 2.0)
+	# Cables and plugs: the ones in their sockets first, the held one last (on top).
+	var order: Array = []
+	for i in Rule.PAIRS:
+		if int(_links[i]) >= 0:
+			order.push_front(i)
+		elif i != _selected and i != _drag_left:
+			order.append(i)
+	for i in Rule.PAIRS:
+		if not order.has(i):
+			order.append(i)
+	for i: int in order:
+		_draw_cable_and_plug(c, i)
+	# The socket frames go over the seated plugs' prongs.
+	for j in Rule.PAIRS:
+		if _links.has(j):
+			_draw_socket(c, j)
+
+
+func _draw_relay(c: Control) -> void:
+	var rect := _r(RELAY_RECT)
+	var stand := Rect2(rect.position.x + rect.size.x * 0.3, rect.end.y - 10.0 * _k, rect.size.x * 0.4, 28.0 * _k)
+	Kit.box(c, stand, Kit.METAL_DARK, 6.0, Kit.BAY_LIP, 2.0)
+	var t := Kit.tex("relay/relay")
+	if t != null:
+		c.draw_texture_rect(t, rect, false)
+	var k := rect.size.x / RELAY_SRC.x
+	var lens := rect.position + LENS * k
+	var done := 0
+	var lit := 0.0
+	for i in Rule.PAIRS:
+		if int(_links[i]) >= 0:
+			done += 1
+			lit += _trace[i]
+	var good: Color = UiTheme.palette().good
+	if lit > 0.0:
+		var beat := 1.0 if wants_less_motion() else 0.85 + 0.15 * Kit.pulse(1.2)
+		var share := lit / float(Rule.PAIRS)
+		var glow := Kit.HAZARD.lerp(good.lightened(0.3), 1.0 if lit >= float(Rule.PAIRS) - 0.01 else 0.0)
+		c.draw_circle(lens, LENS_R * k * (0.55 + 0.45 * share), Color(glow, 0.55 * share * beat))
+		c.draw_circle(lens, LENS_R * k * 0.55 * share, Color(1, 1, 0.9, 0.85 * share))
+		if lit >= float(Rule.PAIRS) - 0.01:
+			for n in 8:
+				var a := TAU * float(n) / 8.0
+				c.draw_line(lens + Vector2.from_angle(a) * LENS_R * k * 1.15, lens + Vector2.from_angle(a) * LENS_R * k * 1.45,
+					Color(good.lightened(0.4), 0.9 * beat), maxf(2.0, 5.0 * k), true)
+	Kit.pips(c, Vector2(rect.get_center().x, rect.end.y + 46.0 * _k), Rule.PAIRS, done, maxf(5.0, 9.0 * _k))
+
+
+func _draw_traces(c: Control) -> void:
+	var width := maxf(3.0, 9.0 * _k)
+	for j in Rule.PAIRS:
+		var path := _trace_path(j)
+		_stroke(c, path, width + 4.0, Kit.INK)
+		_stroke(c, path, width, TRACE_OFF)
+	for j in Rule.PAIRS:
+		var i := _links.find(j)
+		if i < 0 or _trace[i] <= 0.0:
 			continue
-		_cable(box, Vector2(8, _end_y(left_buttons[i])), Vector2(w - 8, _end_y(right_buttons[int(_links[i])])), int(_layout.left[i]), true)
-	var hover := -1
-	if _drag_left >= 0 and _drag_active:
-		var local := _mouse - box.get_global_rect().position
-		hover = _right_under(_mouse)
-		var end := Vector2(w - 8, _end_y(right_buttons[hover])) if hover >= 0 else local
-		_cable(box, Vector2(8, _end_y(left_buttons[_drag_left])), end, int(_layout.left[_drag_left]), false)
-	elif _selected >= 0 and _selected < left_buttons.size():
-		var start := Vector2(8, _end_y(left_buttons[_selected]))
-		_cable(box, start, start + Vector2(w * 0.25, 30.0), int(_layout.left[_selected]), false)
-	if hover >= 0:
-		box.draw_arc(Vector2(w - 8, _end_y(right_buttons[hover])), 14.0, 0.0, TAU, 32, UiTheme.palette().focus, 3.0)
+		var path := _trace_path(j)
+		var total := _length(path)
+		var color: Color = Rule.COLORS[int(_layout.right[j])]
+		var lit := _slice(path, 0.0, total * _trace[i])
+		_stroke(c, lit, width + 6.0, Color(color, 0.25))
+		_stroke(c, lit, width, color)
+		# Sparks running towards the relay (motion and shape, not colour alone).
+		var phase := 0.25 if wants_less_motion() else fposmod(float(Time.get_ticks_msec()) * 0.001 * 0.7, 1.0)
+		for n in 3:
+			var at := fposmod(phase + float(n) / 3.0, 1.0) * total
+			if at <= total * _trace[i]:
+				c.draw_circle(_slice(path, at, at)[0], width * 0.42, Color(1, 1, 0.92, 0.95))
+	# The relay's input pins.
+	for j in Rule.PAIRS:
+		var p := _trace_path(j)
+		c.draw_circle(p[p.size() - 1], width * 0.8, Kit.INK)
+		c.draw_circle(p[p.size() - 1], width * 0.55, Kit.METAL if _links.find(j) < 0 else Color.WHITE)
 
 
-func _cable(box: Control, a: Vector2, b: Vector2, pair: int, plugged: bool) -> void:
+func _draw_socket(c: Control, j: int) -> void:
+	var rect := _socket_rect(j)
+	var t := Kit.tex("relay/socket")
+	if t != null:
+		c.draw_texture_rect(t, rect, false)
+	var centre := rect.get_center()
+	var r := rect.size.x * HOLE_R
+	var pair := int(_layout.right[j])
 	var color: Color = Rule.COLORS[pair]
-	var dx := maxf(40.0, absf(b.x - a.x) * 0.45)
-	var sag := 18.0
+	var kind: int = KIT_SHAPE[int(Rule.SHAPES[pair])]
+	var i := _links.find(j)
+	if i >= 0 and _seat[i] >= 1.0:
+		# Seated: the plug's lit face fills the hole.
+		c.draw_circle(centre, r, color.darkened(0.35))
+		c.draw_circle(centre, r * 0.86, color)
+		Kit.shape(c, kind, centre, r * 0.5, Color.WHITE)
+		return
+	# Empty: the shape key, a hollow outline of the shape in the pair's colour.
+	c.draw_circle(centre, r, Color(0.02, 0.025, 0.03))
+	Kit.shape(c, kind, centre, r * 0.62, color, color.darkened(0.45))
+	Kit.shape(c, kind, centre, r * 0.36, Color(0.03, 0.035, 0.04), Color(0.03, 0.035, 0.04))
+
+
+func _draw_cable_and_plug(c: Control, i: int) -> void:
+	var pair := int(_layout.left[i])
+	var color: Color = Rule.COLORS[pair]
+	var rect := _plug_rect(i, _seat[i])
+	var held := false
+	if i == _drag_left and _drag_active:
+		var local := _mouse - c.get_global_rect().position
+		var target := _right_under(_mouse)
+		if target >= 0:
+			local = _socket_rect(target).get_center() - Vector2(_socket_rect(target).size.x * 0.35, 0.0)
+		rect.position = local - Vector2(rect.size.x * 0.92, rect.size.y * 0.5)
+		held = true
+	elif i == _selected:
+		rect.position += Vector2(26.0, -6.0) * _k
+		held = true
+	var cord := Vector2(rect.position.x + 2.0 * _k, rect.get_center().y)
+	_cable(c, _cable_root(i), cord, color)
+	if held:
+		Kit.box(c, Rect2(rect.position + Vector2(6, 10) * _k, rect.size), Color(0, 0, 0, 0.35), 18.0 * _k)
+	var t := Kit.tex("relay/plug")
+	if t != null:
+		c.draw_texture_rect(t, rect, false, color.lightened(0.15))
+	# The plug's shape, stamped on its body.
+	var body := rect.position + Vector2(rect.size.x * 0.47, rect.size.y * 0.5)
+	Kit.shape(c, KIT_SHAPE[int(Rule.SHAPES[pair])], body, rect.size.y * 0.27, Color.WHITE)
+
+
+## A thick, slightly sagging cable with a dark edge.
+func _cable(c: Control, a: Vector2, b: Vector2, color: Color) -> void:
+	var dx := maxf(30.0 * _k, absf(b.x - a.x) * 0.45)
+	var sag := 26.0 * _k
 	var c1 := a + Vector2(dx, sag)
 	var c2 := b + Vector2(-dx, sag)
 	var pts := PackedVector2Array()
@@ -244,11 +520,84 @@ func _cable(box: Control, a: Vector2, b: Vector2, pair: int, plugged: bool) -> v
 		var t := float(s) / 32.0
 		var u := 1.0 - t
 		pts.append(a * u * u * u + c1 * 3.0 * u * u * t + c2 * 3.0 * u * t * t + b * t * t * t)
-	box.draw_polyline(pts, Color(0.08, 0.08, 0.1), 11.0, true)
-	box.draw_polyline(pts, color, 6.0, true)
-	var mid := pts[16]
-	draw_symbol(box, int(Rule.SHAPES[pair]), mid, 8.0, color, Color(0.08, 0.08, 0.1))
-	box.draw_circle(a, 6.0, color)
-	if plugged:
-		box.draw_circle(b, 6.0, color)
-		box.draw_circle(b, 2.5, LAMP_GOOD)
+	c.draw_polyline(pts, CABLE_EDGE, maxf(6.0, 22.0 * _k), true)
+	c.draw_polyline(pts, color.darkened(0.15), maxf(4.0, 15.0 * _k), true)
+	c.draw_polyline(pts, Color(1, 1, 1, 0.25), maxf(1.5, 4.0 * _k), true)
+
+
+## The shared marks over the buttons: hover, the target ring (the plug to pick; while a plug is held, every free
+## socket), the focus ring, a tick on each seated socket and an amber cross on a refused one.
+func _paint_marks(c: Control) -> void:
+	if _k <= 0.0:
+		return
+	var less := wants_less_motion()
+	for list: Array in [left_buttons, right_buttons]:
+		for b: Button in list:
+			if b.is_hovered() and not b.disabled and not b.has_focus():
+				Kit.box(c, Rect2(b.position, b.size).grow(-2.0), Color(1, 1, 1, 0.05), 14.0 * _k, Color(1, 1, 1, 0.5), 2.0)
+	if not succeeded and not pending:
+		var holding := _selected >= 0 or (_drag_left >= 0 and _drag_active)
+		if holding:
+			for j in Rule.PAIRS:
+				if not _links.has(j):
+					Kit.target_ring(c, _socket_rect(j).grow(4.0), 16.0 * _k, less)
+		else:
+			for i in Rule.PAIRS:
+				if int(_links[i]) < 0:
+					Kit.target_ring(c, _plug_rect(i, 1.0).grow(2.0), 18.0 * _k, less)
+					break
+	for list: Array in [left_buttons, right_buttons]:
+		for b: Button in list:
+			if b.has_focus():
+				var rect := Rect2(b.position, b.size).grow(-2.0)
+				var at := left_buttons.find(b)
+				if at >= 0 and at == _selected:
+					rect.position += Vector2(26.0, -6.0) * _k
+				Kit.focus_ring(c, rect, 16.0 * _k, 4.0)
+	for j in Rule.PAIRS:
+		var rect := _socket_rect(j)
+		var badge := rect.position + Vector2(rect.size.x * 0.92, rect.size.y * 0.1)
+		var i := _links.find(j)
+		if i >= 0 and _seat[i] >= 1.0:
+			Kit.tick(c, badge, maxf(9.0, 15.0 * _k))
+		elif j == _shake_socket:
+			Kit.cross(c, badge, maxf(9.0, 15.0 * _k))
+
+
+static func _length(path: PackedVector2Array) -> float:
+	var total := 0.0
+	for i in range(1, path.size()):
+		total += path[i - 1].distance_to(path[i])
+	return total
+
+
+## The part of a polyline between two distances along it.
+static func _slice(path: PackedVector2Array, from: float, to: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	var walked := 0.0
+	for i in range(1, path.size()):
+		var length := path[i - 1].distance_to(path[i])
+		if length <= 0.0:
+			continue
+		var start := walked
+		walked += length
+		if walked < from:
+			continue
+		if out.is_empty():
+			out.append(path[i - 1].lerp(path[i], clampf((from - start) / length, 0.0, 1.0)))
+		if walked >= to:
+			out.append(path[i - 1].lerp(path[i], clampf((to - start) / length, 0.0, 1.0)))
+			return out
+		out.append(path[i])
+	if out.is_empty() and not path.is_empty():
+		out.append(path[path.size() - 1])
+	return out
+
+
+## A thick line along a polyline with round corners.
+static func _stroke(c: Control, path: PackedVector2Array, width: float, color: Color) -> void:
+	for i in range(1, path.size()):
+		c.draw_line(path[i - 1], path[i], color, width, true)
+		c.draw_circle(path[i - 1], width * 0.5, color)
+	if path.size() > 1:
+		c.draw_circle(path[path.size() - 1], width * 0.5, color)
