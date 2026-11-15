@@ -13,6 +13,12 @@ extends RefCounted
 ##   test   payload = 0                    the self-test: both leads seated -> repaired (complete)
 ##   reset  payload = 0                    pull both leads out again
 ## Pure and static: validate() never uses randomness or the clock.
+##
+## Two-player task (owner, 2026-11-15): one player plugs in the left machine (heal station), a DIFFERENT player plugs in
+## the right one (CT scanner). state.by keeps the peer that seated each lead; a player who already seated one lead is
+## refused the other. With both machines on, either player may run the self-test. RepairRuntime passes the mover's peer
+## id as move.peer and lets several players hold this task at once (RepairRuntime.SHARED_TASKS). A move without a peer
+## (headless tests) skips the two-player check.
 
 const LEADS := 2
 const SOCKETS := 4
@@ -39,7 +45,7 @@ static func initial_state(puzzle_seed: int) -> Dictionary:
 		var keep: Variant = order[i]
 		order[i] = order[j]
 		order[j] = keep
-	return {"seed": puzzle_seed, "step": 0, "sockets": order, "plugged": [-1, -1], "tested": false}
+	return {"seed": puzzle_seed, "step": 0, "sockets": order, "plugged": [-1, -1], "by": [-1, -1], "tested": false}
 
 
 ## The host's puzzle_state when it is a valid state of this seed, else the seeded start (plain ints, JSON-safe).
@@ -61,7 +67,13 @@ static func current_state(task: Dictionary) -> Dictionary:
 		var socket: int = plugged[lead]
 		if socket != -1 and (socket < 0 or socket >= SOCKETS or int(start.sockets[socket]) != int(LEAD_INFO[lead][1])):
 			return start
-	return {"seed": puzzle_seed, "step": int(ps.step), "sockets": start.sockets, "plugged": plugged, "tested": bool(ps.get("tested", false))}
+	var by: Array = [-1, -1]
+	var raw_by: Variant = ps.get("by", [])
+	if raw_by is Array and (raw_by as Array).size() == LEADS:
+		for lead in LEADS:
+			by[lead] = int(raw_by[lead]) if int(plugged[lead]) != -1 else -1
+	return {"seed": puzzle_seed, "step": int(ps.step), "sockets": start.sockets, "plugged": plugged, "by": by,
+		"tested": bool(ps.get("tested", false))}
 
 
 static func validate(task: Dictionary, move: Dictionary) -> Dictionary:
@@ -80,7 +92,11 @@ static func validate(task: Dictionary, move: Dictionary) -> Dictionary:
 				return refused
 			if not fits(state, lead, socket):
 				return refused
+			var peer := int(move.get("peer", -1))
+			if peer >= 0 and int(state.by[1 - lead]) == peer:
+				return refused
 			plugged[lead] = socket
+			state.by[lead] = peer
 		"test":
 			if payload != 0 or plugged.has(-1):
 				return refused
@@ -89,6 +105,7 @@ static func validate(task: Dictionary, move: Dictionary) -> Dictionary:
 			if payload != 0 or plugged == [-1, -1]:
 				return refused
 			state.plugged = [-1, -1]
+			state.by = [-1, -1]
 		_:
 			return refused
 	state.step = int(state.step) + 1
@@ -106,6 +123,12 @@ static func progress_of(state: Dictionary) -> float:
 	for p: Variant in state.plugged:
 		seated += 1 if int(p) != -1 else 0
 	return minf(0.99, PLUG_SHARE * float(seated))
+
+
+## True when `peer` already seated the OTHER machine's lead, so this one is the partner's job.
+static func partners_job(state: Dictionary, lead: int, peer: int) -> bool:
+	var by: Array = state.get("by", [-1, -1])
+	return peer >= 0 and lead >= 0 and lead < LEADS and by.size() == LEADS and int(by[1 - lead]) == peer
 
 
 static func lead_kind(lead: int) -> int:

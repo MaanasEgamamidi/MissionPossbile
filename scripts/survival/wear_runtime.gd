@@ -71,7 +71,7 @@ func check(ctx: ActionService.Context) -> ActionResult:
 		return ActionResult.failure(ctx.request.request_id, &"unsafe_maintenance", "Use a functional suit or return to safe pressure before maintenance.")
 	if not _valid_operator(ctx.session, ctx.actor, task, int(ctx.request.params.generation)):
 		return ActionResult.failure(ctx.request.request_id, &"wrong_room", "Stand beside this equipment with the required healthy specialist.")
-	if jobs.has(task_id) or ctx.session.repair_runtime.locks.has(task_id):
+	if jobs.has(task_id) or ctx.session.repair_runtime.is_locked(task_id):
 		return ActionResult.failure(ctx.request.request_id, &"task_busy", "Another operation is already using this equipment.")
 	if float(task.condition) >= 1.0 - EPSILON and not bool(task.get("maintenance_fault", false)):
 		return ActionResult.failure(ctx.request.request_id, &"missing_prerequisite", "This equipment is already in full condition.")

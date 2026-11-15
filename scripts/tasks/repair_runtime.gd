@@ -7,6 +7,9 @@ extends RefCounted
 const CLAIM_SECONDS := 30.0
 ## Reach is measured to the whole broken object (2026-11-14), not only the floor anchor.
 const RepairReach := preload("res://scripts/tasks/repair_reach.gd")
+## Two-player tasks (2026-11-15): several players hold a lease on the same task at once, one lease per peer, stored
+## under "<task>@<peer>". The task's rule receives the mover's peer id ("peer" in the move) and decides who may do what.
+const SHARED_TASKS := ["T10"]
 var locks: Dictionary = {}
 var _rules: Dictionary = {}
 var _resume_rules: Dictionary = {}
@@ -17,6 +20,30 @@ func register_rule(task_id: String, validator: Callable, supports_resume := fals
 	if RepairCatalog.TASKS.has(task_id) and validator.is_valid():
 		_rules[task_id] = validator
 		_resume_rules[task_id] = supports_resume
+
+static func is_shared(task_id: String) -> bool:
+	return SHARED_TASKS.has(task_id)
+
+## The lock key of a peer's lease on a task: the task id itself, or "<task>@<peer>" for a two-player task.
+static func lease_key(task_id: String, peer: int) -> String:
+	return "%s@%d" % [task_id, peer] if is_shared(task_id) else task_id
+
+## The task id of a lock key.
+static func task_of(key: String) -> String:
+	return key.get_slice("@", 0)
+
+## True when anyone holds a lease on the task.
+func is_locked(task_id: String) -> bool:
+	for key: String in locks:
+		if task_of(key) == task_id:
+			return true
+	return false
+
+## Drops every lease on the task (all players of a two-player task).
+func unlock_task(task_id: String) -> void:
+	for key: String in locks.keys():
+		if task_of(key) == task_id:
+			locks.erase(key)
 
 func clear_session() -> void:
 	locks.clear()
@@ -34,12 +61,12 @@ func advance(session: SessionService, real_delta: float) -> void:
 
 func prune(session: SessionService) -> void:
 	var changed := false
-	for task_id: String in locks.keys():
-		var lease: Dictionary = locks[task_id]
+	for key: String in locks.keys():
+		var lease: Dictionary = locks[key]
 		var actor := session.state.character(StringName(lease.actor))
-		var task: Dictionary = session.state.repair.tasks.get(task_id, {})
+		var task: Dictionary = session.state.repair.tasks.get(task_of(key), {})
 		if _elapsed >= float(lease.expires) or actor == null or actor.owner_peer != int(lease.peer) or not _eligible(session, actor, task):
-			locks.erase(task_id)
+			locks.erase(key)
 			changed = true
 	if changed:
 		session.events.state_changed.emit(&"repair_lock")
@@ -75,7 +102,7 @@ func check(ctx: ActionService.Context) -> ActionResult:
 		return ActionResult.failure(ctx.request.request_id, &"wrong_specialty", "Switch to %s to work on %s." % [role, task.title])
 	if not _eligible(ctx.session, ctx.actor, task):
 		return ActionResult.failure(ctx.request.request_id, &"wrong_room", "Stand beside this task in its room with a healthy crew member.")
-	var lease: Dictionary = locks.get(task_id, {})
+	var lease: Dictionary = locks.get(lease_key(task_id, ctx.request.peer_id), {})
 	if not lease.is_empty() and (int(lease.peer) != ctx.request.peer_id or String(lease.actor) != String(ctx.actor.id)):
 		return ActionResult.failure(ctx.request.request_id, &"task_busy", "Another crew member is operating this task.")
 	if ctx.request.action in [&"task_claim", &"task_resume"]:
@@ -88,7 +115,7 @@ func check(ctx: ActionService.Context) -> ActionResult:
 		return ActionResult.failure(ctx.request.request_id, &"task_complete", "This fault is already repaired.")
 	if not _rules.has(task_id):
 		return ActionResult.failure(ctx.request.request_id, &"not_available_yet", "This repair puzzle is not installed yet.")
-	var result: Variant = (_rules[task_id] as Callable).call(task.duplicate(true), {"move": ctx.request.params.move, "value": int(ctx.request.params.value)})
+	var result: Variant = (_rules[task_id] as Callable).call(task.duplicate(true), {"move": ctx.request.params.move, "value": int(ctx.request.params.value), "peer": ctx.request.peer_id})
 	if not result is Dictionary or not bool(result.get("accepted", false)):
 		return ActionResult.failure(ctx.request.request_id, &"invalid_move", "That move is not valid for the current puzzle.")
 	var progress := float(result.get("progress", task.progress))
@@ -102,10 +129,11 @@ func check(ctx: ActionService.Context) -> ActionResult:
 func apply(ctx: ActionService.Context) -> Dictionary:
 	var task_id := String(ctx.target.task_id)
 	var task: Dictionary = ctx.state.repair.tasks[task_id]
+	var key := lease_key(task_id, ctx.request.peer_id)
 	if ctx.request.action == &"task_release":
-		locks.erase(task_id)
+		locks.erase(key)
 		return {"task_id": task_id, "released": true}
-	locks[task_id] = {"peer": ctx.request.peer_id, "actor": String(ctx.actor.id), "expires": _elapsed + CLAIM_SECONDS}
+	locks[key] = {"peer": ctx.request.peer_id, "actor": String(ctx.actor.id), "expires": _elapsed + CLAIM_SECONDS}
 	if ctx.request.action != &"task_move":
 		return {"task_id": task_id, "claimed": true, "generation": int(task.fault_generation)}
 	var outcome: Dictionary = _accepted[ctx.request.request_id]
@@ -119,7 +147,7 @@ func apply(ctx: ActionService.Context) -> Dictionary:
 		task.first_completed = true
 		task.broken = false
 		task.condition = 1.0
-		locks.erase(task_id)
+		unlock_task(task_id)
 		ctx.session.wear_runtime.on_task_repaired(ctx.session, task_id)
 		_update_room(ctx.state, String(task.room_id))
 	return {"task_id": task_id, "progress": task.progress, "first_completion": first_completion,
@@ -136,7 +164,7 @@ func force_complete(session: SessionService, task_id: String) -> bool:
 	task.broken = false
 	task.maintenance_fault = false
 	task.condition = 1.0
-	locks.erase(task_id)
+	unlock_task(task_id)
 	session.wear_runtime.on_task_repaired(session, task_id)
 	_update_room(session.state, String(task.room_id))
 	return true
@@ -154,7 +182,7 @@ func begin_fault(state: ColonyState, task_id: String, puzzle_seed: int, conditio
 	task.resume_supported = false
 	task.maintenance_fault = true
 	task.broken = true
-	locks.erase(task_id)
+	unlock_task(task_id)
 	_update_room(state, String(task.room_id))
 	return true
 

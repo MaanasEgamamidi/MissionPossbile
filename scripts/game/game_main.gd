@@ -309,7 +309,7 @@ func _on_menu_host(port: int, continue_save: bool) -> void:
 			_confirm_new = true
 			_main_menu.show_notice("Hosting a new colony replaces your saved one (the old save is kept as a backup). Press Start hosting again to go ahead, or tick \"Continue my saved colony\".")
 			return
-		services.start_new_game()
+		services.start_new_game(-1, &"crew_2")
 	var err := services.net.host(port)
 	if err != OK:
 		_main_menu.show_notice("Could not host on port %d (%s). Another program may be using it: try another port." % [port, error_string(err)])
@@ -386,7 +386,7 @@ func _on_menu_new() -> void:
 		_confirm_new = true
 		_main_menu.show_notice("A new colony replaces your saved one (the old save is kept as a backup). Press New colony again to start.")
 		return
-	services.start_new_game()
+	services.start_new_game(-1, &"crew_2")
 	_begin_play()
 
 
@@ -407,7 +407,7 @@ func _start_or_continue() -> void:
 		# Do not overwrite saves this version cannot read: play under another name and say so.
 		services.saves.save_name += "_new"
 		notice = "The saved game could not be opened (%s). A new game was started beside it." % loaded.status
-	services.start_new_game()
+	services.start_new_game(-1, &"crew_2")
 
 
 ## Outdoor ground: the sampled height grid if it has been built, else a flat plane at y = 0 so nobody falls for ever.

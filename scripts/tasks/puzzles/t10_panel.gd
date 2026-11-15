@@ -12,6 +12,8 @@ extends "res://scripts/tasks/puzzles/med_ui.gd"
 ## amber shake, the plug goes back). Only sends moves; the host rule (t10_rule.gd) decides everything.
 ## Public members read by tests and tools/godot/capture_puzzles.gd: lead_buttons, socket_buttons, test_button, held,
 ## device_state(), _can_drop() / _drop().
+## Two-player task (2026-11-15): one player plugs in the left machine, a different player the right one; either one
+## runs the self-test. The partner's plug shows up live (the panel redraws from the host's state).
 
 const Rule := preload("res://scripts/tasks/puzzles/t10_rule.gd")
 ## Lead colours (designer art values, matching the BP02 leads: green and blue).
@@ -44,6 +46,7 @@ const CABLE := Color(0.09, 0.1, 0.12)
 ## Seconds for the self-test sweep and for a refused socket to shake.
 const TEST_SECONDS := 1.3
 const SHAKE_SECONDS := 0.6
+const PARTNER_LINE := "You did your machine! A second player has to plug in the other one."
 
 var lead_buttons: Array[Button] = []
 var socket_buttons: Array[Button] = []
@@ -69,8 +72,10 @@ func rule_script() -> Script:
 
 func setup(p_services: GameServices) -> void:
 	task_title = "Revive the Med Bay"
-	instructions = ("Two Med Bay machines came unplugged. Put each plug into the socket with the same colour and the "
-		+ "same shape, then press the self-test button. Click a plug and then a socket, or drag it; Tab and Enter work too.")
+	instructions = ("Two-player job! Two Med Bay machines came unplugged. One player plugs in the LEFT machine, a "
+		+ "different player plugs in the RIGHT one: each plug goes into the socket with the same colour and the same "
+		+ "shape. With both on, either player presses the self-test button. Click a plug and then a socket, or drag "
+		+ "it; Tab and Enter work too.")
 	set_cue("Plug in the machines [Enter]")
 	super.setup(p_services)
 	name = "T10EquipmentPanel"
@@ -146,6 +151,9 @@ func pick_lead(lead: int) -> void:
 	if int(puzzle.plugged[lead]) != -1:
 		hint("That plug is in already.")
 		return
+	if _partners_job(lead):
+		hint(PARTNER_LINE)
+		return
 	held = -1 if held == lead else lead
 	_repaint()
 
@@ -176,6 +184,9 @@ func run_test() -> void:
 func _drag_lead(_at: Vector2, lead: int) -> Variant:
 	if pending or succeeded or puzzle.is_empty() or int(puzzle.plugged[lead]) != -1:
 		return null
+	if _partners_job(lead):
+		hint(PARTNER_LINE)
+		return null
 	var holder := Control.new()
 	holder.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var head := DrawBox.new()
@@ -189,6 +200,11 @@ func _drag_lead(_at: Vector2, lead: int) -> Variant:
 	held = -1
 	_repaint()
 	return {"t10_lead": lead}
+
+
+## True when this player already plugged in the other machine, so `lead` is for the second player.
+func _partners_job(lead: int) -> bool:
+	return services != null and Rule.partners_job(puzzle, lead, services.local_peer())
 
 
 func _can_drop(_at: Vector2, data: Variant, _socket: int) -> bool:
@@ -239,6 +255,8 @@ func explain(move: Dictionary) -> String:
 				return "That socket is full."
 			if int(puzzle.plugged[lead]) != -1:
 				return "That plug is in already."
+			if _partners_job(lead):
+				return PARTNER_LINE
 			_shake_socket = socket
 			_shake_left = SHAKE_SECONDS
 			_repaint()
@@ -262,7 +280,8 @@ func praise(move: Dictionary) -> String:
 			if not (puzzle.plugged as Array).has(-1):
 				return "Both on! Now the self-test."
 			var lead := int(move.get("value", 0)) % STEP_BASE / 10
-			return "Click! The heal station is on." if lead == 0 else "Click! The scanner is on."
+			var line := "Click! The heal station is on." if lead == 0 else "Click! The scanner is on."
+			return line + " Now a second player plugs in the other machine."
 		"reset":
 			return "Both plugs are out."
 	return "Done."
