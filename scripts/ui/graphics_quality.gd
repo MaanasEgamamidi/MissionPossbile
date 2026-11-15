@@ -10,6 +10,12 @@ enum Level { LOW, MEDIUM, HIGH, ULTRA }
 
 const NAMES: PackedStringArray = ["Low", "Medium", "High", "Ultra"]
 const DEFAULT_LEVEL := Level.HIGH
+## macOS first launch: Medium. Apple GPUs (M-series) have a fraction of the desktop GPU this look was tuned on.
+const MAC_DEFAULT_LEVEL := Level.MEDIUM
+## macOS: most 3D pixels each preset renders before MetalFX upscales to the window. A Retina window is 2-4x the
+## pixels of 1080p, which is the single biggest cost on a Mac; the UI stays sharp at native resolution.
+const MAC_PIXEL_BUDGET: Array[float] = [1280.0 * 720.0, 1600.0 * 900.0, 1920.0 * 1080.0, 2560.0 * 1440.0]
+const MAC_MIN_SCALE := 0.5
 ## One line per preset for the settings panel.
 const DESCRIPTIONS: PackedStringArray = [
 	"Fastest. Room lights cast no shadows, render at 75 % with FSR upscaling, no reflections or ambient shading.",
@@ -57,6 +63,20 @@ const _P := {
 }
 
 
+## The preset a fresh install starts on for this computer.
+static func default_level() -> int:
+	return MAC_DEFAULT_LEVEL if OS.has_feature("macos") else DEFAULT_LEVEL
+
+
+## The 3D render scale for `level` on a viewport of `pixels` (width x height). Off macOS this is the preset value.
+static func render_scale(level: int, pixels: float, macos := OS.has_feature("macos")) -> float:
+	var scale: float = value("scale", level)
+	if macos and pixels > 0.0:
+		var budget: float = MAC_PIXEL_BUDGET[clampi(level, 0, Level.ULTRA)]
+		scale = clampf(minf(scale, sqrt(budget / pixels)), MAC_MIN_SCALE, 1.0)
+	return snappedf(scale, 0.01)
+
+
 static func level_name(level: int) -> String:
 	return NAMES[clampi(level, 0, NAMES.size() - 1)]
 
@@ -94,11 +114,26 @@ static func apply(tree: SceneTree, level: int, viewport: Viewport = null) -> voi
 static func _apply_viewport(vp: Viewport, level: int) -> void:
 	vp.msaa_3d = value("msaa", level)
 	vp.screen_space_aa = Viewport.SCREEN_SPACE_AA_FXAA if value("fxaa", level) else Viewport.SCREEN_SPACE_AA_DISABLED
-	var scale: float = value("scale", level)
-	vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR if scale < 1.0 else Viewport.SCALING_3D_MODE_BILINEAR
-	vp.scaling_3d_scale = scale
+	_apply_scale(vp, level)
+	if OS.has_feature("macos") and not vp.has_meta(&"gq_resize_hook"):
+		# a Retina window that is resized or moved to another screen gets its render scale recomputed
+		vp.set_meta(&"gq_resize_hook", true)
+		vp.size_changed.connect(func() -> void: _apply_scale(vp, int(vp.get_meta(_META, level))))
+	vp.set_meta(_META, level)
 	vp.mesh_lod_threshold = value("lod_px", level)
 	vp.positional_shadow_atlas_size = value("pos_atlas", level)
+
+
+static func _apply_scale(vp: Viewport, level: int) -> void:
+	var size: Vector2i = (vp as Window).size if vp is Window else (vp as SubViewport).size if vp is SubViewport else Vector2i.ZERO
+	var scale := render_scale(level, float(size.x) * float(size.y))
+	if scale >= 1.0:
+		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
+	elif OS.has_feature("macos"):
+		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_METALFX_SPATIAL  # Apple's own upscaler: sharper than FSR 1 on Apple GPUs
+	else:
+		vp.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR
+	vp.scaling_3d_scale = scale
 
 
 static func _apply_server(level: int) -> void:

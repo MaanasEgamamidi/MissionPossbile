@@ -30,7 +30,7 @@ func _initialize() -> void:
 	_check(low.shadows == 0, "Low: no fixture shadows")
 	_check(low.faded == fixtures.size(), "Low: every fixture fades out with distance")
 	_check(not env.ssao_enabled and not env.ssil_enabled and not env.ssr_enabled and not env.glow_enabled, "Low: SSAO, SSIL, SSR and glow off")
-	_check(root.msaa_3d == Viewport.MSAA_DISABLED and root.scaling_3d_scale < 1.0 and root.scaling_3d_mode == Viewport.SCALING_3D_MODE_FSR, "Low: no MSAA, FSR at 75 %")
+	_check(root.msaa_3d == Viewport.MSAA_DISABLED and root.scaling_3d_scale < 1.0 and root.scaling_3d_mode == _upscaler(), "Low: no MSAA, upscaled from 75 % (MetalFX on macOS, FSR elsewhere)")
 	_check(sun.directional_shadow_max_distance < authored.sun_dist, "Low: shorter sun shadow distance")
 
 	GraphicsQuality.apply(self, GraphicsQuality.Level.MEDIUM)
@@ -54,7 +54,16 @@ func _initialize() -> void:
 	DirAccess.make_dir_recursive_absolute(dir)
 	var path := dir.path_join("graphics_settings.json")
 	var s := GameSettings.new()
-	_check(s.graphics_quality == GraphicsQuality.Level.HIGH, "default preset is High")
+	_check(s.graphics_quality == GraphicsQuality.default_level(), "default preset is High (Medium on macOS)")
+	_check(GraphicsQuality.default_level() == (GraphicsQuality.Level.MEDIUM if OS.has_feature("macos") else GraphicsQuality.Level.HIGH), "platform default level")
+
+	# macOS Retina budget: render pixels capped, never below half resolution, never above full
+	var retina := 2560.0 * 1664.0
+	_check(is_equal_approx(GraphicsQuality.render_scale(GraphicsQuality.Level.HIGH, retina, false), 1.0), "off macOS High renders at full resolution")
+	var mac_high := GraphicsQuality.render_scale(GraphicsQuality.Level.HIGH, retina, true)
+	_check(mac_high < 1.0 and mac_high * mac_high * retina <= 1920.0 * 1080.0 * 1.02, "macOS High on Retina renders about 1080p of pixels (%.2f)" % mac_high)
+	_check(GraphicsQuality.render_scale(GraphicsQuality.Level.LOW, retina * 4.0, true) >= GraphicsQuality.MAC_MIN_SCALE, "macOS scale never drops under the minimum")
+	_check(is_equal_approx(GraphicsQuality.render_scale(GraphicsQuality.Level.HIGH, 1280.0 * 720.0, true), 1.0), "macOS small window renders at full resolution")
 	s.graphics_quality = 9
 	_check(s.graphics_quality == GraphicsQuality.Level.ULTRA, "out of range clamps to Ultra")
 	s.graphics_quality = GraphicsQuality.Level.MEDIUM
@@ -73,7 +82,7 @@ func _initialize() -> void:
 	root.add_child(panel)
 	await process_frame
 	_check(panel.tabs().get_tab_title(2) == "Graphics" and panel.quality_button().item_count == 4, "Graphics tab offers four presets")
-	_check(panel.quality_button().selected == GraphicsQuality.Level.HIGH, "panel shows the current preset")
+	_check(panel.quality_button().selected == GraphicsQuality.default_level(), "panel shows the current preset")
 	panel.quality_button().select(GraphicsQuality.Level.LOW)
 	panel.quality_button().item_selected.emit(GraphicsQuality.Level.LOW)
 	_check(panel.settings.graphics_quality == GraphicsQuality.Level.LOW and GraphicsQuality.applied_level(self) == GraphicsQuality.Level.LOW, "choosing Low in the panel applies it at once")
@@ -98,6 +107,10 @@ func _snapshot(env: Environment, sun: DirectionalLight3D, fixtures: Array[Node])
 	return {"shadows": shadows, "faded": faded, "fade_sum": fade_sum, "ssao": env.ssao_enabled, "ssil": env.ssil_enabled,
 		"ssr": env.ssr_enabled, "ssr_steps": env.ssr_max_steps, "glow": env.glow_enabled, "vol": env.volumetric_fog_enabled,
 		"sun_dist": sun.directional_shadow_max_distance, "sun_mode": sun.directional_shadow_mode}
+
+
+func _upscaler() -> int:
+	return Viewport.SCALING_3D_MODE_METALFX_SPATIAL if OS.has_feature("macos") else Viewport.SCALING_3D_MODE_FSR
 
 
 func _check(ok: bool, what: String) -> void:

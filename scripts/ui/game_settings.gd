@@ -105,8 +105,8 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 			emit_changed()
 
 
-## Graphics preset: GraphicsQuality.Level (0 Low, 1 Medium, 2 High, 3 Ultra).
-@export var graphics_quality: int = GraphicsQuality.DEFAULT_LEVEL:
+## Graphics preset: GraphicsQuality.Level (0 Low, 1 Medium, 2 High, 3 Ultra). Medium on a Mac's first launch.
+@export var graphics_quality: int = GraphicsQuality.default_level():
 	set(v):
 		v = clampi(v, GraphicsQuality.Level.LOW, GraphicsQuality.Level.ULTRA)
 		if v != graphics_quality:

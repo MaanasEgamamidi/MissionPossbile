@@ -181,9 +181,12 @@ static func _hang(mi: MeshInstance3D, suit: Dictionary, index: int) -> PlayerVis
 
 ## Derive display visibility from replicated/saved state, rather than a local interaction animation.
 static func sync(tree: SceneTree, state: ColonyState) -> void:
-	for display in tree.get_nodes_in_group(&"rack_suit_display"):
-		var taken := false
-		for c: CharacterState in state.characters.values():
-			if c.suit_on and String(c.suit_rack) == String(display.get_meta("suit_rack")) and c.suit_slot == int(display.get_meta("suit_slot")):
-				taken = true
-		display.visible = not taken
+	# runs every frame: build the worn slots once, then one lookup per display
+	var worn := {}
+	for c: CharacterState in state.characters.values():
+		if c.suit_on:
+			worn["%s#%d" % [c.suit_rack, c.suit_slot]] = true
+	for display: Node in tree.get_nodes_in_group(&"rack_suit_display"):
+		var shown := not worn.has("%s#%d" % [display.get_meta("suit_rack"), int(display.get_meta("suit_slot"))])
+		if display.visible != shown:
+			display.visible = shown

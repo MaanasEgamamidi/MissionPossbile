@@ -718,6 +718,10 @@ func _process(_delta: float) -> void:
 		for id: String in _item_nodes:
 			var node := _item_nodes[id] as CarryItem
 			var mask := _layers_for(services.zones.zone_at_world(node.global_position))
+			# only walk the item's meshes when its room changed (items keep the meshes they were built with)
+			if int(node.get_meta(&"zone_layer_mask", -1)) == mask:
+				continue
+			node.set_meta(&"zone_layer_mask", mask)
 			for mesh in node.find_children("*", "MeshInstance3D", true, false):
 				(mesh as MeshInstance3D).layers = mask
 		for id: StringName in _crew_visuals:
@@ -728,7 +732,7 @@ func _process(_delta: float) -> void:
 # ---------------------------------------------------------------- input that belongs to the whole game
 
 ## Pitch/demo shortcut. Handle before panel shortcuts; held keys never repeat the grant.
-## Mouse side buttons (demo cheats): forward = every cassette picked up (only that), back = every repair fixed.
+## Mouse side buttons (demo cheats): forward = every cassette picked up and played, back = every repair fixed.
 func _input(event: InputEvent) -> void:
 	if not _playing:
 		return
@@ -737,7 +741,7 @@ func _input(event: InputEvent) -> void:
 		if not mb.pressed or mb.button_index not in [MOUSE_BUTTON_XBUTTON1, MOUSE_BUTTON_XBUTTON2]:
 			return
 		get_viewport().set_input_as_handled()
-		# forward: only the cassettes are picked up (nothing played, nothing repaired); back: every repair fixed
+		# forward: every cassette picked up and played (nothing repaired); back: every repair fixed
 		var action := &"demo_collect_cassettes" if mb.button_index == MOUSE_BUTTON_XBUTTON2 else &"demo_fix_repairs"
 		_demo_request(action)
 		return

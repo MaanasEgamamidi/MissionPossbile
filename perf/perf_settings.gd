@@ -23,6 +23,11 @@ var shader_warmup_enabled := false    # Phase 6: draw every zone once behind the
 # otherwise (decision recorded in docs/perf/phase_1.md).
 var sun_shadow_tuning_enabled := false
 var light_distance_fade_enabled := false
+# Battery / thermals (a fanless MacBook throttles hard when it heats up): while the game window is in the background
+# and you are not hosting or in an online game, cap the frame rate. Online games are never touched, so the host's
+# state and voice ticks keep their pace.
+var background_throttle_enabled := true
+var background_max_fps := 10
 
 # --- Zone system ---
 var warm_hops := 1                    # rooms within this many doors of the current room stay WARM
@@ -63,7 +68,9 @@ var dynamic_resolution_target_fps := 60.0  # the frame rate it holds (the screen
 
 const SWITCHES: Array[StringName] = [&"zones_enabled", &"room_props_enabled", &"exterior_cull_enabled", &"view_activation_enabled",
 	&"colony_lod_enabled", &"visibility_ranges_enabled", &"shader_warmup_enabled", &"sun_shadow_tuning_enabled",
-	&"light_distance_fade_enabled"]
+	&"light_distance_fade_enabled", &"background_throttle_enabled"]
+
+var _fps_before_background := -1
 
 
 func _ready() -> void:
@@ -79,6 +86,33 @@ func _ready() -> void:
 			var kv := a.trim_prefix("--perf-set=").split(":", true, 1)
 			if kv.size() == 2 and kv[0] in self:
 				set_value(StringName(kv[0]), type_convert(kv[1], typeof(get(kv[0]))) if kv[1] != "true" and kv[1] != "false" else kv[1] == "true")
+
+
+func _notification(what: int) -> void:
+	match what:
+		NOTIFICATION_APPLICATION_FOCUS_OUT:
+			if background_throttle_enabled and not _is_online() and _fps_before_background < 0:
+				_fps_before_background = Engine.max_fps
+				Engine.max_fps = background_max_fps
+		NOTIFICATION_APPLICATION_FOCUS_IN:
+			_restore_fps()
+
+
+func _process(_delta: float) -> void:
+	# a game hosted or joined while the window is in the background gets its full frame rate back at once
+	if _fps_before_background >= 0 and (_is_online() or not background_throttle_enabled):
+		_restore_fps()
+
+
+func _restore_fps() -> void:
+	if _fps_before_background >= 0:
+		Engine.max_fps = _fps_before_background
+		_fps_before_background = -1
+
+
+func _is_online() -> bool:
+	var peer := get_tree().root.multiplayer.multiplayer_peer
+	return peer != null and not (peer is OfflineMultiplayerPeer)
 
 
 ## Sets one switch or tunable by name and tells every listener.
