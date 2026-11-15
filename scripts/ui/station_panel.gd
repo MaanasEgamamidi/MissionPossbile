@@ -92,6 +92,9 @@ class UpgradeRow extends PanelContainer:
 ## Shown on stations that have parts not built yet.
 const LATER_NOTE := "More controls arrive with the colony systems update."
 
+const StationSuitRadio := preload("res://scripts/voice/suit_radio.gd")
+const StationColonyBuilds := preload("res://scripts/upgrades/colony_builds.gd")
+
 ## Station id in ColonyState.stations.
 var station_id: StringName = &""
 ## Station kind ("power", "computer", ...).
@@ -123,6 +126,11 @@ var _equipment_status: Dictionary = {}
 var _equipment_pending: Dictionary = {}
 ## Requests sent from a networked client that still wait for the host: request id -> Callable(result).
 var _waiting: Dictionary = {}
+## Core spot of a section (upgrade paths plan §2): its id, the card's summary and day lines and its open button.
+var _section_id := ""
+var _section_summary: Label
+var _section_day: Label
+var _section_button: Button
 
 
 ## Builds the panel once; calling it again does nothing.
@@ -494,7 +502,7 @@ func _build_body() -> void:
 			# Prompt 11: the colony radio's stage and its repair cards (installed at this console).
 			var radio := HBoxContainer.new()
 			_body.add_child(radio)
-			var radio_text := _add_text(radio, CommsStage.stage_text(CommsStage.stage(services.state())))
+			var radio_text := _add_text(radio, StationSuitRadio.status_text(services.state()))
 			radio_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			_add_open_button(radio, "Radio repairs", func() -> UiPanel: return UpgradeCardsPanel.new())
 		"food":
@@ -835,10 +843,27 @@ static func upgrade_gives_text(track: String, next_level: int) -> String:
 	for key: String in effects:
 		var now: Variant = AreaLevels.effect_at(track, key, next_level - 1)
 		var then: Variant = AreaLevels.effect_at(track, key, next_level)
-		if then == null or (now != null and is_equal_approx(float(now), float(then))):
+		if then == null or _same_effect(now, then):
 			continue
-		parts.append(effect_words(track, key, then))
+		# A flag that switches off is never a gift; flags that switch on are new abilities.
+		if then is bool and not bool(then):
+			continue
+		var words_now := effect_words(track, key, then)
+		if words_now != "":
+			parts.append(words_now)
 	return " · ".join(parts)
+
+
+static func _same_effect(a: Variant, b: Variant) -> bool:
+	if a == null:
+		return false
+	var a_num := a is float or a is int
+	var b_num := b is float or b is int
+	if a_num and b_num:
+		return is_equal_approx(float(a), float(b))
+	if typeof(a) != typeof(b):
+		return false
+	return a == b
 
 
 ## One effect of an upgrade path in plain words, for a player of 9 to 12 ("solar panels make 1.5× the power").
@@ -859,10 +884,81 @@ static func effect_words(track: String, key: String, value: Variant) -> String:
 		"health.recovery_health_bonus": return "+%d health when the med bay brings you back" % int(f)
 		"command.drone_range_m": return "the scout drone can fly %d m from the base" % int(f)
 		"scout_drone.speed_mps": return "flies at %s m per second" % num(f, 1)
-		"scout_drone.flight_seconds": return "flies %s minutes on one charge" % num(f / 60.0, 1)
+		"scout_drone.flight_seconds": return "flies %d s on one charge" % roundi(f)
 		"scout_drone.survey_radius_m": return "scans %d m around it" % int(f)
-		"scout_drone.autopilot": return "flies to chosen places by itself" if f >= 1.0 else "you fly it by hand"
-		"scout_drone.max_waypoints": return "remembers %d stop%s on a route" % [int(f), "" if int(f) == 1 else "s"]
+		"scout_drone.vertical_mps": return "climbs at %s m per second" % num(f, 1)
+		"scout_drone.flights_per_sol": return "%d flight%s per sol" % [int(f), "" if int(f) == 1 else "s"]
+		"scout_drone.ability":
+			match str(value):
+				"prescout": return "scouts an area and reports its minerals"
+				"find_known": return "\"find iron\": flies to known ore spots"
+				"scan_anywhere": return "scans anywhere for the ore you ask for"
+			return "you fly it yourself"
+		"day_power.solar_factor": return "solar panels make %s× the power" % num(f, 2)
+		"day_power.panel_cleaning": return "the crew can clean the panels"
+		"day_power.dust_shield": return "a dust shield keeps the panels clean"
+		"day_power.trackers": return "the panels turn to follow the sun"
+		"day_power.multi_junction": return "high-power solar cells"
+		"energy.night_kw", "energy.day_kw": return ""
+		"storm_power.wind_kw": return "wind turbines make about %s kW" % num(f, 1)
+		"use_less.load_factor": return "the base uses %d %% of its old power" % roundi(f * 100.0)
+		"use_less.o2_by_day": return "the oxygen plant runs by day, when the sun shines"
+		"food.calorie_share": return "the farm grows %d %% of the crew's food" % roundi(f * 100.0)
+		"food.water_recovery": return "%d %% of used water comes back" % roundi(f * 100.0)
+		"food.urine_processor": return "a urine processor and air condensers get water back"
+		"food.brine_processor": return "a brine processor squeezes out the last water"
+		"food.laundry_reuse": return "laundry water is used again"
+		"food.water_from_ore": return "water from clay, gypsum and ice"
+		"food.compost": return "a compost bin turns scraps into fertiliser"
+		"food.compost_feeds_farm": return "compost feeds the farm"
+		"food.food_storage_factor": return "stores keep %s× as much food" % num(f, 2)
+		"food.grow_power_factor": return "grow lights use %d %% of the power" % roundi(f * 100.0)
+		"food.closed_loop": return "a closed loop: almost nothing is wasted"
+		"life_support.sabatier": return "a Sabatier reactor gets oxygen back from CO₂"
+		"life_support.o2_from_mars_air": return "makes oxygen from Mars air"
+		"life_support.o2_recovery": return "%d %% of the oxygen comes back" % roundi(f * 100.0)
+		"health.isolation_hours_factor": return "a sick crewmate is back in %d %% of the time" % roundi(f * 100.0)
+		"health.isolation_indoor_work": return "crew in isolation can do indoor work"
+		"health.radiation_care": return "radiation care (still being researched)"
+		"protection.radiation_indoor_factor": return "only %d %% of the radiation gets inside" % roundi(f * 100.0)
+		"protection.storm_shelter": return "a storm shelter for solar storms"
+		"protection.storm_shelter_factor": return "the shelter lets in %s %% of a solar storm" % num(f * 100.0, 0)
+		"protection.suit_o2_hours": return "suits hold %d hours of oxygen" % int(f)
+		"protection.suitports": return "suitports: no air lost, no dust inside"
+		"protection.dust_seals": return "dust-proof seals"
+		"protection.airlock_cycle_factor": return "the airlock cycles %s× as fast" % num(1.0 / maxf(f, 0.01), 1)
+		"lab.identify": return "tells ores apart"
+		"lab.assay": return "a laser spectrometer reads what is in a rock"
+		"lab.xrd": return "an X-ray analyser finds the exact minerals"
+		"lab.materials": return "turns ore into spare parts, glass and bricks"
+		"lab.research": return "a research station opens the last level of other paths"
+		"lab.parts_per_sol_from_ore": return "makes up to %d spare parts a sol from ore" % int(f)
+		"lab.science_factor": return "science goes %s× as fast" % num(f, 2)
+		"ore_survey.survey_rings":
+			if int(f) >= 3:
+				return "ores in the far ring show up"
+			if int(f) == 2:
+				return "ores in the middle ring show up"
+			return "ores near the base show up"
+		"ore_survey.map_overlay": return "ores show on the goals map (J)"
+		"ore_survey.ore_facts": return "each ore says which mission found it"
+		"rover.pressurized_cabin": return "a sealed cabin: no suit oxygen needed inside"
+		"rover.suitport": return "a suitport on the back"
+		"rover.fuel_cell": return "a fuel cell drives it further"
+		"rover.rtg": return "a nuclear power cart tops up the battery"
+		"rover.sample_arm": return "a sample arm tests rocks on site"
+		"command.suit_radio_delay_s":
+			if f < 0.0:
+				return "the suit radio does not send outside"
+			if f <= 0.0:
+				return "the suit radio is instant everywhere"
+			return "the suit radio is %s s late outside" % num(f, 0)
+		"command.suit_radio_garble": return "clear words" if f <= 0.05 else "%d %% crackle on the radio" % roundi(f * 100.0)
+		"command.suit_radio_area_m": return ""
+		"command.storm_warning_factor": return "storm warnings come %s× as early" % num(f, 1)
+		"command.earth_link_factor": return "bigger shipments from Earth (%s×)" % num(f, 2)
+	if value is bool:
+		return key.replace("_", " ") if bool(value) else ""
 	var shown := num(f, 2) if (value is float or value is int) else str(value)
 	return "%s: %s" % [key.replace("_", " "), shown]
 
@@ -875,11 +971,35 @@ static func upgrade_who_text(track: String) -> String:
 	return "the %s specialist" % String(StationPanels.SPECIALTY_WORDS.get(spec, String(spec))).to_lower()
 
 
+## The section whose core spot this station is ("" when it is not a core spot).
+func upgrade_section() -> String:
+	if services == null or not services.has_game():
+		return ""
+	var record: Dictionary = services.state().stations.get(String(station_id), {})
+	return AreaLevels.section_at(String(station_id), record) if not record.is_empty() else ""
+
+
+## The "Choose <section> upgrades" button of a core spot, or null.
+func section_button() -> Button:
+	return _section_button
+
+
+## The section card's summary text at a core spot ("" elsewhere).
+func section_summary_text() -> String:
+	return _section_summary.text if _section_summary != null else ""
+
+
 func _build_upgrades() -> void:
-	var tracks := upgrade_tracks()
 	# Only the station's own surface (StationPanels.for_station) has the strip, not a panel opened from it (the colony
 	# computer's "Scout rover" button opens the scout bay panel for the computer's id).
-	if tracks.is_empty() or not bool(get_meta(&"station_surface", false)):
+	if not bool(get_meta(&"station_surface", false)):
+		return
+	var sec := upgrade_section()
+	if sec != "":
+		_build_section_card(sec)
+		return
+	var tracks := upgrade_tracks()
+	if tracks.is_empty():
 		return
 	var section := VBoxContainer.new()
 	section.name = "Upgrades"
@@ -905,7 +1025,7 @@ func _build_upgrades() -> void:
 		var pip_row := HBoxContainer.new()
 		pip_row.name = "Pips"
 		top.add_child(pip_row)
-		for lvl in range(1, AreaLevels.max_level() + 1):
+		for lvl in range(1, AreaLevels.levels_of(track) + 1):
 			var pip := Label.new()
 			pip.name = "V%d" % lvl
 			pip_row.add_child(pip)
@@ -920,31 +1040,72 @@ func _build_upgrades() -> void:
 		row.cost_label.name = "Cost"
 		row.who_label = _add_text(col, "", UiTheme.MUTED)
 		row.who_label.name = "Who"
-		var buttons := HBoxContainer.new()
-		col.add_child(buttons)
+		# Builds are chosen at the section's core spot (one build a day for the whole colony), so this strip only shows.
 		row.button = Button.new()
 		row.button.name = "UpgradeButton"
-		row.button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-		row.button.pressed.connect(_on_upgrade_pressed.bind(track))
-		buttons.add_child(row.button)
-		row.reason_label = _add_text(col, "", UiTheme.WARN)
+		row.button.visible = false
+		col.add_child(row.button)
+		row.reason_label = _add_text(col, "", UiTheme.MUTED)
 		row.reason_label.name = "Reason"
 		upgrade_rows[track] = row
 
 
+## The core spot's card: every track's level in one line, the day's build state and the button that opens the
+## section panel (scripts/ui/section_panel.gd via StationPanels.section_panel).
+func _build_section_card(sec: String) -> void:
+	_section_id = sec
+	var s := AreaLevels.section(sec)
+	var card := PanelContainer.new()
+	card.name = "Upgrades"
+	card.theme_type_variation = UiTheme.CARD
+	_body.add_child(card)
+	var col := VBoxContainer.new()
+	card.add_child(col)
+	_add_heading(col, "%s  %s upgrades" % [String(s.get("symbol", "●")), String(s.get("name", "Colony"))])
+	_section_summary = _add_text(col, "")
+	_section_summary.name = "Summary"
+	_section_day = _add_text(col, "", UiTheme.MUTED)
+	_section_day.name = "Day"
+	var buttons := HBoxContainer.new()
+	col.add_child(buttons)
+	_section_button = Button.new()
+	_section_button.name = "OpenSection"
+	_section_button.text = "Choose %s upgrades" % String(s.get("name", "")).to_lower()
+	_section_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
+	_section_button.pressed.connect(func() -> void:
+		var p := StationPanels.section_panel(StringName(_section_id), station_id, services)
+		if p != null:
+			open_requested.emit(p))
+	buttons.add_child(_section_button)
+
+
 func _refresh_upgrades(st: ColonyState) -> void:
+	if _section_id != "" and _section_summary != null:
+		var bits := PackedStringArray()
+		for track: String in AreaLevels.section_tracks(_section_id):
+			bits.append("%s V%d/%d" % [AreaLevels.track_name(track), AreaLevels.level(st, track), AreaLevels.levels_of(track)])
+		_section_summary.text = " · ".join(bits)
+		var done := StationColonyBuilds.today(st)
+		var p := StationColonyBuilds.proposal(st)
+		if not done.is_empty():
+			_section_day.text = StationColonyBuilds.DONE_TEXT
+		elif not p.is_empty():
+			_section_day.text = StationColonyBuilds.vote_text_for(st, services.local_character())
+		elif TutorialSystem.tutorial_active(st):
+			_section_day.text = StationColonyBuilds.TUTORIAL_TEXT
+		else:
+			_section_day.text = "One build a day for the whole colony, chosen in the Plan block at %s." % StationColonyBuilds.PLAN_TIME_WORDS
 	if upgrade_rows.is_empty():
 		return
-	var me := services.local_character()
 	for track: String in upgrade_rows:
 		var row := upgrade_rows[track] as UpgradeRow
 		var lvl := AreaLevels.level(st, track)
-		var top_level := AreaLevels.max_level()
+		var top_level := AreaLevels.levels_of(track)
 		for i in row.pips.size():
 			var reached := i + 1 <= lvl
 			row.pips[i].text = "%s V%d" % ["●" if reached else "○", i + 1]
 			row.pips[i].theme_type_variation = UiTheme.GOOD if reached else UiTheme.MUTED
-		row.now_label.text = "Now: %s" % AreaLevels.stage_text(track, lvl)
+		row.now_label.text = "Now: %s" % AreaLevels.stage_text_for(st, track, lvl)
 		var derived := AreaLevels.is_derived(track)
 		var at_top := lvl >= top_level
 		var has_next := not derived and not at_top
@@ -952,7 +1113,7 @@ func _refresh_upgrades(st: ColonyState) -> void:
 		row.gives_label.visible = has_next
 		row.cost_label.visible = has_next
 		row.who_label.visible = has_next
-		row.button.visible = has_next
+		row.button.visible = false
 		if derived:
 			row.reason_label.text = "Upgrade modules in the garage"
 			row.reason_label.theme_type_variation = UiTheme.MUTED
@@ -968,42 +1129,15 @@ func _refresh_upgrades(st: ColonyState) -> void:
 		var gives := upgrade_gives_text(track, next)
 		row.gives_label.text = "It gives: %s" % gives
 		row.gives_label.visible = gives != ""
-		var cost := AreaLevels.cost_to_reach(track, next)
-		row.cost_label.text = "Costs %d spare part%s · the colony has %d" % [cost, "" if cost == 1 else "s", st.parts]
-		row.cost_label.theme_type_variation = UiTheme.GOOD if st.parts >= cost else UiTheme.WARN
-		var spec := StringName(String(AreaLevels.track(track).get("specialty", "")))
-		var mine := me != null and spec != &"" and me.specialty == spec
-		row.who_label.text = "Who can do it: %s%s" % [upgrade_who_text(track), " (you)" if mine else ""]
-		row.button.text = "Upgrade to V%d" % next
-		var blockers := AreaLevels.blockers(st, track, me)
-		row.button.disabled = row.pending or not blockers.is_empty()
-		var reasons := PackedStringArray()
-		for b: Dictionary in blockers:
-			reasons.append("✖ " + String(b.get("text", "")))
-		row.reason_label.text = "\n".join(reasons)
-		row.reason_label.theme_type_variation = UiTheme.WARN
-		row.reason_label.visible = not reasons.is_empty()
-
-
-func _on_upgrade_pressed(track: String) -> void:
-	var row := upgrade_rows.get(track) as UpgradeRow
-	if row == null or row.pending:
-		return
-	row.pending = true
-	row.button.disabled = true
-	_ask(&"upgrade_area", {"track": track}, _on_upgrade_answer.bind(track))
-
-
-func _on_upgrade_answer(result: ActionResult, track: String) -> void:
-	var row := upgrade_rows.get(track) as UpgradeRow
-	if row != null:
-		row.pending = false
-	if result.ok:
-		var text := answer_text(result)
-		_show_message("✓ " + (text if text != "" else "%s upgraded." % AreaLevels.track_name(track)), UiTheme.GOOD)
-	else:
-		_show_refusal(result)
-	refresh()
+		var cost := AreaLevels.cost_of(track, next)
+		var cost_bits := PackedStringArray(["%d spare part%s" % [int(cost.get("parts", 0)), "" if int(cost.get("parts", 0)) == 1 else "s"]])
+		var ores: Dictionary = cost.get("ores", {})
+		for ore: String in ores:
+			cost_bits.append("%d %s" % [int(ores[ore]), AreaLevels.ore_word(ore)])
+		row.cost_label.text = "Costs %s" % " · ".join(cost_bits)
+		row.cost_label.theme_type_variation = UiTheme.GOOD if AreaLevels.can_afford(st, track, next) else UiTheme.WARN
+		row.who_label.text = "Choose it at %s, in the Plan block at %s." % [AreaLevels.spot_words(track), StationColonyBuilds.PLAN_TIME_WORDS]
+		row.reason_label.visible = false
 
 
 # ---------------------------------------------------------------- size

@@ -2,13 +2,15 @@ class_name VitalsBar
 extends PanelContainer
 ## The colony's supplies along the top of the screen: electricity, oxygen, water and food, each with its amount, which
 ## way it is going ("▲ rising", "▼ 2.1 sols" until it runs out, "+2.4 kW") and a thin fill line; then spare parts,
-## science score and ore. The ⋯ button (key H) folds it down to the bare numbers and opens it again; the ? button
+## science score and ore. The ⋯ button (key U; owner 2026-11-15: H is the help key now) folds it down to the bare numbers and opens it again; the ? button
 ## (key F1) opens the science behind the numbers. Clicking a supply opens the power and life-support drawer (key P).
 ## A supply that is running low turns red and says so in words. Read only: it never changes anything.
 
 signal details_requested
 signal help_requested
 signal compact_changed(compact: bool)
+
+const OreCatalog := preload("res://scripts/science/ore_catalog.gd")
 
 const STOCKS := [
 	{"key": &"battery_kwh", "symbol": "⚡", "name": "Electricity", "unit": "kWh", "color": AstraStyle.C_POWER},
@@ -53,10 +55,10 @@ func setup(p_services: GameServices) -> void:
 	_row.add_child(_divider())
 	_more = AstraStyle.flat_button("⋯", 22, AstraStyle.TEXT_2)
 	_more.name = "More"
-	_more.tooltip_text = "Fold the supplies down to the numbers, or open them again (H)"
+	_more.tooltip_text = "Fold the supplies down to the numbers, or open them again (U)"
 	_more.pressed.connect(toggle_compact)
 	_row.add_child(_more)
-	_keys.append(_row_key("H"))
+	_keys.append(_row_key("U"))
 	_help = AstraStyle.flat_button("?", 18, AstraStyle.TEXT_2)
 	_help.name = "Help"
 	_help.tooltip_text = "The science behind these numbers (F1)"
@@ -177,12 +179,25 @@ func refresh() -> void:
 		(it.box as Control).tooltip_text = "%s: %s %s. %s Click or press P for details." % [s.name, value.text, s.unit, t[2]]
 	_parts.text = str(st.parts)
 	_science.text = str(ScoutSystem.science_points(st))
-	var ore := 0
+	# Ore (2026-11-15, ore survey): the identified ore in the colony store (state.ores.stock, OreCatalog) plus the
+	# scout rover's special ore still waiting at the workbench (state.scout.ores); the tooltip lists each ore.
+	var scout_ore := 0
 	for k: String in (st.scout.get("ores", {}) as Dictionary):
-		ore += int(st.scout.ores[k])
-	_ore.text = str(ore)
+		scout_ore += int(st.scout.ores[k])
+	_ore.text = str(OreCatalog.total_stock(st) + scout_ore)
+	var lines := OreCatalog.stock_lines(st)
+	if scout_ore > 0:
+		lines.append("Scout ore for the workbench: %d" % scout_ore)
+	var tip := "Ore in the colony store: %d units. Upgrades spend it." % OreCatalog.total_stock(st)
+	if not lines.is_empty():
+		tip += "\n" + "\n".join(lines)
+	else:
+		tip += "\nNothing yet: walk out in a suit, or send the drone, to find ore deposits."
+	var ore_box := _ore.get_parent() as Control
+	if ore_box != null and ore_box.tooltip_text != tip:
+		ore_box.tooltip_text = tip
 	_more.text = "⋯"
-	_more.tooltip_text = ("Open the supplies again" if compact else "Fold the supplies down to the numbers") + " (H)"
+	_more.tooltip_text = ("Open the supplies again" if compact else "Fold the supplies down to the numbers") + " (U)"
 	for k in _keys:
 		k.visible = not compact
 	_stock_box.visible = true

@@ -1,0 +1,67 @@
+{
+ "schema": 1,
+ "note": "Radiation science text (upgrade paths plan §5.2, research note docs/revisions/research/mars_radiation_food_life.md). Same entry shape as data/explanations.json; source_ids stay empty until the plan's sources 43-49 get S21+ ids in data/sources.json, so each entry lists its references in refs (plan source numbers and URLs). Read by scripts/survival/radiation_system.gd's science panels.",
+ "explanations": {
+  "radiation_msv": {
+   "title": "What is a millisievert (mSv)?",
+   "short": "A millisievert (mSv) measures how much radiation your body takes in.",
+   "long": "Radiation is made of tiny, very fast particles and rays. You cannot see or feel them, but they can damage the cells in your body. Scientists count the dose in millisieverts (mSv). On Earth our air and our planet's magnetic field protect us, so a person gets only about 2 to 3 mSv in a whole year. Each crewmate in the game wears a dose badge that adds up their mSv. Their dose never goes back down.",
+   "source_ids": [],
+   "refs": [{"plan_source": 43, "title": "Curiosity RAD surface dose (Hassler)", "url": "https://www.space.com/23875-mars-radiation-life-manned-mission.html"}]
+  },
+  "radiation_curiosity": {
+   "title": "Curiosity's number: 0.67 mSv a day",
+   "short": "The Curiosity rover measured about 0.67 mSv of radiation per day on the ground on Mars.",
+   "long": "Curiosity carries a radiation detector called RAD. On the surface of Mars it measured about 0.67 mSv every day. That is about 245 mSv in a year, around 100 times what a person gets on Earth. Mars has no global magnetic field and only thin air, so fast particles from deep space (cosmic rays) reach the ground. Out in space on the way to Mars it was even more: about 1.8 mSv a day.",
+   "source_ids": [],
+   "refs": [{"plan_source": 43, "title": "Curiosity RAD surface dose (Hassler)", "url": "https://www.space.com/23875-mars-radiation-life-manned-mission.html"},
+    {"plan_source": 44, "title": "Hassler et al. 2014, Science", "url": "https://doi.org/10.1126/science.1244797"}]
+  },
+  "radiation_limit": {
+   "title": "NASA's limit: 600 mSv",
+   "short": "NASA lets an astronaut take at most 600 mSv in their whole career.",
+   "long": "NASA keeps each astronaut's total dose under 600 mSv over their whole career, so the extra chance of getting cancer later in life stays small (about 3 in 100 or less). A full trip to Mars and back would be about 900 to 1,000 mSv, which is over the limit. That is why shielding matters so much. In the game, a crewmate who reaches 600 mSv gets sick and must rest in isolation in the Med Bay, and after that can do indoor work only.",
+   "source_ids": [],
+   "refs": [{"plan_source": 45, "title": "NASA OCHMO radiation protection brief (600 mSv limit)", "url": "https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf"}]
+  },
+  "radiation_shielding": {
+   "title": "Why shielding works",
+   "short": "Thick walls, especially ones full of water or ice, stop many of the particles before they reach you.",
+   "long": "A particle that hits a wall bumps into its atoms and slows down. Materials with lots of hydrogen, like water, ice and plastic, are the best at this, because hydrogen atoms are about as heavy as the particles they stop. A room lined with water tanks makes a good storm shelter: NASA's Orion capsule cut the storm dose about 4 times this way. Solar storm particles are easy to block. Cosmic rays are much harder: you need metres of soil or ice. About 1 to 1.6 metres of Mars soil keeps the dose under 100 mSv a year.",
+   "source_ids": [],
+   "refs": [{"plan_source": 47, "title": "Zhang et al. 2022, how much soil shields Mars crews", "url": "https://www.space.com/mars-radiation-protection-astronauts-underground"},
+    {"plan_source": 50, "title": "NASA Mars Ice Home", "url": "https://phys.org/news/2016-12-nasa-ice-house-mars.amp"},
+    {"plan_source": 49, "title": "Radiation in Mars lava tubes", "url": "https://arxiv.org/pdf/2004.13156"}]
+  },
+  "radiation_soil_twist": {
+   "title": "The 30 cm soil twist",
+   "short": "A thin layer of soil (about 30 cm) can make the dose slightly WORSE than no soil at all.",
+   "long": "This is a surprise! When a very fast cosmic ray smashes into soil, it breaks atoms apart and makes a shower of new particles (neutrons). In a thin layer, about 30 cm deep, that shower is at its strongest, so the dose under it can be a little higher than with no soil at all. Only a much thicker layer (1 metre or more) soaks up the shower too. That is why the sandbags on the roof (Protection V2) help only a little, and the thick 3D-printed shell (V3) helps a lot.",
+   "source_ids": [],
+   "refs": [{"plan_source": 47, "title": "Zhang et al. 2022, how much soil shields Mars crews", "url": "https://www.space.com/mars-radiation-protection-astronauts-underground"}]
+  },
+  "radiation_solar_storm": {
+   "title": "Solar storms",
+   "short": "Sometimes the Sun throws out a burst of fast particles. With only minutes of warning, the crew must get to the shelter.",
+   "long": "A solar storm (a solar particle event) is a burst of fast particles from the Sun. Big ones happen 1 to 3 times a Mars year when the Sun is most active. The biggest ever seen at Mars, on 20 May 2024, gave Curiosity a dose like about 30 chest X-rays at once. That is not deadly, but astronauts outside would get much more. Warning can be short: NASA wants at least 30 minutes, but sometimes there are only 15 to 20 minutes, or none. A storm can keep the crew in the shelter for hours or days. Better comms give earlier warning.",
+   "source_ids": [],
+   "refs": [{"plan_source": 46, "title": "The May 2024 solar storm at Mars", "url": "https://www.space.com/mars-aurora-radiation-solar-storm-curiosity-rover"},
+    {"plan_source": 74, "title": "NASA, Mars lights up during the May 2024 solar storm", "url": "https://www.nasa.gov/solar-system/planets/mars/nasa-watches-mars-light-up-during-epic-solar-storm/"},
+    {"plan_source": 48, "title": "Löwe et al. 2025, solar-storm warnings on Mars", "url": "https://arxiv.org/abs/2502.02469"}]
+  },
+  "dose_game_scale": {
+   "title": "How the game counts dose (honest note)",
+   "short": "The game speeds up radiation 20 times and makes outside 3 times worse than inside, so you can see it happen in a game.",
+   "long": "At the real rate of 0.67 mSv a day, a crewmate would need about 900 sols (around 300 hours of playing) to reach NASA's limit. So the game counts every real mSv as 20 game mSv: about 13 mSv a sol inside a bare base. In real life, standing outside and sitting in a thin-walled base give about the same dose. The game makes outside 3 times worse so it matters where you are. Solar storms are also played faster: one every 5 to 12 sols instead of 1 to 3 a Mars year (668 sols). Each storm still gives the real warning time (15 to 60 minutes, in game time) and lasts 1 to 3 sols. These are game choices, not NASA numbers.",
+   "source_ids": [],
+   "refs": [{"plan_source": 43, "title": "Curiosity RAD surface dose (Hassler)", "url": "https://www.space.com/23875-mars-radiation-life-manned-mission.html"}]
+  },
+  "radiation_isolation": {
+   "title": "Isolation in the Med Bay",
+   "short": "A crewmate who reaches 600 mSv gets sick and rests in an isolation bed in the Med Bay.",
+   "long": "In the game, a crewmate at NASA's 600 mSv limit gets sick: their health drops and they rest in isolation in the Med Bay for about two sols (less with better medical care). They cannot work or go outside then, so swap to another crewmate (C). After that they can do indoor work only, because their dose never goes down. If every crewmate is in isolation, nobody can run the colony and it is over. Real radiation sickness needs a much bigger dose all at once (about 1,000 mSv); this rule is the game's way of making the career limit count.",
+   "source_ids": [],
+   "refs": [{"plan_source": 45, "title": "NASA OCHMO radiation protection brief (600 mSv limit)", "url": "https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf"}]
+  }
+ }
+}

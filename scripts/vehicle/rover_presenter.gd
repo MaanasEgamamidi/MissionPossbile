@@ -67,6 +67,7 @@ var _send_left := 0.0
 var _state_pose_left := 0.0
 var _stats_left := 0.0
 var _stats := {}
+var _now_stats := {}                # RoverModel.current_stats: real battery, fuel cell, crew and cargo (for the HUD)
 var _cargo_kg := 0.0
 var _live_pose := {}
 var _last_accept_ms := 0
@@ -324,6 +325,7 @@ func _refresh_stats(st: ColonyState, seats: Array) -> void:
 	var levels: Dictionary = st.rover.get("levels", {})
 	_cargo_kg = RoverModel.cargo_mass_kg(st)
 	_stats = RoverModel.stats(levels, _cargo_kg)
+	_now_stats = RoverModel.current_stats(st)
 	var with_cargo := _stats.duplicate()
 	# RoverModel.stats(levels, cargo).mass_kg may or may not include the cargo: add it only if it does not.
 	var empty_mass := float(RoverModel.stats(levels, 0.0).get("mass_kg", 0.0))
@@ -644,14 +646,63 @@ func _update_hud(st: ColonyState, seats: Array, me: CharacterState) -> void:
 		var keys := "%s drive · %s brake · %s get out · %s view" % [_keys_of([&"move_forward", &"move_left", &"move_back", &"move_right"]),
 			_key(&"jump", "Space"), _key(&"interact", "E"), _key(&"toggle_view", "Tab")] if driver else \
 			"%s get out · %s view" % [_key(&"interact", "E"), _key(&"toggle_view", "Tab")]
-		hud_widget.show_seated({"speed_mps": body.linear_velocity.length(), "battery_kwh": battery,
-			"capacity_kwh": float(_stats.get("battery_capacity_kwh", 1.0)), "range_km": float(_stats.get("range_km", 0.0)),
+		var speed := body.linear_velocity.length()
+		var fc := float(_now_stats.get("fuel_cell_kwh", 0.0))
+		var charging := bool(st.rover.get("charging", false)) and String(st.rover.get("charge_status", "")) == "charging"
+		hud_widget.show_seated({"speed_mps": speed, "battery_kwh": battery,
+			"capacity_kwh": float(_stats.get("battery_capacity_kwh", 1.0)),
+			"range_km": float(_now_stats.get("range_km", _stats.get("range_km", 0.0))),
 			"cargo_kg": _cargo_kg, "cargo_capacity_kg": float(_stats.get("cargo_capacity_kg", 0.0)), "seats": names,
-			"seat": mine, "driver": driver, "battery_empty": battery <= 1e-6, "keys": keys})
+			"seat": mine, "driver": driver, "battery_empty": battery <= 1e-6 and fc <= 1e-6, "keys": keys,
+			"heading_deg": heading_deg(), "home_m": home_distance_m(st), "time_left_s": time_left_s(st, speed, battery + fc),
+			"cabin": bool(_now_stats.get("cabin", false)), "sheltered": RoverModel.cabin_sheltered(st, me),
+			"fuel_cell_kwh": fc, "fuel_cell_capacity_kwh": float(_now_stats.get("fuel_cell_capacity_kwh", 0.0)),
+			"rtg_kw": float(_now_stats.get("rtg_kw", 0.0)), "track_level": int(_now_stats.get("track_level", 1)),
+			"charging": charging})
 		hud_widget.show_cue("")
 		return
 	hud_widget.hide_seated()
 	hud_widget.show_cue(cue_for(st, seats))
+
+
+## The rover's heading in degrees, clockwise from north (the map's north is Godot -Z, east +X; the body faces -Z).
+func heading_deg() -> float:
+	var f := -body.global_basis.z
+	if Vector2(f.x, f.z).length_squared() < 1e-8:
+		return 0.0
+	return fposmod(rad_to_deg(atan2(f.x, -f.z)), 360.0)
+
+
+## Horizontal distance from the rover to its home, the garage charger (the garage station if there is no charger), m;
+## -1 when neither is known.
+func home_distance_m(st: ColonyState) -> float:
+	var id := RoverSystem.charger_id(st)
+	if id == "":
+		id = RoverSystem.garage_id(st)
+	var rec: Dictionary = st.stations.get(id, {}) if id != "" else {}
+	if rec.is_empty() or not rec.has("position"):
+		return -1.0
+	var home := CharacterState._v3(rec.position)
+	var p := body.global_position
+	return Vector2(home.x - p.x, home.z - p.z).length()
+
+
+## Real seconds the stored energy (`stored_kwh`: battery plus fuel cell) lasts at the current draw: driving at `speed`
+## m/s with the energy per metre of RoverModel.current_stats (this crew and cargo, the range's terrain allowance),
+## less the RTG trickle. -1 when the rover is (nearly) standing still or the RTG covers the draw.
+func time_left_s(st: ColonyState, speed: float, stored_kwh: float) -> float:
+	if speed < 0.3:
+		return -1.0
+	var b := RoverBalance.get_current()
+	var per_m := float(_now_stats.get("kwh_per_km", 0.0)) * b.range_terrain_factor / 1000.0
+	var draw := speed * per_m                                 # kWh per real second
+	var real_s_per_hour := 3600.0
+	if services != null and services.has_game() and services.clock() != null:
+		real_s_per_hour = maxf(1.0, float(services.clock().sol_minutes) * 60.0 / GameConfig.SOL_HOURS)
+	draw -= RoverModel.rtg_kw(st) / real_s_per_hour
+	if draw <= 1e-9:
+		return -1.0
+	return maxf(0.0, stored_kwh) / draw
 
 
 ## What E would do now, for the line under the crosshair ("" when the rover is not aimed at).

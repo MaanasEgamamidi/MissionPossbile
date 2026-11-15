@@ -114,7 +114,9 @@ func refresh() -> void:
 		_status.text = "Voice starts when you are in a colony with other players. Pick your microphone here."
 	_status.theme_type_variation = UiTheme.WARN if _status.text.begins_with("✖") else UiTheme.GOOD
 	var st := services.state() if services != null and services.has_game() else null
-	_stage_label.text = CommsStage.stage_text(CommsStage.stage(st)) if st != null else CommsStage.stage_text(0) + " (in a colony, this shows its radio.)"
+	# Suit radio (2026-11-15): the comms level decides no signal / delay / garble (scripts/voice/suit_radio.gd).
+	var suit_radio: Variant = load("res://scripts/voice/suit_radio.gd")
+	_stage_label.text = String(suit_radio.status_text(st)) if st != null else CommsStage.stage_text(0) + " (in a colony, this shows its radio.)"
 	_refresh_players(v)
 
 

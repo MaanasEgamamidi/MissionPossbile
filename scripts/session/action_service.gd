@@ -6,6 +6,8 @@ extends RefCounted
 const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
 ## Repair spots (2026-11-14): reach is measured to the whole broken object, not only its floor anchor.
 const RepairReach := preload("res://scripts/tasks/repair_reach.gd")
+## The crew's strict day (2026-11-15): after the tutorial, station work outside its schedule block is refused.
+const ScheduleGate := preload("res://scripts/schedule/schedule_gate.gd")
 
 ## Rules and callbacks for one action.
 class Definition extends RefCounted:
@@ -144,6 +146,12 @@ func _resolve_new(session: SessionService, request: ActionRequest) -> ActionResu
 		var locked := TutorialLock.refusal(ctx)
 		if locked != null:
 			return locked
+		var closed := ScheduleGate.refusal(ctx)
+		if closed != null:
+			return closed
+		var isolated := _isolation_refusal(ctx)
+		if isolated != null:
+			return isolated
 	if d.check_distance and ctx.actor != null and ctx.has_target_position and ctx.actor.position.distance_to(ctx.target_position) > ctx.config.interact_distance_m \
 			and not (d.target_kind == &"station" and RepairReach.within(ctx.target, ctx.actor.position, ctx.config.interact_distance_m)):
 		return ActionResult.failure(request.request_id, &"too_far")
@@ -179,3 +187,23 @@ func _params_valid(d: Definition, params: Dictionary) -> bool:
 			if float(value) < float(rule.get("min", -INF)) or float(value) > float(rule.get("max", INF)):
 				return false
 	return true
+
+
+## Radiation isolation (owner, 2026-11-15): a crewmate in isolation in the Med Bay cannot do station work; only the heal
+## station, the suit rack and release/cancel actions stay open. Loaded at run time (radiation_system types SessionService).
+const ISOLATION_OPEN_KINDS: PackedStringArray = ["heal", "suits"]
+static var _radiation_script: Script
+
+
+static func _isolation_refusal(ctx: Context) -> ActionResult:
+	if ctx.actor == null or ctx.definition == null or ctx.definition.target_kind != &"station":
+		return null
+	if TutorialLock.RELEASE_ACTIONS.has(ctx.request.action):
+		return null
+	if _radiation_script == null:
+		_radiation_script = load("res://scripts/survival/radiation_system.gd")
+	if _radiation_script == null or not bool(_radiation_script.call(&"is_isolated", ctx.actor)):
+		return null
+	if ISOLATION_OPEN_KINDS.has(String(ctx.target.get("kind", ""))):
+		return null
+	return ActionResult.failure(ctx.request.request_id, &"isolated", String(_radiation_script.call(&"blocked_text", ctx.actor, false)))

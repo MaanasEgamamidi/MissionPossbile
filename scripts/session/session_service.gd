@@ -38,6 +38,11 @@ var paused: bool = false
 var _votes: Dictionary = {}
 var _suit_checks: Dictionary = {}
 var _accumulator: float = 0.0
+## Upgrade paths plan phase 1 (2026-11-15): host steps loaded at run time (they type SessionService, so no preload loop).
+var _schedule: Script
+var _radiation: Script
+var _colony_over: Script
+var _builds: Script
 var _counter: int = 0
 
 func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -> void:
@@ -74,6 +79,16 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	sim.post_systems.append(drone_system.new(self))
 	# Prompt 12: tutorial, campaign and story. Registered last: it watches actions the parts above registered.
 	TutorialActions.register(actions)
+	# Upgrade paths plan phase 1 (2026-11-15): the crew's day, radiation, COLONY OVER, one build a day.
+	_schedule = load("res://scripts/schedule/schedule_system.gd")
+	_radiation = load("res://scripts/survival/radiation_system.gd")
+	_colony_over = load("res://scripts/survival/colony_over.gd")
+	_builds = load("res://scripts/upgrades/colony_builds.gd")
+	var ore_actions: Variant = load("res://scripts/science/ore_actions.gd") if ResourceLoader.exists("res://scripts/science/ore_actions.gd") else null
+	if ore_actions != null:
+		ore_actions.register(actions)
+	if ResourceLoader.exists("res://scripts/science/ore_walk_system.gd"):
+		sim.post_systems.append(load("res://scripts/science/ore_walk_system.gd").new())
 	sim.pre_systems.append(WeatherSystem.new())
 	sim.post_systems.append(CropSystem.new())
 	sim.post_systems.append(ProgressionSystem.new())
@@ -108,6 +123,8 @@ func advance(real_delta: float) -> int:
 	if state == null or not authoritative:
 		return 0
 	cassette_runtime.prune(self)
+	if is_colony_over():
+		return 0          # the colony ended: nothing more happens (the COLONY OVER screen is up)
 	if paused:
 		_advance_suit_checks(0.0)
 		return 0
@@ -135,6 +152,10 @@ func advance(real_delta: float) -> int:
 				recover_character(id, SurvivalRuntime.DeathReasons.health_id(self, state.character(id)))
 			for rollover: int in clock.rolled_over:
 				events.sol_started.emit(clock.sol_index - clock.rolled_over + rollover + 1)
+			_schedule.call(&"step", self, dt_hours)
+			_radiation.call(&"step", self, dt_hours)
+			_colony_over.call(&"step", self, dt_hours)
+			_builds.call(&"tick", self)
 			count += 1
 		survival.advance(step)
 		remaining -= step
@@ -146,6 +167,8 @@ func advance(real_delta: float) -> int:
 func submit(action_request: ActionRequest) -> ActionResult:
 	if not authoritative:
 		return ActionResult.failure(action_request.request_id, &"host_only", "Only the authoritative host can apply gameplay actions.")
+	if is_colony_over():
+		return ActionResult.failure(action_request.request_id, &"colony_over", "The colony is over.")
 	if state != null:
 		survival.refresh_all()
 		repair_runtime.prune(self)
@@ -154,6 +177,10 @@ func submit(action_request: ActionRequest) -> ActionResult:
 	var answer := actions.resolve(self, action_request)
 	survival.refresh_all()
 	return answer
+
+## True once COLONY OVER has happened in this colony (scripts/survival/colony_over.gd).
+func is_colony_over() -> bool:
+	return state != null and _colony_over != null and bool(_colony_over.call(&"is_over", state))
 
 ## Builds a fresh request using the peer's current character.
 func request(action: StringName, target: StringName = &"", params: Dictionary = {}, peer: int = HOST_PEER) -> ActionResult:

@@ -112,6 +112,41 @@ static func for_station(station_id: StringName, services: GameServices) -> UiPan
 	return panel
 
 
+## Path of the section choices panel (upgrade paths plan §2: each section's upgrades are chosen at its core spot).
+const SECTION_PANEL_PATH := "res://scripts/ui/section_panel.gd"
+
+
+## The section id whose core spot `station_id` is ("" = not a core spot): the power panel (Energy), the Greenhouse
+## console (Biology), the med station (Health), the workbench and the lab glovebox (Science), the comms console
+## (Communication). The list is data/area_levels.json "sections".
+static func section_of_station(station_id: StringName, services: GameServices) -> String:
+	if services == null or not services.has_game():
+		return ""
+	var record: Dictionary = services.state().stations.get(String(station_id), {})
+	return AreaLevels.section_at(String(station_id), record) if not record.is_empty() else ""
+
+
+## The choices panel of a section, opened from its core spot `station_id` (the core station's own panel has the
+## "Choose … upgrades" button that calls this). Null when the section or the station is unknown.
+static func section_panel(section_id: StringName, station_id: StringName, services: GameServices) -> UiPanel:
+	if services == null or not services.has_game() or AreaLevels.section(String(section_id)).is_empty():
+		return null
+	var record: Dictionary = services.state().stations.get(String(station_id), {})
+	if record.is_empty():
+		return null
+	var script := load(SECTION_PANEL_PATH) as Script
+	if script == null:
+		return null
+	var panel := script.new() as StationPanel
+	if panel == null:
+		return null
+	panel.set(&"section_id", String(section_id))
+	panel.station_id = station_id
+	panel.kind = String(record.get("kind", ""))
+	panel.setup(services)
+	return panel
+
+
 ## The station's name in words ("Life support console").
 static func name_of(kind: String) -> String:
 	return String(NAMES.get(kind, String(_extra_field(kind, "name", "Station"))))

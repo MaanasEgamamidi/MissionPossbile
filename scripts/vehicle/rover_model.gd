@@ -21,6 +21,15 @@ extends RefCounted
 ##   challenge_variant: int      the assembly check's example number; a wrong answer moves it on (a new example)
 ##   last_refit: {...}           who changed what, when, and the parts it cost (negative = given back)
 ##   empty_announced: bool       the "battery empty" alert was shown for this empty battery
+## Added by the rover upgrade path (phase 1, the "rover" track of data/area_levels.json):
+##   fuel_cell_kwh: float        usable energy left in the fuel-cell tanks (0 below RoverBalance.fuel_cell_level)
+##
+## Rover upgrade path levels (RoverModel.track_level(state) = AreaLevels.level(state, "rover"), 1 when unknown):
+##   L3 pressurized cabin with suitport: seated crew breathe cabin air (no suit oxygen) and are sheltered from
+##      solar-storm radiation while seated (cabin_sheltered).
+##   L4 fuel-cell range extender: +RoverBalance.fuel_cell_kwh of range; it feeds the battery once the battery is low
+##      and is refilled at the garage charger from the colony's oxygen store (RoverSystem).
+##   L5 RTG trickle charge (parked or driving) and the sample arm (can_assay).
 
 const STATS: PackedStringArray = ["speed", "torque", "range", "cargo", "traction"]
 const SEATS := 4
@@ -78,6 +87,59 @@ static func ensure(state: ColonyState) -> void:
 	r["refit_seq"] = int(r.get("refit_seq", 0))
 	r["challenge_variant"] = int(r.get("challenge_variant", 0))
 	r["empty_announced"] = bool(r.get("empty_announced", false))
+	r["fuel_cell_kwh"] = clampf(float(r.get("fuel_cell_kwh", 0.0)), 0.0, fuel_cell_capacity_kwh(state))
+
+
+# ---------------------------------------------------------------- rover upgrade path (area_levels "rover" track)
+
+## Track id of the rover's upgrade path in data/area_levels.json.
+const TRACK_ID := "rover"
+
+
+## The rover's upgrade-path level (1..5): AreaLevels.level(state, "rover"), 1 without a state.
+static func track_level(state: ColonyState) -> int:
+	if state == null:
+		return 1
+	return clampi(AreaLevels.level(state, TRACK_ID), 1, MAX_LEVEL)
+
+
+## True when the cabin is pressurized (suitport): from RoverBalance.cabin_level.
+static func has_cabin(state: ColonyState) -> bool:
+	return track_level(state) >= RoverBalance.get_current().cabin_level
+
+
+## True when the fuel-cell range extender is fitted: from RoverBalance.fuel_cell_level.
+static func has_fuel_cell(state: ColonyState) -> bool:
+	return track_level(state) >= RoverBalance.get_current().fuel_cell_level
+
+
+## True when the RTG power cart is fitted: from RoverBalance.rtg_level.
+static func has_rtg(state: ColonyState) -> bool:
+	return track_level(state) >= RoverBalance.get_current().rtg_level
+
+
+## Usable energy of full fuel-cell tanks at the current level, kWh (0 without the fuel cell).
+static func fuel_cell_capacity_kwh(state: ColonyState) -> float:
+	return RoverBalance.get_current().fuel_cell_kwh if has_fuel_cell(state) else 0.0
+
+
+## RTG trickle-charge power at the current level, kW (0 without the RTG).
+static func rtg_kw(state: ColonyState) -> float:
+	return RoverBalance.get_current().rtg_kw if has_rtg(state) else 0.0
+
+
+## For the radiation and life-support helpers: true when `actor` sits in the rover (any seat) and the rover has its
+## pressurized cabin (L3+). Such crew breathe cabin air (no suit oxygen) and are sheltered from solar-storm radiation.
+static func cabin_sheltered(state: ColonyState, actor: CharacterState) -> bool:
+	if state == null or actor == null or not bool(state.rover.get("built", false)):
+		return false
+	return seat_of(state, String(actor.id)) >= 0 and has_cabin(state)
+
+
+## For the science and survey helpers: true when the rover's sample arm with its laser spectrometer is fitted (L5),
+## so ore can be assayed on site from the rover.
+static func can_assay(state: ColonyState) -> bool:
+	return state != null and bool(state.rover.get("built", false)) and track_level(state) >= RoverBalance.get_current().sample_arm_level
 
 
 ## Parts needed to raise a stat from `level` to `level + 1` (approved: 1, 2, 3, 4).
@@ -219,12 +281,27 @@ static func seat_free(state: ColonyState, index: int) -> bool:
 	return c == null or not c.is_active()
 
 
-## The stats of the rover as it is now: its levels, its real cargo, battery and crew (at least the driver).
+## The stats of the rover as it is now: its levels, its real cargo, battery and crew (at least the driver). With the
+## fuel cell (L4+) range_km also counts the energy left in its tanks; extra keys: fuel_cell_kwh,
+## fuel_cell_capacity_kwh, rtg_kw, track_level, cabin (bool), battery_range_km (the battery alone).
 static func current_stats(state: ColonyState) -> Dictionary:
-	return stats(state.rover.get("levels", {}), cargo_mass_kg(state), float(state.rover.get("battery_kwh", 0.0)), maxi(1, crew_aboard(state)))
+	var s := stats(state.rover.get("levels", {}), cargo_mass_kg(state), float(state.rover.get("battery_kwh", 0.0)), maxi(1, crew_aboard(state)))
+	var fc_cap := fuel_cell_capacity_kwh(state)
+	var fc := clampf(float(state.rover.get("fuel_cell_kwh", 0.0)), 0.0, fc_cap)
+	var per_km := float(s.kwh_per_km) * RoverBalance.get_current().range_terrain_factor
+	s["battery_range_km"] = float(s.range_km)
+	if per_km > 0.0:
+		s["range_km"] = float(s.range_km) + fc / per_km
+	s["fuel_cell_kwh"] = fc
+	s["fuel_cell_capacity_kwh"] = fc_cap
+	s["rtg_kw"] = rtg_kw(state)
+	s["track_level"] = track_level(state)
+	s["cabin"] = has_cabin(state)
+	return s
 
 
-## The honest range now, km on the map: stored energy, cargo and crew aboard (at least a driver), terrain allowance.
+## The honest range now, km on the map: stored energy (battery and fuel cell), cargo and crew aboard (at least a
+## driver), terrain allowance.
 static func range_now_km(state: ColonyState) -> float:
 	return float(current_stats(state).range_km)
 

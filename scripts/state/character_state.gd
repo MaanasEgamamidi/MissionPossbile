@@ -40,6 +40,10 @@ var hazard_cause := ""
 var last_death: Dictionary = {}
 ## Spatial hysteresis across the explicit airlock boundary; unrelated to lighting-zone membership.
 var in_airlock_pressure_volume := false
+## Radiation (upgrade paths plan, 2026-11-15): lifetime dose in mSv (never resets) and isolation in the Med Bay after
+## reaching the limit: {"since_hours", "until_hours"} while isolated, {} otherwise (scripts/survival/radiation_system.gd).
+var dose_msv := 0.0
+var isolation: Dictionary = {}
 var equipment: Array[StringName] = []
 ## Item ids carried by this character (see ColonyState.items).
 var cargo: Array[StringName] = []
@@ -59,6 +63,7 @@ func to_dict() -> Dictionary:
 		"exposure_protected": exposure_protected, "exposure_cause": exposure_cause, "exposure_area": exposure_area,
 		"hazard_cause": hazard_cause, "last_death": last_death.duplicate(true),
 		"in_airlock_pressure_volume": in_airlock_pressure_volume, "suit_integrity": suit_integrity,
+		"dose_msv": dose_msv, "isolation": isolation.duplicate(true),
 		"suit_rack": String(suit_rack), "suit_slot": suit_slot,
 		"equipment": equipment.map(func(e: StringName) -> String: return String(e)),
 		"cargo": cargo.map(func(e: StringName) -> String: return String(e)),
@@ -93,6 +98,8 @@ func assign_from(d: Dictionary, keep_pose := false) -> void:
 	last_death = c.last_death
 	in_airlock_pressure_volume = c.in_airlock_pressure_volume
 	suit_integrity = c.suit_integrity
+	dose_msv = c.dose_msv
+	isolation = c.isolation
 	equipment = c.equipment
 	cargo = c.cargo
 
@@ -123,6 +130,8 @@ static func from_dict(d: Dictionary) -> CharacterState:
 	c.last_death = _death(d.get("last_death", {}))
 	c.in_airlock_pressure_volume = bool(d.get("in_airlock_pressure_volume", false))
 	c.suit_integrity = clampf(float(d.get("suit_integrity", 1.0)), 0.0, 1.0)
+	c.dose_msv = maxf(0.0, float(d.get("dose_msv", 0.0)))
+	c.isolation = (d.get("isolation", {}) as Dictionary).duplicate(true) if d.get("isolation") is Dictionary else {}
 	for e in d.get("equipment", []):
 		c.equipment.append(StringName(String(e)))
 	for e in d.get("cargo", []):

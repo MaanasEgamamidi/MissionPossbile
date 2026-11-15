@@ -194,6 +194,9 @@ func restore(payload: Dictionary) -> void:
 func save_now(reason: StringName = &"manual") -> Error:
 	if not has_game() or not is_authority():
 		return ERR_UNCONFIGURED
+	# COLONY OVER (2026-11-15): never save the ended colony over the last live save ("Load last save" uses it).
+	if session.is_colony_over():
+		return ERR_UNAVAILABLE
 	var err := saves.write(snapshot(), reason)
 	_pending_save = &""
 	_autosave_left = config.autosave_seconds

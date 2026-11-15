@@ -44,7 +44,7 @@ func refresh_actor(actor: CharacterState) -> void:
 	var air := pressure.query(session, actor.position, actor.in_airlock_pressure_volume)
 	actor.in_airlock_pressure_volume = bool(air.in_airlock)
 	actor.outside = not bool(air.breathable)
-	actor.exposure_protected = actor.outside and functional_suit(actor)
+	actor.exposure_protected = actor.outside and (functional_suit(actor) or RoverModel.cabin_sheltered(session.state, actor))   # rover L3 sealed cabin
 	actor.exposure_active = actor.health > 0.0 and actor.outside and not actor.exposure_protected
 	actor.exposure_area = String(air.area)
 	actor.exposure_cause = ""
