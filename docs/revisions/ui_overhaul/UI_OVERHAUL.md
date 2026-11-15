@@ -145,7 +145,46 @@ T05 Elements and T07 Pipes keep the maintenance interface (no broken-part mini-g
 
 ## 5. What changed, by area
 
-(Filled in at the end of the work: see the section below.)
+Commits on `maanas/ui`: `ec27d91` (checkpoint of the first session), `6f5b5c3` (T02, T04, T10), `be2fb6b` (T01, T03,
+T06, T08, T09, T11, T12), `180b4fc` (HUD).
+
+### Repair mini-games (all ten rebuilt on the shell)
+
+Every game: action title, one cue line with key caps, the equipment fills the frame, no words on the equipment,
+mouse and keyboard, a shape on every colour, the shared focus ring / target ring / tick / padlock, the shared
+success mark, and the panel closes itself. All fit a 1280 x 720 window ("layout issues: none").
+
+| Task | The equipment and what the child does | Suite |
+|---|---|---|
+| T01 Lock the Relay | Scope with a ghost wave and the live wave; turn one big knob (drag, wheel, arrows) or slide the frequency strip; hold pips and a padlock on the scope, data pulses run down a cable to the relay dish | 48/48 |
+| T02 Patch the Relay | Four tinted plugs with shapes, a patch bay of shape-keyed sockets, the relay; a seated plug clicks in and its trace lights to the relay | 48/48 |
+| T03 Sync the Turbine | One turbine face, three rings; only the active ring moves; press the big button in the green arc; locked rings show a padlock | 40/40 |
+| T04 Light the Power Bench | Power jack, a board of cell plates, a real lamp; current lights the path to the first gap; a meter beside the lamp shows volts and a booster / reducer icon | 49/49 |
+| T06 Water the Kale | Tank, 4 x 3 pipe board, kale tray; turn pipes, water runs to the first break, the kale perks up | 46/46 |
+| T08 Glaze the Dome | Five coloured panes beside the dome frame; an outline previews the drop; sunlight passes through fitted panes, one shimmer at the end | 54/54 |
+| T09 Sort the Lab Samples | The rack is the play area; fallen tubes on a mat with ghost slots; a picked tube lifts and leans to a valid tube, the dose pours, full one-kind tubes get a tick | 51/51 |
+| T10 Revive the Med Bay | Heal station and CT scanner beside a power unit; shaped plugs; a heartbeat trace and a scanner sweep when powered; a self-test button | 48/48 |
+| T11 Clear the Landing Lines | The hangar floor; brush clumps loose, vacuum the dust, the landing stripe shows through | 57/57 |
+| T12 Seal the Airlock | The vapor leads to the seam; fit the shaped gasket, press three glowing points in order, the gauge needle rises into the green band. Rule: 3 press points (was 5); an old save past the new count is peeled back to 0 | 79/79 |
+
+### Menus, settings, goals (first session, checked in screenshots)
+
+Main menu: one large Play, Play with friends, small Settings / Credits / Quit chips. Pause: Resume plus a grid of
+pictogram tiles. Settings: big "A" tiles for text size, toggles instead of sentences. Goals (J): one row per repair
+with its picture, action title and the specialist's badge, a map beside the list.
+
+### Sparkles
+
+See §4. Stars are alpha blended with a darker amber rim (additive light vanished on the white walls); checked in
+screenshots on light walls and on dark floor.
+
+### Tests after the work
+
+Green: task panel 29/29, all ten `test_puzzle_tNN`, hud_panels 89/89, upgrade_ui 60/60, survival_hud 65/65,
+cassette_ui 76/76, tutorial_start 36/36, voice 84/84, p07_panels 54/54. Still failing, each traced to before this
+branch: ui_framework 123/125 (M key / blueprint switched off in 301d499), station_panels 199/200 (same), tutorial
+56/57 (tutorial widget off at 72070d4), scout 57/58 (scout goals off at 72070d4). game_scene 29/34 (player stuck
+near the suit rack) was not run before the branch, so its cause is unconfirmed (see `AFTER_TOKENS_RESET.md`).
 
 ### HUD in play (finished after the checkpoint)
 
