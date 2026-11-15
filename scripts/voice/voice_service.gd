@@ -9,8 +9,9 @@ extends Node
 ## catch-up (playing faster or slower with pitch_scale to steer the buffer) is NOT used: pitch_scale stays 1.0, so
 ## speech speed never changes and a radio delay is never shortened.
 ##
-## What leaves this computer: only Opus frames while the talk key (V, action push_to_talk) is held, to the other
-## players of this session. Nothing is recorded or written to disk; buffers live in memory and are cleared on mute,
+## Open mic (2026-11-15): voice chat is always on. While a game is running and the microphone is not muted, Opus
+## frames go continuously to the other players of this session; no key needs to be held. Nothing is recorded or
+## written to disk; buffers live in memory and are cleared on mute,
 ## on a player's disconnect and when the session ends. Without a microphone (none, blocked, or a headless run) the
 ## game plays on and listening still works. Voice keeps working while the game is paused.
 ## The extension's classes are looked up at run time (ClassDB) and every method is checked first, so a missing or
@@ -32,6 +33,8 @@ const OPUS_COMPLEXITY := 10
 const MIC_HANG_S := 3.0
 ## An open microphone that gives no samples for this long is reported as "no signal".
 const MIC_SIGNAL_TIMEOUT_S := 3.0
+## A microphone that is missing, failed or silent is looked for again this often, seconds (plugging one in works).
+const MIC_RETRY_S := 5.0
 ## Height of a speaker's voice above their feet, metres (engineering).
 const MOUTH_HEIGHT_M := 1.6
 ## A "heard" line stays this long after the last frame, seconds.
@@ -108,6 +111,7 @@ var _transition_until := 0.0
 var _peer_check_left := 0.0
 var _fx: RadioFx                   # radio_fx.gd: the SuitRadio bus, clicks, hiss, dropouts, the no-signal beep
 var _no_signal_until := -1.0       # the speaker's "No signal" line shows until then (once per press)
+var _mic_retry_left := MIC_RETRY_S
 
 
 ## One speaker's player on one route. Proximity: AudioStreamPlayer3D at the speaker (no engine attenuation: the
@@ -233,6 +237,9 @@ func setup(p_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 		var s: Variant = p_game.get(&"settings") if p_game != null else null
 		settings = s as GameSettings if s is GameSettings else GameSettings.new()
 	_stream_id = randi() & 0xffff
+	# voice chat is always on: a mute left over from an earlier session does not carry into this one
+	if settings.voice_mic_muted:
+		settings.voice_mic_muted = false
 	_library_problem = library_problem()
 	_library = _library_problem == ""
 	if _library:
@@ -328,7 +335,7 @@ func mic_state_text() -> String:
 		return "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
 	match _mic_state:
 		&"ready":
-			return "✓ Microphone ready. Hold V to talk."
+			return "✓ Microphone ready. Voice chat is always on: just talk."
 		&"synthetic":
 			return "✓ Test sound instead of a microphone (synthetic input)."
 		&"headless":
@@ -416,28 +423,33 @@ func _start_mic(now: float) -> void:
 	_mic_frames_seen = false
 
 
+## Looks for the microphone again every MIC_RETRY_S while it is missing or failed, so voice starts by itself once a
+## microphone is plugged in or allowed.
+func _retry_mic(delta: float) -> void:
+	_mic_retry_left -= delta
+	if _mic_retry_left > 0.0:
+		return
+	_mic_retry_left = MIC_RETRY_S
+	if synthetic_input or not _library or mic_muted():
+		return
+	if _mic_state in [&"failed", &"no_device"]:
+		_probe_mic()
+	elif _mic_state == &"no_signal" and _mic_active and not _mic_frames_seen:
+		# reopen the device: some drivers only start delivering after a fresh open
+		_stop_mic()
+		_start_mic(_now())
+
+
 func _stop_mic() -> void:
 	if _mic_active:
 		AudioServer.set_input_device_active(false)
 	_mic_active = false
 
 
+## Open mic: voice chat is always on, so the microphone always wants to send (tests may override it).
 func _ptt_held() -> bool:
 	if _ptt_override >= 0:
 		return _ptt_override == 1
-	if not InputMap.has_action(&"push_to_talk") or not Input.is_action_pressed(&"push_to_talk"):
-		return false
-	# typing in a text field or changing a key binding is not talking
-	var vp := get_viewport()
-	var focus := vp.gui_get_focus_owner() if vp != null else null
-	if focus is LineEdit or focus is TextEdit:
-		return false
-	# the settings panel waiting for a new key: that key press is for the binding
-	var n: Node = focus
-	while n != null:
-		if n is SettingsPanel:
-			return (n as SettingsPanel).capturing() == &""
-		n = n.get_parent()
 	return true
 
 
@@ -695,6 +707,7 @@ func _door_controllers() -> Array[DoorController]:
 
 func _process(delta: float) -> void:
 	var now := _now()
+	_retry_mic(delta)
 	_capture(now)
 	_watch_session(delta)
 	_play(now)
@@ -974,16 +987,13 @@ func comms_down() -> bool:
 	return false
 
 
-## Demo build: the corner reads "Voice chat is off." until every tape and required repair is finished, even though
-## voice keeps working underneath.
+## Voice chat is always on (open mic); the corner never reads "off".
 func voice_label_off() -> bool:
-	return services != null and services.has_game() and not TutorialSystem.restoration_complete(services.state())
+	return false
 
 
 ## The local player's own line: what their voice does now (talking) or would do (idle).
 func own_line() -> String:
-	if voice_label_off():
-		return "Voice chat is off."
 	var short := mic_short_text()
 	if short != "":
 		return short
@@ -997,7 +1007,7 @@ func own_line() -> String:
 			text += " (playing alone: nobody else is here)"
 		return text
 	if services == null or not services.has_game():
-		return "Hold V to talk to people near you."
+		return "Voice chat is on: people near you hear you."
 	return SuitRadio.idle_text(services.state(), _listener(), services.zones)
 
 

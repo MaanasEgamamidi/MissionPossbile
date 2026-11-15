@@ -247,11 +247,11 @@ static func idle_text(state: ColonyState, me: Dictionary, zones: ColonyZones) ->
 		if not has_radio_signal(state):
 			return "You are outside and the suit radio has no signal: nobody can hear you. Upgrade Communication in the Command Room."
 		if near_comms(state, me, zones):
-			return "Hold V to talk: your suit radio carries your voice, clear and at once."
+			return "Voice chat is on: your suit radio carries your voice, clear and at once."
 		var words := garble_words(garble(state))
-		return "Hold V to talk: your suit radio carries your voice (delay %d s%s)." % [roundi(maxf(0.0, delay_s(state))),
+		return "Voice chat is on: your suit radio carries your voice (delay %d s%s)." % [roundi(maxf(0.0, delay_s(state))),
 			", " + words if words != "" else ""]
-	return "Hold V to talk to people near you."
+	return "Voice chat is on: people near you hear you."
 
 
 ## Shown for a few seconds after going outside or coming in.
