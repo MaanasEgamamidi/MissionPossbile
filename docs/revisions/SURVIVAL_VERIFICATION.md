@@ -4,55 +4,14 @@ This record covers the newly authorized S01-S04 section, PDF pages 22-25, stoppi
 
 ## Final regression selection
 
-The user requested immediate wrap-up before the broad run completed. At the documentation freeze, 36 completed unique suite logs report 2468/2468 checks, with no FAIL/SCRIPT ERROR/Parse Error lines in that selected set. This is a partial broad verification, not an all-38-suite acceptance claim. Remaining or rerunning suites at freeze: test_cassette_assets, test_cassette_ui. A final small GameServices local-character guard awaits its targeted network recheck. Completed earlier focused checks do not establish verification of a later edit.
-
-| Suite | Completed result | Evidence |
-| --- | --- | --- |
-| test_cassettes | 88/88 | evidence/s_survival_regression/test_cassettes.txt |
-| test_collision | 40/40 | evidence/s_survival_regression/test_collision.txt |
-| test_crew_collision | 5/5 | evidence/s_survival_regression/test_crew_collision.txt |
-| test_food | 85/85 | evidence/s_survival_regression/test_food.txt |
-| test_game_scene | 34/34 | evidence/s_survival_final/test_game_scene.txt |
-| test_game_services | 25/25 | evidence/s_survival_final/test_game_services.txt |
-| test_graphics_quality | 23/23 | evidence/s_survival_regression/test_graphics_quality.txt |
-| test_hud_panels | 89/89 | evidence/s_survival_regression/test_hud_panels.txt |
-| test_life_support | 88/88 | evidence/s_survival_final/test_life_support.txt |
-| test_net | 56/56 | evidence/s_survival_regression/test_net.txt |
-| test_net_game | 21/21 | evidence/s_survival_regression/test_net_game.txt |
-| test_p07_panels | 54/54 | evidence/s_survival_regression/test_p07_panels.txt |
-| test_pdf_fixes | 43/43 | evidence/s_survival_regression/test_pdf_fixes.txt |
-| test_perf | 48/48 | evidence/s_survival_regression/test_perf.txt |
-| test_player | 112/112 | evidence/s_survival_regression/test_player.txt |
-| test_progression | 84/84 | evidence/s_survival_regression/test_progression.txt |
-| test_repair_anchors | 113/113 | evidence/s_survival_regression/test_repair_anchors.txt |
-| test_repair_foundations | 119/119 | evidence/s_survival_final/test_repair_foundations.txt |
-| test_rover | 80/80 | evidence/s_survival_final/test_rover.txt |
-| test_rover_drive | 64/64 | evidence/s_survival_regression/test_rover_drive.txt |
-| test_saves | 56/56 | evidence/s_survival_regression/test_saves.txt |
-| test_science | 76/76 | evidence/s_survival_regression/test_science.txt |
-| test_scout | 60/60 | evidence/s_survival_final/test_scout.txt |
-| test_session | 91/91 | evidence/s_survival_final/test_session.txt |
-| test_sources | 76/76 | evidence/s_survival_regression/test_sources.txt |
-| test_station_panels | 196/196 | evidence/s_survival_regression/test_station_panels.txt |
-| test_survival | 118/118 | evidence/s_survival_final/test_survival.txt |
-| test_survival_hud | 65/65 | evidence/s_survival_final/test_survival_hud.txt |
-| test_survival_net | 28/28 | evidence/s_survival_final/test_survival_net.txt |
-| test_task_panel | 29/29 | evidence/s_survival_regression/test_task_panel.txt |
-| test_tutorial | 59/59 | evidence/s_survival_regression/test_tutorial.txt |
-| test_ui_framework | 125/125 | evidence/s_survival_regression/test_ui_framework.txt |
-| test_voice | 84/84 | evidence/s_survival_regression/test_voice.txt |
-| test_wear_runtime | 53/53 | evidence/s_survival_final/test_wear_runtime.txt |
-| test_weather | 66/66 | evidence/s_survival_final/test_weather.txt |
-| test_weather_data | 15/15 | evidence/s_survival_final/test_weather_data.txt |
-
-Logs are selected newest per suite from evidence/s_survival_regression and evidence/s_survival_final. Empty or incomplete logs are excluded. Raw initial failures remain available. Later log completion does not retroactively change this freeze snapshot.
+The user requested immediate wrap-up before the complete broad run finished. The confirmed documentation snapshot is 34 unique suites and 2332/2332 checks, with zero FAIL/SCRIPT ERROR/Parse Error lines in the selected newest per-suite logs. This is partial broad verification, not an all-38-suite acceptance claim. The performance and three cassette suites were outside that snapshot. Logs under evidence/s_survival_regression and evidence/s_survival_final retain raw initial failures and subsequent reruns; repeated suites are not added together. Later log arrivals do not retroactively change this snapshot.
 
 ## Focused coverage
 
 - `test_survival.gd`: the foundation engineer's final focused run passes 118/118 in `evidence/survival_backend.log`. It covers exterior/cabin/chamber safety, real-time deadline and safe-interval reset, suit reserve/integrity, frame-step and sol-length invariance, saved exposure/pressure, exactly-once recovery, per-peer warning ownership, authority refusal, safe-side T12 repair, door pressure and unchanged global air accounting. Pressure-aware remote parking is covered at the real GameServices restore boundary.
 - `test_wear_runtime.gd`: orchestrator's isolated run passes 53/53, including all twelve continuous conditions, migration preserving actual puzzle state/history, 30/120/240-second targets, pause, different frame/sol settings, mapped twenty-second repair, cooldown/recurrence, specialty and competing operators, future puzzle lease exclusion, direct hazardous start refusal and backend hazard cancellation, legacy cleaner single-owner wear, serialization and clients that never advance authoritative wear.
 - `test_survival_hud.gd`: UI engineer's focused run passes 65/65. It exercises real maintenance cancellation, critical cassette interruption, death/recovery, peer-local warnings, audio preferences, maximum supported layout/contrast and a mouse-ignoring border. Final broad results below supersede focused repeats for the unique total.
-- Real loopback ENet `test_survival_net.gd` previously passed 28/28; its final rerun after the last small guard is pending at the documentation freeze: host plus two clients, late join, pressure and door replication, four-second recovery once, pause, denied client authority, one exclusive maintenance clock and converging repair result. No two-computer LAN playtest is claimed.
+- Real loopback ENet `test_survival_net.gd` passes 28/28 in `evidence/s_survival_final/test_survival_net.txt`: host plus two clients, late join, pressure and door replication, four-second recovery once, pause, denied client authority, one exclusive maintenance clock and converging repair result. No two-computer LAN playtest is claimed.
 
 ## Compilation and visual evidence
 
@@ -83,4 +42,5 @@ Raw initial failures remain in the broad-run logs. Final reruns supersede them o
 - The scout-trip fixture equips its existing suit before waiting outside at the bay. Waiting unprotected now correctly triggers four-second recovery and moves the actor out of recall reach. The sixty original scout assertions remain; no recall-distance rule is weakened.
 
 These fixture changes do not shorten the live hazard, weaken station reach, bypass role checks or reset a player's exposure budget.
+
 
