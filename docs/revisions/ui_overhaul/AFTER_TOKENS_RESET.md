@@ -1,6 +1,6 @@
 # UI overhaul: what to do after the tokens reset (written 2026-11-15)
 
-Branch `maanas/ui`, **not pushed**. The first session's work is committed; check `git status` for the second session's. Full record: `UI_OVERHAUL.md` in this folder.
+Branch `maanas/ui`, pushed and merged into `main`. Full record: `UI_OVERHAUL.md` in this folder.
 
 ## Done
 
@@ -18,26 +18,30 @@ Branch `maanas/ui`, **not pushed**. The first session's work is committed; check
 - T09 opens with one fallen tube; `capture_puzzles.gd --size`; leftover developer phrases.
 - `test_game_scene` and `test_repair_anchors` checked against `72070d4`: both fail there too (see `UI_OVERHAUL.md`).
 
+## Fixed in the third session (2026-11-15)
+
+- Aiming at a station inside a broken part's whole-model target (the Command Room tape in the T02 rack) now picks
+  that station (`player_controller.gd` `_station_inside_part`); `test_repair_anchors` 116/116.
+- `test_game_scene` suit-rack approach retries free spots until the player stands still on the floor; 34/34.
+
 ## Next, in priority order
 
-1. **Aiming bug (older than this branch)**: aiming at the Command Room tape picks the T02 repair station
-   (`tests/test_repair_anchors.gd`, 108/114). The broken rack's whole-model aim target covers the tape.
-2. **`test_game_scene` is timing dependent** (passes and fails on the same commit): make its suit-rack approach wait
-   until the player is standing still on the floor.
-3. **Small leftovers**
+1. **Small leftovers**
    - T02 wrong specialist: the concept wants the electrical badge where the first plug would be; the shell's generic
      padlock view is shown now and reads fine.
    - Lab and weather station panels got the new frame only; their long text is untouched. The Upgrades strip on a
      station still has five sentences per card (pinned by `test_upgrade_ui`).
    - `PowerModel.LABELS` ("Electrolyser", "CO2-oxygen unit") is where the jargon on switches and alerts comes from.
+     Left on purpose: real life-support terms, and `test_life_support` pins the alert text. Your call.
+   - `test_broken_parts` 96/97: the repair glow transition timing check (already failing before this branch).
    - Pictogram sizes on the information panels are fixed when a panel opens (text and bars follow the setting live).
    - Not yet looked at in screenshots: a held plug (T02 / T10), a wrong-socket shake, T04's meter with a joined path
      at the wrong voltage, the drawer's Messages list with messages in it, the "B Build here" chip.
    - Nothing was played end to end in the running game with a second player.
-4. **Pre-existing failures (not caused by this branch)**: M key / blueprint (ui_framework 2, station_panels 1, off
+2. **Pre-existing failures (not caused by this branch)**: M key / blueprint (ui_framework 2, station_panels 1, off
    since `301d499`), tutorial widget (tutorial 1) and scout goals (scout 1), off since `72070d4`. Update or delete
    those assertions when those features are decided.
-5. **Ship it**: push `maanas/ui` and open a PR to `main` when happy (`git push -u origin maanas/ui`).
+3. **Shipped**: `maanas/ui` and `main` point at the same commit on origin (third session).
 
 ## How to run things (this machine)
 

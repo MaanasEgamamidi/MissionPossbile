@@ -43,9 +43,21 @@ func _suit_checks() -> void:
 	var rack_pos := CharacterState._v3(rack.position)
 	# Probe the actual headless collision assembly with the full player capsule.
 	# Its rack clearance differs from the rendered map's prop-collision assembly.
-	var spot := _free_spot_near(rack_pos, 1.6)
-	await _place(spot, 0.0)
-	await _frames(20)
+	# A probed spot can still push the capsule out onto a ledge (the collision assembly settles over a few frames), so
+	# take the first spot where the player really stands on the floor within reach, still, and reported to the host.
+	var spots := _free_spots_near(rack_pos, 1.6)
+	if spots.is_empty():
+		spots.append(rack_pos + Vector3(1.6, 0, 0))
+	var spot: Vector3 = spots[0]
+	for candidate: Vector3 in spots:
+		spot = candidate
+		await _place(spot, 0.0)
+		await _frames(20)
+		var settled := player.global_position
+		await _frames(5)
+		if player.is_on_floor() and absf(player.global_position.y) < 0.1 and player.global_position.distance_to(settled) < 0.01 \
+				and player.global_position.distance_to(rack_pos) <= services.config.interact_distance_m:
+			break
 	var contacts: Array[String] = []
 	for index in player.get_slide_collision_count():
 		var contact := player.get_slide_collision(index)
@@ -291,6 +303,13 @@ func _open_run(around: Vector3, length: float) -> Array:
 
 ## A standing spot within `radius` of `around` where the player's capsule does not overlap anything.
 func _free_spot_near(around: Vector3, radius: float) -> Vector3:
+	var spots := _free_spots_near(around, radius)
+	return spots[0] if not spots.is_empty() else around + Vector3(radius, 0, 0)
+
+
+## Every free, floor-level spot on rings around `around`, nearest ring first.
+func _free_spots_near(around: Vector3, radius: float) -> Array[Vector3]:
+	var found: Array[Vector3] = []
 	var space := root.get_world_3d().direct_space_state
 	var shape := CapsuleShape3D.new()
 	shape.radius = main.player.tuning.body_radius_m + 0.02
@@ -308,8 +327,8 @@ func _free_spot_near(around: Vector3, radius: float) -> Vector3:
 				var down := PhysicsRayQueryParameters3D.create(p + Vector3(0, 1.0, 0), p + Vector3(0, -1.0, 0), Layers.WORLD)
 				var hit := space.intersect_ray(down)
 				if not hit.is_empty() and absf(float(hit.position.y)) < 0.1:
-					return p
-	return around + Vector3(radius, 0, 0)
+					found.append(p)
+	return found
 
 
 func _door_walks() -> void:
