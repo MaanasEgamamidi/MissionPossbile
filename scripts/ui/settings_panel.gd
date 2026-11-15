@@ -408,7 +408,7 @@ func _build_graphics(box: VBoxContainer) -> void:
 func _voice_button(node_name: String) -> Button:
 	var voice := Kit.button("Voice and mic", &"mic", &"", 28.0, 1.0, 56.0)
 	voice.name = node_name
-	voice.tooltip_text = "Pick your microphone, mute it, and set how loud other players are."
+	voice.tooltip_text = "Toggle your built-in microphone and set how loud other players are."
 	voice.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	voice.pressed.connect(func() -> void:
 		var p := VoiceSettingsPanel.new()

@@ -28,6 +28,8 @@ func _run() -> void:
 	check("no device stays unavailable", VoiceService.built_in_device([]).is_empty())
 	var v := VoiceService.new()
 	v.settings = GameSettings.new()
+	check("microphone defaults off", v.settings.voice_mic_muted)
+	v.settings.voice_mic_muted = false
 	v._mic_active = true # simulated state; never opens the hardware
 	v._set_mic_state(&"opening")
 	check("opening does not claim capture is ready", not v.can_capture())
@@ -49,15 +51,81 @@ func _run() -> void:
 	check("only Windows export supported", presets.get_value("preset.0", "platform", "") == "Windows Desktop" and not presets.has_section("preset.1"))
 	check("Windows voice libraries exist", FileAccess.file_exists("res://addons/twovoip/libs/libtwovoip.windows.template_debug.x86_64.dll")
 		and FileAccess.file_exists("res://addons/twovoip/libs/libtwovoip.windows.template_release.x86_64.dll"))
+	await _toggle_check()
 	if OS.get_cmdline_user_args().has("--live"):
 		await _live_check()
 	print("RESULT %d/%d" % [checks - failures, checks])
 	quit(0 if failures == 0 else 1)
 
+func _key(pressed: bool, echo := false) -> void:
+	var event := InputEventKey.new()
+	event.physical_keycode = KEY_V
+	event.keycode = KEY_V
+	event.pressed = pressed
+	event.echo = echo
+	root.push_input(event)
+	await process_frame
+
+func _toggle_check() -> void:
+	var v := VoiceService.new()
+	v.synthetic_input = true # no real microphone, playback or network
+	v.settings = GameSettings.new()
+	v.settings.voice_mic_muted = false # old saved preference must not opt a new session in
+	root.add_child(v)
+	v.setup(null, null, null)
+	check("new session resets saved-on preference to off", v.mic_muted() and not v._mic_active)
+	var hud := VoiceHud.new()
+	root.add_child(hud)
+	hud.setup(v)
+	var panel := VoiceSettingsPanel.new()
+	panel.settings = v.settings
+	panel.settings_path = ""
+	panel.voice = v
+	panel.setup(null)
+	root.add_child(panel)
+	check("HUD and settings start off", hud.header_text().contains("OFF") and panel.mute_button().button_pressed)
+	v.request_meter(true)
+	v.inject_capture(PackedVector2Array([Vector2(0.4, 0.4)]))
+	await process_frame
+	await process_frame # process_frame resumes before the nodes' _process callbacks
+	check("opening the meter cannot enable capture", v.input_level() == 0.0 and v._synthetic.is_empty() and not v.can_capture())
+	await _key(true)
+	hud.refresh()
+	panel.refresh()
+	check("first V press enables microphone and updates UI", not v.mic_muted() and hud.header_text().contains("ON") and not panel.mute_button().button_pressed)
+	await _key(true, true)
+	check("held-key repeat does not toggle", not v.mic_muted())
+	await _key(false)
+	check("key release leaves microphone on", not v.mic_muted())
+	v._level = 0.5
+	v._transmitting = true
+	await _key(true)
+	hud.refresh()
+	panel.refresh()
+	check("second V press closes capture and clears meter", v.mic_muted() and not v.is_transmitting() and is_zero_approx(v.input_level()))
+	check("HUD and settings return to off together", hud.header_text().contains("OFF") and panel.mute_button().button_pressed)
+	await _key(false)
+	paused = true
+	await _key(true)
+	check("toggle works while paused", not v.mic_muted())
+	await _key(false)
+	paused = false
+	var field := LineEdit.new()
+	root.add_child(field)
+	field.grab_focus()
+	await _key(true)
+	check("typing V does not toggle the microphone", not v.mic_muted())
+	await _key(false)
+	field.free()
+	panel.free()
+	hud.free()
+	v.free()
+
 func _live_check() -> void:
 	var v := VoiceService.new()
 	root.add_child(v)
 	v.setup(null, null, null)
+	v.set_mic_muted(false)
 	v.set_input_device("Headset Microphone (USB)")
 	check("legacy external device selection is ignored", v.settings.voice_input_device == VoiceService.built_in_device(AudioServer.get_input_device_list()))
 	var panel := VoiceSettingsPanel.new()

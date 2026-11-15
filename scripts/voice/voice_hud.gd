@@ -9,7 +9,7 @@ extends PanelContainer
 ## Suit radio (2026-11-15, suit_radio.gd): while talking over it, "📡 Radio: delay 30 s (crackly, words drop out)" or
 ## "✖ No signal: the suit radio needs a comms upgrade" (once per press, held a few seconds); a listener sees
 ## "📡 Incoming (delayed) from Ana: heard in 12 s", then "📡 Ana — suit radio, said 30 s ago (crackly …)".
-## Open mic (2026-11-15): the first line always reads "🎙 Voice chat ON" (voice is always on, no key to hold).
+## The first line shows the microphone's ON/OFF toggle and its key (V by default).
 ## VoiceService adds it under GameHud, so it hides with the HUD while a panel is open.
 
 ## Distance from the screen edges, pixels (the HUD's own margin).
@@ -41,7 +41,7 @@ func setup(p_voice: VoiceService) -> void:
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(box)
 	_head = _make_label(box, "Header", UiTheme.GOOD)
-	_head.text = "🎙 Voice chat ON"
+	_head.text = "🎙 Voice chat OFF"
 	_own = _make_label(box, "Own", &"")
 	_note = _make_label(box, "Transition", UiTheme.MUTED)
 	_heard = _make_label(box, "Heard", &"")
@@ -78,8 +78,10 @@ func refresh() -> void:
 	if voice == null or not is_instance_valid(voice) or _own == null:
 		return
 	var listen_only := not voice.can_capture()
-	_head.text = "🎙 Voice chat ON — listening only" if listen_only else "🎙 Voice chat ON"
-	_head.theme_type_variation = UiTheme.WARN if listen_only else UiTheme.GOOD
+	var off := voice.voice_label_off()
+	var key := VoiceService.toggle_key_label()
+	_head.text = "🎙 Voice chat OFF · %s to turn on" % key if off else "🎙 Voice chat ON · %s to turn off" % key
+	_head.theme_type_variation = UiTheme.MUTED if off else (UiTheme.WARN if listen_only else UiTheme.GOOD)
 	var own := voice.own_line()
 	_own.text = own
 	if own.begins_with("✖"):

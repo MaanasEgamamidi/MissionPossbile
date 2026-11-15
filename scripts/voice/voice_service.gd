@@ -9,8 +9,8 @@ extends Node
 ## catch-up (playing faster or slower with pitch_scale to steer the buffer) is NOT used: pitch_scale stays 1.0, so
 ## speech speed never changes and a radio delay is never shortened.
 ##
-## Open mic (2026-11-15): voice chat is always on. While a game is running and the microphone is not muted, Opus
-## frames go continuously to the other players of this session; no key needs to be held. Nothing is recorded or
+## Toggle mic: each game starts with the microphone off. Press V once to turn it on, again to turn it off. While
+## enabled, Opus frames go continuously to the other players; no key needs to be held. Nothing is recorded or
 ## written to disk; buffers live in memory and are cleared on mute,
 ## on a player's disconnect and when the session ends. Without a microphone (none, blocked, or a headless run) the
 ## game plays on and listening still works. Voice keeps working while the game is paused.
@@ -229,8 +229,26 @@ static func library_problem() -> String:
 
 func _ready() -> void:
 	add_to_group(GROUP)
+	PlayerInput.ensure_actions()
 	process_mode = Node.PROCESS_MODE_ALWAYS          # voice keeps working while the game is paused
 	process_priority = -100                       # drain voice before ordinary gameplay work
+
+
+## Keep the existing action id so saved key remaps continue to work. GUI text fields, puzzle controls and
+## key-binding capture handle their events first. Repeats and key-up never toggle the switch.
+func _unhandled_input(event: InputEvent) -> void:
+	if settings == null or not event.is_action_pressed(&"push_to_talk", false, true):
+		return
+	var focus := get_viewport().gui_get_focus_owner()
+	if focus is LineEdit or focus is TextEdit:
+		return
+	set_mic_muted(not mic_muted())
+	get_viewport().set_input_as_handled()
+
+
+static func toggle_key_label() -> String:
+	var label := PlayerInput.describe(&"push_to_talk") if InputMap.has_action(&"push_to_talk") else ""
+	return label if label != "" else "V"
 
 
 ## Presenter entry point. `world` may be null (tests); `game` is GameMain or null.
@@ -243,9 +261,8 @@ func setup(p_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 		var s: Variant = p_game.get(&"settings") if p_game != null else null
 		settings = s as GameSettings if s is GameSettings else GameSettings.new()
 	_stream_id = randi() & 0xffff
-	# voice chat is always on: a mute left over from an earlier session does not carry into this one
-	if settings.voice_mic_muted:
-		settings.voice_mic_muted = false
+	# Every colony session starts off, including when an older settings file saved the microphone as enabled.
+	settings.voice_mic_muted = true
 	_library_problem = library_problem()
 	_library = _library_problem == ""
 	if _library:
@@ -325,7 +342,7 @@ func can_capture() -> bool:
 
 
 func mic_muted() -> bool:
-	return settings != null and settings.voice_mic_muted
+	return settings == null or settings.voice_mic_muted
 
 
 func set_mic_muted(on: bool) -> void:
@@ -334,6 +351,9 @@ func set_mic_muted(on: bool) -> void:
 	if on:
 		_stop_transmit()
 		_stop_mic()
+		_synthetic.clear()
+		_want_input_until = -1.0
+		_no_signal_until = -1.0
 	else:
 		retry_microphone()
 
@@ -341,7 +361,7 @@ func set_mic_muted(on: bool) -> void:
 ## The microphone's state in words for the HUD and the voice settings.
 func mic_state_text() -> String:
 	if mic_muted():
-		return "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
+		return "Voice chat OFF. Microphone muted. Press %s to turn it on. You can still hear other players." % toggle_key_label()
 	match _mic_state:
 		&"available", &"opening":
 			return "Opening the built-in microphone. Speak to check the input level."
@@ -369,7 +389,7 @@ func mic_state_text() -> String:
 ## Short form for the HUD.
 func mic_short_text() -> String:
 	if mic_muted():
-		return "✖ Microphone muted"
+		return "Microphone muted · Press %s to turn voice chat on" % toggle_key_label()
 	if _mic_state == &"quiet":
 		return "✖ Microphone silent — check the system mute key"
 	if _mic_state in [&"available", &"opening"]:
@@ -418,7 +438,7 @@ func retry_microphone() -> void:
 		_start_mic(_now())
 
 
-## The voice settings ask for the level meter while they are open (the microphone opens; nothing is sent).
+## The meter uses the same capture as voice. Opening settings never enables a muted microphone.
 func request_meter(on: bool) -> void:
 	_meter_requests = maxi(0, _meter_requests + (1 if on else -1))
 
@@ -523,11 +543,11 @@ func _check_mic_health(now: float) -> void:
 		_set_mic_state(&"quiet")
 
 
-## Open mic: voice chat is always on, so the microphone always wants to send (tests may override it).
+## After toggling on, capture continues until toggled off (tests can separately gate transmission).
 func _ptt_held() -> bool:
 	if _ptt_override >= 0:
 		return _ptt_override == 1
-	return true
+	return not mic_muted()
 
 
 func _next_chunk() -> PackedVector2Array:
@@ -551,6 +571,10 @@ func is_transmitting() -> bool:
 
 func _capture(now: float) -> void:
 	if not _library or _encoder == null:
+		return
+	if mic_muted():
+		_stop_mic()
+		_synthetic.clear()
 		return
 	var held := _ptt_held()
 	if (held or _meter_requests > 0) and not mic_muted():
@@ -1062,9 +1086,9 @@ func comms_down() -> bool:
 	return false
 
 
-## Voice chat is always on (open mic); the corner never reads "off".
+## The HUD follows the same switch as capture.
 func voice_label_off() -> bool:
-	return false
+	return mic_muted()
 
 
 ## The local player's own line: what their voice does now (talking) or would do (idle).
