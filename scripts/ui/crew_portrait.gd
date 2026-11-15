@@ -5,6 +5,8 @@ extends Control
 ## SubViewport of its own (own world, own camera and lights). Without it, or when `prefer_rig` is false, it draws a
 ## badge: a circle in the crew accent colour with the crew symbol (CrewLooks, as on the suit and name tag).
 
+## The mini-games' drawing kit: the shared tick and padlock (set_mark).
+const PuzzleKit := preload("res://scripts/tasks/puzzles/kit.gd")
 ## Pixel size of the rendered portrait.
 const PORTRAIT_SIZE := Vector2i(160, 200)
 
@@ -33,6 +35,9 @@ var index := 0
 var _viewport: SubViewport
 var _container: SubViewportContainer
 var _visual: PlayerVisual
+## The corner mark (set_mark): a Control over the portrait, made only when a mark is first asked for.
+var _mark: Control
+var _mark_kind: StringName = &""
 
 
 ## Shows `p_character`; `p_index` is the crew index 0..3. Builds the 3D portrait or the badge.
@@ -68,6 +73,41 @@ func set_suit(on: bool) -> void:
 	if _visual != null:
 		_visual.set_suit(on)
 		_viewport.render_target_update_mode = SubViewport.UPDATE_ONCE
+
+
+## Shows a mark in the portrait's top right corner: &"you" (the green tick the mini-games use for "done / yours"),
+## &"taken" (an amber padlock: another player has this crew member) or &"" (none). The mark is a shape, so the card's
+## edge colour is never the only cue.
+func set_mark(kind: StringName) -> void:
+	if kind == _mark_kind:
+		return
+	_mark_kind = kind
+	if _mark == null:
+		if kind == &"":
+			return
+		_mark = Control.new()
+		_mark.name = "Mark"
+		_mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		_mark.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		_mark.draw.connect(_draw_mark)
+		add_child(_mark)
+	_mark.visible = kind != &""
+	_mark.queue_redraw()
+
+
+## The mark now shown: &"you", &"taken" or &"".
+func mark() -> StringName:
+	return _mark_kind
+
+
+func _draw_mark() -> void:
+	var r := clampf(minf(size.x, size.y) * 0.13, 14.0, 30.0)
+	var centre := Vector2(size.x - r - 4.0, r + 4.0)
+	if _mark_kind == &"you":
+		PuzzleKit.tick(_mark, centre, r)
+	elif _mark_kind == &"taken":
+		_mark.draw_circle(centre, r, PuzzleKit.INK)
+		PuzzleKit.lock(_mark, centre + Vector2(0.0, -r * 0.1), r * 0.62, true, UiTheme.palette().warn)
 
 
 ## Crew ids of a colony in order ("crew_1" first). Sorted as text: StringNames do not sort alphabetically.
@@ -110,6 +150,7 @@ func _build_rig() -> void:
 	_container.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_container.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(_container)
+	move_child(_container, 0)            # under the corner mark, if there is one
 	_viewport = SubViewport.new()
 	_viewport.name = "Viewport"
 	_viewport.size = PORTRAIT_SIZE

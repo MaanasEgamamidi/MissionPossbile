@@ -38,7 +38,20 @@ static func expected(state: ColonyState, sols: float) -> int:
 	return n
 
 
+## The Mission Control card's title for a warning, five words at most: "Dust storm in 6 h".
+static func warning_title(state: ColonyState) -> String:
+	var n := now(state)
+	return String(n.text) if String(n.phase) == "warned" else "Dust storm coming"
+
+
+## The ONE thing to do when a warning comes in, for the HUD (nine words at most). The whole advice (warning_advice)
+## stays readable in the Power & life support drawer's message list.
+static func warning_line(_state: ColonyState) -> String:
+	return "Go inside. Charge the battery."
+
+
 ## What to tell the crew when a warning comes in: how long, what it does, what to do, and how many more are lined up.
+## Too long for the HUD: the card shows warning_title() and warning_line(), this is kept for the message list.
 static func warning_advice(state: ColonyState) -> String:
 	var n := now(state)
 	var more := expected(state, 5.0)

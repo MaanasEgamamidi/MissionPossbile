@@ -1,6 +1,7 @@
 extends Node3D
 ## Gold guide lines to the room tapes (owner 2026-11-14, like the guide lines in Marvel's Wolverine): one line of small
-## twinkling gold sparkles per tape, a hand's width above the floor, all starting together just inside the base (the
+## twinkling gold sparkles per tape, at about chest height (owner 2026-11-15: they were a hand's width above the floor
+## and too small to spot), all starting together just inside the base (the
 ## airlock side of the exit tunnel's inner door) and fanning out through the rooms and doorways to each tape, which
 ## sparkles gold too (cassette_presenter.gd). The sparkles drift slowly along the line toward the tape, so the way to go
 ## reads at a glance. Where several lines share a corridor they run side by side (the offsets are baked into the
@@ -28,11 +29,12 @@ const CORNER_STEPS := 6
 ## Seconds a collected tape's line takes to thin out (its last sparkles then live out their LIFETIME).
 const FADE_SECONDS := 0.7
 
-## Sparkle height above the floor point, metres (random per emission point, in this range).
-const LIFT_MIN := 0.06
-const LIFT_MAX := 0.14
-## Sideways scatter of the emission points either side of the path, metres.
-const SCATTER := 0.03
+## Sparkle height above the floor point, metres (random per emission point, in this range): about chest height of a
+## 1.8 m crew member, so the line runs through the middle of the view and not along the floor.
+const LIFT_MIN := 1.05
+const LIFT_MAX := 1.35
+## Sideways scatter of the emission points either side of the path, metres (lanes are 0.24 m apart or more).
+const SCATTER := 0.06
 ## Distance between emission points along a line, metres (widened when the lines are long, see TOTAL_CAP).
 const SPACING := 0.15
 ## Most sparkles across all lines together (one sparkle per emission point).
@@ -41,8 +43,10 @@ const TOTAL_CAP := 1800
 const LIFETIME := 1.2
 const DRIFT_MIN := 0.35
 const DRIFT_MAX := 0.6
-## Sparkle sprite size, metres.
-const SPARKLE_SIZE := 0.06
+## Sparkle sprite size, metres (was 0.06).
+const SPARKLE_SIZE := 0.2
+## The darker amber rim of each sparkle: it keeps the gold readable against the base's white walls.
+const GOLD_RIM := Color(0.93, 0.47, 0.04)
 
 # Owner 2026-11-14: replaced by sparkle particles
 # const SHADER_CODE := "
@@ -370,8 +374,8 @@ static func _tune(node: GPUParticles3D) -> void:
 static func _style(process: ParticleProcessMaterial) -> void:
 	process.angle_min = 0.0
 	process.angle_max = 360.0
-	process.scale_min = 0.7
-	process.scale_max = 1.3
+	process.scale_min = 0.8
+	process.scale_max = 1.4
 	process.scale_curve = _scale_curve_texture()
 	process.color_ramp = _color_ramp_texture()
 
@@ -395,7 +399,7 @@ static func idle_sparkles(amount: int, extents: Vector3, lifetime: float) -> GPU
 	node.preprocess = lifetime
 	node.process_material = process
 	node.local_coords = false
-	var grow := Vector3(0.15, 0.35, 0.15)
+	var grow := Vector3(0.3, 0.5, 0.3)
 	node.visibility_aabb = AABB(-extents - grow, (extents + grow) * 2.0)
 	_tune(node)
 	return node
@@ -410,13 +414,15 @@ static func sparkle_mesh() -> QuadMesh:
 	return _sparkle_mesh
 
 
-## Unshaded, additive, billboarded (per particle), no shadows, no depth write; takes the particle colour.
+## Unshaded, billboarded (per particle), no shadows, no depth write; takes the particle colour. Alpha blended, not
+## additive (owner 2026-11-15, "more visible"): added light disappears on the base's bright walls, a gold sprite with
+## an amber rim reads on light and dark alike.
 static func sparkle_material() -> StandardMaterial3D:
 	if _sparkle_material == null:
 		var mat := StandardMaterial3D.new()
 		mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		mat.blend_mode = BaseMaterial3D.BLEND_MODE_ADD
+		mat.blend_mode = BaseMaterial3D.BLEND_MODE_MIX
 		mat.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
 		mat.billboard_mode = BaseMaterial3D.BILLBOARD_PARTICLES
 		mat.vertex_color_use_as_albedo = true
@@ -441,10 +447,11 @@ static func star_texture() -> Texture2D:
 			var dy := (float(y) + 0.5) / N * 2.0 - 1.0
 			var r := sqrt(dx * dx + dy * dy)
 			var core := exp(-r * r * 22.0)
-			var halo := exp(-r * r * 6.0) * 0.3
-			var rays := exp(-absf(dx) * 26.0) * exp(-absf(dy) * 3.2) + exp(-absf(dy) * 26.0) * exp(-absf(dx) * 3.2)
-			var a := clampf(core + rays * 0.85 + halo, 0.0, 1.0) * clampf(1.0 - r, 0.0, 1.0)
-			var c := GOLD.lerp(white, clampf(core * 1.4, 0.0, 1.0))
+			var halo := exp(-r * r * 5.0) * 0.55
+			var rays := exp(-absf(dx) * 20.0) * exp(-absf(dy) * 2.8) + exp(-absf(dy) * 20.0) * exp(-absf(dx) * 2.8)
+			var a := clampf(core * 1.2 + rays + halo, 0.0, 1.0) * clampf((1.0 - r) * 1.6, 0.0, 1.0)
+			# White-hot centre, gold body, amber rim.
+			var c := GOLD.lerp(GOLD_RIM, clampf(r * 2.2 - 0.25, 0.0, 1.0)).lerp(white, clampf(core * 1.4, 0.0, 1.0))
 			img.set_pixel(x, y, Color(c.r, c.g, c.b, a))
 	img.generate_mipmaps()
 	_star_texture = ImageTexture.create_from_image(img)
@@ -457,7 +464,7 @@ static func _scale_curve_texture() -> CurveTexture:
 		var curve := Curve.new()
 		curve.add_point(Vector2(0.0, 0.1))
 		curve.add_point(Vector2(0.2, 1.0))
-		curve.add_point(Vector2(0.45, 0.55))
+		curve.add_point(Vector2(0.45, 0.7))
 		curve.add_point(Vector2(0.7, 1.0))
 		curve.add_point(Vector2(1.0, 0.0))
 		_scale_texture = CurveTexture.new()

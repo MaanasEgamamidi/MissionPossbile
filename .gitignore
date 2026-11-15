@@ -36,3 +36,6 @@ docs/milestones/04_player/crew_v2/crew_looks/ingame3/*
 assets_src/characters/crew_v2/variants_work/
 # weather test output
 _test_weather/
+_locks/
+# Owner prompt pack copied in for reference (lives at E:\Prompt)
+Prompt/

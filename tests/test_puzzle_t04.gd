@@ -260,7 +260,7 @@ func _panel_checks() -> void:
 	var issues := UiLayoutCheck.problems(panel, root.get_visible_rect().size)
 	_check("layout fits 1280x720", issues.is_empty(), " | ".join(issues))
 	var lay := Rule.layout(int(state.repair.tasks[TASK].puzzle_seed))
-	_check("voltage reading shows the target", (board.get("reading_label") as Label).text.contains("Target: %d V" % int(lay.target)))
+	_check("the meter shows the target voltage", int((board.call("meter") as Dictionary).target) == int(lay.target))
 	for step: Dictionary in lay.solution:
 		(cells[int(step.cell)] as Button).grab_focus()
 		await _frames(1)

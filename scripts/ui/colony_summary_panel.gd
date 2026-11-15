@@ -1,12 +1,20 @@
-﻿class_name ColonySummaryPanel
+class_name ColonySummaryPanel
 extends UiPanel
-## The colony at a glance and in depth: what is in store (stocks), how fast it changes right now (flows), how long
-## each stock lasts at this rate, and which rooms have power. It only reads state; switching rooms is done at the
-## power panel. The static functions below are also used by the HUD, so both always agree.
+## The colony at a glance and, one press away, in depth.
+## At a glance ("What we have"): one tile per supply with its picture, a level bar and ONE status word (OK / Low /
+## Very low, with a mark of its own shape), an arrow when it is rising or falling, and how long it lasts only when
+## it is low. No numbers while things are fine.
+## "Details" (closed when the panel opens) holds everything else: the amounts with their units, what is changing
+## right now and why, how long each supply lasts at this rate, two ideas that are easy to mix up, and which rooms
+## have power. It only reads state; switching rooms is done at the power panel. The static functions below are also
+## used by the HUD, so both always agree.
 ##
 ## Flows come from the model: `state.rates` (net change of each store per game hour in the last tick),
 ## `state.solar_kw`, `state.load_kw` and `state.battery_kw`. Time left comes from ReserveForecast.compute(), which
 ## follows the real sun curve for the battery.
+
+const MenuKit := preload("res://scripts/ui/menu_kit.gd")
+const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
 
 ## Stocks shown, in order: key, symbol, name, unit, explanation id.
 const STOCKS := [
@@ -25,10 +33,18 @@ const URGENT_SOLS := 1.0
 ## The battery uses its own shares (it empties and fills every sol).
 const BATTERY_WARN_SHARE := 0.25
 const BATTERY_URGENT_SHARE := 0.10
+## Narrowest a supply tile may get, in pixels at text size 1.
+const TILE_MIN_WIDTH := 230.0
 
 var _glance: Label
+var _tiles := {}                # key -> {"box", "bar", "mark", "word", "trend", "left", "colour"}
+var _tile_grid: GridContainer
+var _parts_chip: Label
+var _details_button: Button
+var _details: VBoxContainer
+var _scroll: ScrollContainer
+var _content: VBoxContainer
 var _stock_rows := {}           # key -> ReadingRow
-var _stock_bars := {}           # key -> ProgressBar
 var _parts_row: ReadingRow
 var _flow_rows := {}            # name -> ReadingRow
 var _cause_labels := {}         # name -> Label
@@ -42,108 +58,150 @@ func setup(p_services: GameServices) -> void:
 	super.setup(p_services)
 	name = "ColonySummaryPanel"
 	theme_type_variation = UiTheme.PANEL
+	max_height = -1.0               # UiRoot.HUG: as tall as the glance while the details are closed
+	var ts := UiTheme.text_scale()
 	var box := VBoxContainer.new()
 	box.name = "Box"
+	box.add_theme_constant_override(&"separation", 10)
 	add_child(box)
 	var header := HBoxContainer.new()
 	header.name = "Header"
+	header.add_theme_constant_override(&"separation", 12)
 	box.add_child(header)
+	header.add_child(MenuKit.picture(&"dome", 34.0 * ts, &"heading"))
 	var title := Label.new()
 	title.name = "Title"
-	title.text = "Colony summary"
+	title.text = "Colony"
 	title.theme_type_variation = UiTheme.TITLE
-	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	header.add_child(title)
-	_close = Button.new()
-	_close.name = "Close"
-	_close.text = "Close"
-	_close.pressed.connect(func() -> void: close_requested.emit())
-	header.add_child(_close)
 	_glance = Label.new()
 	_glance.name = "Glance"
 	_glance.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	box.add_child(_glance)
+	_glance.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	header.add_child(_glance)
+	var chip := PanelContainer.new()
+	chip.name = "Parts"
+	chip.theme_type_variation = UiTheme.CHIP
+	chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	HudKit.say(chip, "Spare parts. Upgrades and repairs use them.")
+	var chip_row := HBoxContainer.new()
+	chip_row.add_theme_constant_override(&"separation", 8)
+	chip.add_child(chip_row)
+	chip_row.add_child(MenuKit.picture(&"gear", 24.0 * ts, &"heading"))
+	_parts_chip = Label.new()
+	_parts_chip.theme_type_variation = UiTheme.HEADING
+	chip_row.add_child(_parts_chip)
+	header.add_child(chip)
+	_close = Button.new()
+	_close.name = "Close"
+	_close.text = "Close"
+	_close.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_close.pressed.connect(func() -> void: close_requested.emit())
+	header.add_child(_close)
 
-	var scroll := ScrollContainer.new()
-	scroll.name = "Scroll"
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	box.add_child(scroll)
+	_scroll = ScrollContainer.new()
+	_scroll.name = "Scroll"
+	_scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_scroll.follow_focus = true
+	box.add_child(_scroll)
 	var content := VBoxContainer.new()
 	content.name = "Content"
 	content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(content)
+	content.add_theme_constant_override(&"separation", 10)
+	_scroll.add_child(content)
+	_content = content
 
-	# ---- stocks
-	_heading(content, "In store (stocks)")
+	# ---- at a glance: one tile per supply
+	_heading(content, "What we have")
+	_tile_grid = GridContainer.new()
+	_tile_grid.name = "Supplies"
+	_tile_grid.columns = 4
+	_tile_grid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_tile_grid.add_theme_constant_override(&"h_separation", 10)
+	_tile_grid.add_theme_constant_override(&"v_separation", 10)
+	content.add_child(_tile_grid)
+	for s: Dictionary in STOCKS:
+		_tile_grid.add_child(_make_tile(s))
+	_details_button = MenuKit.button("Details", &"down", &"", 22.0 * ts, 1.0, 46.0)
+	_details_button.name = "Details"
+	_details_button.toggle_mode = true
+	_details_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_details_button.tooltip_text = "The numbers, what is changing, and the rooms."
+	_details_button.toggled.connect(_on_details_toggled)
+	content.add_child(_details_button)
+	_details = VBoxContainer.new()
+	_details.name = "DetailsBox"
+	_details.visible = false
+	_details.add_theme_constant_override(&"separation", 8)
+	content.add_child(_details)
+
+	# ---- the numbers
+	_heading(_details, "The numbers")
 	for s: Dictionary in STOCKS:
 		var row := ReadingRow.make(s.symbol, s.name, s.explain)
-		content.add_child(row)
+		_details.add_child(row)
 		_stock_rows[s.key] = row
-		var bar := ProgressBar.new()
-		bar.name = "Bar_" + String(s.key)
-		bar.show_percentage = false
-		bar.min_value = 0.0
-		bar.max_value = 1.0
-		content.add_child(bar)
-		_stock_bars[s.key] = bar
 	_parts_row = ReadingRow.make("⚙", "Spare parts", "parts")
-	content.add_child(_parts_row)
+	_details.add_child(_parts_row)
 
 	# ---- flows
-	_heading(content, "Changing right now (flows)")
-	for f: Array in [["solar", "☀", "Sun gives (solar power)", "solar_power"], ["load", "⌁", "Colony uses (load)", "load"],
+	_heading(_details, "What is changing")
+	for f: Array in [["solar", "☀", "Sun gives", "solar_power"], ["load", "⌁", "Colony uses", "load"],
 			["net", "⇅", "Battery change", "power_deficit"], ["oxygen", "O₂", "Oxygen reserve per sol", "oxygen"],
 			["water", "≈", "Water per sol", "water"], ["food", "✿", "Food per sol", "food"],
 			["cabin", "◎", "Cabin air", "cabin_air"]]:
 		var row := ReadingRow.make(f[1], f[2], f[3])
-		content.add_child(row)
+		_details.add_child(row)
 		_flow_rows[f[0]] = row
 		if String(f[0]) in ["net", "oxygen", "water", "food", "cabin"]:
 			var cause := Label.new()
 			cause.name = "Cause_" + String(f[0])
 			cause.theme_type_variation = UiTheme.MUTED
 			cause.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			content.add_child(cause)
+			_details.add_child(cause)
 			_cause_labels[f[0]] = cause
 		if String(f[0]) == "oxygen":
 			var made := Label.new()
 			made.name = "OxygenMade"
+			made.theme_type_variation = UiTheme.MUTED
 			made.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			content.add_child(made)
+			_details.add_child(made)
 			_cause_labels["oxygen_made"] = made
 
 	# ---- time left
-	_heading(content, "How long it lasts at this rate")
+	_heading(_details, "How long it lasts")
 	for s: Dictionary in STOCKS:
 		var row := ReadingRow.make(s.symbol, short_name(s), "stock_vs_flow")
 		row.name = "TimeLeft_" + String(s.key)
-		content.add_child(row)
+		_details.add_child(row)
 		_time_rows[s.key] = row
 
 	# ---- two ideas that are easy to mix up
-	_idea_box(content, "Stock or flow? A stock is an amount kept in store, like the kWh in the battery or the litres of water in the tank. A flow is how fast it changes right now, like kW or litres per sol.",
+	_heading(_details, "Easy to mix up")
+	_idea_box(_details, "Stock or flow? A stock is an amount kept in store, like the kWh in the battery or the litres of water in the tank. A flow is how fast it changes right now, like kW or litres per sol.",
 		"stock_vs_flow")
-	_idea_box(content, "Body energy or electricity? Body energy (stamina) is how fresh your crew member feels; resting brings it back. Colony electricity is the power in the battery that runs the rooms.",
+	_idea_box(_details, "Body energy or electricity? Body energy (stamina) is how fresh your crew member feels; resting brings it back. Colony electricity is the power in the battery that runs the rooms.",
 		"stamina_vs_electricity")
 
 	# ---- rooms
-	_heading(content, "Rooms with power")
+	_heading(_details, "Rooms with power")
 	var note_row := HBoxContainer.new()
 	note_row.name = "RoomsNoteRow"
 	var note := Label.new()
 	note.name = "RoomsNote"
-	note.text = "Read only. Switch rooms on and off at the power panel in the Power Room."
+	note.text = "Switch rooms on and off at the power panel."
 	note.theme_type_variation = UiTheme.MUTED
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	note.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	note_row.add_child(note)
 	note_row.add_child(ExplainButton.make("zones_power"))
-	content.add_child(note_row)
+	_details.add_child(note_row)
 	_rooms_grid = GridContainer.new()
 	_rooms_grid.name = "Rooms"
 	_rooms_grid.columns = 3
-	content.add_child(_rooms_grid)
+	_details.add_child(_rooms_grid)
+	_scroll.resized.connect(_fit_tiles)
 	refresh()
 
 
@@ -155,22 +213,74 @@ func first_focus() -> Control:
 	return _close
 
 
+## Opens or closes the "Details" part (as its switch does).
+func set_details_open(open: bool) -> void:
+	if _details_button != null:
+		_details_button.button_pressed = open
+
+
+func details_open() -> bool:
+	return _details != null and _details.visible
+
+
+## What the tile of a supply says: {"word": "OK" | "Low" | "Very low", "level": StringName, "share": 0..1,
+## "trend": "Rising" | "Falling" | "Steady", "left": "" or "about 4.9 sols left" (only when it is low)}.
+func tile_reading(key: StringName) -> Dictionary:
+	var st := services.state()
+	var cap := float(st.capacities.get(key, 0.0))
+	var lvl := level_of(services, key)
+	var change := float(st.battery_kw) if key == &"battery_kwh" else change_per_sol(services, key)
+	if key == &"battery_kwh" and absf(change) <= 0.05:
+		change = 0.0
+	return {"word": level_word(lvl), "level": lvl, "share": clampf(st.store(key) / cap, 0.0, 1.0) if cap > 0.0 else 0.0,
+		"trend": trend_word(change), "left": left_words(time_left_sols(services, key)) if lvl != &"ok" else ""}
+
+
+## "about 4.9 sols left", "about 5 hours left", "less than 1 hour left"; "" when `sols` < 0 (not going down).
+static func left_words(sols: float) -> String:
+	if sols < 0.0:
+		return ""
+	if sols >= 1.0:
+		var n := num(sols)
+		return "about %s %s left" % [n, "sol" if n == "1" else "sols"]
+	var hours := sols * GameConfig.SOL_HOURS
+	if hours < 1.0:
+		return "less than 1 hour left"
+	var h := num(hours)
+	return "about %s %s left" % [h, "hour" if h == "1" else "hours"]
+
+
+## The HUD's picture and colour of a supply.
+static func art_of(key: StringName) -> Array:
+	match key:
+		&"battery_kwh":
+			return [&"power", AstraStyle.C_POWER]
+		&"oxygen_kg":
+			return [&"air", AstraStyle.C_O2]
+		&"water_l":
+			return [&"water", AstraStyle.C_WATER]
+		&"food_meals":
+			return [&"food", AstraStyle.C_FOOD]
+	return [&"dot", AstraStyle.TEXT_2]
+
+
 func refresh() -> void:
 	if services == null or not services.has_game():
 		return
 	var st := services.state()
 	var f := flows_of(services)
 	var forecast := ReserveForecast.compute(st, services.balance, services.clock())
-	# stocks
+	# at a glance
+	_parts_chip.text = "1 part" if st.parts == 1 else "%d parts" % st.parts
+	for s: Dictionary in STOCKS:
+		_refresh_tile(s)
+	# the numbers
 	for s: Dictionary in STOCKS:
 		var key: StringName = s.key
 		var cap := float(st.capacities.get(key, 0.0))
 		var lvl := level_of(services, key)
 		(_stock_rows[key] as ReadingRow).set_value("%s of %s" % [amount_with_unit(key, st.store(key)), amount_with_unit(key, cap)], lvl, level_word(lvl))
-		var bar := _stock_bars[key] as ProgressBar
-		bar.value = st.store(key) / cap if cap > 0.0 else 0.0
-		bar.theme_type_variation = UiTheme.bar_of(lvl)          # the bar's colour follows the word beside it
-	_parts_row.set_value("%d parts" % st.parts, &"ok", "OK")
+	_parts_row.set_value("1 part" if st.parts == 1 else "%d parts" % st.parts, &"ok", "OK")
 
 	# flows
 	var battery_kw: float = f.battery_kw
@@ -219,13 +329,120 @@ func refresh() -> void:
 	if cabin_lvl != &"ok":
 		low.append("cabin air")
 	if low.is_empty():
-		_glance.text = "✓ Colony OK. Everything in store is fine right now."
+		_glance.text = "✓ Colony OK"
 		_glance.theme_type_variation = UiTheme.GOOD
 	else:
-		_glance.text = "! Needs attention: %s." % ", ".join(low)
+		_glance.text = "! Low: %s" % ", ".join(low)
 		_glance.theme_type_variation = UiTheme.WARN
 
 	_refresh_rooms()
+	_fit_height()
+
+
+## One supply at a glance: picture, name, status mark and word, an arrow when it changes, a level bar, and how long it
+## lasts when it is low.
+func _make_tile(s: Dictionary) -> Control:
+	var key: StringName = s.key
+	var art := art_of(key)
+	var tile := PanelContainer.new()
+	tile.name = "Tile_" + String(key)
+	tile.theme_type_variation = UiTheme.CARD
+	tile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	tile.custom_minimum_size.x = TILE_MIN_WIDTH
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override(&"separation", 10)
+	tile.add_child(col)
+	var top := HBoxContainer.new()
+	top.add_theme_constant_override(&"separation", 14)
+	col.add_child(top)
+	top.add_child(HudKit.Icon.new(art[0], art[1], 52.0, "Picture"))
+	var words := VBoxContainer.new()
+	words.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	words.add_theme_constant_override(&"separation", 2)
+	top.add_child(words)
+	var name_label := Label.new()
+	name_label.name = "Name"
+	name_label.text = short_name(s)
+	name_label.theme_type_variation = UiTheme.HEADING
+	words.add_child(name_label)
+	var status := HBoxContainer.new()
+	status.add_theme_constant_override(&"separation", 6)
+	words.add_child(status)
+	var mark := HudKit.Icon.new(&"check", AstraStyle.GOOD, 18.0, "Mark")
+	status.add_child(mark)
+	var word := Label.new()
+	word.name = "Word"
+	status.add_child(word)
+	var trend := HudKit.Icon.new(&"down", AstraStyle.TEXT_2, 16.0, "Trend")
+	trend.mouse_filter = Control.MOUSE_FILTER_PASS
+	status.add_child(trend)
+	var bar := HudKit.Bar.new(art[1], Vector2(140, 18), "Bar")
+	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_child(bar)
+	var left := Label.new()
+	left.name = "Left"
+	left.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	left.visible = false
+	col.add_child(left)
+	_tiles[key] = {"box": tile, "bar": bar, "mark": mark, "word": word, "trend": trend, "left": left, "colour": art[1]}
+	return tile
+
+
+func _refresh_tile(s: Dictionary) -> void:
+	var key: StringName = s.key
+	var ui: Dictionary = _tiles[key]
+	var r := tile_reading(key)
+	var lvl: StringName = r.level
+	var bar: Control = ui.bar
+	bar.set(&"share", float(r.share))
+	bar.set(&"color", HudKit.level_color(lvl, ui.colour))
+	var mark: Control = ui.mark
+	mark.set(&"kind", &"check" if lvl == &"ok" else (&"warn" if lvl == &"warn" else &"danger"))
+	mark.set(&"color", HudKit.level_color(lvl))
+	var word := ui.word as Label
+	word.text = String(r.word)
+	word.theme_type_variation = ReadingRow.variation_of(lvl)
+	var trend: Control = ui.trend
+	trend.visible = String(r.trend) != "Steady"
+	trend.set(&"kind", &"up" if String(r.trend) == "Rising" else &"down")
+	HudKit.say(trend, String(r.trend))
+	var left := ui.left as Label
+	left.text = String(r.left)
+	left.visible = not left.text.is_empty()
+	left.theme_type_variation = ReadingRow.variation_of(lvl)
+	(ui.box as Control).accessibility_name = "%s: %s" % [short_name(s), String(r.word)]
+
+
+## Four tiles in a row when there is room, else two.
+func _fit_tiles() -> void:
+	if _tile_grid == null:
+		return
+	var need := 4.0 * TILE_MIN_WIDTH + 3.0 * 10.0
+	for child in _tile_grid.get_children():
+		need = maxf(need, 4.0 * (child as Control).get_combined_minimum_size().x + 30.0)
+	var cols := 4 if _scroll.size.x >= need else 2
+	if _tile_grid.columns != cols:
+		_tile_grid.columns = cols
+
+
+func _on_details_toggled(open: bool) -> void:
+	_details.visible = open
+	_details_button.text = "Hide details" if open else "Details"
+	_details_button.icon = MenuKit.pic(&"up" if open else &"down", 22.0 * UiTheme.text_scale())
+	_fit_height()
+
+
+## The panel is as tall as the glance while the details are closed (also when a "time left" line appears on a tile),
+## and gives the details room to be read once they are open.
+func _fit_height() -> void:
+	if _scroll == null or not is_inside_tree():
+		return
+	# what is left of the screen under the header (UiRoot keeps a margin around every panel)
+	var chrome := get_minimum_size().y - _scroll.get_combined_minimum_size().y
+	var room := maxf(160.0, get_viewport_rect().size.y - chrome - 96.0)
+	var want := room if details_open() else minf(_content.get_combined_minimum_size().y, room)
+	if not is_equal_approx(_scroll.custom_minimum_size.y, want):
+		_scroll.custom_minimum_size.y = want
 
 
 ## The time-left line of a stock ("Oxygen lasts about 4.9 sols at this rate"), or "—" when `sols` < 0.

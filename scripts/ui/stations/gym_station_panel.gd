@@ -17,17 +17,13 @@ func _what_you_can_do() -> PackedStringArray:
 
 
 func _build_body() -> void:
-	_add_reading(&"body_energy", "♥", "Your body energy (stamina)", "stamina")
-	_add_reading(&"fitness", "↑", "Your fitness (conditioning)", "stamina_vs_electricity")
-	_add_reading(&"battery", "⚡", "Colony battery (electricity, not changed here)", "battery")
-	var row := HBoxContainer.new()
-	_body.add_child(row)
-	exercise_button = Button.new()
+	exercise_button = _add_action("Exercise", &"dumbbell", _on_exercise)
 	exercise_button.name = "Exercise"
-	exercise_button.text = "Exercise (uses %d %% body energy)" % roundi(ProgressionBalance.shared().exercise_stamina_cost)
-	exercise_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	exercise_button.pressed.connect(_on_exercise)
-	row.add_child(exercise_button)
+	exercise_button.tooltip_text = "Uses %d %% body energy" % roundi(ProgressionBalance.shared().exercise_stamina_cost)
+	_add_reading(&"body_energy", "♥", "Body energy", "stamina")
+	_add_reading(&"fitness", "↑", "Fitness", "stamina_vs_electricity")
+	# The battery is here only to show that exercise does not change it: part of the help.
+	_help_only(_add_reading(&"battery", "▮", "Colony battery (not changed here)", "battery"))
 
 
 func _refresh_body(st: ColonyState) -> void:
@@ -37,8 +33,9 @@ func _refresh_body(st: ColonyState) -> void:
 		_show_reading(&"fitness", "—", &"ok")
 	else:
 		var low := me.stamina < ProgressionBalance.shared().exercise_stamina_cost
-		_show_reading(&"body_energy", "%d %%" % roundi(me.stamina), &"warn" if low else &"ok")
-		_show_reading(&"fitness", "%d %%" % roundi(ProgressionSystem.conditioning(st, me.id) * 100.0), &"ok")
+		_show_reading(&"body_energy", "%d %%" % roundi(me.stamina), &"warn" if low else &"ok", me.stamina / 100.0)
+		var fit := ProgressionSystem.conditioning(st, me.id)
+		_show_reading(&"fitness", "%d %%" % roundi(fit * 100.0), &"ok", fit)
 	var battery := st.store(&"battery_kwh")
 	_show_reading(&"battery", "%s kWh" % num(battery, 0), StationPanel.stock_level(battery, float(st.capacities.get(&"battery_kwh", 0.0))))
 

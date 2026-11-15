@@ -1014,7 +1014,7 @@ func _test_panels() -> void:
 	for sector in ProgressionSystem.SECTORS:
 		sectors_ok = sectors_ok and up.sector_text(sector).contains("level 0 of 3") and up.find_child("Sector_" + sector, true, false) != null
 	var lines := up.requirement_lines(&"energy_solar_tracking")
-	var locked_ok := up.install_button(&"energy_solar_tracking").disabled and up.reason_label(&"energy_solar_tracking").text.begins_with("Locked:")
+	var locked_ok := up.install_button(&"energy_solar_tracking").disabled and up.reason_label(&"energy_solar_tracking").text == "Answer 2 questions"
 	var n_cards := 16 + CommsStage.CARD_IDS.size()       # Prompt 11 added the four radio cards (energy sector)
 	_check("cards panel: %d cards grouped in 5 sectors with the sector level" % n_cards, up.definitions.size() == n_cards and up.install_buttons.size() == n_cards and sectors_ok,
 		"%d cards, %s" % [up.definitions.size(), up.sector_text("energy")])
@@ -1036,7 +1036,7 @@ func _test_panels() -> void:
 	var at_computer := up.install_button(&"energy_solar_tracking").disabled and up.reason_label(&"energy_solar_tracking").text.contains("Go to the power panel")
 	me.position = CharacterState._v3(st.stations[String(POWER)].position)
 	up.refresh()
-	var at_station := not up.install_button(&"energy_solar_tracking").disabled and up.install_button(&"energy_solar_tracking").text == "Install"
+	var at_station := not up.install_button(&"energy_solar_tracking").disabled and up.install_button(&"energy_solar_tracking").text == "Upgrade"
 	_check("cards panel: Install is enabled only at the install station (disabled at the computer, with the reason)", at_computer and at_station,
 		up.reason_label(&"energy_solar_tracking").text)
 	# the wrong installer at the right station

@@ -2,12 +2,16 @@ class_name ColonyGoals
 extends RefCounted
 ## The goals the HUD's goal card (small mode) and the big goals screen (J) show, each checked from the real colony
 ## state (never from button presses):
-## {"id", "text", "done": bool, "fraction": 0..1, "label": short progress words, "kind", "task", "room", "role"}.
+## {"id", "text", "done": bool, "fraction": 0..1, "label": short progress words, "kind", "task", "room", "role",
+##  "spec": the crew specialty that must do it ("" = everyone), "have" / "need": the count of a counted goal (need 0 =
+##  not counted)}.
 ## Owner 2026-11-14: one list, in this order:
-##   1  "Find the 6 tapes (follow the gold lines)"  n/6  (TutorialSystem.tapes_found)
-##   2  "Play the tapes in the Command Room"        n/6  (TutorialSystem.tapes_played; the tutorial ends only after)
-##   3+ one goal per broken spot, in the tutorial's list order (TutorialSystem.fix_rows), with who can do it:
-##      "Fix the wires (only Electrical engineer)", "Fix the radio signal (anyone)". Ticked by TutorialSystem.is_fixed.
+##   1  "Find the tapes"   n/6  (TutorialSystem.tapes_found)
+##   2  "Play the tapes"   n/6  (TutorialSystem.tapes_played; the tutorial ends only after)
+##   3+ one goal per broken spot, in the tutorial's list order (TutorialSystem.fix_rows): "Patch the Relay",
+##      "Lock the Relay". Ticked by TutorialSystem.is_fixed.
+## UI overhaul: `text` is a short title (at most about five words). Who can do a repair is no longer in the words:
+## `spec` (a specialty id, for the badge) and `role` (kids' words, for the one line under the map) carry it.
 ## Then anything else the campaign publishes in state.campaign.objectives (for example "Base operational" after the
 ## tutorial). The tutorial's own published goals (walk in, tapes, rooms) are left out there: this list is the only one.
 
@@ -35,15 +39,16 @@ static func all(state: ColonyState) -> Array[Dictionary]:
 	# Owner 2026-11-14: first the only goal is finding every tape; once all are found the goals change to playing them
 	# and fixing the base (the repairs unlock at the same moment, TutorialSystem.repairs_unlocked).
 	if not TutorialSystem.repairs_unlocked(state):
-		out.append(_with(_count("tapes_found", "Find all %d tapes (follow the gold lines)" % tapes, found, tapes), "tapes_found", "", "", ""))
+		out.append(_with(_count("tapes_found", "Find the tapes", found, tapes), "tapes_found", "", "", ""))
 		return out
-	out.append(_with(_count("tapes_played", "Play the tapes in the Command Room", played, tapes), "tapes_played", "", "Command Room", ""))
+	out.append(_with(_count("tapes_played", "Play the tapes", played, tapes), "tapes_played", "", "Command Room", ""))
 	for r: Dictionary in TutorialSystem.fix_rows(state):
 		var task := String(r.task)
 		var role := role_words(task)
-		var who := "anyone" if role == "anyone" else "only " + role
 		var done := TutorialSystem.is_fixed(state, task)
-		out.append(_with(_goal("fix_" + task, "%s (%s)" % [String(r.text), who], done, 1.0 if done else 0.0, ""), "fix", task, String(r.room), role))
+		var g := _with(_goal("fix_" + task, String(r.text), done, 1.0 if done else 0.0, ""), "fix", task, String(r.room), role)
+		g["spec"] = String(r.get("specialty", ""))
+		out.append(g)
 	# Whatever else the campaign publishes (after the tutorial: "Base operational"), without the tutorial's own goals.
 	var objectives: Variant = state.campaign.get("objectives", null)
 	if objectives is Array:
@@ -53,8 +58,8 @@ static func all(state: ColonyState) -> Array[Dictionary]:
 				var id := String(d.get("id", d.text))
 				if TUTORIAL_PUBLISHED.has(id) or id.begins_with(TUTORIAL_PUBLISHED_PREFIX):
 					continue
-				out.append(_with({"id": id, "text": String(d.text), "done": bool(d.get("done", false)),
-					"fraction": float(d.get("fraction", 1.0 if bool(d.get("done", false)) else 0.0)), "label": String(d.get("label", ""))},
+				out.append(_with(_goal(id, String(d.text), bool(d.get("done", false)),
+					float(d.get("fraction", 1.0 if bool(d.get("done", false)) else 0.0)), String(d.get("label", ""))),
 					"campaign", "", "", ""))
 	# Owner 2026-11-14: hidden for now (we might use them later). The scout, salvage, ore, science, energy and storm goals.
 	#var s := state.scout
@@ -90,8 +95,32 @@ static func role_words(task_id: String) -> String:
 	return String(ROLE_WORDS.get(spec, spec.replace("_", " ")))
 
 
-## The goals small mode shows: every unfinished goal first (in order), then finished ones, at most MAX_SHOWN.
-static func shown(state: ColonyState) -> Array[Dictionary]:
+## True when a crew member of `specialty` may do goal `g`: any goal that is not a specialist's repair, or their own.
+static func can_do(g: Dictionary, specialty: String) -> bool:
+	var spec := String(g.get("spec", ""))
+	return spec == "" or spec == "general" or spec == specialty
+
+
+## The ONE goal the goals card shows: the first unfinished goal the crew member of `specialty` can do; when every
+## open goal belongs to another specialist, the first open one; {} when there are no goals. Once every goal is done,
+## the last goal (ticked).
+static func next(state: ColonyState, specialty := "") -> Dictionary:
+	var list := all(state)
+	var first_open := {}
+	for g in list:
+		if bool(g.done):
+			continue
+		if can_do(g, specialty):
+			return g
+		if first_open.is_empty():
+			first_open = g
+	if not first_open.is_empty():
+		return first_open
+	return list[list.size() - 1] if not list.is_empty() else {}
+
+
+## Every goal, unfinished ones first (in order), then the finished ones: the order of the big goals screen.
+static func ordered(state: ColonyState) -> Array[Dictionary]:
 	var list := all(state)
 	var open: Array[Dictionary] = []
 	var done: Array[Dictionary] = []
@@ -100,7 +129,12 @@ static func shown(state: ColonyState) -> Array[Dictionary]:
 			done.append(g)
 		else:
 			open.append(g)
-	var out := open + done
+	return open + done
+
+
+## The first goals of ordered(): at most MAX_SHOWN.
+static func shown(state: ColonyState) -> Array[Dictionary]:
+	var out := ordered(state)
 	if out.size() > MAX_SHOWN:
 		out.resize(MAX_SHOWN)
 	return out
@@ -116,12 +150,15 @@ static func done_count(state: ColonyState) -> Vector2i:
 
 
 static func _goal(id: String, text: String, done: bool, fraction: float, label: String) -> Dictionary:
-	return {"id": id, "text": text, "done": done, "fraction": fraction, "label": label}
+	return {"id": id, "text": text, "done": done, "fraction": fraction, "label": label, "spec": "", "have": 0, "need": 0}
 
 
 static func _count(id: String, text: String, have: int, need: int) -> Dictionary:
 	var done := have >= need
-	return _goal(id, text, done, clampf(float(have) / float(maxi(1, need)), 0.0, 1.0), "" if done else "%d/%d" % [mini(have, need), need])
+	var g := _goal(id, text, done, clampf(float(have) / float(maxi(1, need)), 0.0, 1.0), "" if done else "%d/%d" % [mini(have, need), need])
+	g["have"] = mini(have, need)
+	g["need"] = need
+	return g
 
 
 static func _with(g: Dictionary, kind: String, task: String, room: String, role: String) -> Dictionary:

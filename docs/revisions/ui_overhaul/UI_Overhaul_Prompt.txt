@@ -1,0 +1,502 @@
+MissionPossible
+
+Bugs/Fixes
+
+Particle visibility
+
+Increase the size of the particles so players can spot them more easily. Raise the effect to
+approximately chest height on the player character.
+
+Features
+
+Overhaul UI
+
+Redesign the interface so a child can tell what is happening, what they need to do, and which
+control to use. The current UI is too complicated for the intended audience. Prioritize a simpler,
+more visual presentation with clearer actions and less reading during play.
+
+Before redesigning, review the full UI and trace how each screen and its shared components are
+built. Identify the screens, states, and decisions that are hardest to understand. Use the Current UI
+screenshots to document the baseline.
+
+Use Medium UI as a starting point for visual cues and feedback. Simplify those patterns further.
+Use the sketches, reference images, and specific examples explicitly designated as Best UI to
+determine the final direction. Apply the principles from those examples to the rest of the interface.
+
+Project folder
+
+E:\NASA_SpaceAppsChallenge\tonight-we-lock\MissionPossible
+Keep project inspection inside this folder. Ask for explicit permission before looking in any other project
+folder.
+
+MissionPossible  1
+MissionPossible / Overhaul UI
+
+Current UI
+
+Existing project screenshots show five different parts of the interface.
+Main menu
+
+Gameplay HUD
+
+MissionPossible                                                           2
+MissionPossible / Overhaul UI
+
+Current UI
+
+Goals panel
+
+Settings
+
+MissionPossible                3
+MissionPossible / Overhaul UI
+
+Current UI
+
+Task panel
+
+MissionPossible                4
+MissionPossible / Overhaul UI
+
+Medium UI
+
+These references move toward clearer visual feedback. The target UI should be simpler and more visual.
+Wires (wrong specialist)
+
+Mixture
+
+MissionPossible                                                                                         5
+MissionPossible / Overhaul UI
+
+Medium UI
+
+Equipment
+
+Fix the radio signal
+
+MissionPossible                6
+MissionPossible / Overhaul UI
+
+Medium UI
+
+Repair the broken glass
+
+Fix the power dials
+
+MissionPossible                7
+MissionPossible / Overhaul UI
+
+Medium UI
+
+Repair the power circuit
+
+Seal
+
+MissionPossible                8
+MissionPossible / Overhaul UI
+
+Medium UI
+
+Fix the broken pipe
+
+Clean the dusty hangar
+
+Best UI
+
+Use Among Us task screens as the benchmark for simplicity and intuitive controls. Keep text brief, use
+color and shape to signal what belongs together, make the next action obvious, and show the result directly
+on the puzzle.
+
+Adapt those patterns to MissionPossible's own colony equipment and puzzle rules. Some tasks already
+draw on Among Us. Keep the ease of use and give each minigame its own visual identity.
+
+Source: Among Us Wiki - List of Tasks
+Open any task title or screenshot in the gallery for its individual wiki article.
+
+MissionPossible                9
+MissionPossible / Overhaul UI
+
+Custom Minigame Titles and Concepts
+
+Give each repair an action title that makes sense in the colony. Make the equipment itself the interface.
+Repeat familiar conventions for focus, prompts, and success across the game, and give each apparatus its
+own layout and visual response.
+
+Lock the Relay
+
+T01 / Comms | Among Us reference: Find Signal
+
+Use the radio console as the play surface. Turn one oversized knob until the live waveform overlaps a ghost
+trace, then watch a short data pulse travel to a relay icon. Keep hold and transfer feedback on the scope.
+
+Patch the Relay
+
+T02 / Wires | Among Us reference: Fix Wiring
+
+Give the relay a central patch bay with four chunky plugs and shape-keyed sockets. Connected plugs physically
+seat and light a path to the relay. Show the electrical specialist badge where the first plug would be if the player
+needs to switch crew.
+
+Sync the Turbine
+
+T03 / Rings | Among Us reference: Calibrate Distributor
+
+Build the timing task into one turbine face with three concentric rings. Animate the active ring only and show
+each secured ring with a lock mark. Keep the wider timing window available.
+
+Light the Power Bench
+
+T04 / Circuits | Among Us reference: Divert Power
+
+Build a route across a service board from the power jack to a real lamp. Light the connected path up to the first
+gap. Use one small meter beside the lamp to show the required voltage and whether a booster or reducer is
+needed.
+
+Water the Kale
+
+T06 / Water | Among Us reference: Open Waterways
+
+Rotate thick pipe pieces between a visible water tank and a kale tray. Animate water up to the first break. Try a
+shorter 4-by-3 starter board and show the kale perk up as soon as water arrives.
+
+MissionPossible  10
+MissionPossible / Overhaul UI
+
+Custom Minigame Titles and Concepts
+
+Glaze the Dome
+
+T08 / Glass | Among Us reference: Assemble Artifact
+
+Place five colored panes into a dome viewport. Preview the outline under the held piece. Let sunlight pass
+through each fitted pane and add a single shimmer when the whole viewport locks in.
+
+Sort the Lab Samples
+
+T09 / Mixture | Among Us reference: Sort Samples
+
+Make the test-tube rack the play area. Put a shape on every color, tilt the selected tube toward a valid
+destination, and lift settled tubes upright. Try opening with the tubes already standing for a shorter first puzzle.
+
+Revive the Med Bay
+
+T10 / Equipment | Among Us reference: Fix Wiring
+
+Show two real devices beside their sockets. Use distinctly shaped plugs and give each powered device its own
+response, such as a pulse trace or scanner sweep. Let the player start a brief self-test on the machines.
+
+Clear the Landing Lines
+
+T11 / Dust | Among Us reference: Clean O2 Filter
+
+Use the hangar floor as the board. Brush clumps loose and vacuum the loose dust directly. Reveal landing
+markings under the cleaned patches, with fewer patches on the first run.
+
+Seal the Airlock
+
+T12 / Seal | Among Us reference: Monitor Tree
+
+Use the visible vapor leak to guide the player to a damaged seam. Fit a shaped gasket, press three highlighted
+points in order, then watch a pressure needle rise. The gauge is the reference; the gasket interaction is specific
+to MissionPossible.
+
+T05 Elements and T07 Pipes use the maintenance interface in the checked project. The ten concepts here cover the
+standalone broken-part minigames.
+
+MissionPossible  11
+MissionPossible / Overhaul UI
+
+Water the Kale
+
+Greenhouse pipework / Generated concept mockup
+Game screen
+
+Turn the outlined elbow to continue the cyan flow. Keep the tank, unfinished route, and dry planter
+visible in the same frame.
+
+Use a compact starter layout. The final playable board should follow the chosen grid and pipe geometry.
+
+Image generation brief
+
+Screen for Water the Kale. Wide composition: a clear cyan water tank at far left with a visible waterline, an uncluttered rack of exactly 4
+columns by 3 rows of rotating chunky pipe tiles in the center, and a tiny planter of clearly recognizable kale leaves at far right. Each tile has
+one simple pipe shape, with straight and elbow pieces. Show only a contiguous filled cyan path beginning at the tank and stopping at a
+single misaligned elbow. Mark that tile with a bold pale rectangular focus outline and a small circular-arrow pictogram. All pipes beyond the
+break are dry neutral gray, and the planter is still dry. Render strong spacing, distinct ports, readable puzzle geometry. Subtle greenhouse
+glass tint behind the apparatus.
+
+MissionPossible                                 12
+MissionPossible / Overhaul UI
+
+Sort the Lab Samples
+
+Med Bay workbench / Generated concept mockup
+Game screen
+
+Select a tube, then choose where to pour. Carry each liquid's shape symbol through the rack and
+show the possible destination by its outline.
+
+Show a visible pour and a settled tube as the response to a valid move.
+
+Image generation brief
+
+Screen for Sort the Lab Samples. A bright, front-on Med Bay workbench close-up with one large simple rack of exactly five clear test tubes.
+Three tubes contain stratified teal, rose and amber practice liquids, two tubes are empty. Each liquid type has a distinct recurring visible
+shape symbol, circle, triangle or square, and layers have distinct horizontal boundaries. One filled tube is clearly selected by a pale cyan
+outline, and only one empty tube is emphasized as the next possible target by a small removable-looking halo. A compact strip of three
+colored sample-shape symbols sits on the rack itself. Do not show actual transfer, text labels, extra glassware or lab clutter. Make the tube
+bodies and pouring mouths large and readable.
+
+MissionPossible                               13
+MissionPossible / Overhaul UI
+
+Seal the Airlock
+
+Hangar / airlock / Generated concept mockup
+Game screen
+
+Follow the pale vapor to the break, fit the replacement gasket, and press the marked seam points. Let
+the gauge show whether pressure recovered.
+
+Draw the playable seam with distinct touch points and a gauge that clearly separates low pressure from the
+target range.
+
+Image generation brief
+
+Screen for Seal the Airlock. Show a straight-on close-up of a single beveled, closed Mars airlock hatch, framed by a broad, dark rubber
+gasket and a few restrained orange hazard stripes. On the right-hand gasket, show a single obvious break with a small pale vapor plume
+escaping. Alongside the break show a single dark replacement gasket segment with a shape matching the break. Give the segment a clear
+selection outline. Three short gasket press targets are visible only immediately along that affected seam, indicated by small circular
+embossed marks. Put one compact analog pressure gauge on the far right, visibly below its green target band, with no words or numbers.
+Preserve large empty space around the hatch and make the leak the first thing the eye sees.
+
+MissionPossible                              14
+MissionPossible / Overhaul UI
+
+Sync the Turbine
+
+Power supply / Generated concept mockup
+Game screen
+
+Watch the active ring, then press the large stop button when its pointer reaches the target band.
+
+Show a lock on each secured ring. Keep the next ring quiet until it becomes active.
+
+Image generation brief
+
+Screen for Sync the Turbine. A close, straight-on view of one large circular turbine control face. Exactly three concentric tracks, all aligned
+to one center and clearly separated. Each ring has one small visible pointer and one pale green target arc. The outer ring is already locked,
+its pointer resting in its target zone beside a small closed-padlock pictogram. The middle ring is the active challenge, with a crisp cyan
+edge highlight, strong amber pointer, and visible gap between pointer and target zone. The inner ring is muted and waiting. Directly below
+the circle, integrate one large physical amber pushbutton into the housing. Keep the face clean enough that a child can spot the active ring
+and single button immediately. Bright neutral background with a small, deliberate shadow under the apparatus.
+
+MissionPossible                          15
+MissionPossible / Overhaul UI
+
+Clear the Landing Lines
+
+Hangar / Generated concept mockup
+Game screen
+
+Brush the clumps loose, then vacuum the remaining dust. The landing stripe becomes clearer as each
+patch is cleaned.
+
+Give brush and vacuum distinct silhouettes. Use a compact starter floor so the painted markings become visible
+quickly.
+
+Image generation brief
+
+Screen for Clear the Landing Lines. True top-down overhead view of a compact Mars hangar floor repair area, divided into exactly four
+large rectangular floor patches in a clean 2-by-2 layout. A simple white landing stripe crosses the middle horizontally and is partly buried
+under rust-red dust. Show the upper left patch swept clean with a sharp section of the white painted stripe, upper right lightly dusty with a
+faint stripe, and the two bottom patches more heavily dusty with irregular clumps. On the left edge of the playable board, integrate a tiny
+recessed rack holding exactly two recognizable tools, one stiff hand brush and one vacuum nozzle. Use a clear cyan selection outline on
+the brush only. Keep the playable patches visually dominant, with tactile dust markings and low-detail neutral panel edges. No footprints,
+scenery, boxes, bolts, debris, HUD, or decorative signage.
+
+MissionPossible                    16
+MissionPossible / Overhaul UI
+
+Best UI
+
+Among Us task screens closest to MissionPossible
+
+Fix Wiring                                           Calibrate Distributor
+
+Pair matching shapes and colors. Make plugs and      Use the position of a moving indicator to show when
+sockets easy to match at a glance.                   to press. Carry that clarity into the power dials.
+
+Find Signal                                          Assemble Artifact
+
+Make the waveform and tuning dial the center of the  Put the pieces next to their destination. Make the
+radio task. Show a distinct signal-lock state.       glass frame and the shapes that fit it the focus.
+
+MissionPossible                                                                                          17
+MissionPossible / Overhaul UI
+
+Best UI
+
+Among Us task screens closest to MissionPossible
+
+Clean O2 Filter                                       Open Waterways
+
+Show the mess and its destination in the same view.   Give the player a clear control and an obvious water
+In the hangar, let each cleaned area visibly change.  response. Show the flow through MissionPossible's
+                                                      pipe puzzle.
+Inspect Sample
+                                                      Sort Samples
+
+Let the samples carry the visual contrast. Keep the   Use pictorial categories and visible destinations. Give
+
+mixture task centered on the tubes and their contents. each liquid a shape as well as a color.
+
+MissionPossible                                                                                 18
+MissionPossible / Overhaul UI
+
+Best UI
+
+Among Us task screens closest to MissionPossible
+
+Fix Weather Node                                      Divert Power
+
+Keep the route and its endpoints prominent. In the    Show power moving through the console. Give the
+circuit puzzle, let players see how far the current   repaired circuit a visible powered state.
+travels.
+                                                      Monitor Tree
+Replace Parts
+
+Keep replacement parts and their slots in view. Help  Show target values directly on the gauges. Make the
+players recognize where each piece goes by            difference between out of range and in range
+silhouette.                                           apparent.
+
+MissionPossible                                                                                        19
+MissionPossible / Overhaul UI  Align Telescope
+
+Best UI
+
+More Among Us task screens
+
+Align Engine Output
+
+Build Sandcastle               Buy Beverage
+
+Chart Course                   Clean Toilet
+
+MissionPossible                                 20
+MissionPossible / Overhaul UI  Clear Asteroids
+
+Best UI
+
+More Among Us task screens
+
+Clean Vent
+
+Collect Vegetables             Cook Fish
+
+Collect Samples                Collect Shells
+
+MissionPossible                                 21
+MissionPossible / Overhaul UI  Decontaminate
+
+Best UI
+
+More Among Us task screens
+
+Crank Generator
+
+Develop Photos                 Dress Mannequin
+
+Empty Garbage                  Enter Id Code
+
+MissionPossible                                 22
+MissionPossible / Overhaul UI  Fix Antenna
+
+Best UI
+
+More Among Us task screens
+
+Fill Canisters
+
+Fix Shower                     Fuel Engines
+
+Help Critter                   Hoist Supplies
+
+MissionPossible                                23
+MissionPossible / Overhaul UI  Lift Weights
+
+Best UI
+
+More Among Us task screens
+
+Insert Keys
+
+Make Burger                    Measure Weather
+
+Mine Ores                      Pick Up Towels
+
+MissionPossible                                 24
+MissionPossible / Overhaul UI  Polish Ruby
+
+Best UI
+
+More Among Us task screens
+
+Polish Gem
+
+Prime Shields                  Process Data
+
+Put Away Pistols               Put Away Rifles
+
+MissionPossible                                 25
+MissionPossible / Overhaul UI  Record Temperature
+
+Best UI
+
+More Among Us task screens
+
+Reboot Wifi
+
+Repair Drill                   Replace Water Jug
+
+Reset Breakers                 Rewind Tapes
+
+MissionPossible                                    26
+MissionPossible / Overhaul UI  Run Diagnostics
+
+Best UI
+
+More Among Us task screens
+
+Roast Marshmallow
+
+Scan Boarding Pass             Sort Records
+
+Stabilize Steering             Start Fans
+
+MissionPossible                                 27
+MissionPossible / Overhaul UI  Store Artifacts
+
+Best UI
+
+More Among Us task screens
+
+Start Reactor
+
+Submit Scan                    Swipe Card
+
+Throw Frisbee                  Unlock Manifolds
+
+MissionPossible                                  28
+MissionPossible / Overhaul UI  Upload Data
+
+Best UI
+
+More Among Us task screens
+
+Unlock Safe
+
+Water Plants
+
+MissionPossible                             29
+

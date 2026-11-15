@@ -2,15 +2,20 @@ class_name PauseMenu
 extends UiPanel
 ## The pause menu. Opening it asks the host to pause (vote_pause true); closing it takes the vote back.
 ## Solo: the game pauses at once. Co-op: everyone has to agree, and the menu shows how many do.
-## The host also gets "Save now" and the sol length slider.
+## One big "Resume"; everything else is a smaller picture button under it. The host also gets "Save now" and the
+## sol length slider.
 
-## "Quit to menu" was pressed (UiRoot passes it on as quit_to_menu_requested).
+## "Main menu" was pressed (UiRoot passes it on as quit_to_menu_requested).
 signal quit_to_menu_pressed
+
+const Kit = preload("res://scripts/ui/menu_kit.gd")
+const SOL_HELP := "Host only. The time of day stays where it is when you change this. Only the speed of the day changes."
 
 var _vote_label: Label
 var _status: Label
 ## "Hosting on 192.168.1.20:24680, 2 players": the address others type to join. Hidden when playing alone.
 var _net_label: Label
+var _resume_button: Button
 var _save_button: Button
 var _sol_slider: HSlider
 var _sol_label: Label
@@ -43,23 +48,35 @@ func setup(p_services: GameServices) -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.follow_focus = true
 	outer.add_child(scroll)
+	var pad := MarginContainer.new()
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
+		pad.add_theme_constant_override(side, 4)
+	scroll.add_child(pad)
 	var column := VBoxContainer.new()
-	column.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(column)
+	column.add_theme_constant_override(&"separation", 14)
+	pad.add_child(column)
+	_resume_button = Kit.button("Resume", &"play", UiTheme.PRIMARY_BUTTON, 40.0, 1.6, 88.0)
+	_resume_button.name = "Resume"
+	_resume_button.add_theme_constant_override(&"h_separation", 18)
+	_resume_button.tooltip_text = "Back to the colony (Esc)."
+	_resume_button.pressed.connect(func() -> void: close_requested.emit())
+	column.add_child(_resume_button)
 	var grid := GridContainer.new()
-	grid.columns = 2
+	grid.name = "More"
+	grid.columns = 4
 	column.add_child(grid)
-	_add(grid, "Resume", func() -> void: close_requested.emit(), UiTheme.PRIMARY_BUTTON)
-	_add(grid, "Colony summary", func() -> void: open_requested.emit(ColonySummaryPanel.new()))
-	_add(grid, "Crew", func() -> void: open_requested.emit(CrewSelectPanel.new()))
-	_add(grid, "Settings", func() -> void: open_requested.emit(SettingsPanel.new()))
-	_add(grid, "Sources", func() -> void: open_requested.emit(SourceRegisterPanel.new()))
-	_add(grid, "Credits", func() -> void: open_requested.emit(CreditsPanel.new()))
+	_add(grid, "Crew", &"crew", "See the crew and change who you play.", func() -> void: open_requested.emit(CrewSelectPanel.new()))
+	_add(grid, "Colony", &"dome", "Colony summary: how the base is doing.", func() -> void: open_requested.emit(ColonySummaryPanel.new()))
+	_add(grid, "Settings", &"gear", "Text size, keys, sound and graphics.", func() -> void: open_requested.emit(SettingsPanel.new()))
 	if _is_host():
-		_save_button = _add(grid, "Save now", _on_save)
-	_add(grid, "Quit to menu", func() -> void: quit_to_menu_pressed.emit())
-	_add(grid, "Quit game", func() -> void: services.quit_game(), UiTheme.DANGER_BUTTON)
+		_save_button = _add(grid, "Save now", &"save", "Save the colony right now.", _on_save)
+	_add(grid, "Sources", &"book", "The science pages behind the game.", func() -> void: open_requested.emit(SourceRegisterPanel.new()))
+	_add(grid, "Credits", &"star", "Who made the game.", func() -> void: open_requested.emit(CreditsPanel.new()))
+	_add(grid, "Main menu", &"home", "Leave this colony and go to the title screen.", func() -> void: quit_to_menu_pressed.emit())
+	_add(grid, "Quit", &"exit", "Close the game.", func() -> void: services.quit_game(), UiTheme.DANGER_BUTTON)
 	_status = _wrap_label("", UiTheme.MUTED)
+	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status.visible = false
 	column.add_child(_status)
 	if _is_host():
@@ -94,6 +111,9 @@ func refresh() -> void:
 	if _vote_label == null:
 		return
 	_vote_label.text = vote_text()
+	# Alone and paused, the title already says it; the line is for "Pausing…" and for the co-op vote count.
+	var alone := services == null or not services.has_game() or services.session.peers.size() <= 1
+	_vote_label.visible = _vote_label.text != "" and not (alone and services != null and services.has_game() and services.session.paused)
 	var online := services != null and services.net != null and services.net.is_online()
 	_net_label.visible = online
 	if online:
@@ -128,21 +148,26 @@ func _is_host() -> bool:
 
 func _build_sol_setting(parent: Control) -> void:
 	var card := PanelContainer.new()
+	card.name = "SolLength"
 	card.theme_type_variation = UiTheme.CARD
+	card.tooltip_text = SOL_HELP
 	parent.add_child(card)
 	var box := VBoxContainer.new()
 	card.add_child(box)
-	var heading := Label.new()
-	heading.text = "Length of a sol (host only)"
-	heading.theme_type_variation = UiTheme.HEADING
-	box.add_child(heading)
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override(&"separation", 12)
+	box.add_child(row)
+	row.add_child(Kit.picture(&"clock", 28.0))
 	_sol_label = _wrap_label("")
-	box.add_child(_sol_label)
+	_sol_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	row.add_child(_sol_label)
 	_sol_slider = HSlider.new()
 	_sol_slider.min_value = 5.0
 	_sol_slider.max_value = 120.0
 	_sol_slider.step = 1.0
+	_sol_slider.custom_minimum_size.y = 36.0
 	_sol_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_sol_slider.tooltip_text = SOL_HELP
 	_sol_slider.value = services.clock().sol_minutes if services.has_game() else 20.0
 	_sol_slider.value_changed.connect(func(v: float) -> void:
 		_update_sol_label(v)
@@ -150,7 +175,6 @@ func _build_sol_setting(parent: Control) -> void:
 	_sol_slider.drag_started.connect(func() -> void: _dragging = true)
 	_sol_slider.drag_ended.connect(func(_changed: bool) -> void: _dragging = false)
 	box.add_child(_sol_slider)
-	box.add_child(_wrap_label("The time of day stays where it is when you change this. Only the speed of the day changes.", UiTheme.MUTED))
 	_update_sol_label(_sol_slider.value)
 
 
@@ -177,11 +201,10 @@ func _show_status(text: String) -> void:
 	_status.visible = text != ""
 
 
-func _add(parent: Control, text: String, action: Callable, variation: StringName = &"") -> Button:
-	var b := Button.new()
-	b.text = text
-	b.theme_type_variation = variation
-	b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+## A smaller picture button under Resume: pictogram on top, one or two words, the rest in the tooltip.
+func _add(parent: Control, text: String, kind: StringName, tip: String, action: Callable, variation: StringName = &"") -> Button:
+	var b := Kit.tile(text, kind, 40.0, Vector2(150, 104), variation)
+	b.tooltip_text = tip
 	b.pressed.connect(action)
 	parent.add_child(b)
 	return b

@@ -27,8 +27,18 @@ func _initialize() -> void:
 		_check("source credits integrated " + id, SourceLibrary.credits().any(func(credit: Dictionary) -> bool: return (credit.get("source_ids", []) as Array).has(String(record.source_id))))
 		var text := " ".join(record.pages as Array)
 		var words := text.split(" ", false).size()
-		_check("120-180 word preview " + id, words >= 120 and words <= 180 and String(record.briefing_status) == "preview", str(words))
-		_check("installed controls only " + id, text.split(" ").has("E") and text.contains("Previous") and text.contains("Next") and text.contains("Close (Esc)") and not text.contains("four-second"))
+		# UI overhaul (2026-11-15): the tapes are short and written for the players (ages 9-12): what the room is for and
+		# its repairs by their action titles. No developer words, no key list (the player's buttons are pictures).
+		_check("short ready briefing (30-70 words) " + id, words >= 30 and words <= 70 and String(record.briefing_status) == "ready", str(words))
+		var names_repairs := true
+		for task_id: String in RepairCatalog.ROOMS[String(record.room_id)].tasks:
+			if PuzzleRegistry.TITLES.has(task_id) and not text.contains(String(PuzzleRegistry.TITLES[task_id])):
+				names_repairs = false
+		var developer_words := false
+		for word: String in ["build", "installed", "preview", "puzzle", "T0", "T1", "host"]:
+			if text.contains(word):
+				developer_words = true
+		_check("names the room's repairs, no developer words " + id, names_repairs and not developer_words)
 		_check("photo no crop and sufficient resolution " + id, photo.crop == "none" and mini(int(photo.dimensions[0]), int(photo.dimensions[1])) >= 600)
 	_check("six distinct actual photo files", seen.size() == 6)
 	_check("ground prototype caption honest", String((briefs.cassettes as Array).filter(func(r: Dictionary) -> bool: return r.room_id == "green_dome")[0].caption).contains("ground prototype"))

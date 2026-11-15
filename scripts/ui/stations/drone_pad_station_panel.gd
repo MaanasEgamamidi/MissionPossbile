@@ -53,32 +53,19 @@ func _enter_tree() -> void:
 
 func _build_body() -> void:
 	_add_reading(&"level", "✈", "Drone level", "upgrades")
-	_add_reading(&"battery", "⚡", "Battery", "battery")
-	_add_reading(&"range", "◎", "Radio range (command room)", "upgrades")
-	_add_reading(&"surveyed", "◉", "Places surveyed by the drone", "sources")
+	_add_reading(&"battery", "▮", "Battery", "battery")
+	_add_reading(&"range", "◎", "Radio range", "upgrades")
+	_add_reading(&"surveyed", "◉", "Places surveyed", "sources")
 	_status = _add_text(_body, "", UiTheme.HEADING)
 	_status.name = "DroneStatus"
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 10)
-	_body.add_child(row)
-	fly_button = Button.new()
+	fly_button = _add_action("Fly the drone", &"drone", take_control)
 	fly_button.name = "TakeControl"
-	fly_button.text = "✈ Take control (E)"
-	fly_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	fly_button.pressed.connect(take_control)
-	row.add_child(fly_button)
-	hand_back_button = Button.new()
+	hand_back_button = _add_action("Hand it back", &"back", func() -> void: _ask_free(&"drone_land"), false)
 	hand_back_button.name = "HandBack"
-	hand_back_button.text = "Hand it back"
-	hand_back_button.pressed.connect(func() -> void: _ask_free(&"drone_land"))
-	row.add_child(hand_back_button)
-	recall_button = Button.new()
+	recall_button = _add_action("Call it home", &"home", func() -> void: _ask(&"drone_recall", {}, _on_answer), false)
 	recall_button.name = "Recall"
-	recall_button.text = "Call it home"
-	recall_button.pressed.connect(func() -> void: _ask(&"drone_recall", {}, _on_answer))
-	row.add_child(recall_button)
 	_add_heading(_body, "Autopilot")
-	_autopilot_note = _add_text(_body, "", UiTheme.MUTED)
+	_autopilot_note = _add_note(_body, "")
 	_sites = VBoxContainer.new()
 	_sites.name = "Sites"
 	_body.add_child(_sites)
@@ -102,7 +89,7 @@ func _refresh_body(st: ColonyState) -> void:
 	_show_reading(&"level", "V%d" % lvl, &"ok")
 	var b := DroneSystem.battery(st)
 	_show_reading(&"battery", "%d %% · %d s of flight" % [roundi(b * 100.0), roundi(DroneSystem.seconds_left(st))],
-		&"urgent" if b < DroneSystem.num("launch_min_battery", 0.2) else (&"warn" if b < 0.5 else &"ok"))
+		&"urgent" if b < DroneSystem.num("launch_min_battery", 0.2) else (&"warn" if b < 0.5 else &"ok"), b)
 	_show_reading(&"range", "%d m" % roundi(DroneSystem.range_m(st)), &"ok")
 	_show_reading(&"surveyed", "%d of %d" % [(d.get("surveyed", {}) as Dictionary).size(), ScoutSystem.sites().size()], &"ok")
 	_status.text = "● " + DroneSystem.status_text(st)
@@ -212,7 +199,7 @@ func take_control() -> ActionResult:
 func _ask_free(action: StringName) -> void:
 	var r := services.request(action)
 	if r.pending:
-		_show_message("Asked the host…", UiTheme.MUTED)
+		_show_message("One moment…", UiTheme.MUTED)
 	elif r.ok:
 		_on_answer(r)
 	else:

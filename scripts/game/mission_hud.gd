@@ -8,10 +8,13 @@ extends Control
 ##                  here) -> the big goals screen with the base map (scripts/ui/hud/goals_big_panel.gd, a UiRoot panel)
 ##                  -> the compact card ("GOALS 3/12" and a bar) -> the list ... J, Esc or ✕ on the big screen = compact.
 ##   right          the pop-ups (ToastStack) under your crew member. Owner 2026-11-14: the MiniMap is hidden for now.
-##   lower left     MissionControlCard: storm warnings with how many more storms are lined up, scout reports with the
-##                  mast camera's picture, a supply about to run out (K closes a message).
+##   lower left     MissionControlCard: a picture, a title and ONE line (a dust storm on its way, a scout report with
+##                  the mast camera's picture, a supply about to run out). K closes it; the whole message is in the
+##                  Power drawer's message list (P).
 ##   lower right    the scout's mast camera, live, while it is out on a trip.
-##   bottom centre  the dock of keys (Build B, Power P, Cargo I, Crew C) and, by a sun tracker, "B Build here".
+##   bottom centre  the dock of keys (Build B, Power P, Cargo I, Crew C, Science F1): a big pictogram, a key cap and
+##                  one word each; Build is dimmed with a padlock away from the solar field. By a sun tracker,
+##                  "B Build here".
 ## Everything here only reads the colony; the drawers it opens (PowerLifePanel, SolarBuildPanel, VitalsSciencePanel)
 ## go through UiRoot like every panel. Colony alerts become pop-ups here instead of GameHud's message line.
 
@@ -27,6 +30,13 @@ const LEVEL_ALERT_PREFIX := "area_level_"
 const EnergyChipScript := preload("res://scripts/ui/hud/energy_chip.gd")
 ## Owner 2026-11-14: the big goals screen (J), with the goals on a map of the base. It replaces the M blueprint map.
 const GoalsBigPanelScript := preload("res://scripts/ui/hud/goals_big_panel.gd")
+## UI overhaul (2026-11-15): the dock, the build chip, the mast camera card and Mission Control are drawn with the
+## HUD kit (pictograms, key caps and words that follow the text size setting) and the mini-games' padlock.
+const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
+const PuzzleKit := preload("res://scripts/tasks/puzzles/kit.gd")
+## The dock's keys, left to right: [name, pictogram (HudKit), action, fallback key].
+const DOCK := [["Build", &"build", &"build", "B"], ["Power", &"power", &"power_view", "P"], ["Cargo", &"cargo", &"inventory", "I"],
+	["Crew", &"crew", &"crew", "C"], ["Science", &"science", &"vitals_help", "F1"]]
 
 var services: GameServices
 var game: Node
@@ -48,9 +58,11 @@ var feed: PanelContainer
 var _feed_tex: TextureRect
 var _feed_status: Label
 var _dock_build: Control
+var _dock_buttons: Dictionary = {}   # action -> the dock button
 var _refresh_left := 0.0
 var _auto_compact := false
-var _user_compact := false
+## The player's own choice: true = the calm look (pictures and bars, the default), false = the numbers look (key H).
+var _user_compact := true
 var _goals_folded_for_mc := false
 ## The player chose the goal list with J: Mission Control's card no longer folds it away (it would look like J did nothing).
 var _list_by_user := false
@@ -71,6 +83,7 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 	if hud != null:
 		hud.add_child(self)
 		hud.alert_sink = _on_alert
+		hud.supplies_on_strip = true
 		hud.use_dock(true)
 	vitals = VitalsBar.new()
 	add_child(vitals)
@@ -109,15 +122,19 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 # ---------------------------------------------------------------- building
 
 func _build_feed() -> void:
-	feed = AstraStyle.panel(AstraStyle.glass(AstraStyle.RADIUS, 10, 8, true), "MastFeed")
+	feed = HudKit.Card.new("MastFeed", AstraStyle.RADIUS, 10, 8, true)
 	add_child(feed)
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override(&"separation", 6)
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	feed.add_child(col)
 	var head := HBoxContainer.new()
+	head.add_theme_constant_override(&"separation", 8)
+	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(head)
-	head.add_child(AstraStyle.label("●", 11, AstraStyle.DANGER, "Rec", true))
-	var t := AstraStyle.label("MAST CAMERA · SCOUT-1", 11, AstraStyle.TEXT_2, "Title")
+	head.add_child(HudKit.Icon.new(&"dot", AstraStyle.DANGER, 14.0, "Rec"))
+	head.add_child(HudKit.Icon.new(&"scout", AstraStyle.TEXT_2, 24.0, "Symbol"))
+	var t := HudKit.Txt.new("Scout camera", 18.0, AstraStyle.TEXT_2, "Title")
 	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(t)
 	_feed_tex = TextureRect.new()
@@ -125,43 +142,56 @@ func _build_feed() -> void:
 	_feed_tex.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	_feed_tex.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	_feed_tex.custom_minimum_size = Vector2(320, 180)
+	_feed_tex.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(_feed_tex)
-	_feed_status = AstraStyle.label("", 12, AstraStyle.TEXT_2, "Status")
+	_feed_status = HudKit.Txt.new("", 18.0, AstraStyle.TEXT, "Status")
 	_feed_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_feed_status.custom_minimum_size.x = 320
 	col.add_child(_feed_status)
 	feed.visible = false
 
 
+## The dock: one big pictogram per key with its key cap and one word. A key that does nothing right now (Build away
+## from the solar field) is dimmed and shows a padlock where its key cap was.
 func _build_dock() -> void:
-	dock = AstraStyle.panel(AstraStyle.glass(AstraStyle.RADIUS, 10, 6), "Dock")
+	dock = HudKit.Card.new("Dock", AstraStyle.RADIUS, 12, 8)
 	add_child(dock)
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 4)
+	row.name = "Row"
+	row.add_theme_constant_override(&"separation", 6)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	dock.add_child(row)
-	_dock_build = _dock_button(row, "⚒", "Build", &"build", "B", func() -> void: open_build())
-	_dock_button(row, "⚡", "Power", &"power_view", "P", func() -> void: open_power())
-	# Owner 2026-11-14: hidden for now (the big goals screen, J, has the map).
-	#_dock_button(row, "▦", "Map", &"map", "M", func() -> void: _press(&"map"))
-	_dock_button(row, "▤", "Cargo", &"inventory", "I", func() -> void: _press(&"inventory"))
-	_dock_button(row, "☺", "Crew", &"crew", "C", func() -> void: _press(&"crew"))
-	_dock_button(row, "?", "Science", &"vitals_help", "F1", func() -> void: open_science())
-	build_chip = AstraStyle.panel(AstraStyle.pill(Color(AstraStyle.ACCENT, 0.92), AstraStyle.RADIUS_SM + 2, 14, 7), "BuildChip")
+	var runs := {&"build": open_build, &"power_view": open_power, &"inventory": _press.bind(&"inventory"),
+		&"crew": _press.bind(&"crew"), &"vitals_help": open_science}
+	# Owner 2026-11-14: the M map key is hidden for now (the big goals screen, J, has the map).
+	for d: Array in DOCK:
+		_dock_buttons[d[2]] = _dock_button(row, d[1], String(d[0]), d[2], String(d[3]), runs[d[2]])
+	_dock_build = _dock_buttons[&"build"]
+	build_chip = AstraStyle.panel(AstraStyle.pill(Color(AstraStyle.ACCENT, 0.95), AstraStyle.RADIUS_SM + 4, 16, 8), "BuildChip")
+	build_chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(build_chip)
 	var h := HBoxContainer.new()
-	h.add_theme_constant_override(&"separation", 8)
+	h.add_theme_constant_override(&"separation", 10)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	build_chip.add_child(h)
-	h.add_child(AstraStyle.keycap("B", 12))
-	h.add_child(AstraStyle.label("Build here · solar field", 15, AstraStyle.ACCENT_INK, "Text"))
+	h.add_child(HudKit.key_cap(GameHud._key(&"build", "B"), 22.0))
+	h.add_child(HudKit.Icon.new(&"build", AstraStyle.ACCENT_INK, 30.0, "Symbol"))
+	h.add_child(HudKit.Txt.new("Build here", 24.0, AstraStyle.ACCENT_INK, "Text", true))
+	HudKit.say(build_chip, "Build here: this is the solar field")
 	build_chip.visible = false
 
 
-func _dock_button(row: HBoxContainer, symbol: String, word: String, action: StringName, key: String, run: Callable) -> Control:
+func _dock_button(row: HBoxContainer, icon: StringName, word: String, action: StringName, key: String, run: Callable) -> Control:
 	var b := PanelContainer.new()
 	b.name = word
 	b.add_theme_stylebox_override(&"panel", AstraStyle.pill(Color(0, 0, 0, 0), 12, 12, 4))
 	b.mouse_filter = Control.MOUSE_FILTER_STOP
-	b.tooltip_text = "%s (%s)" % [PlayerInput.ACTION_NAMES.get(action, word), key]
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	var key_text := GameHud._key(action, key)
+	if key_text.contains("/"):
+		key_text = key
+	b.set_meta(&"words", "%s (%s)" % [PlayerInput.ACTION_NAMES.get(action, word), key_text])
+	HudKit.say(b, String(b.get_meta(&"words")))
 	b.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and (e as InputEventMouseButton).pressed and (e as InputEventMouseButton).button_index == MOUSE_BUTTON_LEFT:
 			run.call())
@@ -172,15 +202,50 @@ func _dock_button(row: HBoxContainer, symbol: String, word: String, action: Stri
 	b.add_child(col)
 	var top := HBoxContainer.new()
 	top.alignment = BoxContainer.ALIGNMENT_CENTER
-	top.add_theme_constant_override(&"separation", 4)
+	top.add_theme_constant_override(&"separation", 6)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	col.add_child(top)
-	top.add_child(AstraStyle.label(symbol, 19, AstraStyle.TEXT, "Symbol", true))
-	top.add_child(AstraStyle.keycap(key, 9))
-	var w := AstraStyle.label(word, 12, AstraStyle.TEXT_2, "Word")
+	top.add_child(HudKit.Icon.new(icon, AstraStyle.TEXT, 42.0, "Symbol"))
+	top.add_child(HudKit.key_cap(key_text, 20.0, "Key"))
+	var lock := Control.new()
+	lock.name = "Lock"
+	lock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lock.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	lock.visible = false
+	lock.draw.connect(func() -> void:
+		var r := minf(lock.size.x, lock.size.y) * 0.5
+		PuzzleKit.lock(lock, lock.size * 0.5 + Vector2(0.0, -r * 0.17), r, true, AstraStyle.TEXT_2))
+	top.add_child(lock)
+	var w := HudKit.Txt.new(word, 20.0, AstraStyle.TEXT_2, "Word")
 	w.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	col.add_child(w)
 	return b
+
+
+## Shows a dock key as usable, or dimmed with a padlock in place of its key cap (`why` joins its tooltip).
+func _set_dock_usable(b: Control, on: bool, why := "") -> void:
+	if b == null:
+		return
+	var lock := b.find_child("Lock", true, false) as Control
+	var px := roundf(34.0 * HudKit.scale())
+	if lock.custom_minimum_size.x != px:
+		lock.custom_minimum_size = Vector2(px, px)
+	if b.has_meta(&"usable") and bool(b.get_meta(&"usable")) == on:
+		return
+	b.set_meta(&"usable", on)
+	b.modulate.a = 1.0 if on else 0.5
+	(b.find_child("Symbol", true, false) as HudKit.Icon).color = AstraStyle.TEXT if on else AstraStyle.TEXT_3
+	(b.find_child("Word", true, false) as HudKit.Txt).tint(AstraStyle.TEXT_2 if on else AstraStyle.TEXT_3)
+	(b.find_child("Key", true, false) as Control).visible = on
+	lock.visible = not on
+	lock.queue_redraw()
+	HudKit.say(b, String(b.get_meta(&"words")) if on else "%s. %s" % [String(b.get_meta(&"words")), why])
+
+
+## True while the dock shows `action`'s key as usable (Build is not, away from the solar field).
+func dock_usable(action: StringName) -> bool:
+	var b := _dock_buttons.get(action) as Control
+	return b != null and bool(b.get_meta(&"usable", true))
 
 
 # ---------------------------------------------------------------- actions
@@ -286,8 +351,11 @@ func _on_alert(alert_id: StringName, level: StringName, text: String) -> void:
 		&"good", &"ok":
 			kind = &"good"
 	if alert_id == WeatherSystem.ALERT_ID:
-		toasts.push("Dust storm warning: get ready! Mission Control has the details.", &"warn")
-		mission_control.say("Dust storm coming", StormOutlook.warning_advice(services.state()), &"warn", null, "Weather · Jezero archive")
+		# UI overhaul: the card is the warning (no pop-up saying the same). It shows when, and the one thing to do; the
+		# whole advice is in the Power drawer's message list (P).
+		var st := services.state()
+		mission_control.say(StormOutlook.warning_title(st), StormOutlook.warning_advice(st), &"warn", null, "Weather · Jezero archive",
+			StormOutlook.warning_line(st), &"storm")
 		return
 	if alert_id == ScoutSystem.ALERT_ID and text.begins_with("Scout report"):
 		_scout_report.call_deferred(text)
@@ -324,8 +392,13 @@ func _scout_report(text: String) -> void:
 	var revealed: Array = rep.get("revealed", [])
 	if not revealed.is_empty():
 		body += " %d ore deposit%s marked on the map (◆)." % [revealed.size(), "" if revealed.size() == 1 else "s"]
-	mission_control.say("Scout report · %s" % String(rep.get("name", "")), body, &"good", pic, "Scout rover · mast camera")
-	toasts.push("New scout report: the %s." % String(rep.get("name", "site")).to_lower(), &"good")
+	# UI overhaul: the picture and ONE line (what it found for you: ore first, else a danger, else the first sentence).
+	var line := HudKit.short_line(String(rep.get("text", text)), MissionControlCard.MAX_LINE_WORDS)
+	if not revealed.is_empty():
+		line = "%d ore deposit%s on the map" % [revealed.size(), "" if revealed.size() == 1 else "s"]
+	elif String(rep.get("hazard", "")) != "":
+		line = HudKit.short_line(String(rep.hazard), MissionControlCard.MAX_LINE_WORDS)
+	mission_control.say("Scout: %s" % String(rep.get("name", "report")), body, &"good", pic, "Scout rover · mast camera", line, &"scout")
 
 
 func _on_weather(e: Dictionary) -> void:
@@ -345,8 +418,10 @@ func _check_low() -> void:
 		if now - float(_low_said.get(key, -1e9)) < LOW_REPEAT_S:
 			continue
 		_low_said[key] = now
-		mission_control.say("%s is very low" % String(r.name), "%s is down to %s. Find out why on the Power & life support drawer (P), then fix it at the station in the base." % [
-			String(r.name), String(r.value)], &"danger")
+		# UI overhaul: two short sentences; the Power drawer (P) has the why and the station to fix it at.
+		var words := "Down to %s. Press %s to see why." % [String(r.value), GameHud._key(&"power_view", "P")]
+		mission_control.say("%s is very low" % String(r.name), words, &"danger", null, "Colony radio", words,
+			StringName(GameHud.READING_ICONS.get(r.key, &"danger")))
 
 
 # ---------------------------------------------------------------- refresh and layout
@@ -379,11 +454,13 @@ func refresh() -> void:
 			presenter.want_live(true)
 			_feed_tex.texture = presenter.mast_texture()
 		_feed_tex.visible = _feed_tex.texture != null
-		_feed_status.text = ScoutSystem.status_text(st)
+		var status := ScoutSystem.status_text(st)
+		_feed_status.text = HudKit.short_line(status.get_slice(" · ", 0))      # where it is going; the tooltip has the rest
+		HudKit.say(feed, "Scout camera. %s" % status)
 	# by a sun tracker outside: B builds here
 	_near_tracker = _tracker_near()
 	build_chip.visible = _near_tracker != &""
-	_dock_build.modulate.a = 1.0 if _near_tracker != &"" else 0.45
+	_set_dock_usable(_dock_build, _near_tracker != &"", "Walk to a sun tracker outside first.")
 	_check_low()
 
 
@@ -469,8 +546,8 @@ func _layout() -> void:
 	else:
 		toasts.visible = true
 	if mission_control.visible:
+		mission_control.fit(maxf(320.0, dock.position.x - EDGE - 16.0))
 		var cs := mission_control.get_combined_minimum_size()
-		cs.x = minf(cs.x, maxf(320.0, dock.position.x - EDGE - 16.0))
 		mission_control.size = cs
 		mission_control.position = Vector2(EDGE, screen.y - EDGE - cs.y)
 		var clash := goals.position.y + goals.size.y > mission_control.position.y - 10.0
@@ -489,7 +566,9 @@ func _load() -> void:
 		return
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(SETTINGS_PATH))
 	if d is Dictionary:
-		_user_compact = bool((d as Dictionary).get("compact", false))
+		# UI overhaul: the calm look is the default. The choice is kept under "numbers" (true only after the player
+		# pressed H for the numbers look); the old "compact" key is ignored, since older builds wrote false for everyone.
+		_user_compact = not bool((d as Dictionary).get("numbers", false))
 		vitals.set_compact(_user_compact)
 		# Owner 2026-11-14: the goals card always starts in small mode (open).
 		#goals.set_open(bool((d as Dictionary).get("goals_open", true)))
@@ -498,4 +577,4 @@ func _load() -> void:
 func _save() -> void:
 	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f != null:
-		f.store_string(JSON.stringify({"compact": _user_compact, "goals_open": goals.open if not _goals_folded_for_mc else true}))
+		f.store_string(JSON.stringify({"numbers": not _user_compact, "goals_open": goals.open if not _goals_folded_for_mc else true}))

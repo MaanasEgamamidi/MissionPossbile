@@ -132,7 +132,7 @@ func accept_host_result(result: ActionResult, record := {}) -> void:
 		return
 	if action == &"task_claim":
 		if result.ok:
-			status_label.text = "Back at the controls. Try that again." if _reclaim_pending else "Ready. The host checks every step."
+			status_label.text = "Back at the controls. Try that again." if _reclaim_pending else ""
 			_reclaim_pending = false
 		else:
 			status_label.text = "You can't start this repair: " + result.message

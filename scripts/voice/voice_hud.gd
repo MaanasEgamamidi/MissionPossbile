@@ -113,6 +113,7 @@ func _place() -> void:
 
 
 var _strip: Array[Control] = []
+var _feed: Control
 
 
 ## The HUD's bottom-edge boxes (GameHud names them "Hints" and "Status").
@@ -122,6 +123,11 @@ func _bottom_strip() -> Array[Control]:
 			var c := get_parent().find_child(n, true, false) as Control
 			if c != null and c != self:
 				_strip.append(c)
+	# UI overhaul: the mission HUD's mast camera card also sits bottom right; the voice lines stay clear above it.
+	if _feed == null and get_parent() != null:
+		_feed = get_parent().find_child("MastFeed", true, false) as Control
+		if _feed != null:
+			_strip.append(_feed)
 	return _strip
 
 

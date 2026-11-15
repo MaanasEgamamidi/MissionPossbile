@@ -1,11 +1,19 @@
 class_name SettingsPanel
 extends UiPanel
 ## Display, Controls, Graphics and Audio tabs share live settings and keyboard focus.
-## Audio exposes warning mute/volume; voice and microphone keep their existing controls.
-## Audio also has the narrator voice (owner 2026-11-15): on/off and volume for the OS text-to-speech reader.
+## Every option is a picture and one to three words; the sentence that explains it is its tooltip. "Pick one"
+## settings (text size, graphics quality) are rows of large buttons, not drop-downs; the text size buttons show an "A"
+## in the size they stand for. In the key list the box showing a key is the button that changes it.
+## Audio has the warning mute and volume; voice and microphone open from Controls and from Audio.
 ## Changes apply at once and are saved when the panel closes (settings and key bindings).
 ## While it waits for a new key, the panel cannot close and the key it catches never reaches the game.
 
+const Kit = preload("res://scripts/ui/menu_kit.gd")
+## Names (tooltips) of the text sizes, in the order of GameSettings.TEXT_SCALES.
+const TEXT_SIZE_NAMES: PackedStringArray = ["Normal", "Large", "Extra large"]
+const KEY_HINT := "Pick a key to change it."
+const NO_KEY := "(no key)"
+## The narrator reads cassette pages and the opening story aloud.
 const Narration := preload("res://scripts/voice/narration.gd")
 
 ## The settings being edited. UiRoot fills this in from its own settings when it is left empty.
@@ -17,7 +25,7 @@ var input_path := "user://input.json"
 var _tabs: TabContainer
 var _ui_scale: HSlider
 var _ui_scale_label: Label
-var _text_size: OptionButton
+var _text_size: Kit.Segmented
 var _high_contrast: CheckButton
 var _subtitles: CheckButton
 var _reduce_motion: CheckButton
@@ -34,12 +42,12 @@ var _invert_y: CheckButton
 var _fov: HSlider
 var _fov_label: Label
 var _toggle_sprint: CheckButton
-var _quality: OptionButton
+var _quality: Kit.Segmented
 var _quality_info: Label
-var _binding_labels: Dictionary = {}     # action -> Label
-var _change_buttons: Dictionary = {}     # action -> Button
+var _change_buttons: Dictionary = {}     # action -> Button (shows the key; pressing it waits for a new one)
 var _reset_buttons: Dictionary = {}      # action -> Button
 var _reset_all: Button
+var _keys_grid: GridContainer
 var _note: Label
 var _capturing: StringName = &""
 var _held_modifier := KEY_NONE           # a modifier pressed alone while capturing; binds on release
@@ -62,13 +70,13 @@ func setup(p_services: GameServices) -> void:
 	_tabs = TabContainer.new()
 	_tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	outer.add_child(_tabs)
-	_build_display(_tab("Display"))
-	_build_controls(_tab("Controls"))
-	_build_graphics(_tab("Graphics"))
-	_build_audio(_tab("Audio"))
-	var done := Button.new()
-	done.text = "Done"
-	done.theme_type_variation = UiTheme.PRIMARY_BUTTON
+	_build_display(_tab("Display", &"monitor"))
+	_build_controls(_tab("Controls", &"keys"))
+	_build_graphics(_tab("Graphics", &"image"))
+	_build_audio(_tab("Audio", &"sound"))
+	var done := Kit.button("Done", &"check", UiTheme.PRIMARY_BUTTON, 26.0, 1.2, 60.0)
+	done.name = "Done"
+	done.custom_minimum_size.x = 200.0
 	done.size_flags_horizontal = Control.SIZE_SHRINK_END
 	done.pressed.connect(func() -> void: close_requested.emit())
 	outer.add_child(done)
@@ -96,9 +104,15 @@ func tabs() -> TabContainer:
 	return _tabs
 
 
-## The graphics preset picker (tests choose presets with it).
-func quality_button() -> OptionButton:
+## The graphics preset picker: a row of four buttons with OptionButton's item_count, selected, select() and
+## item_selected (tests choose presets with it).
+func quality_button() -> Kit.Segmented:
 	return _quality
+
+
+## The text size picker: three "A" buttons, one per GameSettings.TEXT_SCALES.
+func text_size_button() -> Kit.Segmented:
+	return _text_size
 
 
 ## The action waiting for a new key, or &"".
@@ -113,8 +127,7 @@ func begin_capture(action: StringName) -> void:
 	_capturing = action
 	_held_modifier = KEY_NONE
 	(_change_buttons[action] as Button).text = "Press a key…"
-	(_binding_labels[action] as Label).text = "Press a key or mouse button. Esc cancels."
-	_note.text = ""
+	_note.text = "Press a key or mouse button. Esc cancels."
 
 
 ## Stops waiting; the old binding stays.
@@ -123,7 +136,7 @@ func cancel_capture() -> void:
 		return
 	_capturing = &""
 	_held_modifier = KEY_NONE
-	_note.text = "Nothing changed."
+	_note.text = "Nothing changed. " + KEY_HINT
 	_update_bindings()
 
 
@@ -143,12 +156,12 @@ func save_all() -> void:
 	PlayerInput.save(input_path)
 
 
-## The binding text shown for an action.
+## The binding text shown for an action (on its key button).
 func binding_text(action: StringName) -> String:
-	return (_binding_labels[action] as Label).text
+	return (_change_buttons[action] as Button).text
 
 
-## The "Change" button for an action.
+## The button that shows an action's key; pressing it waits for a new one.
 func change_button(action: StringName) -> Button:
 	return _change_buttons[action]
 
@@ -224,64 +237,74 @@ static func _code(key: InputEventKey) -> Key:
 
 # ---------------------------------------------------------------- building
 
-func _tab(title: String) -> VBoxContainer:
+func _tab(title: String, kind: StringName) -> VBoxContainer:
 	var scroll := ScrollContainer.new()
 	scroll.name = title
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	scroll.follow_focus = true
 	_tabs.add_child(scroll)
+	_tabs.set_tab_icon(_tabs.get_tab_count() - 1, Kit.pic(kind, 30.0))
+	# Room for the focus ring on the left and for the scroll bar on the right.
+	var pad := MarginContainer.new()
+	pad.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pad.add_theme_constant_override(&"margin_left", 4)
+	pad.add_theme_constant_override(&"margin_top", 4)
+	pad.add_theme_constant_override(&"margin_right", 18)
+	pad.add_theme_constant_override(&"margin_bottom", 4)
+	scroll.add_child(pad)
 	var box := VBoxContainer.new()
 	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll.add_child(box)
+	box.add_theme_constant_override(&"separation", 12)
+	pad.add_child(box)
 	return box
 
 
 func _build_display(box: VBoxContainer) -> void:
-	_ui_scale_label = _label(box, "")
+	_ui_scale_label = _caption(box, "Menu size", &"zoom", "Makes every menu and the HUD bigger or smaller.")
 	_ui_scale = _slider(box, 0.75, 2.0, 0.05)
 	_ui_scale.value_changed.connect(func(v: float) -> void:
 		settings.ui_scale = v
 		_apply())
-	_label(box, "Text size")
-	_text_size = OptionButton.new()
-	for item: String in ["Normal", "Large", "Extra large"]:
-		_text_size.add_item(item)
-	_text_size.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	_caption(box, "Text size", &"letter", "How big the words are.")
+	_text_size = Kit.Segmented.new()
+	_text_size.name = "TextSize"
+	for i in GameSettings.TEXT_SCALES.size():
+		# Each "A" is drawn in the size it stands for, whatever the text size is now.
+		_text_size.add_item("A", &"", TEXT_SIZE_NAMES[i], GameSettings.TEXT_SCALES[i] * 1.5)
 	_text_size.item_selected.connect(func(i: int) -> void:
 		settings.text_scale = GameSettings.TEXT_SCALES[i]
 		_apply())
 	box.add_child(_text_size)
-	_high_contrast = _check(box, "High contrast (stronger colours and borders)", func(on: bool) -> void:
+	var grid := _switch_grid(box)
+	_high_contrast = _check(grid, "High contrast", &"contrast", "Stronger colours and borders.", func(on: bool) -> void:
 		settings.high_contrast = on
 		_apply())
-	_subtitles = _check(box, "Subtitles for messages and voices", func(on: bool) -> void:
+	_subtitles = _check(grid, "Subtitles", &"bubble", "Shows messages and voices as words on the screen.", func(on: bool) -> void:
 		settings.subtitles = on
 		_apply())
-	_reduce_motion = _check(box, "Reduce motion (no camera bob, no fades)", func(on: bool) -> void:
+	_reduce_motion = _check(grid, "Less motion", &"motion", "No camera bob and no fades.", func(on: bool) -> void:
 		settings.reduce_motion = on
 		_apply())
-	_reduce_flashes = _check(box, "Static danger warnings (no border pulse)", func(on: bool) -> void:
+	_reduce_flashes = _check(grid, "No flashing", &"flash", "Danger warnings stay still instead of pulsing at the screen edge.", func(on: bool) -> void:
 		settings.reduce_flashes = on
 		_apply())
 
 
 func _build_audio(box: VBoxContainer) -> void:
-	_warning_muted = _check(box, "Mute warning sounds", func(on: bool) -> void:
+	var grid := _switch_grid(box)
+	_warning_muted = _check(grid, "Mute alarms", &"mute", "Turns the warning sounds off. Danger banners and countdowns stay on the screen.", func(on: bool) -> void:
 		settings.warning_sound_muted = on
 		_apply())
-	_warning_volume_label = _label(box, "")
+	_warning_volume_label = _caption(box, "Alarm volume", &"sound", "How loud the warning sounds are.")
 	_warning_volume = _slider(box, 0.0, 1.0, 0.05)
 	_warning_volume.value_changed.connect(func(value: float) -> void:
 		settings.warning_sound_volume = value
 		_apply())
-	var note := _label(box, "Danger banners and countdowns remain visible with sound muted. Voice and microphone controls are in the Controls tab.")
-	note.theme_type_variation = UiTheme.MUTED
-	# Owner 2026-11-15: the narrator voice reads the tapes and the opening story aloud (the computer's own voice).
-	_narrator = _check(box, "Narrator voice (reads the tapes and the opening story aloud)", func(on: bool) -> void:
+	_narrator = _check(grid, "Narrator", &"sound", "Reads the tapes and the opening story aloud.", func(on: bool) -> void:
 		settings.narrator_voice = on
 		_apply())
 	_narrator.name = "NarratorVoice"
-	_narrator_volume_label = _label(box, "")
+	_narrator_volume_label = _caption(box, "Narrator volume", &"sound", "How loud the narrator is.")
 	_narrator_volume = _slider(box, 0.0, 1.0, 0.05)
 	_narrator_volume.name = "NarratorVolume"
 	_narrator_volume.value_changed.connect(func(value: float) -> void:
@@ -291,89 +314,108 @@ func _build_audio(box: VBoxContainer) -> void:
 	var narrator_note := _label(box, "The words always show on screen too." if narrator.available()
 		else "This computer has no text-to-speech voice, so the narrator stays silent. The words always show on screen.")
 	narrator_note.theme_type_variation = UiTheme.MUTED
+	box.add_child(_voice_button("VoiceSettingsButtonAudio"))
 
 
 func _build_controls(box: VBoxContainer) -> void:
-	_mouse_label = _label(box, "")
+	_mouse_label = _caption(box, "Mouse speed", &"mouse", "How fast the view turns. Normal is 2.0.")
 	_mouse = _slider(box, 0.0005, 0.006, 0.0001)
 	_mouse.value_changed.connect(func(v: float) -> void:
 		settings.mouse_sensitivity = v
 		_apply())
-	_invert_y = _check(box, "Invert mouse up and down", func(on: bool) -> void:
-		settings.invert_y = on
-		_apply())
-	_fov_label = _label(box, "")
+	_fov_label = _caption(box, "View width", &"eye", "Field of view: how much you see at once.")
 	_fov = _slider(box, 60.0, 100.0, 1.0)
 	_fov.value_changed.connect(func(v: float) -> void:
 		settings.fov_degrees = v
 		_apply())
-	_toggle_sprint = _check(box, "Tap Shift to sprint (instead of holding it)", func(on: bool) -> void:
+	var grid := _switch_grid(box)
+	_invert_y = _check(grid, "Invert mouse", &"flip", "Moving the mouse up looks down.", func(on: bool) -> void:
+		settings.invert_y = on
+		_apply())
+	_toggle_sprint = _check(grid, "Tap to sprint", &"fast", "Tap Shift once to sprint, instead of holding it.", func(on: bool) -> void:
 		settings.toggle_sprint = on
 		_apply())
 	# Prompt 11: microphone, voice volume and per-player mute live in their own panel.
-	var voice := Button.new()
-	voice.name = "VoiceSettingsButton"
-	voice.text = "Voice and microphone…"
+	box.add_child(_voice_button("VoiceSettingsButton"))
+
+	var keys_row := HBoxContainer.new()
+	keys_row.name = "KeysHeader"
+	keys_row.add_theme_constant_override(&"separation", 12)
+	box.add_child(keys_row)
+	keys_row.add_child(Kit.picture(&"keys", 30.0, &"heading"))
+	var heading := Label.new()
+	heading.text = "Keys"
+	heading.theme_type_variation = UiTheme.HEADING
+	heading.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	keys_row.add_child(heading)
+	_reset_all = Kit.button("Reset all keys", &"reset", &"", 24.0, 1.0, 48.0)
+	_reset_all.tooltip_text = "Puts every key back to the one the game started with."
+	_reset_all.pressed.connect(reset_all)
+	keys_row.add_child(_reset_all)
+	_note = _label(box, KEY_HINT)
+	_note.theme_type_variation = UiTheme.MUTED
+	var grid_keys := GridContainer.new()
+	grid_keys.name = "Keys"
+	grid_keys.add_theme_constant_override(&"h_separation", 12)
+	box.add_child(grid_keys)
+	_keys_grid = grid_keys
+	_fit_keys_grid()
+	for action: StringName in PlayerInput.ACTION_NAMES:
+		var action_name := String(PlayerInput.ACTION_NAMES[action])
+		var name_label := Label.new()
+		name_label.text = action_name
+		name_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		name_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_label.custom_minimum_size.x = 150.0
+		grid_keys.add_child(name_label)
+		var change := Button.new()
+		change.icon = Kit.pic(&"pencil", 20.0)
+		change.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		change.custom_minimum_size = Vector2(210, 48)
+		change.tooltip_text = "Change the key for: %s" % action_name
+		change.pressed.connect(begin_capture.bind(action))
+		grid_keys.add_child(change)
+		_change_buttons[action] = change
+		var reset := Button.new()
+		reset.icon = Kit.pic(&"reset", 24.0)
+		reset.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		reset.custom_minimum_size = Vector2(56, 48)
+		reset.tooltip_text = "Back to the usual key for: %s" % action_name
+		reset.pressed.connect(func() -> void:
+			cancel_capture()
+			PlayerInput.reset(action)
+			_note.text = "%s is back to %s." % [PlayerInput.ACTION_NAMES[action], PlayerInput.describe(action)]
+			_update_bindings())
+		grid_keys.add_child(reset)
+		_reset_buttons[action] = reset
+
+
+func _build_graphics(box: VBoxContainer) -> void:
+	_caption(box, "Graphics quality", &"image", "Lower runs faster on slower computers. High is how the colony was designed to look.")
+	_quality = Kit.Segmented.new()
+	_quality.name = "Quality"
+	for i in GraphicsQuality.NAMES.size():
+		_quality.add_item(GraphicsQuality.NAMES[i], StringName("bars%d" % (i + 1)), GraphicsQuality.DESCRIPTIONS[i], 0.0, 44.0)
+	_quality.item_selected.connect(func(i: int) -> void:
+		settings.graphics_quality = i
+		_apply())
+	box.add_child(_quality)
+	_quality_info = _label(box, "Lower runs faster. Higher looks better.")
+	_quality_info.theme_type_variation = UiTheme.MUTED
+
+
+## The button that opens the voice and microphone panel with these settings.
+func _voice_button(node_name: String) -> Button:
+	var voice := Kit.button("Voice and mic", &"mic", &"", 28.0, 1.0, 56.0)
+	voice.name = node_name
+	voice.tooltip_text = "Pick your microphone, mute it, and set how loud other players are."
 	voice.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	voice.pressed.connect(func() -> void:
 		var p := VoiceSettingsPanel.new()
 		p.settings = settings
 		p.settings_path = settings_path
 		open_requested.emit(p))
-	box.add_child(voice)
-	var heading := _label(box, "Keys")
-	heading.theme_type_variation = UiTheme.HEADING
-	var help := _label(box, "Press Change, then the new key or mouse button. Esc cancels.")
-	help.theme_type_variation = UiTheme.MUTED
-	var grid := GridContainer.new()
-	grid.columns = 4
-	box.add_child(grid)
-	for action: StringName in PlayerInput.ACTION_NAMES:
-		var name_label := Label.new()
-		name_label.text = PlayerInput.ACTION_NAMES[action]
-		grid.add_child(name_label)
-		var binding := Label.new()
-		binding.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		binding.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		grid.add_child(binding)
-		_binding_labels[action] = binding
-		var change := Button.new()
-		change.text = "Change"
-		change.pressed.connect(begin_capture.bind(action))
-		grid.add_child(change)
-		_change_buttons[action] = change
-		var reset := Button.new()
-		reset.text = "Reset"
-		reset.pressed.connect(func() -> void:
-			cancel_capture()
-			PlayerInput.reset(action)
-			_note.text = "%s is back to %s." % [PlayerInput.ACTION_NAMES[action], PlayerInput.describe(action)]
-			_update_bindings())
-		grid.add_child(reset)
-		_reset_buttons[action] = reset
-	_reset_all = Button.new()
-	_reset_all.text = "Reset all keys"
-	_reset_all.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	_reset_all.pressed.connect(reset_all)
-	box.add_child(_reset_all)
-	_note = _label(box, "")
-	_note.theme_type_variation = UiTheme.MUTED
-
-
-func _build_graphics(box: VBoxContainer) -> void:
-	_label(box, "Graphics quality")
-	_quality = OptionButton.new()
-	for item: String in GraphicsQuality.NAMES:
-		_quality.add_item(item)
-	_quality.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	_quality.item_selected.connect(func(i: int) -> void:
-		settings.graphics_quality = i
-		_apply())
-	box.add_child(_quality)
-	_quality_info = _label(box, "")
-	_quality_info.theme_type_variation = UiTheme.MUTED
-	var help := _label(box, "Lower presets run faster on slower computers. High is how the colony was designed to look.")
-	help.theme_type_variation = UiTheme.MUTED
+	return voice
 
 
 func _read_settings() -> void:
@@ -399,22 +441,28 @@ func _apply() -> void:
 	_update_value_labels()
 	if is_inside_tree():
 		settings.apply(get_tree())
+	_fit_keys_grid()
+
+
+## The key list is two rows wide (name, key, reset twice) while the text is normal size, one row wide when it is
+## large, so long action names keep enough room.
+func _fit_keys_grid() -> void:
+	if _keys_grid != null:
+		_keys_grid.columns = 6 if UiTheme.text_scale() < 1.2 else 3
 
 
 func _update_value_labels() -> void:
-	_ui_scale_label.text = "Menu and HUD size: %d %%" % roundi(settings.ui_scale * 100.0)
-	_mouse_label.text = "Mouse speed: %.1f (normal 2.0)" % (settings.mouse_sensitivity * 1000.0)
-	_fov_label.text = "Field of view: %d°" % roundi(settings.fov_degrees)
-	_quality_info.text = GraphicsQuality.DESCRIPTIONS[settings.graphics_quality]
-	_warning_volume_label.text = "Warning sound volume: %d %%" % roundi(settings.warning_sound_volume * 100.0)
-	_narrator_volume_label.text = "Narrator voice volume: %d %%" % roundi(settings.narrator_volume * 100.0)
+	_ui_scale_label.text = "%d %%" % roundi(settings.ui_scale * 100.0)
+	_mouse_label.text = "%.1f" % (settings.mouse_sensitivity * 1000.0)
+	_fov_label.text = "%d°" % roundi(settings.fov_degrees)
+	_warning_volume_label.text = "%d %%" % roundi(settings.warning_sound_volume * 100.0)
+	_narrator_volume_label.text = "%d %%" % roundi(settings.narrator_volume * 100.0)
 
 
 func _update_bindings() -> void:
-	for action: StringName in _binding_labels:
+	for action: StringName in _change_buttons:
 		var text := PlayerInput.describe(action)
-		(_binding_labels[action] as Label).text = text if text != "" else "(no key)"
-		(_change_buttons[action] as Button).text = "Change"
+		(_change_buttons[action] as Button).text = text if text != "" else NO_KEY
 
 
 func _label(parent: Control, text: String) -> Label:
@@ -425,20 +473,34 @@ func _label(parent: Control, text: String) -> Label:
 	return l
 
 
+## A pictogram and a short name above a slider or a row of choices; returns the label that shows the value.
+func _caption(parent: Control, text: String, kind: StringName, tip: String) -> Label:
+	var row := Kit.caption(text, kind, tip)
+	parent.add_child(row)
+	return row.get_node("Value") as Label
+
+
 func _slider(parent: Control, lo: float, hi: float, step: float) -> HSlider:
 	var s := HSlider.new()
 	s.min_value = lo
 	s.max_value = hi
 	s.step = step
+	s.custom_minimum_size.y = 40.0
 	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	parent.add_child(s)
 	return s
 
 
-func _check(parent: Control, text: String, on_toggle: Callable) -> CheckButton:
-	var c := CheckButton.new()
-	c.text = text
-	c.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	c.toggled.connect(on_toggle)
+## Two columns of switches, so each one is a wide target.
+func _switch_grid(parent: Control) -> GridContainer:
+	var grid := GridContainer.new()
+	grid.columns = 2
+	grid.add_theme_constant_override(&"h_separation", 24)
+	parent.add_child(grid)
+	return grid
+
+
+func _check(parent: Control, text: String, kind: StringName, tip: String, on_toggle: Callable) -> CheckButton:
+	var c := Kit.toggle(text, kind, tip, on_toggle)
 	parent.add_child(c)
 	return c

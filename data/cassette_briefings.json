@@ -1,102 +1,96 @@
 {
   "schema": 1,
-  "scope": "C04 previews approved by the user; finished T-section controls deferred.",
+  "scope": "Tape briefings for players aged 9-12: what the room is for and its two repairs, by their action titles (UI overhaul, 2026-11-15).",
   "cassettes": [
     {
       "id": "cassette_command_center",
       "room_id": "command_center",
       "title": "Command center",
       "pages": [
-        "The Command Room connects the colony's people and systems. This tape previews two planned repairs: T01 - Comms is a general task for any controlled crew member, while T02 - Wires requires the Electrical and comms specialist in solo play and co-op. Their intended goals are restoring a communications link and reconnecting a wiring panel. Those puzzles are not installed in this build; this briefing does not promise tuning knobs, cable dragging, or a working repair success indicator.",
-        "For the controls available now, approach a labeled tape and press E to collect it for the colony. Inventory shows its collection status, but cannot open these pages. Return to the Command Room cassette player, press E, then choose a collected tape. Use Previous and Next to change pages, or Close (Esc) to leave. You can also inspect either reserved task station with E. Solo players will need to switch specialists safely in the Med Bay. Reading a tape does not unlock repairs, and the colony keeps running while you read."
+        "This is the Command Room. From here the colony talks to Mission Control. The storm knocked out the radio signal and pulled the relay cables loose.",
+        "Lock the Relay: anyone can turn the knob until the two waves match. Patch the Relay: only the Electrical specialist can plug each cable into its shape."
       ],
       "image_path": "res://assets/cassettes/command_center.jpg",
       "caption": "NASA astronaut Jonny Kim uses a ham radio to speak with students from the International Space Station. This is ISS communications, not a Mars control room.",
       "credit": "NASA",
       "source_url": "https://www.nasa.gov/missions/station/iss-research/nasa-astronaut-jonny-kim-advances-research-aboard-space-station/",
       "source_id": "CN01",
-      "briefing_status": "preview",
-      "preview_note": "Repair preview: task puzzles are not installed in this build."
+      "briefing_status": "ready"
     },
     {
       "id": "cassette_power_supply",
       "room_id": "power_supply",
       "title": "Power supply",
       "pages": [
-        "The Power Room helps the colony manage electricity. The repair plan assigns T03 - Rings to any crew member and T04 - Circuits to the Electrical and comms specialist. The planned goals are calibrating distributor channels and restoring a circuit. This is a preview of the intended work, not instructions for a finished puzzle. Ring timing, conductor placement, rotation, and voltage targets are not playable here yet. The NASA photograph illustrates real spacecraft solar generation, not the inside of the fictional circuit board.",
-        "In this build, E inspects the reserved T03 and T04 stations and their role information. Use the existing Power panel for its current equipment and room controls; this tape does not replace that panel. Collect a room tape with E and read it only at the Command Room cassette player. Choose a collected tape, use Previous or Next, and leave with Close (Esc). Solo players must return to the safe crew-switch flow when a specialist is needed. Monitoring colony supplies remains useful while the new room puzzles are pending."
+        "The Power Room stores the Sun's power in a big battery, so the base has light at night. Its turbine and its power bench both need fixing.",
+        "Sync the Turbine: anyone can stop each ring in the green. Light the Power Bench: only the Electrical specialist can make a path to the lamp."
       ],
       "image_path": "res://assets/cassettes/power_supply.jpg",
       "caption": "Solar arrays on the Russian segment of the International Space Station, photographed by an Expedition 38 crew member on February 5, 2014. Earth is visible beyond the station.",
       "credit": "NASA",
       "source_url": "https://www.nasa.gov/image-article/solar-array-panels-russian-segment-of-space-station/",
       "source_id": "CN02",
-      "briefing_status": "preview",
-      "preview_note": "Repair preview: task puzzles are not installed in this build."
+      "briefing_status": "ready"
     },
     {
       "id": "cassette_greenhouse",
       "room_id": "greenhouse",
       "title": "Greenhouse",
       "pages": [
-        "This is the indoor Greenhouse, which is separate from the outside Garden dome. Its planned pair is T05 - Elements for the Biology and food specialist and T06 - Water for any crew member. The intended goals concern plant-control settings and getting water to the plants. Nutrient tokens and stream-redirection controls are future game designs, not NASA procedures or working controls in this build. The accompanying photograph shows a real ISS plant-growth chamber; the fictional repair tasks do not reproduce its scientific protocol.",
-        "For now, approach either reserved task station and press E to inspect its role. Existing greenhouse controls remain available through their own station. Find this room's labeled cassette and press E to add it to the colony's shared collection. Inventory reports collected and missing tapes without revealing their pages. At the Command Room player, choose this tape and use Previous or Next to read, or Close (Esc) to return to the world. In solo play, use the safe Med Bay crew-switch flow to take the Biology and food specialist when that repair becomes available."
+        "The Greenhouse grows the colony's food. Plants need light, water and plant food. A water pipe broke, so the kale is dry.",
+        "Water the Kale: anyone can turn the pipes until water reaches the plants. The Biology specialist looks after the plant food."
       ],
       "image_path": "res://assets/cassettes/greenhouse.jpg",
       "caption": "Radishes growing in the Plant Habitat-02 experiment aboard the International Space Station, photographed on November 11, 2020. The chamber supports controlled plant-growth research.",
       "credit": "NASA/Kate Rubins",
       "source_url": "https://www.nasa.gov/image-article/astronauts-grow-radishes-second-advanced-plant-habitat-experiment/",
       "source_id": "CN03",
-      "briefing_status": "preview",
-      "preview_note": "Repair preview: task puzzles are not installed in this build."
+      "briefing_status": "ready"
     },
     {
       "id": "cassette_green_dome",
       "room_id": "green_dome",
       "title": "Green dome",
       "pages": [
-        "The Garden dome has a separate tape and task pair. T07 - Pipes is planned for the Field engineering and geology specialist; T08 - Glass is a general task open to all four crew members. Their intended goals are restoring irrigation and replacing a glass pane. Connecting pipe pieces, fitting glass shapes, visible flowing water, and restoration shots belong to later work. They are not completed interactions in this build. The photograph shows a NASA plant-habitat ground development unit in Florida, not a greenhouse built on Mars.",
-        "Use E to inspect the reserved T07 and T08 locations and their role information. Collect this room's cassette with E; its collection is shared across the colony and does not fill a cargo slot. Read it at the Command Room cassette player using the collected-tape list, Previous, Next, and Close (Esc). Wear a functional suit while traveling through the exterior and pay attention to existing safety messages. Solo players must switch to the required specialist through the safe crew-switch flow. Reading a tape is optional preparation, not a repair-unlock requirement."
+        "The Garden Dome is a big glass room full of plants. Its glass keeps the air inside. One window pane cracked and needs new glass.",
+        "Glaze the Dome: anyone can fit the five glass pieces into the window. The Field engineer looks after the dome's pipes."
       ],
       "image_path": "res://assets/cassettes/green_dome.jpg",
       "caption": "A NASA Advanced Plant Habitat engineering development unit at Kennedy Space Center in Florida, 2016. This photographed ground prototype is an engineering analogy, not a Martian garden dome.",
       "credit": "NASA/Bill White",
       "source_url": "https://www.nasa.gov/image-article/prototype-of-space-stations-advanced-plant-habitat/",
       "source_id": "CN04",
-      "briefing_status": "preview",
-      "preview_note": "Repair preview: task puzzles are not installed in this build."
+      "briefing_status": "ready"
     },
     {
       "id": "cassette_med_bay",
       "room_id": "med_bay",
       "title": "Med Bay",
       "pages": [
-        "Med Bay is the new-colony starting and recovery area. Its planned repairs are T09 - Mixture for the Medical and life support specialist and T10 - Equipment for any crew member. The intended goals are a fictional reagent exercise and checking a piece of equipment. Pouring amounts, plug placement, and new self-test controls are not installed yet, so this preview does not describe them as actions you can perform. The NASA photograph shows ultrasound research aboard the ISS; it does not demonstrate a medical mixture or real treatment advice.",
-        "For current controls, approach a reserved task station and press E to inspect its role. The existing medical station retains its own controls. Med Bay also provides the safe crew-switch area: solo players must use the correct specialist for role-restricted work. Press E near the room cassette to collect it, then return to the Command Room player to read. Choose a collected tape and use Previous, Next, or Close (Esc). Inventory shows collection status only. Reading remains optional, and colony systems continue running while the cassette panel is open."
+        "The Med Bay keeps the crew healthy. The lab samples got mixed up, and two machines lost their power.",
+        "Sort the Lab Samples: only the Medical specialist can pour each shape into its own tube. Revive the Med Bay: anyone can plug the machines back in."
       ],
       "image_path": "res://assets/cassettes/med_bay.jpg",
       "caption": "NASA astronaut Chris Cassidy performs an ultrasound on ESA astronaut Luca Parmitano in the ISS Columbus laboratory on August 21, 2013. This is medical research, not a game reagent recipe.",
       "credit": "NASA",
       "source_url": "https://www.nasa.gov/image-article/astronauts-perform-spinal-ultrasound-investigation/",
       "source_id": "CN05",
-      "briefing_status": "preview",
-      "preview_note": "Repair preview: task puzzles are not installed in this build."
+      "briefing_status": "ready"
     },
     {
       "id": "cassette_hangar",
       "room_id": "hangar",
       "title": "Hangar / airlock",
       "pages": [
-        "The Hangar and its linked Airlock form one briefing area. T11 - Dust is planned as a general task, while T12 - Seal requires the Field engineering and geology specialist. Their intended goals are cleaning marked surfaces and restoring an airlock seal. Dust-removal gestures, patch placement, fasteners, and a new pressure-hold puzzle are not installed in this build. The photograph shows real spacesuit and tool staging inside the ISS Quest airlock; the future Mars repair sequence is fictional.",
-        "Press E at T11 or T12 for equipment maintenance; the field engineer services the seal from the safe interior. At the suit rack, complete the check and confirm a sealed suit with oxygen before entering the exit vestibule. A seal fault or open outer door can make that small chamber unbreathable. Unprotected exposure becomes fatal after four seconds: retreat through the inner door. Do not attempt a twenty-second repair inside the hazard. Collect this cassette with E; read it at the Command Room player. Use Previous or Next, and leave with Close (Esc). Solo specialist changes happen safely in the Med Bay."
+        "The Hangar holds the rover, and the airlock is the door to the outside. Dust covers the landing lines, and the airlock is leaking air.",
+        "Clear the Landing Lines: anyone can brush and vacuum the dust away. Seal the Airlock: only the Field engineer can fit the new seal."
       ],
       "image_path": "res://assets/cassettes/hangar.jpg",
       "caption": "NASA astronaut Michael Hopkins prepares tools and U.S. spacesuits inside the ISS Quest airlock on December 17, 2020. This is real ISS suit staging, not a fictional Mars leak repair.",
       "credit": "NASA",
       "source_url": "https://www.nasa.gov/image-article/flight-engineer-michael-hopkins-works-inside-quest-airlock/",
       "source_id": "CN06",
-      "briefing_status": "preview",
-      "preview_note": "Repair preview: task puzzles are not installed in this build."
+      "briefing_status": "ready"
     }
   ]
 }

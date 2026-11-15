@@ -31,20 +31,11 @@ func _build_body() -> void:
 	_record_text = _add_text(_body, "")
 	_fiction = _add_text(_body, "", UiTheme.MUTED)
 	_science = _add_text(_body, "", UiTheme.MUTED)
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 12)
-	_body.add_child(row)
-	read_button = Button.new()
+	read_button = _add_action("Read", &"book", _on_read)
 	read_button.name = "Read"
-	read_button.text = "Read the record"
-	read_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	read_button.pressed.connect(_on_read)
-	row.add_child(read_button)
-	journal_button = Button.new()
+	journal_button = _add_action("Journal", &"list", func() -> void: open_requested.emit(StoryLogPanel.new()), false)
 	journal_button.name = "Journal"
-	journal_button.text = "Open the colony journal"
-	journal_button.pressed.connect(func() -> void: open_requested.emit(StoryLogPanel.new()))
-	row.add_child(journal_button)
+	journal_button.tooltip_text = "Open the colony journal"
 
 
 func _refresh_body(st: ColonyState) -> void:
@@ -66,7 +57,7 @@ func _refresh_body(st: ColonyState) -> void:
 	_science.text = "Science: %s%s" % [String(r.get("science", "")), "" if ids.is_empty() else " Sources: %s." % ", ".join(PackedStringArray(ids))]
 	_science.visible = found
 	read_button.disabled = false
-	read_button.text = "Read it again" if found else "Read the record"
+	read_button.text = "Read again" if found else "Read"
 
 
 func _on_read() -> void:

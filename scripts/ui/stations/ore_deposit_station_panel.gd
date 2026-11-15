@@ -30,16 +30,12 @@ func _what_you_can_do() -> PackedStringArray:
 
 
 func _build_body() -> void:
-	_add_reading(&"left", "◆", "Good ore left here", "parts")
-	_add_reading(&"store", "⌂", "This ore in the colony store", "cargo")
+	collect_button = _add_action("Collect", &"pick", func() -> void: _ask(&"collect_ore", {}, _on_answer))
+	collect_button.name = "Collect"
+	_add_reading(&"left", "⛏", "Ore left here", "parts")
+	_add_reading(&"store", "♻", "In the colony store", "cargo")
 	_what = _add_text(_body, "")
 	_why = _add_text(_body, "", UiTheme.MUTED)
-	collect_button = Button.new()
-	collect_button.name = "Collect"
-	collect_button.text = "◆ Collect a piece"
-	collect_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	collect_button.pressed.connect(func() -> void: _ask(&"collect_ore", {}, _on_answer))
-	_body.add_child(collect_button)
 
 
 func _refresh_body(st: ColonyState) -> void:

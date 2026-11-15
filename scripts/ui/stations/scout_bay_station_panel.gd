@@ -38,20 +38,10 @@ func _build_body() -> void:
 	_add_reading(&"trips", "◉", "Places surveyed", "sources")
 	_status = _add_text(_body, "", UiTheme.HEADING)
 	_status.name = "ScoutStatus"
-	var row := HBoxContainer.new()
-	row.add_theme_constant_override(&"separation", 10)
-	_body.add_child(row)
-	assemble_button = Button.new()
+	assemble_button = _add_action("Finish scout · %d parts" % ScoutSystem.ASSEMBLE_PARTS, &"wrench", func() -> void: _ask(&"scout_assemble", {}, _on_answer))
 	assemble_button.name = "Assemble"
-	assemble_button.text = "⛏ Finish the scout (%d parts)" % ScoutSystem.ASSEMBLE_PARTS
-	assemble_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	assemble_button.pressed.connect(func() -> void: _ask(&"scout_assemble", {}, _on_answer))
-	row.add_child(assemble_button)
-	recall_button = Button.new()
+	recall_button = _add_action("Call it back", &"home", func() -> void: _ask(&"scout_recall", {}, _on_answer), false)
 	recall_button.name = "Recall"
-	recall_button.text = "Call it back"
-	recall_button.pressed.connect(func() -> void: _ask(&"scout_recall", {}, _on_answer))
-	row.add_child(recall_button)
 	_add_heading(_body, "Mast camera")
 	_feed = TextureRect.new()
 	_feed.name = "MastCamera"
@@ -74,7 +64,7 @@ func _build_body() -> void:
 func _refresh_body(st: ColonyState) -> void:
 	var s := st.scout
 	var built := ScoutSystem.is_built(st)
-	_show_reading(&"parts", "%d parts" % st.parts, &"ok" if st.parts >= ScoutSystem.ASSEMBLE_PARTS or built else &"warn")
+	_show_reading(&"parts", "%d" % st.parts, &"ok" if st.parts >= ScoutSystem.ASSEMBLE_PARTS or built else &"warn")
 	_show_reading(&"trips", "%d of %d" % [(s.get("surveyed", {}) as Dictionary).size(), ScoutSystem.sites().size()], &"ok")
 	_status.text = ("● " if built else "◌ ") + ScoutSystem.status_text(st)
 	assemble_button.visible = not built and kind == "scout_bay"

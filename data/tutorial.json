@@ -13,16 +13,16 @@
 		"hangar": "Hangar and airlock"
 	},
 	"fixes": [
-		{"task": "T01", "text": "Fix the radio signal", "done": "The radio signal is fixed"},
-		{"task": "T02", "text": "Fix the wires", "done": "The wires are fixed"},
-		{"task": "T03", "text": "Fix the power dials", "done": "The power dials are fixed"},
-		{"task": "T04", "text": "Repair the power circuit", "done": "The power circuit is repaired"},
-		{"task": "T06", "text": "Fix the broken pipe", "done": "The water pipe is fixed"},
-		{"task": "T08", "text": "Repair the broken glass", "done": "The dome glass is repaired"},
-		{"task": "T09", "text": "Fix the test-tube rack", "done": "The test-tube rack is fixed"},
-		{"task": "T10", "text": "Fix the unplugged equipment", "done": "The Med Bay equipment is plugged in"},
-		{"task": "T11", "text": "Clean the dusty hangar", "done": "The hangar is clean"},
-		{"task": "T12", "text": "Repair the air leak", "done": "The airlock seal is repaired"}
+		{"task": "T01", "text": "Lock the Relay", "done": "The relay is locked on"},
+		{"task": "T02", "text": "Patch the Relay", "done": "The relay is patched"},
+		{"task": "T03", "text": "Sync the Turbine", "done": "The turbine is in sync"},
+		{"task": "T04", "text": "Light the Power Bench", "done": "The power bench is lit"},
+		{"task": "T06", "text": "Water the Kale", "done": "The kale has water"},
+		{"task": "T08", "text": "Glaze the Dome", "done": "The dome has its glass"},
+		{"task": "T09", "text": "Sort the Lab Samples", "done": "The lab samples are sorted"},
+		{"task": "T10", "text": "Revive the Med Bay", "done": "The Med Bay is running"},
+		{"task": "T11", "text": "Clear the Landing Lines", "done": "The landing lines are clear"},
+		{"task": "T12", "text": "Seal the Airlock", "done": "The airlock is sealed"}
 	],
 	"messages": {
 		"welcome": "Welcome to Mars, crew. It is the 2060s and Earth is in trouble: people need a new home. You are the second team sent here. The first team could not finish their mission.",

@@ -517,9 +517,9 @@ func _test_solo_flow() -> void:
 	var lines := TutorialPresenter.list_lines(st, 3)
 	var joined := "\n".join(lines)
 	_check("fix: the list shows the 10 broken spots by room with the specialist each needs; T05 and T07 are not on it",
-		lines.size() == 10 and joined.contains("Command Room: Fix the wires (⚡ Electrical and comms specialist)") and joined.contains("Med Bay: Fix the test-tube rack (✚ Medical and life support specialist)")
-		and joined.contains("Hangar and airlock: Repair the air leak (⛏ Field engineering and geology specialist)") and joined.contains("Command Room: Fix the radio signal")
-		and not joined.contains("Command Room: Fix the radio signal (") and not joined.contains("Elements") and not joined.contains("Pipes"), joined)
+		lines.size() == 10 and joined.contains("Command Room: Patch the Relay (⚡ Electrical and comms specialist)") and joined.contains("Med Bay: Sort the Lab Samples (✚ Medical and life support specialist)")
+		and joined.contains("Hangar and airlock: Seal the Airlock (⛏ Field engineering and geology specialist)") and joined.contains("Command Room: Lock the Relay")
+		and not joined.contains("Command Room: Lock the Relay (") and not joined.contains("Elements") and not joined.contains("Pipes"), joined)
 	var card: Array = st.campaign.get("objectives", [])
 	_check("fix: the goal card lists the 6 rooms with their fixed counts", card.size() == 6 and String(card[0].text) == "Fix the Command Room" and String(card[0].label) == "0/2", str(card))
 	# wrong specialist refused on the host; the right one fixes it

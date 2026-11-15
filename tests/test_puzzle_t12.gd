@@ -1,8 +1,9 @@
 extends SceneTree
-## T12 Seal (airlock exit-tunnel inner door) puzzle: seeded leak and shuffled numbers 1-5 along it, host rule through a
-## real SessionService with the field engineer at the repair_t12 station, specialty gate, fail-closed moves (wrong number,
-## forged, out-of-range, replayed), reset, save projection (supports_resume), the panel's numbered seal points and its
-## 10 s clock (time up -> Restart -> reset), the panel solved by keyboard, and the S04 link: with the seal fault active an engineer
+## T12 Seal (airlock exit-tunnel inner door) puzzle: seeded leak and a shuffled order of the three press points along it,
+## host rule through a real SessionService with the field engineer at the repair_t12 station, specialty gate, fail-closed
+## moves (wrong number, forged, out-of-range, replayed), reset, save projection (supports_resume), the panel (find the
+## leak by its vapor, fit the gasket, press the glowing points; 10 s clock: time up -> the gasket springs back and the
+## panel sends reset), the panel solved by keyboard, and the S04 link: with the seal fault active an engineer
 ## standing on the safe side (no suit) solves it, the hazard keeps running for anyone in the vestibule, and completion
 ## clears T12.maintenance_fault so LocalPressure stops the leak and the vestibule repressurises.
 ## Run: godot --headless --path . --script res://tests/test_puzzle_t12.gd
@@ -67,7 +68,7 @@ func _initialize() -> void:
 	quit(0 if _passed == _total else 1)
 
 
-## The full list of {move, payload} that solves a state (test only): press 1, 2, 3, 4, 5.
+## The full list of {move, payload} that solves a state (test only): press 1, 2, 3.
 static func solution(_state: Dictionary) -> Array:
 	var moves: Array = []
 	for n in Rule.POINTS:
@@ -81,6 +82,11 @@ func _rule_checks() -> void:
 	var leaks := {}
 	var orders := {}
 	var shuffled_ok := true
+	var plain: Array = []
+	for n in Rule.POINTS:
+		plain.append(n + 1)
+	var backwards := plain.duplicate()
+	backwards.reverse()
 	for s in 60:
 		var seeded := Rule.initial_state(3000 + s * 6151)
 		leaks[int(seeded.leak)] = true
@@ -88,18 +94,20 @@ func _rule_checks() -> void:
 		orders[str(order)] = true
 		var sorted := order.duplicate()
 		sorted.sort()
-		shuffled_ok = shuffled_ok and sorted == [1, 2, 3, 4, 5] and order != [1, 2, 3, 4, 5] and order != [5, 4, 3, 2, 1]
-	_check("seeds vary the leaking section and the number order", leaks.size() == Rule.SECTIONS.size() and orders.size() >= 12, "%d sections, %d orders" % [leaks.size(), orders.size()])
-	_check("numbers are 1-5 once each, never in plain left-to-right (or right-to-left) order", shuffled_ok)
+		shuffled_ok = shuffled_ok and sorted == plain and order != plain and order != backwards
+	# Three points: 3! = 6 orders, minus the two plain ones.
+	_check("three press points", Rule.POINTS == 3)
+	_check("seeds vary the leaking section and the number order", leaks.size() == Rule.SECTIONS.size() and orders.size() == 4, "%d sections, %d orders" % [leaks.size(), orders.size()])
+	_check("numbers are 1..3 once each, never in plain left-to-right (or right-to-left) order", shuffled_ok)
 	var task := {"puzzle_seed": 31, "puzzle_state": {}}
 	var start := Rule.current_state(task)
 	_check("spot_of / order_number / next_point agree", Rule.order_number(start, Rule.spot_of(start, 3)) == 3 and Rule.next_point(start) == Rule.spot_of(start, 1))
 	_check("rule: number 1 first accepted", bool(Rule.validate(task, {"move": "press", "value": 1}).accepted))
 	_check("rule: wrong number refused", not bool(Rule.validate(task, {"move": "press", "value": 2}).accepted))
-	_check("rule: number 0 and 6 refused", not bool(Rule.validate(task, {"move": "press", "value": 0}).accepted) and not bool(Rule.validate(task, {"move": "press", "value": 6}).accepted))
+	_check("rule: number 0 and POINTS + 1 refused", not bool(Rule.validate(task, {"move": "press", "value": 0}).accepted) and not bool(Rule.validate(task, {"move": "press", "value": Rule.POINTS + 1}).accepted))
 	_check("rule: reset with nothing pressed refused", not bool(Rule.validate(task, {"move": "reset", "value": 0}).accepted))
 	_check("rule: the old step moves are gone", not bool(Rule.validate(task, {"move": "find", "value": int(start.leak)}).accepted) and not bool(Rule.validate(task, {"move": "test", "value": 0}).accepted))
-	var forged := {"puzzle_seed": 31, "puzzle_state": {"seed": 31, "step": 2, "leak": (int(start.leak) + 1) % 6, "order": [1, 2, 3, 4, 5], "pressed": 5}}
+	var forged := {"puzzle_seed": 31, "puzzle_state": {"seed": 31, "step": 2, "leak": (int(start.leak) + 1) % 6, "order": plain, "pressed": Rule.POINTS}}
 	var fixed := Rule.current_state(forged)
 	_check("rule: forged leak / order / pressed are not kept", int(fixed.leak) == int(start.leak) and fixed.order == start.order and int(fixed.pressed) == 2)
 	var moves := solution(start)
@@ -109,10 +117,14 @@ func _rule_checks() -> void:
 		var r := Rule.validate(t, {"move": moves[k][0], "value": k * Rule.STEP_BASE + int(moves[k][1])})
 		all_ok = all_ok and bool(r.accepted) and (bool(r.complete) == (k == moves.size() - 1))
 		if all_ok and k < moves.size() - 1:
-			all_ok = is_equal_approx(float(r.progress), 0.18 * float(k + 1))
+			all_ok = is_equal_approx(float(r.progress), Rule.PRESS_SHARE * float(k + 1))
 		t.puzzle_state = r.get("puzzle_state", {})
-	_check("rule: pressing 1, 2, 3, 4, 5 completes it (0.18 progress each before that)", all_ok and moves.size() == 5)
-	_check("rule: nothing accepted after completion", not bool(Rule.validate(t, {"move": "reset", "value": 5 * Rule.STEP_BASE}).accepted))
+		t.progress = r.get("progress", 0.0)
+	_check("rule: pressing 1, 2, 3 completes it (PRESS_SHARE progress each before that)", all_ok and moves.size() == Rule.POINTS)
+	_check("rule: nothing accepted after completion", not bool(Rule.validate(t, {"move": "reset", "value": Rule.POINTS * Rule.STEP_BASE}).accepted))
+	# A seal saved half-pressed under the old five-point door (step 4, pressed 4) peels off and starts again at 1.
+	var old_save := {"puzzle_seed": 31, "progress": 0.72, "puzzle_state": {"seed": 31, "step": 4, "leak": int(start.leak), "order": start.order, "pressed": 4}}
+	_check("rule: an old five-point save resumes at 0 pressed, not stuck", int(Rule.current_state(old_save).pressed) == 0 and bool(Rule.validate(old_save, {"move": "press", "value": 4 * Rule.STEP_BASE + 1}).accepted))
 	# Reset half way: back to 0 pressed, same leak and numbers, the step keeps counting.
 	t = task.duplicate(true)
 	for k in 2:
@@ -175,8 +187,8 @@ func _session_checks() -> void:
 	var ok := true
 	for n in Rule.POINTS - 1:
 		ok = ok and _move(1, "press", n + 1).ok
-	_check("1 to 4 pressed after the reload and restart, not complete before 5", ok and float(task.progress) < 1.0 and not bool(task.first_completed))
-	_check("pressing 5 completes T12", _move(1, "press", Rule.POINTS).ok and float(task.progress) >= 1.0 and bool(task.first_completed))
+	_check("1 to 2 pressed after the reload and restart, not complete before 3", ok and float(task.progress) < 1.0 and not bool(task.first_completed))
+	_check("pressing the last number completes T12", _move(1, "press", Rule.POINTS).ok and float(task.progress) >= 1.0 and bool(task.first_completed))
 	_check("T12 no longer broken; seal fault clear", not PuzzleRegistry.is_broken(s.state, TASK) and float(task.condition) == 1.0 and not bool(task.maintenance_fault))
 	_check("moves after completion refused", _move(1, "reset", 0).reason in [&"task_unclaimed", &"task_complete"])
 
@@ -245,8 +257,8 @@ func _pressure_checks() -> void:
 	_check("visitor in the vestibule is exposed while the seal is open", bool(s.survival.status(visitor.id).active))
 	visitor.position = safe
 	s.advance(0.1)
-	_check("still leaking until number 5 is pressed", ok and bool(s.survival.pressure_info().leaking) and not bool(task.first_completed))
-	_check("pressing 5 completes T12 during the fault", _move(1, "press", Rule.POINTS).ok and bool(task.first_completed))
+	_check("still leaking until the last number is pressed", ok and bool(s.survival.pressure_info().leaking) and not bool(task.first_completed))
+	_check("pressing the last number completes T12 during the fault", _move(1, "press", Rule.POINTS).ok and bool(task.first_completed))
 	_check("completion clears the seal fault S04 reads", not bool(task.maintenance_fault) and float(task.condition) == 1.0)
 	s.advance(0.2)
 	info = s.survival.pressure_info()
@@ -287,56 +299,65 @@ func _panel_checks() -> void:
 	_check("panel claimed the task on open", s.repair_runtime.locks.has(TASK) and String(s.repair_runtime.locks[TASK].actor) == "crew_4")
 	var issues := UiLayoutCheck.problems(panel, root.get_visible_rect().size)
 	_check("panel layout fits 1280x720", issues.is_empty(), " | ".join(issues))
-	_check("panel names the safe side and the suit", "hangar side" in panel.safety_label.text and "suit" in panel.safety_label.text, panel.safety_label.text)
+	_check("panel names the safe side and the suit", "hangar side" in panel.instructions and "suit" in panel.instructions, panel.instructions)
 	var task: Dictionary = s.state.repair.tasks[TASK]
 	var start := Rule.current_state(task)
-	_check("the old step buttons are gone", panel.get("section_buttons") == null and panel.get("seal_buttons") == null and panel.get("test_button") == null)
+	var leak := int(start.leak)
+	_check("the old step buttons are gone", panel.get("section_buttons") == null and panel.get("seal_buttons") == null and panel.get("test_button") == null and panel.get("restart_button") == null)
+	var seams: Array = panel.seam_buttons
 	var points: Array = panel.press_buttons
-	_check("five numbered seal points on the door picture", points.size() == Rule.POINTS and points.all(func(b: Button) -> bool: return b.is_visible_in_tree() and b.size.x >= 40.0 and b.size.y >= 40.0 and panel.door_box.is_ancestor_of(b)))
-	var door_size: Vector2 = panel.door_box.size
-	_check("door picture at most 420x300 and the play area within 540 px", door_size.x <= 420.5 and door_size.y <= 300.5 and panel.play_area.size.y <= 540.0, "door %s, play area %s" % [door_size, panel.play_area.size])
-	var inside := true
-	var apart := true
-	for a in Rule.POINTS:
-		var ra := Rect2((points[a] as Button).position, (points[a] as Button).size)
-		inside = inside and Rect2(Vector2.ZERO, door_size).encloses(ra)
-		for b in range(a + 1, Rule.POINTS):
-			apart = apart and ra.get_center().distance_to(Rect2((points[b] as Button).position, (points[b] as Button).size).get_center()) >= SealPanel.POINT_SIZE - 0.5
-	_check("the points sit inside the picture and do not overlap", inside and apart)
-	_check("the clock waits for number 1", not panel.timer_running and is_equal_approx(panel.time_left, SealPanel.TIME_LIMIT_S) and SealPanel.TIME_LIMIT_S == 10.0, panel.time_label.text)
+	var box: Control = panel.airlock
+	_check("step 1: six seams on the hatch, each named, the points still hidden", seams.size() == Rule.SECTIONS.size() and seams.all(func(b: Button) -> bool: return b.is_visible_in_tree() and box.is_ancestor_of(b) and not b.tooltip_text.is_empty()) and points.all(func(b: Button) -> bool: return not b.is_visible_in_tree()))
+	_check("the equipment is one picture filling the play area", box.size.x >= 900.0 and box.size.y >= 380.0, str(box.size))
+	_check("the cue says find the leak", "leak" in panel.cue_text, panel.cue_text)
+	(seams[0] as Button).grab_focus()
 	var visited := {}
-	(points[0] as Button).grab_focus()
-	for i in 12:
+	for i in 8:
 		var focused := root.gui_get_focus_owner()
 		if focused != null:
 			visited[focused] = true
 		_key(KEY_TAB)
-	_check("Tab reaches every seal point", points.all(func(b: Button) -> bool: return visited.has(b)))
-	(points[0] as Button).grab_focus()
-	_key(KEY_RIGHT)
-	await _frames()
-	_check("arrow keys step along the points", root.gui_get_focus_owner() == points[1])
+		await _frames(1)
+	_check("Tab reaches every seam and the gasket", seams.all(func(b: Button) -> bool: return visited.has(b)) and visited.has(panel.gasket_button))
+	var wrong_seam := (leak + 1) % seams.size()
+	await _press(seams[wrong_seam])
+	_check("a wrong seam gets the amber cross and a friendly line, nothing sent", panel.miss_seam == wrong_seam and not panel.leak_found and (task.puzzle_state as Dictionary).is_empty() and panel.status_label.text == SealPanel.MISS_TEXT, panel.status_label.text)
+	await _press(seams[leak])
+	_check("the vapor's seam is the leak: step 2, the gasket is next", panel.leak_found and not panel.gasket_fitted and root.gui_get_focus_owner() == panel.gasket_button and "seal" in panel.cue_text and (task.puzzle_state as Dictionary).is_empty(), panel.cue_text)
+	await _press(panel.gasket_button)
+	await _frames(3)
+	var first := Rule.spot_of(start, 1)
+	_check("the gasket goes on: three points on the seam, the keyboard on the one to press first", panel.gasket_fitted and points.size() == Rule.POINTS and points.all(func(b: Button) -> bool: return b.is_visible_in_tree() and minf(b.size.x, b.size.y) >= 40.0 and box.is_ancestor_of(b)) and root.gui_get_focus_owner() == points[first])
+	var inside := true
+	var apart := true
+	for a in Rule.POINTS:
+		var ra := Rect2((points[a] as Button).position, (points[a] as Button).size)
+		inside = inside and Rect2(Vector2.ZERO, box.size).encloses(ra)
+		for b in range(a + 1, Rule.POINTS):
+			var rb := Rect2((points[b] as Button).position, (points[b] as Button).size)
+			apart = apart and not ra.intersects(rb)
+	_check("the points sit inside the picture and do not overlap", inside and apart)
+	_check("the clock waits for the first press", not panel.timer_running and is_equal_approx(panel.time_left, SealPanel.TIME_LIMIT_S) and SealPanel.TIME_LIMIT_S == 10.0)
+	issues = UiLayoutCheck.problems(panel, root.get_visible_rect().size)
+	_check("panel layout with the gasket on fits 1280x720", issues.is_empty(), " | ".join(issues))
 	var wrong_spot := Rule.spot_of(start, 3)
 	await _press(points[wrong_spot])
-	_check("a wrong number flashes red and sends nothing", panel.flash_spot == wrong_spot and (task.puzzle_state as Dictionary).is_empty() and "number 1" in panel.status_label.text, panel.status_label.text)
-	await _press(points[Rule.spot_of(start, 1)])
-	_check("number 1 goes to the host and starts the clock", int(Rule.current_state(task).pressed) == 1 and panel.timer_running and panel.time_left <= SealPanel.TIME_LIMIT_S and panel.time_left > SealPanel.TIME_LIMIT_S - 3.0, "%s s" % panel.time_left)
-	_check("the time left is shown", panel.time_label.is_visible_in_tree() and "Time left" in panel.time_label.text, panel.time_label.text)
+	_check("a point out of turn flashes amber and sends nothing", panel.flash_spot == wrong_spot and (task.puzzle_state as Dictionary).is_empty() and panel.status_label.text == SealPanel.WRONG_TEXT, panel.status_label.text)
+	await _press(points[first])
+	_check("the first point goes to the host and starts the clock", int(Rule.current_state(task).pressed) == 1 and panel.timer_running and panel.time_left <= SealPanel.TIME_LIMIT_S and panel.time_left > SealPanel.TIME_LIMIT_S - 3.0, "%s s" % panel.time_left)
+	_check("the keyboard moves on to the next point", root.gui_get_focus_owner() == points[Rule.spot_of(start, 2)])
 	# Run the clock out (no 10 s wait in the test).
 	panel.time_left = 0.0
+	await _frames(4)
+	_check("too slow: the host peeled the seal off, the gasket is back in its holder", int(Rule.current_state(task).pressed) == 0 and int(Rule.current_state(task).step) == 2 and not panel.gasket_fitted and panel.leak_found and not panel.timed_out and not panel.timer_running and panel.gasket_button.is_visible_in_tree() and points.all(func(b: Button) -> bool: return not b.is_visible_in_tree()))
+	_check("too slow is said kindly", panel.status_label.text == SealPanel.TIMEOUT_TEXT, panel.status_label.text)
+	_check("keyboard focus comes back to the gasket", root.gui_get_focus_owner() == panel.gasket_button)
+	await _press(panel.gasket_button)
 	await _frames(3)
-	_check("too slow: the panel asks for a restart", panel.timed_out and panel.restart_button.is_visible_in_tree() and "Too slow" in panel.timeout_label.text and "Restart" in panel.status_label.text, panel.status_label.text)
-	_check("the points take no clicks while the time is up", points.all(func(b: Button) -> bool: return b.disabled))
-	await _press(points[Rule.spot_of(start, 2)])
-	_check("pressing 2 after the time ran out sends nothing", int(Rule.current_state(task).pressed) == 1 and int(Rule.current_state(task).step) == 1)
-	issues = UiLayoutCheck.problems(panel, root.get_visible_rect().size)
-	_check("panel layout with the Restart row fits 1280x720", issues.is_empty(), " | ".join(issues))
-	await _press(panel.restart_button)
-	_check("Restart sends reset: 0 pressed, clock stopped, Restart gone", int(Rule.current_state(task).pressed) == 0 and not panel.timed_out and not panel.timer_running and not panel.restart_button.is_visible_in_tree(), panel.status_label.text)
-	_check("keyboard focus comes back to the points", points.has(root.gui_get_focus_owner()))
 	for n in Rule.POINTS:
 		await _press(points[Rule.spot_of(start, n + 1)])
-	_check("keyboard path 1-5 solves T12 through the session", bool(task.first_completed) and float(task.progress) >= 1.0, panel.status_label.text)
-	_check("panel shows the host's success; the clock stopped", panel.succeeded and "Fixed" in panel.status_label.text and not panel.timer_running and not panel.timed_out)
+	_check("keyboard path solves T12 through the session", bool(task.first_completed) and float(task.progress) >= 1.0, panel.status_label.text)
+	_check("panel shows the host's success; the clock stopped", panel.succeeded and panel.status_label.text == panel.solved_text() and not panel.timer_running and not panel.timed_out, panel.status_label.text)
+	_check("the seal is done: the needle goes to the green band", panel.stage() == SealPanel.Stage.DONE)
 	ui.close_all()
 	await _frames()

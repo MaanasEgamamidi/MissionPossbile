@@ -1,8 +1,8 @@
 class_name SuitRackPanel
 extends StationPanel
-## The suit rack by the airlock: your suit (on or off) with a button that starts the one-second suit check
-## (`begin_suit_check`), your suit tank and the colony's oxygen reserve, and "Fill tank from colony oxygen"
-## (`refill_suit`), which says how much oxygen it takes from the reserve. Filling here is the only way to fill a tank.
+## The suit rack by the airlock: two big buttons, "Put suit on" / "Take suit off" (starts the one-second suit check,
+## `begin_suit_check`) and "Fill tank" (`refill_suit`), then your suit, your tank and the colony's oxygen as bars.
+## The help ("?") says how much oxygen a fill takes from the reserve. Filling here is the only way to fill a tank.
 
 ## Puts the suit on or takes it off (starts the suit check).
 var suit_button: Button
@@ -28,48 +28,45 @@ func _what_you_can_do() -> PackedStringArray:
 
 
 func _build_body() -> void:
-	_add_reading(&"suit", "◆", "Your suit", "suit_tank")
-	_add_reading(&"tank", "⛑", "Your suit tank", "suit_tank")
-	_add_reading(&"reserve", "O₂", "Colony oxygen reserve", "oxygen")
-
-	_add_heading(_body, "Suit")
-	var suit_row := HBoxContainer.new()
-	_body.add_child(suit_row)
-	suit_button = Button.new()
+	suit_button = _add_action("Put suit on", &"crew", _on_suit_pressed)
 	suit_button.name = "SuitCheck"
-	suit_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
-	suit_button.pressed.connect(_on_suit_pressed)
-	suit_row.add_child(suit_button)
-	_check_label = Label.new()
-	_check_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_check_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_check_label.theme_type_variation = UiTheme.MUTED
-	suit_row.add_child(_check_label)
-
-	_add_heading_with_help(_body, "Suit tank", "suit_refill")
-	fill_button = Button.new()
+	fill_button = _add_action("Fill tank", &"tank", _on_fill_pressed, false)
 	fill_button.name = "Fill"
-	fill_button.text = "Fill tank from colony oxygen"
-	fill_button.pressed.connect(_on_fill_pressed)
-	_body.add_child(fill_button)
-	_fill_note = _add_text(_body, "")
+	# One short line under the buttons: the running suit check, or why the tank cannot be filled.
+	_check_label = _add_text(_body, "", UiTheme.MUTED)
+	_check_label.name = "SuitCheckStatus"
+	_body.move_child(_check_label, _actions.get_index() + 1)
+
+	_add_reading(&"suit", "◆", "Your suit", "suit_tank")
+	_add_reading(&"tank", "⛑", "Your tank", "suit_tank")
+	_add_reading(&"reserve", "O₂", "Colony oxygen", "oxygen")
+
+	_fill_note = _add_note(_body, "")
+	var help_row := HBoxContainer.new()
+	_body.add_child(help_row)
+	_help_only(help_row)
+	var about := _add_text(help_row, "Fill your tank here before you go outside.", UiTheme.MUTED)
+	about.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	help_row.add_child(ExplainButton.make("suit_refill"))
 
 
 func _refresh_body(st: ColonyState) -> void:
 	var bal := services.balance
 	var me := services.local_character()
 	var reserve := st.store(&"oxygen_kg")
-	_show_reading(&"reserve", "%s kg" % num(reserve, 2), &"urgent" if reserve <= 0.0 else (&"warn" if reserve < bal.oxygen_reserve_warn_kg else &"ok"))
+	_show_reading(&"reserve", "%s kg" % num(reserve, 1), &"urgent" if reserve <= 0.0 else (&"warn" if reserve < bal.oxygen_reserve_warn_kg else &"ok"),
+		reserve / maxf(float(st.capacities.get(&"oxygen_kg", 0.0)), 1.0))
 	if me == null:
 		_show_reading(&"suit", "No crew member", &"warn")
 		_show_reading(&"tank", "—", &"ok")
-		suit_button.text = "Put the suit on"
+		suit_button.text = "Put suit on"
 		suit_button.disabled = true
 		suit_button.tooltip_text = "Choose a crew member first."
 		_check_label.text = "Choose a crew member first."
 		fill_button.disabled = true
 		fill_button.tooltip_text = "Choose a crew member first."
 		_fill_note.text = "Choose a crew member first."
+		_check_label.visible = true
 		return
 	_show_reading(&"suit", "On" if me.suit_on else "Off", &"ok")
 	var tank_kg := LifeSupportModel.suit_kg(bal, me)
@@ -78,17 +75,18 @@ func _refresh_body(st: ColonyState) -> void:
 		tank_level = &"urgent"
 	elif me.suit_charge < bal.suit_warn_charge:
 		tank_level = &"warn"
-	_show_reading(&"tank", "%s %% · %s kg of oxygen" % [num(me.suit_charge, 0), num(tank_kg, 3)], tank_level)
+	_show_reading(&"tank", "%s %%" % num(me.suit_charge, 0), tank_level, me.suit_charge / 100.0)
+	(readings[&"tank"] as Reading).value_label.tooltip_text = "%s kg of oxygen" % num(tank_kg, 3)
 
 	var progress := services.session.suit_check_progress(me.id) if services.session != null else -1.0
-	suit_button.text = "Take the suit off" if me.suit_on else "Put the suit on"
+	suit_button.text = "Take suit off" if me.suit_on else "Put suit on"
 	suit_button.disabled = progress >= 0.0
+	var line := ""
 	if progress >= 0.0:
-		_check_label.text = "Suit check running… %d %%" % roundi(progress * 100.0)
+		line = "Suit check… %d %%" % roundi(progress * 100.0)
 		suit_button.tooltip_text = "A suit check is already running."
 	else:
-		_check_label.text = "The suit check takes about %s second. Stay at the rack until it is done." % num(services.config.suit_check_seconds)
-		suit_button.tooltip_text = "Starts the suit check."
+		suit_button.tooltip_text = "Starts the suit check: about %s second. Stay at the rack until it is done." % num(services.config.suit_check_seconds)
 
 	var need := (100.0 - me.suit_charge) / 100.0 * bal.suit_o2_capacity_kg
 	var reason := ""
@@ -98,6 +96,11 @@ func _refresh_body(st: ColonyState) -> void:
 		reason = "The colony's oxygen reserve is empty."
 	fill_button.disabled = reason != ""
 	fill_button.tooltip_text = reason if reason != "" else "Moves oxygen from the colony's tanks into your suit."
+	# A full tank needs no sentence (the reading shows 100 % and a tick); an empty reserve does.
+	if line == "" and reserve <= 0.0 and me.suit_charge < 100.0:
+		line = "✖ No oxygen left to fill the tank."
+	_check_label.text = line
+	_check_label.visible = line != ""
 	var take := minf(need, reserve)
 	var how := "Filling takes %s kg of oxygen from the colony reserve, which has %s kg." % [num(take, 3), num(reserve, 2)]
 	if reason != "":

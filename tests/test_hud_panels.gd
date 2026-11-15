@@ -141,6 +141,22 @@ func _all_text(node: Node) -> String:
 	return "\n".join(parts)
 
 
+## What a player can read or hear on `node`: the visible labels plus the accessible names (also the tooltips) of the
+## visible pictures. UI overhaul: the HUD shows pictures and gives each its words this way (HudKit.say).
+func _all_words(node: Node) -> String:
+	var parts := PackedStringArray()
+	if node is Control and (node as Control).is_visible_in_tree():
+		if node is Label:
+			parts.append((node as Label).text)
+		if String((node as Control).accessibility_name) != "":
+			parts.append(String((node as Control).accessibility_name))
+	for child in node.get_children():
+		var t := _all_words(child)
+		if t != "":
+			parts.append(t)
+	return "\n".join(parts)
+
+
 # ------------------------------------------------------------------ HUD
 
 func _test_hud() -> void:
@@ -154,8 +170,10 @@ func _test_hud() -> void:
 	# nothing low: one quiet line
 	_fill_stores()
 	hud.refresh()
-	_check("hud: nothing low shows only 'Colony OK ✓'", hud.colony_ok_shown() and hud.shown_readings().is_empty() and _all_text(hud.root_control()).contains("Colony OK ✓"),
-		str(hud.shown_readings()))
+	# UI overhaul: the tick is drawn (a check pictogram) beside the words "Colony OK"
+	var ok_chip := hud.root_control().find_child("ColonyOk", true, false)
+	_check("hud: nothing low shows only 'Colony OK ✓'", hud.colony_ok_shown() and hud.shown_readings().is_empty() and _all_text(hud.root_control()).contains("Colony OK")
+		and ok_chip != null and StringName(ok_chip.find_child("Symbol", true, false).get("kind")) == &"check", str(hud.shown_readings()))
 
 	# each reading on its own
 	var cases := [
@@ -204,7 +222,9 @@ func _test_hud() -> void:
 	st.power_deficit = false
 
 	# body energy, never "energy" alone
-	var crew_text := _all_text(hud.root_control().find_child("TopRight", true, false))
+	# UI overhaul: the crew corner shows a badge, the symbol, one role word and three picture bars; each picture carries
+	# its words as tooltip and accessible name, so those count as what the corner says.
+	var crew_text := _all_words(hud.root_control().find_child("TopRight", true, false))
 	var bad_energy := false
 	for line in crew_text.split("\n"):
 		if (line.to_lower().contains("energy") and not line.contains("Body energy")) or line.to_lower().contains("stamina"):
@@ -233,24 +253,32 @@ func _test_hud() -> void:
 		hud.show_message("Message number %d." % (i + 1), 3.0)
 	hud.show_message("Message number 1.", 3.0)
 	var now := hud.current_messages()
-	_check("hud: messages queue (3 on screen, 2 waiting, no repeats)", now.size() == 3 and now[0] == "Message number 1." and hud.waiting_messages().size() == 2,
-		"%s / %s" % [now, hud.waiting_messages()])
+	# UI overhaul: GameHud.MAX_MESSAGES (two) short lines on screen; nothing is dropped, the rest wait in order
+	var on_screen := GameHud.MAX_MESSAGES
+	_check("hud: messages queue (%d on screen, %d waiting, no repeats)" % [on_screen, 5 - on_screen], now.size() == on_screen and now[0] == "Message number 1."
+		and hud.waiting_messages().size() == 5 - on_screen and not hud.waiting_messages().has("Message number 1."), "%s / %s" % [now, hud.waiting_messages()])
 	hud._process(3.1)
 	now = hud.current_messages()
-	_check("hud: waiting messages come next, in order", now.size() == 2 and now[0] == "Message number 4." and now[1] == "Message number 5.", str(now))
+	var expect := PackedStringArray()
+	for i in range(on_screen, mini(5, on_screen * 2)):
+		expect.append("Message number %d." % (i + 1))
+	_check("hud: waiting messages come next, in order", now == expect and hud.waiting_messages().size() == maxi(0, 5 - on_screen * 2), "%s / %s" % [now, hud.waiting_messages()])
 	hud.show_message("A long message to check wrapping: the colony computer says that the greenhouse lights are on and the battery is charging nicely in the sun today.", 5.0)
 
 	# key hints, status, pause banner, suit check bar
 	var hints := (hud.root_control().find_child("HintText", true, false) as Label).text
-	_check("hud: key hint strip", hints == "M map · I cargo · C crew · Esc pause · Shift+Backspace sources", hints)
+	# Owner 2026-11-14: the M map is hidden; J shows the goals (and the map in big mode)
+	_check("hud: key hint strip", hints == "J goals · I cargo · C crew · Esc pause · Shift+Backspace sources", hints)
 	hud.set_status("Connected to the host.")
 	_check("hud: status line shows", _all_text(hud.root_control()).contains("Connected to the host."))
 	services.session.request(&"vote_pause", &"", {"paused": true})
 	hud.refresh()
-	_check("hud: PAUSED banner while paused", _all_text(hud.root_control()).contains("PAUSED"))
+	# UI overhaul: the banner is a "⏸ Paused" card at the top centre
+	var banner := hud.root_control().find_child("Paused", true, false) as Control
+	_check("hud: PAUSED banner while paused", banner != null and banner.is_visible_in_tree() and _all_text(hud.root_control()).to_lower().contains("paused"))
 	services.session.request(&"vote_pause", &"", {"paused": false})
 	hud.refresh()
-	_check("hud: no banner when running", not _all_text(hud.root_control()).contains("PAUSED"))
+	_check("hud: no banner when running", banner != null and not banner.is_visible_in_tree() and not _all_text(hud.root_control()).to_lower().contains("paused"))
 	var rack: Dictionary = st.stations["al_suit_rack"]
 	me.position = CharacterState._v3(rack.position)
 	me.suit_on = false
@@ -309,6 +337,7 @@ func _test_summary() -> void:
 	root.add_child(panel)
 	panel.setup(services)
 	panel.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	panel.set_details_open(true)          # UI overhaul: the numbers, flows, ideas and rooms are under "Details"
 	await _frames()
 	panel.refresh()
 
@@ -406,10 +435,13 @@ func _test_inventory() -> void:
 	await _frames()
 	panel.refresh()
 	var text := _all_text(panel)
-	_check("cargo: slots used of cargo_slots", text.contains("carries 2 of %d slots" % services.balance.cargo_slots), text.get_slice("\n", 1))
+	# UI overhaul: "2 / 6" beside the title and one tile per slot (the sentence is the tooltip)
+	var slots := services.balance.cargo_slots
+	_check("cargo: slots used of cargo_slots", panel.slots_text() == "2 / %d" % slots and text.contains("2 / %d" % slots)
+		and panel.find_child("Items", true, false).get_child_count() == slots, panel.slots_text())
 	_check("cargo: items named from their kind", text.count("Supply crate") == 2)
 	var where := services.zones.zone_at_world(Vector3(1.0, 0.0, -1.0))
-	_check("cargo: cache with zone and distance", text.contains("Cache with 1 thing in %s" % where) and text.contains("m from you") and _has_explain(panel, "recovery"),
+	_check("cargo: cache with zone and distance", text.contains("1 thing · %s" % where) and text.contains("m away") and _has_explain(panel, "recovery"),
 		text.replace("\n", " | "))
 	await _check_layout("InventoryPanel", panel, true)
 	var buttons := panel.put_down_buttons()
@@ -426,11 +458,11 @@ func _test_inventory() -> void:
 	buttons = panel.put_down_buttons()
 	text = _all_text(panel)
 	_check("cargo: list updates after the state changes", buttons.size() == 1 and buttons[0].get_parent().get_meta("item_id") == &"crate_1"
-		and text.contains("carries 1 of %d slots" % services.balance.cargo_slots) and not me.cargo.has(&"crate_2"), text.replace("\n", " | "))
+		and panel.slots_text() == "1 / %d" % slots and not me.cargo.has(&"crate_2"), text.replace("\n", " | "))
 	_check("cargo: the answer is shown", text.contains("You put down the supply crate."))
 	services.session.request(&"drop", &"crate_1")
 	panel.refresh()
-	_check("cargo: empty hands say so", _all_text(panel).contains("Your hands and pack are empty"))
+	_check("cargo: empty hands say so", _all_text(panel).contains("Nothing carried") and panel.put_down_buttons().is_empty())
 	panel.queue_free()
 	await _frames()
 
@@ -448,19 +480,27 @@ func _test_crew() -> void:
 	await _frames()
 	panel.refresh()
 	_check("crew: four cards sorted by id", str(panel.sorted_ids()) == str([&"crew_1", &"crew_2", &"crew_3", &"crew_4"]), str(panel.sorted_ids()))
-	_check("crew: status words", panel.status_text(&"crew_1") == "You" and panel.status_text(&"crew_2") == "Free — waiting at the hub")
+	_check("crew: status words", panel.status_text(&"crew_1") == "You" and panel.status_text(&"crew_2") == "Free")
+	# UI overhaul: a card is the portrait, the symbol and ONE role word; the rest is behind "More"
 	var card_text := _all_text(panel.find_child("Card_crew_2", true, false))
+	_check("crew: card shows the symbol, one role word and one button", card_text.contains("✚") and card_text.contains("Medical") and not card_text.contains("Health")
+		and panel.play_button(&"crew_2").is_visible_in_tree() and not panel.play_button(&"crew_1").is_visible_in_tree()
+		and (panel.find_child("Card_crew_1", true, false).find_child("Portrait", true, false) as CrewPortrait).mark() == &"you", card_text.replace("\n", " | "))
+	panel.show_details(true)
+	card_text = _all_text(panel.find_child("Card_crew_2", true, false))
 	_check("crew: card shows specialty with symbol, health, suit tank and place", card_text.contains("✚ Medical and life support specialist") and card_text.contains("Health 100 %")
 		and card_text.contains("tank 100 %") and card_text.contains("Where: %s" % services.zones.zone_at_world(st.character(&"crew_2").position)), card_text.replace("\n", " | "))
 	_check("crew: own card is disabled with a reason", panel.play_button(&"crew_1").disabled and panel.reason_text(&"crew_1") == "You are already this crew member.")
-	_check("crew: rule line with crew_switching explanation", _all_text(panel).contains("change crew member at the hub") and _has_explain(panel, "crew_switching"))
+	_check("crew: rule line with crew_switching explanation", _all_text(panel).contains("change crew member in the Med Bay") and _has_explain(panel, "crew_switching"))
+	await _check_layout("CrewSelectPanel with details", panel, true)
+	panel.show_details(false)
 
-	# far from the hub
+	# far from the Med Bay
 	me.position = Vector3(30.0, 0.0, 9.0)
 	panel.refresh()
 	var host := services.session.request(&"claim_character", &"crew_2")
-	_check("crew: far from the hub is disabled with the reason", panel.play_button(&"crew_2").disabled and panel.reason_text(&"crew_2") == "Walk to the hub to change crew member."
-		and host.reason == &"not_at_hub", "%s / host %s" % [panel.reason_text(&"crew_2"), host.reason])
+	_check("crew: far from the Med Bay is disabled with the reason", panel.play_button(&"crew_2").disabled and panel.reason_text(&"crew_2") == "Walk to the Med Bay to change crew member."
+		and panel.hint_text() == "Walk to the Med Bay to swap." and host.reason == &"not_at_hub", "%s / host %s" % [panel.reason_text(&"crew_2"), host.reason])
 	me.position = me.hub_spot
 
 	# four players
@@ -477,19 +517,20 @@ func _test_crew() -> void:
 	panel.refresh()
 	host = services.session.request(&"claim_character", &"crew_3")
 	_check("crew: taken is disabled with the reason", panel.play_button(&"crew_3").disabled and panel.reason_text(&"crew_3") == "Another player is already this crew member."
-		and panel.status_text(&"crew_3") == "Played by player 2" and host.reason == &"character_taken", "%s / host %s" % [panel.reason_text(&"crew_3"), host.reason])
+		and panel.status_text(&"crew_3") == "Player 2" and (panel.find_child("Card_crew_3", true, false).find_child("Portrait", true, false) as CrewPortrait).mark() == &"taken"
+		and host.reason == &"character_taken", "%s / host %s" % [panel.reason_text(&"crew_3"), host.reason])
 	st.character(&"crew_3").owner_peer = 0
 
 	# allowed
 	panel.refresh()
-	_check("crew: allowed at the hub", not panel.play_button(&"crew_2").disabled and panel.reason_text(&"crew_2") == "")
+	_check("crew: allowed at the hub", not panel.play_button(&"crew_2").disabled and panel.reason_text(&"crew_2") == "" and panel.hint_text() == "")
 	await _check_layout("CrewSelectPanel", panel, true)
 	services.sent.clear()
 	panel.play_button(&"crew_2").pressed.emit()
 	var claims := services.sent_of(&"claim_character")
 	_check("crew: 'Play as' sends exactly one claim_character", services.sent.size() == 1 and claims.size() == 1 and claims[0].target == &"crew_2", str(services.sent))
 	_check("crew: the answer is shown and the cards update", st.character(&"crew_2").owner_peer == 1 and panel.status_text(&"crew_2") == "You"
-		and panel.status_text(&"crew_1") == "Free — waiting at the hub" and _all_text(panel).contains("You are now Medical and life support."))
+		and panel.status_text(&"crew_1") == "Free" and _all_text(panel).contains("You are now Medical and life support."))
 	services.session.request(&"claim_character", &"crew_1")
 	panel.queue_free()
 	await _frames()

@@ -62,7 +62,7 @@
     0,
     -12.45
    ],
-   "prompt": "[E] Fix the test-tube rack",
+   "prompt": "[E] Sort the lab samples",
    "special": "",
    "nodes": [
     {
@@ -156,7 +156,7 @@
     0,
     -17.5
    ],
-   "prompt": "[E] Fix the unplugged equipment",
+   "prompt": "[E] Revive the Med Bay",
    "special": "",
    "nodes": [
     {
@@ -277,7 +277,7 @@
     0,
     -17.4
    ],
-   "prompt": "[E] Fix the wires",
+   "prompt": "[E] Patch the relay",
    "special": "",
    "nodes": [
     {
@@ -347,7 +347,7 @@
     0,
     -11.7
    ],
-   "prompt": "[E] Fix the radio signal",
+   "prompt": "[E] Lock the relay",
    "special": "",
    "nodes": [
     {
@@ -419,7 +419,7 @@
     0,
     27.0
    ],
-   "prompt": "[E] Repair the broken glass",
+   "prompt": "[E] Glaze the dome",
    "special": "",
    "nodes": [
     {
@@ -515,7 +515,7 @@
     0,
     9.4
    ],
-   "prompt": "[E] Fix the power dials",
+   "prompt": "[E] Sync the turbine",
    "special": "",
    "nodes": [
     {
@@ -636,7 +636,7 @@
     0,
     9.45
    ],
-   "prompt": "[E] Repair the power circuit",
+   "prompt": "[E] Light the power bench",
    "special": "",
    "nodes": [
     {
@@ -706,7 +706,7 @@
     0,
     10.45
    ],
-   "prompt": "[E] Repair the air leak",
+   "prompt": "[E] Seal the airlock",
    "special": "door_901",
    "nodes": [
     {
@@ -942,7 +942,7 @@
     0,
     10.6
    ],
-   "prompt": "[E] Fix the broken pipe",
+   "prompt": "[E] Water the kale",
    "special": "",
    "nodes": [
     {
@@ -1116,7 +1116,7 @@
     0,
     -3.0
    ],
-   "prompt": "[E] Clean the dusty hangar",
+   "prompt": "[E] Clear the landing lines",
    "special": "dust",
    "nodes": [
     {

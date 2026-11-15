@@ -20,6 +20,10 @@ func panel_title() -> String:
 
 
 func _what_you_can_do() -> PackedStringArray:
+	return PackedStringArray(["Each level adds more to this area, and it does more for the colony."])
+
+
+## The console's one short line ("Plant more of the Garden dome.") above its upgrade strip.
+func _build_body() -> void:
 	var record: Dictionary = services.state().stations.get(String(station_id), {}) if services != null else {}
-	var line := String(record.get("description", "Upgrade this area."))
-	return PackedStringArray([line, "Each level adds more to this area, and it does more for the colony."])
+	_add_text(_body, String(record.get("description", "Upgrade this area.")))

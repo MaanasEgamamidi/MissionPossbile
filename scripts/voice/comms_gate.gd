@@ -5,7 +5,8 @@ extends RefCounted
 ## fixed, voice works exactly as before. Each machine reads the replicated state, so host and clients agree.
 ## Loaded by path (no class_name): const CommsGate := preload("res://scripts/voice/comms_gate.gd")
 
-const MESSAGE := "Crew radio is down: only Mission Control can reach you. Fix the radio signal in the Command Room to talk to your crew."
+## UI overhaul: one short line on the voice corner (the ✖ turns it amber there); the goals show the repair itself.
+const MESSAGE := "✖ Radio down: Lock the Relay"
 
 
 ## True while crew voice chat is off in this colony.

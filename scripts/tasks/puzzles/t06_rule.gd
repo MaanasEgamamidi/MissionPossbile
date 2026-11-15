@@ -3,7 +3,8 @@ extends RefCounted
 ## elbow pipe pieces from the supply to the rack until water flows"; pipe-board details from the Prompt Pack's T07
 ## page, adapted). Contract: scripts/tasks/puzzle_registry.gd.
 ##
-## Board: COLS x ROWS squares, read left to right, top to bottom (cell = row * COLS + col). Water enters the left
+## Board: COLS x ROWS squares (UI overhaul, 2026-11-15: the owner's compact 4-by-3 starter board, was 5 by 4), read
+## left to right, top to bottom (cell = row * COLS + col). Water enters the left
 ## edge at supply_row and must leave the right edge at rack_row. Every square holds a straight or an elbow pipe.
 ## The seed draws a route from the supply to the rack first (so a solution always exists), fills the other squares
 ## with harmless spare pipes, then turns pipes out of line. The player turns pipes a quarter turn at a time.
@@ -17,8 +18,8 @@ extends RefCounted
 ##   "water": [cells water reaches, in flow order], "supply_row", "rack_row", "cols", "rows"}
 ## Completion: the water reaches the rack square and flows out of its right side.
 
-const COLS := 5
-const ROWS := 4
+const COLS := 4
+const ROWS := 3
 const STEP_SHIFT := 1024
 const STRAIGHT := 0
 const ELBOW := 1
