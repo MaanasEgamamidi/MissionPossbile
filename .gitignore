@@ -1,5 +1,7 @@
 # Godot 4 import cache and editor state
-.godot/
+.godot/*
+# ...except the list of GDExtensions to load (the TwoVoIP voice library), so a fresh clone or pull has voice chat
+!.godot/extension_list.cfg
 *.translation
 
 # experiment leftovers

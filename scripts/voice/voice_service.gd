@@ -180,8 +180,25 @@ static func find(tree: SceneTree) -> VoiceService:
 	return tree.get_first_node_in_group(GROUP) as VoiceService if tree != null else null
 
 
+## The TwoVoIP GDExtension. Godot normally loads it from .godot/extension_list.cfg, but .godot/ is not in git, so a
+## fresh clone or pull (and a run before the editor has rescanned) starts without it. ensure_library() loads it then.
+const EXTENSION_PATH := "res://addons/twovoip/twovoip.gdextension"
+
+
+## Loads the TwoVoIP extension at run time when Godot did not load it at startup. Safe to call more than once.
+static func ensure_library() -> void:
+	if ClassDB.class_exists(ENCODER_CLASS) or not FileAccess.file_exists(EXTENSION_PATH):
+		return
+	if GDExtensionManager.is_extension_loaded(EXTENSION_PATH):
+		return
+	var status := GDExtensionManager.load_extension(EXTENSION_PATH)
+	if status != GDExtensionManager.LOAD_STATUS_OK and status != GDExtensionManager.LOAD_STATUS_ALREADY_LOADED:
+		push_warning("Voice: could not load %s (status %d)." % [EXTENSION_PATH, status])
+
+
 ## Problems with the TwoVoIP library in this build ("" when every class and method needed is there).
 static func library_problem() -> String:
+	ensure_library()
 	for cls: String in [ENCODER_CLASS, STREAM_CLASS, PLAYBACK_CLASS]:
 		if not ClassDB.class_exists(cls):
 			return "the class %s is missing" % cls
