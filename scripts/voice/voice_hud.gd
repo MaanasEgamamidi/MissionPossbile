@@ -82,7 +82,7 @@ func refresh() -> void:
 	_head.theme_type_variation = UiTheme.WARN if listen_only else UiTheme.GOOD
 	var own := voice.own_line()
 	_own.text = own
-	if own.begins_with("✖"):
+	if own.begins_with("✖") or own.begins_with("⚠"):
 		_own.theme_type_variation = UiTheme.WARN
 	elif voice.is_transmitting():
 		_own.theme_type_variation = UiTheme.GOOD

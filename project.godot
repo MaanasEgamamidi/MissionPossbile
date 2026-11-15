@@ -22,6 +22,7 @@ driver/enable_input=true
 
 [autoload]
 
+MacMicLaunch="*res://addons/mac_mic/launch_check.gd"
 PerfSettings="*res://perf/perf_settings.gd"
 PerfHud="*res://perf/perf_hud.gd"
 
@@ -37,7 +38,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/funplay_mcp/plugin.cfg")
+enabled=PackedStringArray("res://addons/funplay_mcp/plugin.cfg", "res://addons/mac_mic/plugin.cfg")
 
 [rendering]
 

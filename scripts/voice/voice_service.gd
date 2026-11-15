@@ -37,6 +37,19 @@ const MIC_SIGNAL_TIMEOUT_S := 3.0
 const MIC_SILENCE_PEAK := 0.000001
 ## Retry unavailable/stalled capture and watch device/sample-rate changes at this interval, in seconds.
 const MIC_RETRY_S := 5.0
+## Microphone auto-gain (2026-11-15: players' mics were far too quiet). Each 20 ms chunk is lifted toward
+## MIC_TARGET_PEAK by up to MIC_MAX_GAIN (+24 dB), dropping at once on loud input and rising slowly (MIC_GAIN_RISE per
+## chunk); below MIC_SPEECH_FLOOR (room silence) the gain holds so hiss is not pumped up. A soft limiter above
+## MIC_KNEE keeps shouts from clipping. Real microphones also get the library's RNNoise suppression.
+const MIC_TARGET_PEAK := 0.6
+const MIC_MAX_GAIN := 16.0
+const MIC_START_GAIN := 6.0
+const MIC_SPEECH_FLOOR := 0.004
+const MIC_GAIN_RISE := 0.03
+const MIC_KNEE := 0.7
+## An input rate at or below this is a Bluetooth headset/speaker in call mode (8 or 16 kHz). On a Mac, Godot keeps
+## the rate of the Mac's input at launch (addons/mac_mic switches the Mac to its built-in mic before that).
+const LOW_INPUT_RATE_HZ := 16000
 ## Height of a speaker's voice above their feet, metres (engineering).
 const MOUTH_HEIGHT_M := 1.6
 ## A "heard" line stays this long after the last frame, seconds.
@@ -96,6 +109,8 @@ var _encoder_input_rate := 0
 var _want_input_until := -1.0
 var _meter_requests := 0
 var _level := 0.0
+var _mic_gain := MIC_START_GAIN
+var _denoise := false
 var _ptt_override := -1
 var _synthetic: Array[PackedVector2Array] = []
 var _transmitting := false
@@ -282,8 +297,10 @@ func _make_encoder() -> void:
 		return
 	var in_rate := int(AudioServer.get_input_mix_rate())
 	_encoder_input_rate = in_rate
-	# create_sampler(input mix rate, Opus sample rate, channels, noise suppression), as the TwoVoIP helper calls it
-	var ok_sampler := bool(_encoder.call(&"create_sampler", in_rate, VoiceScheduler.SAMPLE_RATE, VoiceScheduler.CHANNELS, false))
+	# create_sampler(input mix rate, Opus sample rate, channels, noise suppression), as the TwoVoIP helper calls it.
+	# RNNoise for real microphones only: it would erase the tests' synthetic sine tone.
+	_denoise = not synthetic_input
+	var ok_sampler := bool(_encoder.call(&"create_sampler", in_rate, VoiceScheduler.SAMPLE_RATE, VoiceScheduler.CHANNELS, _denoise))
 	var ok_encoder := bool(_encoder.call(&"create_opus_encoder", OPUS_BITRATE, OPUS_COMPLEXITY, true))
 	_audio_chunk = int(_encoder.call(&"calc_audio_chunk_size", VoiceScheduler.FRAME_SAMPLES))
 	if not ok_sampler or not ok_encoder or _audio_chunk <= 0:
@@ -346,6 +363,9 @@ func mic_state_text() -> String:
 		&"available", &"opening":
 			return "Opening the built-in microphone. Speak to check the input level."
 		&"ready":
+			var warn := mic_quality_warning()
+			if warn != "":
+				return warn
 			return "✓ Built-in microphone receiving audio. Voice chat is on: just talk."
 		&"quiet":
 			return "✖ No sound detected. Speak, then check the microphone mute key and system input volume."
@@ -366,6 +386,18 @@ func mic_state_text() -> String:
 	return "✖ No microphone. You can still listen."
 
 
+## "" when the microphone should sound fine; otherwise why it is muffled and how to fix it.
+func mic_quality_warning() -> String:
+	if synthetic_input or _mic_state != &"ready":
+		return ""
+	var rate := int(AudioServer.get_input_mix_rate())
+	if rate > 0 and rate <= LOW_INPUT_RATE_HZ:
+		var fix := "In System Settings › Sound › Input pick your Mac's own microphone, then restart the game." if OS.get_name() == "macOS" \
+			else "Pick your computer's own microphone as the input in Windows sound settings, then restart the game."
+		return "⚠ The game started while a Bluetooth speaker or headset was the input (%d kHz), so the microphone sounds very quiet and muffled. %s" % [rate / 1000, fix]
+	return ""
+
+
 ## Short form for the HUD.
 func mic_short_text() -> String:
 	if mic_muted():
@@ -375,6 +407,8 @@ func mic_short_text() -> String:
 	if _mic_state in [&"available", &"opening"]:
 		return "Opening built-in microphone…"
 	if can_capture():
+		if mic_quality_warning() != "":
+			return "⚠ Microphone sounds poor — see Voice settings"
 		return ""
 	return "✖ No microphone — you can still listen"
 
@@ -385,13 +419,14 @@ static func built_in_device(devices: PackedStringArray) -> String:
 	for device: String in devices:
 		var label := device.to_lower().replace("_", " ").replace("-", " ")
 		var external := false
-		for word: String in ["usb", "bluetooth", "airpods", "headset", "iphone", "virtual", "webcam", "brio", "voicemeeter", "cable"]:
+		for word: String in ["usb", "bluetooth", "airpods", "headset", "iphone", "virtual", "webcam", "brio", "voicemeeter", "cable", "steam"]:
 			if label.contains(word):
 				external = true
 				break
 		if external:
 			continue
-		if label.contains("microphone array") or label.contains("internal mic") or label.contains("built in mic"):
+		if label.contains("microphone array") or label.contains("internal mic") or label.contains("built in mic") \
+				or label.contains("macbook") or label.contains("imac") or label.contains("studio display"):
 			return device
 	return ""
 
@@ -513,6 +548,42 @@ func _observe_input(chunk: PackedVector2Array, now: float) -> void:
 			_set_mic_state(&"ready")
 
 
+## Peak sample of a chunk, 0..1+.
+static func chunk_peak(chunk: PackedVector2Array) -> float:
+	var peak := 0.0
+	for v: Vector2 in chunk:
+		peak = maxf(peak, maxf(absf(v.x), absf(v.y)))
+	return peak
+
+
+## The auto-gain after one chunk whose raw peak is `peak`: straight down when the chunk would pass the target, slowly
+## up toward it while someone speaks, held through silence.
+static func next_mic_gain(gain: float, peak: float) -> float:
+	if peak < MIC_SPEECH_FLOOR:
+		return gain
+	var want := clampf(MIC_TARGET_PEAK / peak, 1.0, MIC_MAX_GAIN)
+	if want < gain:
+		return want
+	return gain + (want - gain) * MIC_GAIN_RISE
+
+
+## The chunk times `gain`, softly limited above MIC_KNEE so it never passes 1.0.
+static func apply_mic_gain(chunk: PackedVector2Array, gain: float) -> PackedVector2Array:
+	var out := PackedVector2Array()
+	out.resize(chunk.size())
+	for i: int in chunk.size():
+		var v := chunk[i] * gain
+		out[i] = Vector2(_soft_limit(v.x), _soft_limit(v.y))
+	return out
+
+
+static func _soft_limit(x: float) -> float:
+	var a := absf(x)
+	if a <= MIC_KNEE:
+		return x
+	return signf(x) * (MIC_KNEE + (1.0 - MIC_KNEE) * tanh((a - MIC_KNEE) / (1.0 - MIC_KNEE)))
+
+
 func _check_mic_health(now: float) -> void:
 	if not _mic_active or synthetic_input:
 		return
@@ -569,8 +640,11 @@ func _capture(now: float) -> void:
 		if chunk.is_empty():
 			break
 		got_audio = true
+		if not synthetic_input:
+			_mic_gain = next_mic_gain(_mic_gain, chunk_peak(chunk))
+			chunk = apply_mic_gain(chunk, _mic_gain)
 		_observe_input(chunk, now)
-		_encoder.call(&"process_pre_encoded_chunk", chunk, VoiceScheduler.FRAME_SAMPLES, false, false)
+		_encoder.call(&"process_pre_encoded_chunk", chunk, VoiceScheduler.FRAME_SAMPLES, _denoise, false)
 		if _transmitting:
 			_send_frame()
 	if not got_audio:

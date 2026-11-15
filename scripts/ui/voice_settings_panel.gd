@@ -118,7 +118,7 @@ func refresh() -> void:
 		_status.text = "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
 	else:
 		_status.text = "Voice uses the built-in microphone automatically when you enter a colony."
-	_status.theme_type_variation = UiTheme.WARN if _status.text.begins_with("✖") else UiTheme.GOOD
+	_status.theme_type_variation = UiTheme.WARN if _status.text.begins_with("✖") or _status.text.begins_with("⚠") else UiTheme.GOOD
 	var st := services.state() if services != null and services.has_game() else null
 	# Suit radio (2026-11-15): the comms level decides no signal / delay / garble (scripts/voice/suit_radio.gd).
 	var suit_radio: Variant = load("res://scripts/voice/suit_radio.gd")

@@ -25,6 +25,13 @@
 	"VoiceService.OPUS_COMPLEXITY": {"category": "engineering", "source_ids": [], "note": "Opus complexity 5 of 10."},
 	"VoiceService.MIC_HANG_S": {"category": "engineering", "source_ids": [], "note": "The microphone stays open 3 s after V is released so quick presses do not keep reopening it."},
 	"VoiceService.MIC_SIGNAL_TIMEOUT_S": {"category": "engineering", "source_ids": [], "note": "An open microphone with no samples for 3 s is reported as no signal."},
+	"VoiceService.MIC_TARGET_PEAK": {"category": "engineering", "source_ids": [], "note": "Auto-gain lifts speech toward a 0.6 peak (2026-11-15: players' microphones were far too quiet)."},
+	"VoiceService.MIC_MAX_GAIN": {"category": "engineering", "source_ids": [], "note": "Auto-gain boosts a quiet microphone by at most 16x (+24 dB)."},
+	"VoiceService.MIC_START_GAIN": {"category": "engineering", "source_ids": [], "note": "Auto-gain starts at 6x so the first words are already audible."},
+	"VoiceService.MIC_SPEECH_FLOOR": {"category": "engineering", "source_ids": [], "note": "Below a 0.004 peak a chunk is room silence: the gain holds instead of pumping up hiss."},
+	"VoiceService.MIC_GAIN_RISE": {"category": "engineering", "source_ids": [], "note": "The gain rises 3% of the way to its target per 20 ms chunk (about 0.7 s) and drops at once."},
+	"VoiceService.MIC_KNEE": {"category": "engineering", "source_ids": [], "note": "Soft limiter above 0.7 so boosted shouts never clip."},
+	"VoiceService.LOW_INPUT_RATE_HZ": {"category": "engineering", "source_ids": [], "note": "An input at 16 kHz or less is a Bluetooth device in call mode; the player is told to switch the input and restart."},
 	"VoiceService.MOUTH_HEIGHT_M": {"category": "engineering", "source_ids": [], "note": "Indoor speech comes from 1.6 m above the speaker's feet."},
 	"VoiceService.VOLUME_MAX": {"category": "engineering", "source_ids": [], "note": "Volume sliders go up to 200 %."},
 	"Earth-Mars light time": {"category": "physics", "source_ids": [], "note": "Shown only as words (many minutes, depending on where the planets are). Radio waves travel at the speed of light; the Earth-Mars distance changes over the planets' orbits. Not taken from the source register, and the game computes nothing from it."}

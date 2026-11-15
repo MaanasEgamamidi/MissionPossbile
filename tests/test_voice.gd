@@ -85,6 +85,7 @@ func _run() -> void:
 	_test_schedule_two_speakers()
 	_test_schedule_latency()
 	_test_opus_round_trip()
+	_test_mic_auto_gain()
 	_test_settings_file()
 	_test_sources_and_privacy()
 	await _test_net()
@@ -175,6 +176,29 @@ func _fake_frame(stream: int, seq: int, index: int, start_ms: int, send_ms: int)
 
 
 # ================================================================ stages and cards
+
+## Microphone auto-gain (2026-11-15): quiet speech is lifted toward the target, loud input is never pushed past full
+## scale, and room silence does not raise the gain.
+func _test_mic_auto_gain() -> void:
+	var g := VoiceService.MIC_START_GAIN
+	for i: int in 200:                                 # 4 s of quiet speech, peak 0.03
+		g = VoiceService.next_mic_gain(g, 0.03)
+	var quiet := VoiceService.chunk_peak(VoiceService.apply_mic_gain(_sine_chunk(882, 0.03), g))
+	_check("mic gain: quiet speech (peak 0.03) is lifted to %.2f (gain %.1fx, at most %.0fx)" % [quiet, g, VoiceService.MIC_MAX_GAIN],
+		quiet > 0.4 and g <= VoiceService.MIC_MAX_GAIN)
+	var held := VoiceService.next_mic_gain(5.0, 0.001)
+	_check("mic gain: silence below the speech floor holds the gain (no hiss pumping)", is_equal_approx(held, 5.0))
+	var loud_g := VoiceService.next_mic_gain(16.0, 0.9)
+	var loud := VoiceService.chunk_peak(VoiceService.apply_mic_gain(_sine_chunk(882, 0.9), loud_g))
+	_check("mic gain: a shout drops the gain at once and never clips (peak %.3f)" % loud, loud_g <= 1.0 and loud < 1.0)
+	var hot := VoiceService.chunk_peak(VoiceService.apply_mic_gain(_sine_chunk(882, 0.5), 16.0))
+	var mac := PackedStringArray(["Default", "Tribit XSound Go (108)", "Steam Streaming Microphone (74)", "MacBook Air Microphone (97)"])
+	_check("built-in mic: picked over a Bluetooth speaker and Steam's virtual mic", VoiceService.built_in_device(mac) == "MacBook Air Microphone (97)", VoiceService.built_in_device(mac))
+	var win := PackedStringArray(["Default", "Headset Microphone (AirPods Hands-Free)", "Microphone Array (Realtek(R) Audio)"])
+	_check("built-in mic: a laptop's microphone array on Windows, not the AirPods", VoiceService.built_in_device(win) == "Microphone Array (Realtek(R) Audio)", VoiceService.built_in_device(win))
+	_check("built-in mic: none recognised means no microphone (never Default)", VoiceService.built_in_device(PackedStringArray(["Default", "USB Audio (3)"])) == "")
+	_check("mic gain: the soft limiter keeps an over-boosted chunk under full scale (%.3f)" % hot, hot <= 1.0 and hot > VoiceService.MIC_KNEE)
+
 
 func _test_stages() -> void:
 	var delays: Array = []
@@ -755,7 +779,9 @@ func _test_sources_and_privacy() -> void:
 		"VoiceScheduler.FRAME_SAMPLES", "VoiceScheduler.FRAME_S", "VoiceScheduler.JITTER_S", "VoiceScheduler.PLAYBACK_TARGET_S",
 		"VoiceScheduler.MAX_QUEUE_S", "VoiceScheduler.MAX_QUEUE_FRAMES", "VoiceScheduler.MAX_UTTERANCES", "VoiceScheduler.MAX_TOTAL_FRAMES",
 		"VoiceScheduler.STALL_S", "VoiceScheduler.MAX_UTTERANCE_FRAMES", "VoiceService.OPUS_BITRATE", "VoiceService.OPUS_COMPLEXITY",
-		"VoiceService.MIC_HANG_S", "VoiceService.MIC_SIGNAL_TIMEOUT_S", "VoiceService.MOUTH_HEIGHT_M", "VoiceService.VOLUME_MAX"]
+		"VoiceService.MIC_HANG_S", "VoiceService.MIC_SIGNAL_TIMEOUT_S", "VoiceService.MOUTH_HEIGHT_M", "VoiceService.VOLUME_MAX",
+		"VoiceService.MIC_TARGET_PEAK", "VoiceService.MIC_MAX_GAIN", "VoiceService.MIC_START_GAIN", "VoiceService.MIC_SPEECH_FLOOR",
+		"VoiceService.MIC_GAIN_RISE", "VoiceService.MIC_KNEE", "VoiceService.LOW_INPUT_RATE_HZ"]
 	for key: String in named:
 		var cls := key.get_slice(".", 0)
 		var constant := key.get_slice(".", 1)
