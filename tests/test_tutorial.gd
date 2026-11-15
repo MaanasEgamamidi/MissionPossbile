@@ -566,14 +566,22 @@ func _test_order() -> void:
 	var early := _fix(s, &"crew_1", "T01")
 	_go(s, &"crew_1", s.config.hub_position)
 	_tick(s, 0.4)
-	_check("order: a broken spot fixed during the tapes step works and counts at once", early.ok and TutorialSystem.fixed_count(st) == 1 and TutorialSystem.current_stage(st) == 2, "%s %s" % [early.reason, early.message])
+	_check("order: tapes first: a broken spot can not be fixed before every tape is found (plain message)", not early.ok and early.reason == TutorialLock.REASON
+		and early.message == TutorialLock.TAPES_MESSAGE % 6 and TutorialSystem.fixed_count(st) == 0 and TutorialSystem.current_stage(st) == 2, "%s %s" % [early.reason, early.message])
+	var ids: Array = CassetteCatalog.TAPES.keys()
+	for id: String in ids:
+		_collect(s, &"crew_1", id)
+	var found_fix := _fix(s, &"crew_1", "T01")
+	_go(s, &"crew_1", s.config.hub_position)
+	_tick(s, 0.4)
+	_check("order: once every tape is found a spot fixed before the tapes are played works and counts at once", found_fix.ok and TutorialSystem.fixed_count(st) == 1
+		and TutorialSystem.current_stage(st) == 2, "%s %s" % [found_fix.reason, found_fix.message])
 	for task: String in TEN:
 		st.repair.tasks[task].first_completed = true      # synthetic set-up: every spot fixed before the tapes
 	_tick(s, 0.4)
 	_check("order: even with every spot fixed the tutorial waits for the tapes", not TutorialSystem.is_tutorial_done(st) and TutorialSystem.current_stage(st) == 2
 		and TutorialSystem.tutorial_active(st))
-	for id: String in CassetteCatalog.TAPES:
-		_collect(s, &"crew_1", id)
+	for id: String in ids:
 		_play(s, &"crew_1", id)
 	_tick(s, 0.4)
 	_check("order: the last tape played then finishes it straight away (fix step done at once) with Base operational",
@@ -593,18 +601,30 @@ func _test_lock_host() -> void:
 	var power := _do(s, &"crew_1", &"set_zone_power", POWER, {"zone": "Hangar bay", "on": false})
 	var solar := _do(s, &"crew_1", &"clean_panel", TRACKER)
 	var record := _do(s, &"crew_1", &"read_record", &"pr_fsp_console")
+	var tapes_line := TutorialLock.TAPES_MESSAGE % 6
 	_check("lock: during the tutorial other stations are refused on the host with a plain message (power panel, sun tracker, record console)",
-		not power.ok and power.reason == TutorialLock.REASON and power.message == TutorialLock.MESSAGE and not solar.ok and solar.reason == TutorialLock.REASON
+		not power.ok and power.reason == TutorialLock.REASON and power.message == tapes_line and not solar.ok and solar.reason == TutorialLock.REASON
 		and not record.ok and record.reason == TutorialLock.REASON and st.is_zone_powered("Hangar bay"), "%s / %s / %s" % [power.reason, solar.reason, record.reason])
 	var suit := _do(s, &"crew_1", &"begin_suit_check", SUITS, {"on": false})
 	var tape := _collect(s, &"crew_1", "cassette_med_bay")
+	# tapes first: until every tape is found the cassette player and the broken spots are locked too
+	var early_player := _do(s, &"crew_1", &"cassette_open", PLAYER)
+	var early_spot := _do(s, &"crew_1", &"task_claim", &"repair_t01", {"generation": int(st.repair.tasks.T01.fault_generation)})
+	_check("lock: tapes first: before every tape is found only the tapes and the suit rack work; the player and broken spots say 'Find all 6 tapes first'",
+		suit.ok and tape.ok and not early_player.ok and early_player.reason == TutorialLock.REASON and early_player.message == tapes_line
+		and not early_spot.ok and early_spot.reason == TutorialLock.REASON and not TutorialLock.station_usable(st, st.stations["repair_t02"])
+		and not TutorialLock.station_usable(st, st.stations[String(PLAYER)]) and TutorialLock.station_usable(st, st.stations["cassette_hangar"]),
+		"%s %s %s" % [tape.reason, early_player.reason, early_spot.reason])
+	for id: String in CassetteCatalog.TAPES:
+		if not CassetteCatalog.collected(st, id):
+			_collect(s, &"crew_1", id)
 	var player := _do(s, &"crew_1", &"cassette_open", PLAYER)
 	s.request(&"cassette_close", PLAYER, {}, 1)
 	var gen := int(st.repair.tasks.T01.fault_generation)
 	var broken := _do(s, &"crew_1", &"task_claim", &"repair_t01", {"generation": gen})
 	var release := s.request(&"task_release", &"repair_t01", {"generation": gen}, 1)
 	var t05 := _do(s, &"crew_1", &"task_claim", &"repair_t05", {"generation": int(st.repair.tasks.T05.fault_generation)})
-	_check("lock: the suit rack, tape pickups, the cassette player and broken spots still work; releasing a spot always works; T05 (no broken part) is locked",
+	_check("lock: with every tape found the suit rack, tape pickups, the cassette player and broken spots work; releasing a spot always works; T05 (no broken part) is locked",
 		suit.ok and tape.ok and player.ok and broken.ok and release.ok and not t05.ok and t05.reason == TutorialLock.REASON,
 		"%s %s %s %s %s %s" % [suit.reason, tape.reason, player.reason, broken.reason, release.reason, t05.reason])
 	var swap := _switch(s, &"crew_1", &"crew_2")
@@ -643,6 +663,8 @@ func _test_voice_gate() -> void:
 	var line_down := vs.own_line() if gs_stub.has_game() else CommsGate.MESSAGE
 	_go(s, &"crew_1", s.config.hub_position)
 	_tick(s, 0.4)
+	for id: String in CassetteCatalog.TAPES:          # tapes first: repairs open once every tape is found
+		_collect(s, &"crew_1", id)
 	var r := _fix(s, &"crew_1", "T01")
 	_go(s, &"crew_1", s.config.hub_position)
 	_tick(s, 0.4)
@@ -666,14 +688,14 @@ func _test_save_and_late_join() -> void:
 	var ids: Array = CassetteCatalog.TAPES.keys()
 	for i in 4:
 		_collect(s, &"crew_1", String(ids[i]))
-	for i in 2:
-		_play(s, &"crew_2", String(ids[i]))
+	var early_play := _play(s, &"crew_2", String(ids[0]))          # tapes first: the player waits for every tape
 	s.request(&"cassette_close", PLAYER, {}, 2)
 	_tick(s, 0.4)
 	var s2 := _resume(s, _json(st))
 	_tick(s2, 0.4)
-	_check("save: mid-tapes the colony resumes at the same step with 4/6 found and 2/6 played; Mission Control does not repeat itself",
-		TutorialSystem.current_stage(s2.state) == 2 and TutorialSystem.tapes_found(s2.state) == 4 and TutorialSystem.tapes_played(s2.state) == 2
+	_check("save: mid-tapes the colony resumes at the same step with 4/6 found and 0/6 played (the player waits for every tape); Mission Control does not repeat itself",
+		TutorialSystem.current_stage(s2.state) == 2 and TutorialSystem.tapes_found(s2.state) == 4 and TutorialSystem.tapes_played(s2.state) == 0
+		and not early_play.ok and early_play.reason == TutorialLock.REASON
 		and TutorialSystem.tutorial_active(s2.state) and _heard(s2).is_empty(), "%d %d %s" % [TutorialSystem.tapes_found(s2.state), TutorialSystem.tapes_played(s2.state), _heard(s2)])
 	# finish the tapes and fix some spots in the resumed colony
 	s2.request(&"claim_character", &"crew_1", {}, 1)
@@ -681,6 +703,7 @@ func _test_save_and_late_join() -> void:
 	_stand_in_rules(s2)
 	for i in ids.size():
 		_collect(s2, &"crew_1", String(ids[i]))
+	for i in ids.size():
 		_play(s2, &"crew_1", String(ids[i]))
 	s2.request(&"cassette_close", PLAYER, {}, 1)
 	_fix(s2, &"crew_1", "T01")
@@ -874,14 +897,14 @@ func _test_presentation() -> void:
 	var tape_cue := hud.cue_text()
 	hud.set_target({"kind": "station", "id": "repair_t05"})
 	var t05_cue := hud.cue_text()
-	_check("hud: during the tutorial the power panel and T05 show no [E] prompt; the suit rack, a tape and a broken spot do",
-		power_cue == "" and t05_cue == "" and suit_cue.begins_with("[E]") and broken_cue.begins_with("[E]") and tape_cue.begins_with("[E]"),
+	_check("hud: tapes first: before every tape is found the power panel, T05 and the broken spots show no [E] prompt; the suit rack and a tape do",
+		power_cue == "" and t05_cue == "" and suit_cue.begins_with("[E]") and broken_cue == "" and tape_cue.begins_with("[E]"),
 		"'%s' '%s' '%s' '%s' '%s'" % [power_cue, t05_cue, suit_cue, broken_cue, tape_cue])
-	# a locked station's panel closes at once with the plain message; the cassette player stays open
+	# a locked station's panel closes at once with the plain message; the suit rack's stays open
 	game.ui.open(StationPanels.for_station(POWER, gs))
 	await process_frame
 	await process_frame
-	var said := "\n".join(hud.current_messages() + hud.waiting_messages()).contains("Not yet: Mission Control")
+	var said := "\n".join(hud.current_messages() + hud.waiting_messages()).contains("Find all 6 tapes first")
 	var closed := game.ui.top() == null and presenter.closed_locked_panels == 1
 	gs.report_position(me.id, CharacterState._v3(st.stations[String(SUITS)].position), 0.0)
 	game.ui.open(StationPanels.for_station(SUITS, gs))
@@ -892,6 +915,16 @@ func _test_presentation() -> void:
 	gs.report_position(me.id, gs.config.hub_position, 0.0)
 	_check("lock on screen: E on a locked station closes its panel at once and says why; the suit rack's panel stays open", closed and said and suits_open,
 		"closed %s said %s suits %s: %s" % [closed, said, suits_open, hud.current_messages() + hud.waiting_messages()])
+	# every tape found (synthetic set-up: the shared library has every tape): the broken spots open
+	for id: String in CassetteCatalog.TAPES:
+		if not CassetteCatalog.collected(st, id):
+			(st.repair.collected_cassettes as Array).append(id)
+	hud.set_target({"kind": "station", "id": "repair_t02"})
+	var broken_after := hud.cue_text()
+	hud.set_target({"kind": "station", "id": String(POWER)})
+	var power_after := hud.cue_text()
+	_check("hud: once every tape is found a broken spot shows its [E] prompt; the power panel still does not", broken_after.begins_with("[E]") and power_after == "",
+		"'%s' '%s'" % [broken_after, power_after])
 	# wrong specialist: the scrambled panel (crew_1 is the electrical specialist)
 	var resolved := [0]
 	gs.events.action_resolved.connect(func(_r: ActionResult) -> void: resolved[0] += 1)

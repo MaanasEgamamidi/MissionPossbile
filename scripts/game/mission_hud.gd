@@ -4,12 +4,14 @@ extends Control
 ## member top right, the crosshair in the middle):
 ##   top centre     VitalsBar: electricity, oxygen, water, food, parts, science, ore. ⋯ (H) folds it, ? (F1) explains.
 ##                  Under it the battery chip: sun or moon, battery %, and while it drains how fast and how long it lasts.
-##   left           GoalsCard under the time (J folds it).
-##   right          MiniMap under your crew member, then the pop-ups (ToastStack).
+##   left           GoalsCard under the time. Owner 2026-11-14, J cycles three looks: the goal list (a new game starts
+##                  here) -> the big goals screen with the base map (scripts/ui/hud/goals_big_panel.gd, a UiRoot panel)
+##                  -> the compact card ("GOALS 3/12" and a bar) -> the list ... J, Esc or ✕ on the big screen = compact.
+##   right          the pop-ups (ToastStack) under your crew member. Owner 2026-11-14: the MiniMap is hidden for now.
 ##   lower left     MissionControlCard: storm warnings with how many more storms are lined up, scout reports with the
 ##                  mast camera's picture, a supply about to run out (K closes a message).
 ##   lower right    the scout's mast camera, live, while it is out on a trip.
-##   bottom centre  the dock of keys (Build B, Power P, Map M, Cargo I, Crew C) and, by a sun tracker, "B Build here".
+##   bottom centre  the dock of keys (Build B, Power P, Cargo I, Crew C) and, by a sun tracker, "B Build here".
 ## Everything here only reads the colony; the drawers it opens (PowerLifePanel, SolarBuildPanel, VitalsSciencePanel)
 ## go through UiRoot like every panel. Colony alerts become pop-ups here instead of GameHud's message line.
 
@@ -23,6 +25,8 @@ const LOW_REPEAT_S := 180.0
 const LEVEL_ALERT_PREFIX := "area_level_"
 ## Upgrade update (2026-11-14): the battery chip under the vitals bar (sun or moon, battery %, night drain).
 const EnergyChipScript := preload("res://scripts/ui/hud/energy_chip.gd")
+## Owner 2026-11-14: the big goals screen (J), with the goals on a map of the base. It replaces the M blueprint map.
+const GoalsBigPanelScript := preload("res://scripts/ui/hud/goals_big_panel.gd")
 
 var services: GameServices
 var game: Node
@@ -33,6 +37,7 @@ var vitals: VitalsBar
 ## The battery chip under the vitals bar (scripts/ui/hud/energy_chip.gd).
 var energy: PanelContainer
 var goals: GoalsCard
+## Owner 2026-11-14: hidden for now (the big goals screen has the map). Stays null.
 var map: MiniMap
 var toasts: ToastStack
 var mission_control: MissionControlCard
@@ -47,6 +52,8 @@ var _refresh_left := 0.0
 var _auto_compact := false
 var _user_compact := false
 var _goals_folded_for_mc := false
+## The player chose the goal list with J: Mission Control's card no longer folds it away (it would look like J did nothing).
+var _list_by_user := false
 var _near_tracker: StringName = &""
 var _low_said: Dictionary = {}       # key -> Time seconds
 var _last_report_at := -1.0
@@ -83,9 +90,10 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 	goals.toggled.connect(func(_open: bool) -> void:
 		if not _goals_folded_for_mc:
 			_save())
-	map = MiniMap.new()
-	add_child(map)
-	map.setup(services)
+	# Owner 2026-11-14: hidden for now (the big goals screen, J, has the map).
+	#map = MiniMap.new()
+	#add_child(map)
+	#map.setup(services)
 	toasts = ToastStack.new()
 	add_child(toasts)
 	mission_control = MissionControlCard.new()
@@ -133,7 +141,8 @@ func _build_dock() -> void:
 	dock.add_child(row)
 	_dock_build = _dock_button(row, "⚒", "Build", &"build", "B", func() -> void: open_build())
 	_dock_button(row, "⚡", "Power", &"power_view", "P", func() -> void: open_power())
-	_dock_button(row, "▦", "Map", &"map", "M", func() -> void: _press(&"map"))
+	# Owner 2026-11-14: hidden for now (the big goals screen, J, has the map).
+	#_dock_button(row, "▦", "Map", &"map", "M", func() -> void: _press(&"map"))
 	_dock_button(row, "▤", "Cargo", &"inventory", "I", func() -> void: _press(&"inventory"))
 	_dock_button(row, "☺", "Crew", &"crew", "C", func() -> void: _press(&"crew"))
 	_dock_button(row, "?", "Science", &"vitals_help", "F1", func() -> void: open_science())
@@ -188,6 +197,26 @@ func open_science() -> void:
 	ui.open(VitalsSciencePanel.new())
 
 
+## J from the goal list: the big goals screen with the map (step 2 of the J cycle). However it closes (J, Esc, ✕),
+## the goals card then shows its compact look (step 3).
+func open_goals_big() -> void:
+	if ui == null or _top_is(GoalsBigPanelScript):
+		return
+	var panel := GoalsBigPanelScript.new() as UiPanel
+	panel.tree_exiting.connect(_on_goals_big_closed)
+	ui.open(panel)
+
+
+## The big goals screen left the screen (UiRoot took it out): on to the compact goals card. UiRoot's own close path
+## captures the mouse again.
+func _on_goals_big_closed() -> void:
+	if goals == null or not is_instance_valid(goals):
+		return
+	_goals_folded_for_mc = false        # compact by choice now, not only for Mission Control
+	_list_by_user = false
+	goals.set_open(false)
+
+
 func open_build() -> void:
 	if ui == null:
 		return
@@ -216,6 +245,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if ui != null and ui.is_open():
 		return
+	# Held before any key's action runs, so marking the key handled never depends on what that action did.
+	var vp := get_viewport()
 	if event.is_action_pressed(&"power_view"):
 		open_power()
 	elif event.is_action_pressed(&"build"):
@@ -223,14 +254,24 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"hud_details"):
 		vitals.toggle_compact()
 	elif event.is_action_pressed(&"goals"):
-		goals.toggle()
+		# Owner 2026-11-14: J cycles list -> big screen with the map -> compact -> list ... The big screen handles its
+		# own J (and Esc / ✕); closing it lands on compact (_on_goals_big_closed). Here: list -> map, compact -> list.
+		#goals.toggle()
+		if ui == null:
+			goals.toggle()
+		elif goals.open or _goals_folded_for_mc:
+			open_goals_big()
+		else:
+			_list_by_user = true
+			goals.set_open(true)
 	elif event.is_action_pressed(&"advisor_ok"):
 		mission_control.dismiss()
 	elif event.is_action_pressed(&"vitals_help"):
 		open_science()
 	else:
 		return
-	get_viewport().set_input_as_handled()
+	if vp != null:
+		vp.set_input_as_handled()
 
 
 # ---------------------------------------------------------------- events
@@ -326,7 +367,8 @@ func refresh() -> void:
 	vitals.refresh()
 	energy.call(&"refresh")
 	goals.refresh()
-	map.refresh()
+	# Owner 2026-11-14: hidden for now.
+	#map.refresh()
 	var st := services.state()
 	# the scout's camera while it is out
 	var out := ScoutSystem.is_out(st)
@@ -404,12 +446,13 @@ func _layout() -> void:
 	# left column: goals under the time
 	goals.size = goals.get_combined_minimum_size()
 	goals.position = Vector2(EDGE, maxf(left.end.y + 12.0, top_band + 12.0 if vitals.position.x < goals.size.x + EDGE else 0.0))
-	# right column: map, then pop-ups
-	var ms := map.get_combined_minimum_size()
-	map.size = ms
-	map.position = Vector2(screen.x - EDGE - ms.x, right.end.y + 12.0)
+	# right column: pop-ups. Owner 2026-11-14: the mini map above them is hidden for now.
+	#var ms := map.get_combined_minimum_size()
+	#map.size = ms
+	#map.position = Vector2(screen.x - EDGE - ms.x, right.end.y + 12.0)
 	toasts.size = Vector2(maxf(360.0, toasts.get_combined_minimum_size().x), toasts.get_combined_minimum_size().y)
-	toasts.position = Vector2(screen.x - EDGE - toasts.size.x, map.position.y + ms.y + 12.0)
+	#toasts.position = Vector2(screen.x - EDGE - toasts.size.x, map.position.y + ms.y + 12.0)
+	toasts.position = Vector2(screen.x - EDGE - toasts.size.x, right.end.y + 12.0)
 	# bottom: dock in the middle, build chip above it, the mast camera bottom right, Mission Control bottom left
 	var ds := dock.get_combined_minimum_size()
 	dock.size = ds
@@ -431,7 +474,7 @@ func _layout() -> void:
 		mission_control.size = cs
 		mission_control.position = Vector2(EDGE, screen.y - EDGE - cs.y)
 		var clash := goals.position.y + goals.size.y > mission_control.position.y - 10.0
-		if clash and goals.open:
+		if clash and goals.open and not _list_by_user:
 			_goals_folded_for_mc = true
 			goals.set_open(false)
 	elif _goals_folded_for_mc:
@@ -448,7 +491,8 @@ func _load() -> void:
 	if d is Dictionary:
 		_user_compact = bool((d as Dictionary).get("compact", false))
 		vitals.set_compact(_user_compact)
-		goals.set_open(bool((d as Dictionary).get("goals_open", true)))
+		# Owner 2026-11-14: the goals card always starts in small mode (open).
+		#goals.set_open(bool((d as Dictionary).get("goals_open", true)))
 
 
 func _save() -> void:

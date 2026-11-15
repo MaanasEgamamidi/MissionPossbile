@@ -4,6 +4,8 @@ extends Node3D
 ## over about one second. Soft star sparkles only: no electric sparks, no fire look.
 ## GPUParticles3D normally; CPUParticles3D on the Low graphics preset (cheaper on weak GPUs, same look).
 ## The burst frees itself when its last star has faded. Loaded by path (no class_name).
+## Optional tint (2026-11-14): spawn(..., tint) colours the stars warm white -> `tint` (the tapes pass rich gold); with
+## no tint the stars keep the white-gold look above (broken-part fixes).
 
 ## Seconds one star lives.
 const LIFETIME := 1.0
@@ -23,14 +25,21 @@ var star_count := 0
 var _age := 0.0
 
 
-## Makes a burst over `bounds` (world space) on render layers `layers` under `parent` and starts it.
-static func spawn(parent: Node, bounds: AABB, layers: int, use_cpu: bool) -> Node3D:
+## Makes a burst over `bounds` (world space) on render layers `layers` under `parent` and starts it. `tint` (alpha > 0)
+## colours the stars; the default (transparent) keeps the usual white-gold.
+static func spawn(parent: Node, bounds: AABB, layers: int, use_cpu: bool, tint := Color(0.0, 0.0, 0.0, 0.0)) -> Node3D:
 	var script: GDScript = load("res://scripts/tasks/sparkle_burst.gd")
 	var burst: Node3D = script.new()
 	burst.name = "SparkleBurst"
 	parent.add_child(burst)
-	burst.call(&"build", bounds, layers, use_cpu)
+	burst.call(&"build", bounds, layers, use_cpu, tint)
 	return burst
+
+
+## The colour ramp for a tinted burst: in white, warm white, `tint`, then gone.
+static func tinted_colors(tint: Color) -> PackedColorArray:
+	var c := Color(tint, 1.0)
+	return PackedColorArray([Color(1.0, 1.0, 1.0, 0.0), Color(1.0, 0.96, 0.82, 1.0), Color(c, 0.9), Color(c.darkened(0.1), 0.0)])
 
 
 ## Number of stars for a part of this size: more for big parts, always 60-120.
@@ -42,7 +51,7 @@ func is_cpu() -> bool:
 	return particles is CPUParticles3D
 
 
-func build(bounds: AABB, layers: int, use_cpu: bool) -> void:
+func build(bounds: AABB, layers: int, use_cpu: bool, tint := Color(0.0, 0.0, 0.0, 0.0)) -> void:
 	global_position = bounds.get_center()
 	var half := (bounds.size * 0.5).max(Vector3(0.15, 0.15, 0.15))
 	star_count = stars_for(bounds.size)
@@ -51,7 +60,7 @@ func build(bounds: AABB, layers: int, use_cpu: bool) -> void:
 	quad.material = _star_material()
 	var gradient := Gradient.new()
 	gradient.offsets = PackedFloat32Array(COLOR_STOPS)
-	gradient.colors = PackedColorArray(COLORS)
+	gradient.colors = tinted_colors(tint) if tint.a > 0.0 else PackedColorArray(COLORS)
 	var size_curve := Curve.new()
 	size_curve.add_point(Vector2(0.0, 0.35))
 	size_curve.add_point(Vector2(0.2, 1.0))

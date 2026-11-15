@@ -3,7 +3,7 @@ extends PanelContainer
 ## The small map in the top-right corner: the base and its dome, the two solar fields, the scout bay, the places the
 ## scout can survey (? until it has been there, ✓ after), ore deposits once found (◆ in the ore's colour), the
 ## broken-down rover, the scout rover with its route, the crew, and you (the white arrow). North is up.
-## M opens the full blueprint map.
+## Owner 2026-11-14: hidden for now (MissionHud no longer creates it; the big goals screen, J, has the map).
 
 const CENTRE := Vector2(15.0, 26.0)        # Godot x, z at the middle of the map
 const HALF := 62.0                          # metres from the middle to each edge

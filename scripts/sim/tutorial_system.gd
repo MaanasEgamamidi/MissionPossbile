@@ -245,6 +245,12 @@ static func tutorial_active(state: ColonyState) -> bool:
 	return bool(t.get("locks", false)) and not bool(t.get("done", false))
 
 
+## Tapes first (owner 2026-11-14): in tutorial mode the repairs (broken spots, their green / red glow) and the
+## cassette player open only once the crew has found every room tape. Always true outside tutorial mode.
+static func repairs_unlocked(state: ColonyState) -> bool:
+	return not tutorial_active(state) or tapes_found(state) >= tape_count()
+
+
 ## True while the crew can not talk to each other: tutorial mode and the T01 radio is still broken.
 static func crew_radio_down(state: ColonyState) -> bool:
 	return tutorial_active(state) and PuzzleRegistry.is_broken(state, RADIO_TASK)

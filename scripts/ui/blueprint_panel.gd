@@ -1,6 +1,7 @@
 class_name BlueprintPanel
 extends UiPanel
-## The blueprint map (M key): a top-down plan of the colony with live markers, a legend that explains every symbol in
+## The blueprint map (the colony computer's "Blueprint map" button; owner 2026-11-14: the M key no longer opens it, the
+## big goals screen (J) has the map now): a top-down plan of the colony with live markers, a legend that explains every symbol in
 ## words, zoom buttons, "Centre on me", and the name, power and load of the room you click.
 ## The 3D view stays visible around it.
 
@@ -139,8 +140,10 @@ func _build() -> void:
 	var hint := Label.new()
 	hint.theme_type_variation = UiTheme.MUTED
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.text = "Drag to move the map. Use the mouse wheel or the + and − keys to zoom. Press %s or %s to close." % [
-		StationPanel._key_name(&"map", "M"), StationPanel._key_name(&"back", "Esc")]
+	# Owner 2026-11-14: M no longer opens or closes this map.
+	#hint.text = "Drag to move the map. Use the mouse wheel or the + and − keys to zoom. Press %s or %s to close." % [
+	#	StationPanel._key_name(&"map", "M"), StationPanel._key_name(&"back", "Esc")]
+	hint.text = "Drag to move the map. Use the mouse wheel or the + and − keys to zoom. Press %s to close." % StationPanel._key_name(&"back", "Esc")
 	column.add_child(hint)
 
 

@@ -1,6 +1,8 @@
 class_name TutorialPresenter
 extends Node
-## Scene side of the whiteboard tutorial (2026-11-14): the Mission Control tracker on the HUD, hints, the specialist
+## Scene side of the whiteboard tutorial (2026-11-14): the Mission Control tracker on the HUD (owner 2026-11-14: hidden for
+## now, the goals card and its big J screen show the same list; Mission Control's lines still arrive as pop-ups and in
+## the journal, and a due hint shows as a HUD message), hints, the specialist
 ## cues, the colony journal (L) and the tutorial station lock on screen. It only reads state.campaign and sends
 ## ordinary requests; the host's TutorialSystem decides. Two host-side duties live here because they belong to the
 ## real game, not to simulation harnesses:
@@ -24,6 +26,7 @@ const REFRESH_SECONDS := 0.25
 var services: GameServices
 ## The GameMain (or a stand-in with `hud` and `ui`), or null.
 var game: Node
+## Owner 2026-11-14: the tracker is hidden for now, so this stays null.
 var hud_widget: TutorialHud
 ## Real seconds without tutorial progress (only while the game runs).
 var idle_seconds := 0.0
@@ -36,6 +39,8 @@ var _progress_key := ""
 var _refresh_left := 0.0
 var _last_view := {}
 var _ui: UiRoot
+## Hints already shown as a HUD message for the current progress (while the tracker is hidden).
+var _hints_said := 0
 
 
 func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
@@ -43,18 +48,19 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 	game = p_game
 	name = "TutorialPresenter"
 	process_mode = Node.PROCESS_MODE_ALWAYS
-	hud_widget = TutorialHud.new()
-	hud_widget.name = "TutorialHud"
-	hud_widget.setup(services)
-	var hud: Variant = game.get("hud") if game != null else null
-	if hud is Node and is_instance_valid(hud):
-		(hud as Node).add_child(hud_widget)
-	else:
-		var layer := CanvasLayer.new()
-		layer.name = "TutorialLayer"
-		layer.layer = 10
-		add_child(layer)
-		layer.add_child(hud_widget)
+	# Owner 2026-11-14: hidden for now ("missions also fit into goals"): the goals card shows the tapes and broken spots.
+	#hud_widget = TutorialHud.new()
+	#hud_widget.name = "TutorialHud"
+	#hud_widget.setup(services)
+	#var hud: Variant = game.get("hud") if game != null else null
+	#if hud is Node and is_instance_valid(hud):
+	#	(hud as Node).add_child(hud_widget)
+	#else:
+	#	var layer := CanvasLayer.new()
+	#	layer.name = "TutorialLayer"
+	#	layer.layer = 10
+	#	add_child(layer)
+	#	layer.add_child(hud_widget)
 	var ui: Variant = game.get("ui") if game != null else null
 	if ui is UiRoot:
 		_ui = ui as UiRoot
@@ -74,6 +80,7 @@ func _process(delta: float) -> void:
 		_progress_key = key
 		idle_seconds = 0.0
 		requested_hints = 0
+		_hints_said = 0
 		_refresh_left = 0.0
 	_refresh_left -= delta
 	if _refresh_left <= 0.0:
@@ -148,11 +155,21 @@ func _close_locked(panel: UiPanel, text: String) -> void:
 
 
 func refresh() -> void:
-	if hud_widget == null or services == null or not services.has_game():
+	#if hud_widget == null or services == null or not services.has_game():
+	if services == null or not services.has_game():
 		return
 	_last_view = view(services, idle_seconds, requested_hints)
-	hud_widget.show_view(_last_view)
-	hud_widget.place_below(_hud_corner_bottom())
+	if hud_widget != null:
+		hud_widget.show_view(_last_view)
+		hud_widget.place_below(_hud_corner_bottom())
+		return
+	# The tracker is hidden: a hint that just became due (time or N) shows as a HUD message instead.
+	var hints: PackedStringArray = _last_view.get("hints", PackedStringArray())
+	if hints.size() > _hints_said:
+		_hints_said = hints.size()
+		var hud: Variant = game.get("hud") if game != null else null
+		if hud is GameHud:
+			(hud as GameHud).show_message("Hint: " + hints[hints.size() - 1], 8.0)
 
 
 ## The last view shown (for tests).

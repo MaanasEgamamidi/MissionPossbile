@@ -92,6 +92,8 @@ var _dust_left := 0.0
 var _role_left := 0.0
 ## Specialty of this machine's crew member the glows were coloured for ("?" = not read yet).
 var _local_spec := "?"
+## Whether the glows were on (tapes first: no glow until every tape is found in tutorial mode); -1 = not read yet.
+var _glow_on := -1
 
 
 ## Creates the presenter under `parent` and sets it up. Returns it.
@@ -477,8 +479,10 @@ func _apply_role_glow(p: Dictionary) -> void:
 		return
 	if _local_spec == "?":
 		_local_spec = local_specialty()
+	if _glow_on < 0:
+		_glow_on = 1 if glows_allowed() else 0
 	var can := can_do(String(p.task_id), _local_spec)
-	var mat := glow_material(can)
+	var mat: Material = glow_material(can) if _glow_on == 1 else null
 	var plain: Array[GeometryInstance3D] = []
 	var fx: Array[GeometryInstance3D] = []
 	for g in _geometry(model):
@@ -494,8 +498,16 @@ func _apply_role_glow(p: Dictionary) -> void:
 			saved[g] = mat          # mid-transition flash: the glow comes back when the flash ends
 		else:
 			g.material_overlay = mat
-		g.set_meta(GLOW_META, true)
-	model.set_meta(GLOW_META, "green" if can else "red")
+		g.set_meta(GLOW_META, mat != null)
+	model.set_meta(GLOW_META, ("green" if can else "red") if mat != null else "")
+
+
+## Tapes first (owner 2026-11-14): in tutorial mode the broken parts show no colour until every tape is found
+## (TutorialSystem.repairs_unlocked); the broken models still look broken.
+func glows_allowed() -> bool:
+	if services == null or not services.has_game():
+		return true
+	return TutorialSystem.repairs_unlocked(services.state())
 
 
 ## "green", "red" or "" (no glow): the part's glow while its broken model is on show (checks and tools).
@@ -511,12 +523,15 @@ func shows_gold(task_id: String) -> bool:
 	return glow_of(task_id) != ""
 
 
-## Recolours every broken part when this machine's player becomes another crew member.
+## Recolours every broken part when this machine's player becomes another crew member, and switches the glows on or
+## off when the tapes-first gate changes.
 func _follow_local_role() -> void:
 	var spec := local_specialty()
-	if spec == _local_spec:
+	var on := 1 if glows_allowed() else 0
+	if spec == _local_spec and on == _glow_on:
 		return
 	_local_spec = spec
+	_glow_on = on
 	for task_id: String in parts:
 		var p: Dictionary = parts[task_id]
 		if p.model != null and is_instance_valid(p.model):

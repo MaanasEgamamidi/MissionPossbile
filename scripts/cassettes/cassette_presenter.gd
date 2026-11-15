@@ -5,6 +5,11 @@ extends Node3D
 ## "prop_position" / "prop_yaw_deg" of its entry in data/stations_repairs.json, measured in the intact map so the visual
 ## top and the collision top agree within 2 cm. Nothing floats and no sign hangs in the air (owner 2026-11-14): the HUD
 ## prompt "[E] ..." says what to do. Presentation follows shared authoritative collection state.
+## Tapes first (owner 2026-11-14): each tape not yet found twinkles with a small cloud of gold sparkles (one
+## GPUParticles3D per tape, the shared sparkle look of tape_trail_presenter.gd) over a faint gold rim glow, lines of gold
+## sparkles lead to them from just inside the base (tape_trail_presenter.gd, made here) until every tape is found, and
+## a tape that is picked up while the game runs (the replicated state, on every machine) stops twinkling and shrinks
+## away under a gold sparkle burst (scripts/tasks/sparkle_burst.gd). No lights: the sparkles are the gold look.
 ## The station's sensing Area3D stays the only interaction shape: its sphere, plus a small reach box around the prop so
 ## that aiming at the prop itself works. The props add no solid collision.
 
@@ -15,12 +20,38 @@ const TAPE_STRIP_TOP := Vector3(0.0, 0.0198, -0.032)
 ## Reach boxes (designer balance): a little larger than the props, so E aims easily at a small tape.
 const TAPE_REACH := Vector3(0.5, 0.3, 0.44)
 const TAPE_GLOW_SHADER := preload("res://materials/specialist_gold.gdshader")
-const TAPE_GLOW := Color(1.0, 0.86, 0.3)
+## Rich gold, the same as the gold guide lines (tape_trail_presenter.gd), strong enough to read from across a room.
+const TAPE_GLOW := Color(1.0, 0.75, 0.2)
+const TapeTrails := preload("res://scripts/cassettes/tape_trail_presenter.gd")
+const SparkleBurst := preload("res://scripts/tasks/sparkle_burst.gd")
+## Seconds a picked-up tape takes to shrink away under its sparkles.
+const VANISH_SECONDS := 0.35
+## Idle gold sparkles around a tape not yet found: count (half on Low), half size of the box they twinkle in (centred
+## IDLE_LIFT above the tape's resting spot, so they sit just over the surface), seconds each lives.
+const IDLE_SPARKLES := 20
+const IDLE_EXTENTS := Vector3(0.28, 0.09, 0.28)
+const IDLE_LIFT := 0.12
+const IDLE_LIFETIME := 1.6
 const PLAYER_REACH := Vector3(0.62, 0.34, 0.42)
 
 var services: GameServices
 var cassette_nodes: Dictionary = {}
 var _refresh_left := 0.0
+## The gold guide lines to the tapes (tape_trail_presenter.gd), made in setup.
+var trails: Node3D
+## Sparkle bursts played since setup, and the last one (checks).
+var bursts_started := 0
+var last_burst: Node3D
+## Instance id of the colony state the tapes were last shown for (another one = loaded or joined: no sparkles).
+var _state_id := 0
+## cassette id -> collected when last shown.
+var _seen := {}
+## cassette id -> seconds into its shrink after pickup.
+var _vanish := {}
+## cassette id -> world pose of the tape (sparkles).
+var _tape_pose := {}
+## cassette id -> the tape's idle gold sparkles (GPUParticles3D, a child of its station).
+var _idle := {}
 
 func setup(p_services: GameServices, collision: Node3D) -> void:
 	services = p_services
@@ -37,12 +68,35 @@ func setup(p_services: GameServices, collision: Node3D) -> void:
 			continue
 		var model := _cassette(cassette_id)
 		_place(station, model, entries.get(cassette_id, {}), TAPE_REACH, 0.06)
+		_tape_pose[cassette_id] = prop_pose(entries.get(cassette_id, {}), station.position)
 		cassette_nodes[cassette_id] = station
 	var player := stations.get_node_or_null(NodePath(CassetteCatalog.PLAYER_ID)) as Area3D
 	if player != null:
 		_place(player, _player_model(), entries.get(CassetteCatalog.PLAYER_ID, {}), PLAYER_REACH, 0.16)
+	trails = TapeTrails.new()
+	add_child(trails)
+	trails.call(&"setup", services)
+	var mask := int(trails.call(&"_layers"))
+	# Low graphics preset: still GPU particles (cheap), half as many.
+	var idle_amount := int(IDLE_SPARKLES * 0.5) if _use_cpu() else IDLE_SPARKLES
+	for cassette_id: String in cassette_nodes:
+		var station := cassette_nodes[cassette_id] as Area3D
+		var pose: Transform3D = _tape_pose[cassette_id]
+		var sparkles := TapeTrails.idle_sparkles(idle_amount, IDLE_EXTENTS, IDLE_LIFETIME)
+		sparkles.name = "TapeSparkles"
+		sparkles.layers = mask
+		sparkles.emitting = false
+		# Stations sit under the identity "Stations" node, so local = world offsets.
+		sparkles.position = pose.origin - station.position + Vector3(0, IDLE_LIFT, 0)
+		station.add_child(sparkles)
+		_idle[cassette_id] = sparkles
 	services.events.state_changed.connect(func(_reason: StringName) -> void: refresh())
-	services.events.game_loaded.connect(func(_source: String) -> void: refresh())
+	services.events.game_loaded.connect(_on_game_loaded)
+	refresh()
+
+## A loaded colony is shown as it is: no sparkles, no fades.
+func _on_game_loaded(_source: String) -> void:
+	_state_id = 0
 	refresh()
 
 func _process(delta: float) -> void:
@@ -50,16 +104,86 @@ func _process(delta: float) -> void:
 	if _refresh_left <= 0.0:
 		_refresh_left = 0.25
 		refresh()
+	step_vanish(delta)
 
+## Shows each tape as the shared collection state says. A tape that becomes collected while the game runs (on the host
+## by the pickup, on clients by the replicated state) plays a sparkle burst and shrinks away; a loaded or joined colony
+## is shown as it is, without sparkles. The gold lines follow on the same refresh.
 func refresh() -> void:
 	if services == null or not services.has_game():
 		return
+	var st := services.state()
+	var fresh := st.get_instance_id() != _state_id
+	_state_id = st.get_instance_id()
+	var newly: Array[String] = []
+	for cassette_id: String in cassette_nodes:
+		var collected := CassetteCatalog.collected(st, cassette_id)
+		if not fresh and collected and _seen.has(cassette_id) and not bool(_seen[cassette_id]):
+			newly.append(cassette_id)
+		_seen[cassette_id] = collected
+		if fresh:
+			_end_vanish(cassette_id)
+	# More than two at once is a state sync (a late join), not pickups: no sparkles.
+	if newly.size() <= 2:
+		for cassette_id: String in newly:
+			_sparkle(cassette_id)
 	for cassette_id: String in cassette_nodes:
 		var station := cassette_nodes[cassette_id] as Area3D
-		var available := not CassetteCatalog.collected(services.state(), cassette_id)
-		station.visible = available
+		var available := not CassetteCatalog.collected(st, cassette_id)
+		station.visible = available or _vanish.has(cassette_id)
 		station.collision_layer = Layers.STATION if available else 0
 		station.set_meta("cassette_collected", not available)
+		# Twinkles while it waits to be found; a picked-up tape's last sparkles fade out under its burst.
+		var sparkles := _idle.get(cassette_id) as GPUParticles3D
+		if sparkles != null and sparkles.emitting != available:
+			if available:
+				sparkles.restart() # starts already twinkling (preprocess)
+			else:
+				sparkles.emitting = false
+	if trails != null:
+		trails.call(&"refresh", fresh)
+
+
+## Sparkles over a tape that was just picked up, and its shrink.
+func _sparkle(cassette_id: String) -> void:
+	if not is_inside_tree():
+		return
+	var pose: Transform3D = _tape_pose.get(cassette_id, Transform3D())
+	var centre := pose.origin + Vector3(0, 0.08, 0)
+	var bounds := AABB(centre - Vector3(0.22, 0.1, 0.22), Vector3(0.44, 0.3, 0.44))
+	var mask := (1 << 20) - 1
+	if trails != null:
+		mask = int(trails.call(&"_layers"))
+	last_burst = SparkleBurst.spawn(self, bounds, mask, _use_cpu(), TAPE_GLOW)
+	bursts_started += 1
+	_vanish[cassette_id] = 0.0
+
+
+## Shrinks picked-up tapes away under their sparkles (tests call it directly).
+func step_vanish(delta: float) -> void:
+	for cassette_id: String in _vanish.keys():
+		var t := float(_vanish[cassette_id]) + delta
+		_vanish[cassette_id] = t
+		var model := (cassette_nodes[cassette_id] as Node3D).get_node_or_null("CassetteModel") as Node3D
+		if model != null:
+			model.scale = Vector3.ONE * maxf(0.001, 1.0 - smoothstep(0.0, VANISH_SECONDS, t))
+		if t >= VANISH_SECONDS:
+			_end_vanish(cassette_id)
+			var gone := services != null and services.has_game() and CassetteCatalog.collected(services.state(), cassette_id)
+			(cassette_nodes[cassette_id] as Node3D).visible = not gone
+
+
+func _end_vanish(cassette_id: String) -> void:
+	_vanish.erase(cassette_id)
+	var station := cassette_nodes.get(cassette_id) as Node3D
+	var model := station.get_node_or_null("CassetteModel") as Node3D if station != null else null
+	if model != null:
+		model.scale = Vector3.ONE
+
+
+func _use_cpu() -> bool:
+	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
+	return level == GraphicsQuality.Level.LOW
 
 ## World position (on its support surface) and yaw of a prop, from its station entry. Without "prop_position" the prop
 ## sits on the floor under the station.
@@ -128,27 +252,29 @@ static func _cassette(cassette_id: String) -> Node3D:
 	_add_glow(model)
 	return model
 
-## Owner 2026-11-14: tapes glow so they are easy to find. A pulsing warm-yellow rim on the tape (the same rim shader as
-## the broken parts, in a colour of its own: green and red mean "you can / cannot fix this") and a small soft light
-## that makes a pool of glow on the surface it rests on. Gone with the tape once it is picked up.
+## Owner 2026-11-14: tapes are easy to find. The gold look is the idle sparkles (made in setup); under them a faint,
+## gently pulsing rich-gold rim on the tape (the same rim shader as the broken parts, in a colour of its own: green and
+## red mean "you can / cannot fix this"). No light (it was one extra light per tape). Gone with the tape once picked up.
 static func _add_glow(model: Node3D) -> void:
 	var glow := ShaderMaterial.new()
 	glow.shader = TAPE_GLOW_SHADER
 	glow.set_shader_parameter(&"gold", TAPE_GLOW)
-	glow.set_shader_parameter(&"base_glow", 0.35)
+	glow.set_shader_parameter(&"base_glow", 0.4)
 	glow.set_shader_parameter(&"strength", 2.2)
+	glow.set_shader_parameter(&"pulse_depth", 0.3)
 	for g in model.find_children("*", "GeometryInstance3D", true, false):
 		if g is MeshInstance3D:
 			(g as MeshInstance3D).material_overlay = glow
-	var light := OmniLight3D.new()
-	light.name = "TapeGlowLight"
-	light.light_color = TAPE_GLOW
-	light.light_energy = 1.2
-	light.omni_range = 1.1
-	light.omni_attenuation = 1.6
-	light.shadow_enabled = false
-	light.position = Vector3(0, 0.12, 0)
-	model.add_child(light)
+	# Owner 2026-11-14: replaced by sparkle particles
+	# var light := OmniLight3D.new()
+	# light.name = "TapeGlowLight"
+	# light.light_color = TAPE_GLOW
+	# light.light_energy = 2.0
+	# light.omni_range = 1.6
+	# light.omni_attenuation = 1.6
+	# light.shadow_enabled = false
+	# light.position = Vector3(0, 0.12, 0)
+	# model.add_child(light)
 
 static func _player_model() -> Node3D:
 	var model := Node3D.new()

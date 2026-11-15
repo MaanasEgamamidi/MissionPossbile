@@ -829,7 +829,10 @@ static func repair_station_name(rec: Dictionary) -> String:
 
 
 func _hint_line() -> String:
-	return "%s map · %s cargo · %s crew · %s pause · %s sources" % [_key(&"map", "M"), _key(&"inventory", "I"), _key(&"crew", "C"),
+	# Owner 2026-11-14: the M map is hidden for now; J shows the goals (and the map in big mode).
+	#return "%s map · %s cargo · %s crew · %s pause · %s sources" % [_key(&"map", "M"), _key(&"inventory", "I"), _key(&"crew", "C"),
+	#	_key(&"back", "Esc"), _key(&"source_register", "Shift+Backspace")]
+	return "%s goals · %s cargo · %s crew · %s pause · %s sources" % [_key(&"goals", "J"), _key(&"inventory", "I"), _key(&"crew", "C"),
 		_key(&"back", "Esc"), _key(&"source_register", "Shift+Backspace")]
 
 

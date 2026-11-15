@@ -22,10 +22,10 @@ const ACTIONS: Dictionary = {
 const ACTION_NAMES: Dictionary = {
 	&"move_forward": "Move forward", &"move_back": "Move back", &"move_left": "Move left", &"move_right": "Move right",
 	&"sprint": "Sprint", &"jump": "Jump", &"interact": "Use (interact)", &"grab": "Grab, drop, throw",
-	&"toggle_view": "First / third person", &"map": "Blueprint map", &"inventory": "Cargo", &"crew": "Crew",
+	&"toggle_view": "First / third person", &"map": "Blueprint map (off for now)", &"inventory": "Cargo", &"crew": "Crew",
 	&"push_to_talk": "Push to talk", &"back": "Close / pause", &"source_register": "Source register",
 	&"power_view": "Power and life support", &"build": "Build (at the solar field)", &"hud_details": "Fold the supplies",
-	&"goals": "Fold the goals", &"advisor_ok": "Close a Mission Control message", &"vitals_help": "Science behind the numbers",
+	&"goals": "Goals (list / map / compact)", &"advisor_ok": "Close a Mission Control message", &"vitals_help": "Science behind the numbers",
 	&"tutorial_hint": "Tutorial hint", &"journal": "Colony journal",
 }
 static var _remapped: Dictionary = {}

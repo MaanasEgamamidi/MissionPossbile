@@ -156,7 +156,7 @@
  "blueprint": {
   "title": "Blueprint map",
   "short": "The blueprint is a map of the colony seen from above.",
-  "long": "Press M to open it. It shows the rooms, the stations, the crew and things lying on the ground. Rooms without power are drawn dim with a ✖.",
+  "long": "Open it from the colony computer. It shows the rooms, the stations, the crew and things lying on the ground. Rooms without power are drawn dim with a ✖.",
   "source_ids": [],
   "claim_ids": ["colony_premise"]
  },

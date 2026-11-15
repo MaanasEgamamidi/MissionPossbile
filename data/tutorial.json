@@ -26,9 +26,9 @@
 	],
 	"messages": {
 		"welcome": "Welcome to Mars, crew. It is the 2060s and Earth is in trouble: people need a new home. You are the second team sent here. The first team could not finish their mission.",
-		"radio_down": "Your crew radio is broken, so for now only Mission Control can talk to you. We opened every door for you. Walk into the base.",
-		"tapes_start": "The first team left a tape in each of the 6 main rooms. Find all 6 tapes, then play them on the cassette player in the Command Room. They tell us what happened.",
-		"tapes_all_found": "All 6 tapes found! Play each one on the cassette player in the Command Room.",
+		"radio_down": "Your crew radio is broken, so for now only Mission Control can talk to you. We opened every door for you. Walk into the base and look for the gold lines on the floor.",
+		"tapes_start": "The first team left a tape in each of the 6 main rooms. Pick a gold line on the floor and follow it: each line leads to a glowing gold tape. Find all 6 tapes first: the repairs open once every tape is found.",
+		"tapes_all_found": "All 6 tapes found! The cassette player and the repairs work now. Play each tape on the cassette player in the Command Room: they tell us what happened.",
 		"fix_start": "Fix the base: get it to operational condition. The tapes showed us 10 broken spots. Some jobs need a specialist: the list shows who.",
 		"fixed": "{done}. {n} of {total} fixed.",
 		"room_restored": "The {room} is restored!",
@@ -44,7 +44,7 @@
 				{"id": "arrival_inside", "kind": "inside_base",
 					"text": "Walk into the base through the open doors.",
 					"explain": "W A S D to walk, the mouse to look. Your suit keeps you safe outside. Inside the base you can breathe the air.",
-					"hints": ["Walk forward: the open doors are right in front of you.", "Press M for the blueprint map of the base."]}
+					"hints": ["Walk forward: the open doors are right in front of you.", "Press J to see your goals on a map of the base."]}
 			]
 		},
 		{
@@ -54,8 +54,8 @@
 			"objectives": [
 				{"id": "tapes_found", "kind": "tapes_found", "done_message": "tapes_all_found",
 					"text": "Find the 6 room tapes: one in each main room.",
-					"explain": "The tapes are in the Command Room, the Power Room, the Greenhouse, the Garden dome, the Med Bay and the Hangar. Look at a tape and press E to pick it up. The whole crew shares the tapes.",
-					"hints": ["Press M for the map and visit each main room.", "Look at a tape and press E."]},
+					"explain": "Follow a gold line on the floor to a glowing gold tape, look at it and press E to pick it up. There is one tape in each main room (the Garden dome's line goes outside, through the tunnel). The whole crew shares the tapes. The repairs open once all 6 are found.",
+					"hints": ["Press J to see the tapes on a map of the base.", "Look at a tape and press E."]},
 				{"id": "tapes_played", "kind": "tapes_played",
 					"text": "Play every tape on the cassette player in the Command Room.",
 					"explain": "Tapes only play on the Command Room cassette player. Each one shows a photo and tells you about its room and its broken spots.",

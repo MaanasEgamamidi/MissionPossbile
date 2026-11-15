@@ -61,6 +61,9 @@ func _initialize() -> void:
 	main._rebuild_crew()
 	await _frames(3)
 	_check("nineteen new locations", entries.size() == 19, str(entries.size()))
+	# Tapes first (owner 2026-11-14): in tutorial mode the cassette player opens only once every tape is found, so the
+	# room tapes are visited before the other anchors.
+	entries.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return String(a.kind) == "cassette_anchor" and String(b.kind) != "cassette_anchor")
 	var captured := {}
 	var tape_ids := {}
 	var task_count := 0
@@ -100,6 +103,7 @@ func _initialize() -> void:
 			main.player._interact()
 			await _frames(1)
 			_check("E collects physical room cassette " + id, CassetteCatalog.collected(services.state(), id) and not main.ui.is_open())
+			await create_timer(CassettePresenter.VANISH_SECONDS + 0.2).timeout          # it shrinks away under its sparkles
 			var cassette_area := main.cassette_presenter.cassette_nodes.get(id) as Area3D
 			_check("collected cassette disappears from live world " + id, cassette_area != null and not cassette_area.visible and cassette_area.collision_layer == 0)
 			await _capture(id + "_collected")

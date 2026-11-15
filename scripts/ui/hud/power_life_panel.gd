@@ -236,5 +236,8 @@ func refresh() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if visible and event.is_action_pressed(&"power_view"):
+		# Closing takes this panel out of the tree at once: mark the key handled first.
+		var vp := get_viewport()
+		if vp != null:
+			vp.set_input_as_handled()
 		close_requested.emit()
-		get_viewport().set_input_as_handled()

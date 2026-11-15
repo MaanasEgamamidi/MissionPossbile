@@ -4,7 +4,8 @@ extends CanvasLayer
 ##
 ## - Only the top panel is shown and takes input; panels underneath are hidden until it closes.
 ## - Esc closes the top panel; with nothing open it opens the pause menu.
-## - M, I and C open their panels only while gameplay has focus (or close their own panel when it is on top).
+## - I and C open their panels only while gameplay has focus (or close their own panel when it is on top).
+##   Owner 2026-11-14: M (the blueprint map) opens nothing for now; J opens the big goals screen with the map (MissionHud).
 ## - E closes a station surface, but never in the frame it was opened (E opened it).
 ## - The first panel frees the mouse; closing the last one captures it again while a game is running.
 ## - Scroll positions are kept per panel class, and focus returns to where it was, so quick switching does not lose
@@ -247,8 +248,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		else:
 			open(SourceRegisterPanel.new())
 		_handled()
-	elif event.is_action_pressed(&"map"):
-		_toggle(BlueprintPanel)
+	# Owner 2026-11-14: hidden for now (the big goals screen, J, has the map). The M binding itself stays.
+	#elif event.is_action_pressed(&"map"):
+	#	_toggle(BlueprintPanel)
 	elif event.is_action_pressed(&"inventory"):
 		_toggle(InventoryPanel)
 	elif event.is_action_pressed(&"crew"):
@@ -263,7 +265,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_handled()        # the view never switches while a panel is open or text is being typed
 
 
-## M / I / C: open the panel from gameplay, or close it when it is the top panel; otherwise do nothing.
+## I / C: open the panel from gameplay, or close it when it is the top panel; otherwise do nothing.
 func _toggle(panel_class: Script) -> void:
 	var panel := top()
 	if panel != null and panel.get_script() == panel_class:

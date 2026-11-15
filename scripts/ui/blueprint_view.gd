@@ -64,6 +64,9 @@ var symbols_used: Dictionary = {}
 var draw_count := 0
 ## Filled by every draw: tracker index -> true if it was marked dusty.
 var dusty_trackers: Dictionary = {}
+## False: the station symbols and the things on the ground are not drawn (the big goals screen keeps its map simple).
+var show_stations := true
+var show_items := true
 
 var _rooms: Array = []
 var _dome: Dictionary = {}
@@ -309,8 +312,10 @@ func _draw() -> void:
 			symbols_used["▢"] = true
 
 	if st != null:
-		_draw_stations(st, font, fs, text_colour, k)
-		_draw_items(st, font, fs)
+		if show_stations:
+			_draw_stations(st, font, fs, text_colour, k)
+		if show_items:
+			_draw_items(st, font, fs)
 		_draw_crew(st, font, fs)
 
 	# north arrow, top right

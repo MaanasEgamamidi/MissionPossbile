@@ -98,7 +98,7 @@ var station_id: StringName = &""
 var kind := ""
 ## Reading lines by key, for refresh() and tests.
 var readings: Dictionary = {}
-## Buttons of the colony computer by key ("summary", "upgrades", "blueprint").
+## Buttons of the colony computer by key ("summary", "upgrades", "scout"; "blueprint" is off for now, owner 2026-11-14).
 var computer_buttons: Dictionary = {}
 ## Equipment switches by equipment id (power panel and life-support console).
 var equipment_switches: Dictionary = {}
@@ -441,7 +441,9 @@ func _what_you_can_do() -> PackedStringArray:
 			return PackedStringArray([CassetteCatalog.PLAY_INSTRUCTION, "Use the player to choose a collected tape. Room repairs are not required."])
 		"computer":
 			return PackedStringArray(["See the colony summary: stores, power and how long they last.",
-				"Look at the upgrade cards for the facilities.", "Open the blueprint map of the base."])
+				"Look at the upgrade cards for the facilities."])
+			# Owner 2026-11-14: map off for now (goals big view replaces it)
+			#	"Look at the upgrade cards for the facilities.", "Open the blueprint map of the base."])
 		"comms":
 			return PackedStringArray(["Read messages from Earth.", "Learn why a radio message to Earth takes minutes.", "Repair the colony radio (radio repairs)."])
 		"food":
@@ -466,7 +468,8 @@ func _build_body() -> void:
 			_body.add_child(buttons)
 			computer_buttons["summary"] = _add_open_button(buttons, "Colony summary", func() -> UiPanel: return ColonySummaryPanel.new())
 			computer_buttons["upgrades"] = _add_open_button(buttons, "Upgrades", func() -> UiPanel: return UpgradeCardsPanel.new())
-			computer_buttons["blueprint"] = _add_open_button(buttons, "Blueprint map", func() -> UiPanel: return BlueprintPanel.new())
+			# Owner 2026-11-14: map off for now (goals big view replaces it)
+			#computer_buttons["blueprint"] = _add_open_button(buttons, "Blueprint map", func() -> UiPanel: return BlueprintPanel.new())
 			# Scout update: the scout rover can be sent from the colony computer as well as from its bay outside.
 			computer_buttons["scout"] = _add_open_button(buttons, "Scout rover", func() -> UiPanel:
 				var p := ScoutBayStationPanel.new()
