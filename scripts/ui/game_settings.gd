@@ -127,10 +127,10 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 		if v != voice_mic_muted:
 			voice_mic_muted = v
 			emit_changed()
-## Prompt 11 voice: loudness of everyone's voices (0 to 2; 1 = normal).
+## Prompt 11 voice: loudness of everyone's voices (0 to 5; 1 = normal, 5 = 500 %).
 @export var voice_volume := 1.0:
 	set(v):
-		v = clampf(v, 0.0, 2.0)
+		v = clampf(v, 0.0, 5.0)
 		if v != voice_volume:
 			voice_volume = v
 			emit_changed()

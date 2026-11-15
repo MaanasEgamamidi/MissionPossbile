@@ -38,8 +38,12 @@ const MOUTH_HEIGHT_M := 1.6
 const HEARD_HOLD_S := 0.5
 ## The indoor/outdoor change note stays this long, seconds.
 const TRANSITION_NOTE_S := 6.0
-## Highest per-player and overall volume (linear).
-const VOLUME_MAX := 2.0
+## Highest per-player and overall volume (linear; 5 = 500 %).
+const VOLUME_MAX := 5.0
+## Nearby voices play through AudioStreamPlayer3D, whose output Godot caps at max_db (+6 dB at most). To reach 500 %
+## they play on this bus, which amplifies by BOOST_LINEAR, with their own volume divided by the same amount.
+const BOOST_BUS := &"VoiceBoost"
+const BOOST_LINEAR := 5.0
 
 const ENCODER_CLASS := "TwovoipOpusEncoder"
 const STREAM_CLASS := "AudioStreamOpus"
@@ -782,9 +786,26 @@ func _apply_levels() -> void:
 			if c != null and out.player is Node3D and (out.player as Node3D).is_inside_tree():
 				var pos: Vector3 = VoiceRouter.participant(st, c, services.zones).position
 				(out.player as Node3D).global_position = pos + Vector3(0.0, MOUTH_HEIGHT_M, 0.0)
-		out.player.set(&"volume_db", linear_to_db(maxf(gain * vol, 1e-5)))
+		var level := gain * vol
+		if out.player is AudioStreamPlayer3D:
+			level /= BOOST_LINEAR  # the VoiceBoost bus multiplies it back
+		out.player.set(&"volume_db", linear_to_db(maxf(level, 1e-5)))
 	if _fx != null:
 		_fx.set_hiss(hiss, master)
+
+
+## The VoiceBoost bus (made on first use): one Amplify effect of BOOST_LINEAR, sending to Master.
+static func _ensure_boost_bus() -> StringName:
+	if AudioServer.get_bus_index(BOOST_BUS) >= 0:
+		return BOOST_BUS
+	AudioServer.add_bus()
+	var idx := AudioServer.bus_count - 1
+	AudioServer.set_bus_name(idx, BOOST_BUS)
+	AudioServer.set_bus_send(idx, &"Master")
+	var amp := AudioEffectAmplify.new()
+	amp.volume_db = linear_to_db(BOOST_LINEAR)
+	AudioServer.add_bus_effect(idx, amp)
+	return BOOST_BUS
 
 
 func _out_for(peer: int, lane: StringName) -> VoiceOut:
@@ -807,6 +828,8 @@ func _out_for(peer: int, lane: StringName) -> VoiceOut:
 		p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_DISABLED
 		p3.max_distance = 0.0
 		p3.doppler_tracking = AudioStreamPlayer3D.DOPPLER_TRACKING_DISABLED
+		p3.max_db = 6.0
+		p3.bus = _ensure_boost_bus()
 		p3.stream = stream
 		out.player = p3
 	else:

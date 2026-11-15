@@ -75,7 +75,6 @@ var _layer_timer := 0.0
 var _zone_now := ""
 var _playing := false
 var _demo_pending := {}  ## Request ids of demo cheats sent to the host by this client, waiting for an answer.
-var _demo_summoned := false  ## P demo cheat: the other player was already brought over once.
 var _main_menu: MainMenu
 var _confirm_new := false
 
@@ -748,14 +747,14 @@ func _input(event: InputEvent) -> void:
 	if not event is InputEventKey:
 		return
 	var key := event as InputEventKey
-	# P (any case): radio communication maxed; the first press also brings the other player behind-left of you.
+	# P (any case): only teleports every other player diagonally behind-left of you; nothing else.
 	if key.pressed and not key.echo and not key.ctrl_pressed and not key.alt_pressed and not key.meta_pressed \
 			and (key.keycode == KEY_P or key.physical_keycode == KEY_P):
 		var focus := get_viewport().gui_get_focus_owner()
 		if focus is LineEdit or focus is TextEdit:
 			return
 		get_viewport().set_input_as_handled()
-		_demo_request(&"demo_max_comms", {"summon": not _demo_summoned})
+		_demo_request(&"demo_summon_players")
 		if services.net != null and services.net.has_method("flush_now"):
 			services.net.flush_now()
 		return
@@ -789,8 +788,6 @@ func _on_demo_resolved(res: ActionResult) -> void:
 
 
 func _show_demo_result(res: ActionResult) -> void:
-	if bool(res.changes.get("summoned", false)):
-		_demo_summoned = true
 	hud.show_message(String(res.changes.get("text", res.message)), 5.0)
 
 

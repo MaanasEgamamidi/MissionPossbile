@@ -238,7 +238,7 @@ func _build() -> void:
 	_volume = HSlider.new()
 	_volume.name = "Volume"
 	_volume.min_value = 0.0
-	_volume.max_value = 2.0
+	_volume.max_value = VoiceService.VOLUME_MAX
 	_volume.step = 0.05
 	_volume.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_volume.value_changed.connect(func(value: float) -> void:

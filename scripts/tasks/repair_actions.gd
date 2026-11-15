@@ -18,49 +18,40 @@ static func register(service: ActionService) -> void:
 		TutorialSystem.advance_tutorial(ctx.state, ctx.balance, ctx.session.events)
 		return {"fixed": fixed, "text": "Demo: all %d tutorial repairs fixed." % TutorialSystem.required_fixes().size()}
 	service.register(demo)
-	# Demo cheat (P): Communication track to its top level, every radio card installed, and only the comms area's repairs
-	# fixed (nothing else). With "summon", the other
-	# human player's character is moved 1 m behind and 1 m left of the host (the client takes the host's pose through
-	# the replicated character_recovered event, flagged demo_teleport).
-	var comms := ActionService.Definition.new()
-	comms.id = &"demo_max_comms"
-	comms.host_only = false  # demo cheats: every player may use them
-	comms.needs_actor = false
-	comms.check_distance = false
-	comms.allowed_while_paused = true
-	comms.important = false  # no save on press: the teleport replicates at once
-	comms.params = {"summon": {"type": TYPE_BOOL}}
-	comms.check = func(ctx: ActionService.Context) -> ActionResult:
+	# Demo cheat (P): ONLY a teleport. Every other human player is moved diagonally behind-left of the one who pressed
+	# it (the first 1 m back and 1 m left, each next one another step further along the same diagonal), facing the
+	# same way. Nothing is fixed or upgraded. Clients take the new pose through the replicated character_recovered
+	# event, flagged demo_teleport.
+	var summon := ActionService.Definition.new()
+	summon.id = &"demo_summon_players"
+	summon.host_only = false  # demo cheats: every player may use them
+	summon.needs_actor = false
+	summon.check_distance = false
+	summon.allowed_while_paused = true
+	summon.important = false  # no save on press: the teleport replicates at once
+	summon.check = func(ctx: ActionService.Context) -> ActionResult:
 		return null if ctx.state != null else ActionResult.failure(ctx.request.request_id, &"no_game")
-	comms.apply = func(ctx: ActionService.Context) -> Dictionary:
+	summon.apply = func(ctx: ActionService.Context) -> Dictionary:
 		var st := ctx.state
-		st.levels["command"] = AreaLevels.levels_of("command")
-		for card: String in CommsStage.CARD_IDS:
-			if not st.has_upgrade(card):
-				st.upgrades[card] = {"installed": true, "by": "demo", "at_hours": st.sim_hours, "parts": 0,
-					"station": CommsStage.INSTALL_STATION, "sector": "energy"}
-		fix_rooms(ctx, ["command_center"])  # only the comms area (T01 comms, T02 wires); every other area stays broken
-		TutorialSystem.advance_tutorial(st, ctx.balance, ctx.session.events)
-		var text := "Demo: radio communication maxed out; the comms area is fixed."
-		if bool(ctx.request.params.get("summon", false)):
-			var me := st.character_of_peer(ctx.request.peer_id)
-			var other: CharacterState = null
-			for c: CharacterState in st.active_characters():
-				if me != null and c.id != me.id and c.owner_peer > 0 and c.owner_peer != ctx.request.peer_id:
-					other = c
-					break
-			if me == null or other == null:
-				text += " No other player to bring over."
-			else:
-				other.position = me.position + Basis(Vector3.UP, me.yaw) * Vector3(-1.0, 0.0, 1.0)
-				other.yaw = me.yaw
-				other.outside = me.outside
-				if ctx.session.events != null:
-					ctx.session.events.character_recovered.emit(other.id, {"demo_teleport": true})
-				text += " %s is behind you." % other.display_name
-				return {"text": text, "summoned": true}
-		return {"text": text}
-	service.register(comms)
+		var me := st.character_of_peer(ctx.request.peer_id)
+		if me == null:
+			return {"text": "Demo: no character to bring players to."}
+		var basis := Basis(Vector3.UP, me.yaw)
+		var moved: Array[String] = []
+		for c: CharacterState in st.active_characters():
+			if c.id == me.id or c.owner_peer <= 0 or c.owner_peer == ctx.request.peer_id:
+				continue
+			var step := float(moved.size() + 1)
+			c.position = me.position + basis * Vector3(-1.0 * step, 0.0, 1.0 * step)  # left (-x) and back (+z)
+			c.yaw = me.yaw
+			c.outside = me.outside
+			if ctx.session.events != null:
+				ctx.session.events.character_recovered.emit(c.id, {"demo_teleport": true})
+			moved.append(c.display_name)
+		if moved.is_empty():
+			return {"text": "Demo: no other players to bring over."}
+		return {"text": "Demo: %s behind you." % ", ".join(moved)}
+	service.register(summon)
 	for id: StringName in [&"task_claim", &"task_resume", &"task_move", &"task_release"]:
 		var definition := ActionService.Definition.new()
 		definition.id = id
@@ -74,16 +65,6 @@ static func register(service: ActionService) -> void:
 		definition.check = func(ctx: ActionService.Context) -> ActionResult: return ctx.session.repair_runtime.check(ctx)
 		definition.apply = func(ctx: ActionService.Context) -> Dictionary: return ctx.session.repair_runtime.apply(ctx)
 		service.register(definition)
-
-
-## Demo cheat (P): only the repairs of the rooms in `rooms` (RepairCatalog.ROOMS ids) finished. Returns how many changed.
-static func fix_rooms(ctx: ActionService.Context, rooms: Array) -> int:
-	var fixed := 0
-	for room_id: String in rooms:
-		for task_id: String in (RepairCatalog.ROOMS.get(room_id, {}) as Dictionary).get("tasks", []):
-			if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
-				fixed += 1
-	return fixed
 
 
 ## Demo cheats: every repair in every area finished, so every room looks fixed, except the tasks of the rooms in
