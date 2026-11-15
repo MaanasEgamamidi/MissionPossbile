@@ -139,6 +139,14 @@ func _build_text() -> String:
 	t += "[S1]colony LOD %s  [S2]mars ranges %s  [S3]sun tuning %s  [S4]light fade %s\n" % [
 		_onoff(Perf.cfg().colony_lod_enabled), _onoff(Perf.cfg().visibility_ranges_enabled),
 		_onoff(Perf.cfg().sun_shadow_tuning_enabled), _onoff(Perf.cfg().light_distance_fade_enabled)]
+	var dr := get_tree().get_first_node_in_group(&"dynamic_resolution") as DynamicResolution
+	t += "GPU %s | score %.2f | 3D render %d %% of %d x %d" % [
+		RenderingServer.get_video_adapter_name(), float(HardwareProfile.current().get("score", 0.0)),
+		roundi(root.scaling_3d_scale * 100.0), root.size.x, root.size.y]
+	if dr != null and dr.active:
+		t += " | adaptive ON, GPU %.1f ms, target %d FPS\n" % [dr.gpu_ms, roundi(dr.target_fps())]
+	else:
+		t += " | adaptive off\n"
 	if zm != null and zm.is_graph_ready:
 		var cur := String(zm.current.zone_id) if zm.current != null else "-"
 		var counts := [0, 0, 0, 0]

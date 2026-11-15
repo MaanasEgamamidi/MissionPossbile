@@ -100,6 +100,8 @@ func _ready() -> void:
 		add_child(lighting)
 		lighting.setup(world)
 		GraphicsQuality.apply(get_tree(), settings.graphics_quality)   # after setup: it swaps in its own environment copy
+		# Slower graphics cards (laptops): the 3D render resolution adapts to hold 60 FPS. Off on strong cards and headless.
+		DynamicResolution.attach(self, settings)
 		for cam in world.find_children("*", "Camera3D", true, false):
 			(cam as Camera3D).current = false
 

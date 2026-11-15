@@ -13,6 +13,7 @@ const Kit = preload("res://scripts/ui/menu_kit.gd")
 const TEXT_SIZE_NAMES: PackedStringArray = ["Normal", "Large", "Extra large"]
 const KEY_HINT := "Pick a key to change it."
 const NO_KEY := "(no key)"
+const QUALITY_HINT := "Lower runs faster. Higher looks better."
 ## The narrator reads cassette pages and the opening story aloud.
 const Narration := preload("res://scripts/voice/narration.gd")
 
@@ -44,6 +45,7 @@ var _fov_label: Label
 var _toggle_sprint: CheckButton
 var _quality: Kit.Segmented
 var _quality_info: Label
+var _auto_quality: CheckButton
 var _change_buttons: Dictionary = {}     # action -> Button (shows the key; pressing it waits for a new one)
 var _reset_buttons: Dictionary = {}      # action -> Button
 var _reset_all: Button
@@ -397,11 +399,20 @@ func _build_graphics(box: VBoxContainer) -> void:
 	for i in GraphicsQuality.NAMES.size():
 		_quality.add_item(GraphicsQuality.NAMES[i], StringName("bars%d" % (i + 1)), GraphicsQuality.DESCRIPTIONS[i], 0.0, 44.0)
 	_quality.item_selected.connect(func(i: int) -> void:
+		# A preset picked by hand stays exactly as picked: "Fit to this computer" goes off.
+		settings.graphics_auto = false
 		settings.graphics_quality = i
 		_apply())
 	box.add_child(_quality)
-	_quality_info = _label(box, "Lower runs faster. Higher looks better.")
+	_quality_info = _label(box, QUALITY_HINT)
 	_quality_info.theme_type_variation = UiTheme.MUTED
+	var auto_tip := "Picks the quality for this computer's graphics card. On slower cards the 3D picture gets a little softer when needed to stay smooth."
+	_auto_quality = _check(_switch_grid(box), "Fit to this computer", &"image", auto_tip, func(on: bool) -> void:
+		settings.graphics_auto = on
+		settings.fit_to_hardware()
+		_quality.select(settings.graphics_quality)
+		_apply())
+	_auto_quality.name = "AutoQuality"
 
 
 ## The button that opens the voice and microphone panel with these settings.
@@ -457,6 +468,21 @@ func _update_value_labels() -> void:
 	_fov_label.text = "%d°" % roundi(settings.fov_degrees)
 	_warning_volume_label.text = "%d %%" % roundi(settings.warning_sound_volume * 100.0)
 	_narrator_volume_label.text = "%d %%" % roundi(settings.narrator_volume * 100.0)
+	_update_quality_info()
+
+
+## The line under the presets: which graphics card the game runs on and what was picked for it.
+func _update_quality_info() -> void:
+	if _quality_info == null or _auto_quality == null:
+		return
+	_auto_quality.set_pressed_no_signal(settings.graphics_auto)
+	var card := HardwareProfile.summary()
+	if settings.graphics_auto and card != "":
+		_quality_info.text = "This computer: %s. Picked %s to keep the game smooth." % [card, GraphicsQuality.level_name(settings.graphics_quality)]
+	elif card != "":
+		_quality_info.text = "%s This computer: %s." % [QUALITY_HINT, card]
+	else:
+		_quality_info.text = QUALITY_HINT
 
 
 func _update_bindings() -> void:

@@ -56,6 +56,11 @@ var light_fade_begin := 30.0          # m, OmniLight3D/SpotLight3D distance_fade
 var light_fade_length := 10.0         # m
 var light_fade_shadow := 25.0         # m
 
+# --- Adaptive render resolution (perf/dynamic_resolution.gd, docs/perf/laptop_rtx5050.md) ---
+# Not in SWITCHES: the player's "Fit to this computer" setting decides, not the A/B switches. `--perf-off` sets mode 0.
+var dynamic_resolution_mode := -1     # -1 = follow the setting and the graphics card, 0 = never, 1 = always
+var dynamic_resolution_target_fps := 60.0  # the frame rate it holds (the screen's refresh rate when that is lower)
+
 const SWITCHES: Array[StringName] = [&"zones_enabled", &"room_props_enabled", &"exterior_cull_enabled", &"view_activation_enabled",
 	&"colony_lod_enabled", &"visibility_ranges_enabled", &"shader_warmup_enabled", &"sun_shadow_tuning_enabled",
 	&"light_distance_fade_enabled"]
@@ -65,6 +70,7 @@ func _ready() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.has("--perf-off"):
 		set_all(false)
+		dynamic_resolution_mode = 0   # the baseline never changes the render resolution
 	elif args.has("--perf-on"):
 		set_all(true)
 	for a: String in args:

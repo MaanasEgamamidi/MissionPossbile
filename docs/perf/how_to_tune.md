@@ -18,6 +18,12 @@ one live with the HUD keys, at launch with `-- --perf-set=name:value`, or in the
 
 Launch: `-- --perf-off` (baseline), `-- --perf-on` (all on). A/B bench: `sh tools/perf/run_perf_ab.sh`.
 
+## Slower graphics cards and laptops (2026-11-15)
+
+"Fit to this computer" (Settings > Graphics, on by default) picks the preset for the graphics card and, on mid-range
+and basic cards, adapts the 3D render resolution to hold 60 FPS. See `laptop_rtx5050.md`. Force it on any card with
+`-- --perf-set=dynamic_resolution_mode:1`, off with `:0`; `dynamic_resolution_target_fps` (60) is the rate it holds.
+
 ## Settings
 
 | Setting | Default | Raise it when | Lower it when |

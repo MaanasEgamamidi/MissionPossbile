@@ -11,7 +11,7 @@ const TEXT_SCALES: Array[float] = [1.0, 1.25, 1.5]
 const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov_degrees", &"mouse_sensitivity",
 	&"invert_y", &"toggle_sprint", &"reduce_motion", &"high_contrast", &"graphics_quality",
 	&"voice_input_device", &"voice_mic_muted", &"voice_volume", &"reduce_flashes", &"warning_sound_muted", &"warning_sound_volume",
-	&"narrator_voice", &"narrator_volume"]
+	&"narrator_voice", &"narrator_volume", &"graphics_auto"]
 
 ## Size of all menus and the HUD (0.75 to 2.0).
 @export var ui_scale := 1.0:
@@ -112,6 +112,14 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 		if v != graphics_quality:
 			graphics_quality = v
 			emit_changed()
+## "Fit to this computer" (owner 2026-11-15): the preset is picked for this computer's graphics card and, on slower
+## cards, the 3D render resolution adapts to hold 60 FPS (HardwareProfile, perf/dynamic_resolution.gd). Choosing a
+## preset by hand in Settings turns it off.
+@export var graphics_auto := true:
+	set(v):
+		if v != graphics_auto:
+			graphics_auto = v
+			emit_changed()
 
 
 ## VoiceService resolves this computer's built-in microphone when capture starts.
@@ -140,9 +148,11 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 static func load_or_default(path := DEFAULT_PATH) -> GameSettings:
 	var s := GameSettings.new()
 	if not FileAccess.file_exists(path):
+		s.fit_to_hardware()
 		return s
 	var data: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if not data is Dictionary:
+		s.fit_to_hardware()
 		return s
 	var d: Dictionary = data
 	for key: StringName in KEYS:
@@ -156,7 +166,21 @@ static func load_or_default(path := DEFAULT_PATH) -> GameSettings:
 			s.set(key, int(v))
 		elif current is String and v is String:
 			s.set(key, v)
+	# A file written before graphics_auto existed: a preset other than the default was chosen by hand, so keep it.
+	if not d.has("graphics_auto"):
+		s.graphics_auto = s.graphics_quality == GraphicsQuality.DEFAULT_LEVEL
+	s.fit_to_hardware()
 	return s
+
+
+## With graphics_auto on, takes the preset this computer's graphics card is rated for. Nothing changes when the card
+## is not recognised (and in headless runs, which have no graphics card).
+func fit_to_hardware() -> void:
+	if not graphics_auto:
+		return
+	var level := HardwareProfile.recommended_level()
+	if level >= 0:
+		graphics_quality = level
 
 
 ## Writes the settings as JSON.
