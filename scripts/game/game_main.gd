@@ -318,8 +318,7 @@ func _on_menu_host(port: int, continue_save: bool) -> void:
 		return
 	_hook_net()
 	_begin_play()
-	# No "Hosting…" subtitle (2026-11-15): it covered the opening cutscene's dialogue. Others find the game under
-	# Join > Open games, and the pause menu shows the address.
+	_announce_hosting()
 
 
 ## Join: connect, wait for the host's colony, then play. The menu stays up until the colony arrives.
@@ -356,6 +355,10 @@ func _on_net_joined(_peer: int) -> void:
 		_begin_play()
 		var me := _local_character()
 		ui.show_subtitle("Joined the colony%s." % (" as %s" % me.display_name if me != null else ""), 6.0, "", true)
+
+
+func _announce_hosting() -> void:
+	ui.show_subtitle("Hosting. Other players choose Join a game and click \"Join %s\". The pause menu shows your address if they need to type it." % LanDiscovery.local_name(), 14.0, "Network", true)
 
 
 func _say_crew_change(peer: int, joined_now: bool) -> void:
