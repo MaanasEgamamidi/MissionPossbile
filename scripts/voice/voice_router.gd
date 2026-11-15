@@ -13,10 +13,6 @@ extends RefCounted
 ##     a chain of doors), along speaker -> door -> listener, at half the level, scaled by how far the door is open; a
 ##     closed door (or no door between the zones) means silence. The gain is re-read every frame while the utterance
 ##     plays (people move), but the route itself does not change mid-utterance.
-## 2026-11-15: VoiceService now decides routes with scripts/voice/suit_radio.gd (SuitRadio.decide), which keeps the
-## proximity rule below exactly and replaces the radio half: the suit radio follows the Communication level (no signal
-## / delay and garble away from the Command Room / instant and clear). decide() and the text helpers here stay for the
-## older tests and callers.
 ## Zones are ColonyZones zones (rooms, the dome plaza, the garden dome, the exterior). Door portals come from the
 ## colony manifest (24 room doors) plus any other DoorController the game builds (airlock doors).
 
@@ -240,9 +236,9 @@ static func speaking_text(me_outside: bool, p_stage: int, crew_outside: int) -> 
 static func idle_text(me_outside: bool, p_stage: int) -> String:
 	if me_outside:
 		if CommsStage.has_link(p_stage):
-			return "Press V to toggle your microphone: you are outside, so the radio carries your voice (heard %s)." % CommsStage.delay_words(p_stage)
+			return "Hold V to talk: you are outside, so the radio carries your voice (heard %s)." % CommsStage.delay_words(p_stage)
 		return "You are outside and the radio is broken: nobody can hear you. Repair it at the comms console."
-	return "Press V to toggle your microphone and talk to people near you."
+	return "Hold V to talk to people near you."
 
 
 ## A line about someone the local player hears (or would hear).

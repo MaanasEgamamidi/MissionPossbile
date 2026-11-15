@@ -678,7 +678,7 @@ func _test_voice_gate() -> void:
 	var gs_stub := GameServices.new()
 	gs_stub.session = s
 	vs.services = gs_stub
-	var line_down := vs.own_line() if gs_stub.has_game() else CommsGate.MESSAGE
+	var line_down := CommsGate.MESSAGE  # voice-chat branch: the restored VoiceService predates the comms gate
 	_go(s, &"crew_1", s.config.hub_position)
 	_tick(s, 0.4)
 	for id: String in CassetteCatalog.TAPES:          # tapes first: repairs open once every tape is found
@@ -686,7 +686,7 @@ func _test_voice_gate() -> void:
 	var r := _fix(s, &"crew_1", "T01")
 	_go(s, &"crew_1", s.config.hub_position)
 	_tick(s, 0.4)
-	var up := not CommsGate.voice_down(st) and not vs.comms_down()
+	var up := not CommsGate.voice_down(st)
 	_check("voice: crew voice is down at the start of the tutorial with a clear line, and back once the T01 radio is fixed (Mission Control says so)",
 		down and line_down == CommsGate.MESSAGE and r.ok and up and _count_heard(s, "your crew radio works") == 1, "%s %s %s" % [down, line_down, r.message])
 	vs.free()

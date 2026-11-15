@@ -2,8 +2,7 @@ class_name VoiceSettingsPanel
 extends UiPanel
 ## Voice and microphone settings (Prompt 11), opened from Settings > Controls > "Voice and microphone…".
 ## Microphone state in words, the input device list, an input level meter (the microphone opens while this panel is
-## open and voice is enabled; V toggles the microphone, starting off), mute my microphone, the volume of everyone's
-## voices, and for each other
+## open, nothing is sent unless you hold V), mute my microphone, the volume of everyone's voices, and for each other
 ## player a volume slider and a mute switch (for this session). Then how voice works: nearby inside, radio outside,
 ## the radio's stage and why it is slow. The microphone, mute and volume are saved with the other settings; per-player
 ## volume and mute last for the session only (there are no player accounts).
@@ -27,8 +26,6 @@ var _player_rows := {}             # peer -> {"label", "slider", "mute"}
 var _players_sig := ""
 var _stage_label: Label
 var _metering: VoiceService
-var _device_name := ""
-var _device_refresh_at := 0
 
 
 func setup(p_services: GameServices) -> void:
@@ -36,7 +33,6 @@ func setup(p_services: GameServices) -> void:
 	if settings == null:
 		settings = GameSettings.new()
 	name = "VoiceSettingsPanel"
-	process_mode = Node.PROCESS_MODE_ALWAYS
 	theme_type_variation = UiTheme.PANEL
 	_build()
 	_read_settings()
@@ -103,28 +99,22 @@ func _process(_delta: float) -> void:
 	if _metering == null:
 		_set_metering(true)
 	var v := _voice()
-	# A perceptual scale makes ordinary speech visible without changing the transmitted audio gain.
-	_meter.value = (sqrt(v.input_level()) * 100.0) if v != null else 0.0
+	_meter.value = (v.input_level() * 100.0) if v != null else 0.0
 
 
 func refresh() -> void:
 	if _status == null:
 		return
 	var v := _voice()
-	_refresh_device()
 	if v != null:
 		_status.text = v.mic_state_text()
 	elif settings.voice_mic_muted:
-		_status.text = "Voice chat OFF. Your microphone is muted. Press %s in a colony to turn it on." % VoiceService.toggle_key_label()
+		_status.text = "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
 	else:
-		_status.text = "Voice starts off in each colony. Press %s to enable the built-in microphone." % VoiceService.toggle_key_label()
-	var muted := v.mic_muted() if v != null else settings.voice_mic_muted
-	_mute_mic.set_pressed_no_signal(muted)
-	_status.theme_type_variation = UiTheme.MUTED if muted else (UiTheme.WARN if _status.text.begins_with("✖") else UiTheme.GOOD)
+		_status.text = "Voice starts when you are in a colony with other players. Pick your microphone here."
+	_status.theme_type_variation = UiTheme.WARN if _status.text.begins_with("✖") else UiTheme.GOOD
 	var st := services.state() if services != null and services.has_game() else null
-	# Suit radio (2026-11-15): the comms level decides no signal / delay / garble (scripts/voice/suit_radio.gd).
-	var suit_radio: Variant = load("res://scripts/voice/suit_radio.gd")
-	_stage_label.text = String(suit_radio.status_text(st)) if st != null else CommsStage.stage_text(0) + " (in a colony, this shows its radio.)"
+	_stage_label.text = CommsStage.stage_text(CommsStage.stage(st)) if st != null else CommsStage.stage_text(0) + " (in a colony, this shows its radio.)"
 	_refresh_players(v)
 
 
@@ -206,14 +196,21 @@ func _build() -> void:
 	scroll.add_child(body)
 
 	_status = _label(body, "")
-	_label(body, "Built-in microphone (always used)")
+	_label(body, "Microphone")
 	_device = OptionButton.new()
 	_device.name = "Device"
 	_device.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	_device.tooltip_text = "Voice stays on this computer's built-in microphone, even when a headset is connected."
-	_device.disabled = true
+	_device.tooltip_text = "Which microphone the game listens to."
+	_device.item_selected.connect(func(i: int) -> void:
+		var device := _device.get_item_text(i)
+		var value := "" if device == "Default" else device
+		settings.voice_input_device = value
+		var v := _voice()
+		if v != null:
+			v.set_input_device(value)
+		refresh())
 	body.add_child(_device)
-	_meter_label = _label(body, "Input level: press %s to turn voice chat on, then speak. Press it again to turn voice chat off." % VoiceService.toggle_key_label())
+	_meter_label = _label(body, "Input level: speak to see the bar move. Nothing is sent to anyone unless you hold V.")
 	_meter_label.theme_type_variation = UiTheme.MUTED
 	_meter = ProgressBar.new()
 	_meter.name = "Meter"
@@ -223,15 +220,6 @@ func _build() -> void:
 	_meter.custom_minimum_size = Vector2(240.0, 14.0)
 	_meter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	body.add_child(_meter)
-	var retry := Button.new()
-	retry.text = "Retry built-in microphone"
-	retry.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	retry.pressed.connect(func() -> void:
-		var v := _voice()
-		if v != null:
-			v.retry_microphone()
-		refresh())
-	body.add_child(retry)
 	_mute_mic = CheckButton.new()
 	_mute_mic.name = "MuteMic"
 	_mute_mic.text = "Mute my microphone"
@@ -248,7 +236,7 @@ func _build() -> void:
 	_volume = HSlider.new()
 	_volume.name = "Volume"
 	_volume.min_value = 0.0
-	_volume.max_value = VoiceService.VOLUME_MAX
+	_volume.max_value = 2.0
 	_volume.step = 0.05
 	_volume.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_volume.value_changed.connect(func(value: float) -> void:
@@ -266,8 +254,7 @@ func _build() -> void:
 
 	var how := _label(body, "How voice works")
 	how.theme_type_variation = UiTheme.HEADING
-	_label(body, "Voice chat starts off. Press %s once to turn your microphone on, then again to turn it off. No need to hold the key. " % VoiceService.toggle_key_label()
-		+ "Inside the base, people near you hear you at once: clearly up to 5 m, fading out by 25 m. "
+	_label(body, "Hold V to talk. Inside the base, people near you hear you at once: clearly up to 5 m, fading out by 25 m. "
 		+ "Walls stop your voice; an open door lets some of it through.")
 	_label(body, "If you or the listener is outside, your voice goes over the colony radio instead, to everyone on the map, "
 		+ "inside too. Outside there is almost no air to carry sound, so suits use the radio.")
@@ -275,7 +262,7 @@ func _build() -> void:
 	_stage_label.theme_type_variation = UiTheme.HEADING
 	var why := _label(body, CommsStage.explanation())
 	why.theme_type_variation = UiTheme.MUTED
-	var privacy := _label(body, "Your voice only goes to the other players in this colony (mute your microphone above to stop it). "
+	var privacy := _label(body, "Your voice only goes to the other players in this colony, and only while you hold V. "
 		+ "It is never recorded or saved.")
 	privacy.theme_type_variation = UiTheme.MUTED
 
@@ -289,27 +276,22 @@ func _build() -> void:
 
 
 func _read_settings() -> void:
-	_refresh_device()
+	_device.clear()
+	var devices := AudioServer.get_input_device_list()
+	if not devices.has("Default"):
+		_device.add_item("Default")
+	for d: String in devices:
+		_device.add_item(d)
+	var want := settings.voice_input_device if settings.voice_input_device != "" else "Default"
+	var chosen := 0
+	for i in _device.item_count:
+		if _device.get_item_text(i) == want:
+			chosen = i
+	_device.select(chosen)
 	_mute_mic.set_pressed_no_signal(settings.voice_mic_muted)
 	_volume.set_value_no_signal(settings.voice_volume)
 	_update_volume_label()
 	refresh()
-
-
-func _refresh_device() -> void:
-	var now := Time.get_ticks_msec()
-	if _device_name != "" and now < _device_refresh_at:
-		return
-	_device_refresh_at = now + 5000
-	var device := VoiceService.built_in_device(AudioServer.get_input_device_list())
-	var label := device if device != "" else "Built-in microphone unavailable"
-	if label == _device_name:
-		return
-	_device_name = label
-	_device.clear()
-	_device.add_item(label)
-	_device.select(0)
-	settings.voice_input_device = device
 
 
 func _update_volume_label() -> void:

@@ -114,7 +114,7 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 			emit_changed()
 
 
-## VoiceService resolves this computer's built-in microphone when capture starts.
+## Prompt 11 voice: the microphone to use ("" = the computer's default input).
 @export var voice_input_device := "":
 	set(v):
 		v = v.strip_edges().substr(0, 200)
@@ -122,15 +122,15 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 			voice_input_device = v
 			emit_changed()
 ## Prompt 11 voice: your own microphone is muted (nothing is sent; you still hear the others).
-@export var voice_mic_muted := true:
+@export var voice_mic_muted := false:
 	set(v):
 		if v != voice_mic_muted:
 			voice_mic_muted = v
 			emit_changed()
-## Prompt 11 voice: loudness of everyone's voices (0 to 5; 1 = normal, 5 = 500 %).
+## Prompt 11 voice: loudness of everyone's voices (0 to 2; 1 = normal).
 @export var voice_volume := 1.0:
 	set(v):
-		v = clampf(v, 0.0, 5.0)
+		v = clampf(v, 0.0, 2.0)
 		if v != voice_volume:
 			voice_volume = v
 			emit_changed()

@@ -1,6 +1,6 @@
 class_name VoiceService
 extends Node
-## Private voice for the colony (Prompt 11): open-mic capture, Opus encoding, sending over the game's own ENet
+## Private voice for the colony (Prompt 11): push-to-talk capture, Opus encoding, sending over the game's own ENet
 ## session (NetSession.send_voice, channel 2), receiving, the timed buffer (VoiceScheduler), routing (VoiceRouter),
 ## decoding and playing. A presenter: GameMain adds it in _begin_play() and calls setup(world, services, game).
 ##
@@ -9,46 +9,29 @@ extends Node
 ## catch-up (playing faster or slower with pitch_scale to steer the buffer) is NOT used: pitch_scale stays 1.0, so
 ## speech speed never changes and a radio delay is never shortened.
 ##
-## Toggle mic: each game starts with the microphone off. Press V once to turn it on, again to turn it off. While
-## enabled, Opus frames go continuously to the other players; no key needs to be held. Nothing is recorded or
-## written to disk; buffers live in memory and are cleared on mute,
+## What leaves this computer: only Opus frames while the talk key (V, action push_to_talk) is held, to the other
+## players of this session. Nothing is recorded or written to disk; buffers live in memory and are cleared on mute,
 ## on a player's disconnect and when the session ends. Without a microphone (none, blocked, or a headless run) the
 ## game plays on and listening still works. Voice keeps working while the game is paused.
 ## The extension's classes are looked up at run time (ClassDB) and every method is checked first, so a missing or
 ## different library leaves the game playable with voice off and a plain message.
 
 const GROUP := &"voice_service"
-## Tutorial (2026-11-14): crew voice is off until the T01 radio is fixed (scripts/voice/comms_gate.gd).
-const CommsGate := preload("res://scripts/voice/comms_gate.gd")
-## Suit radio (2026-11-15, UPGRADE_PATHS_PLAN.md §7.1): which route, no signal / delay / garble by the Communication
-## level (suit_radio.gd), and how the garbled radio sounds (radio_fx.gd). Face to face inside is unchanged.
-const SuitRadio := preload("res://scripts/voice/suit_radio.gd")
-const RadioFx := preload("res://scripts/voice/radio_fx.gd")
-## The speaker's "No signal" line stays this long after the press that triggered it, seconds.
-const NO_SIGNAL_HOLD_S := 3.0
-## Opus encoder settings (engineering): 64 kbit/s, complexity 10 (best quality), tuned for voice.
-const OPUS_BITRATE := 64000
-const OPUS_COMPLEXITY := 10
+## Opus encoder settings (engineering): 24 kbit/s, complexity 5, tuned for voice.
+const OPUS_BITRATE := 24000
+const OPUS_COMPLEXITY := 5
 ## The microphone stays open this long after the talk key is let go, so quick presses do not keep reopening it.
 const MIC_HANG_S := 3.0
 ## An open microphone that gives no samples for this long is reported as "no signal".
 const MIC_SIGNAL_TIMEOUT_S := 3.0
-## Digital silence (including a Windows/hardware mute) is not proof that a microphone works.
-const MIC_SILENCE_PEAK := 0.000001
-## Retry unavailable/stalled capture and watch device/sample-rate changes at this interval, in seconds.
-const MIC_RETRY_S := 5.0
 ## Height of a speaker's voice above their feet, metres (engineering).
 const MOUTH_HEIGHT_M := 1.6
 ## A "heard" line stays this long after the last frame, seconds.
 const HEARD_HOLD_S := 0.5
 ## The indoor/outdoor change note stays this long, seconds.
 const TRANSITION_NOTE_S := 6.0
-## Highest per-player and overall volume (linear; 5 = 500 %).
-const VOLUME_MAX := 5.0
-## Nearby voices play through AudioStreamPlayer3D, whose output Godot caps at max_db (+6 dB at most). To reach 500 %
-## they play on this bus, which amplifies by BOOST_LINEAR, with their own volume divided by the same amount.
-const BOOST_BUS := &"VoiceBoost"
-const BOOST_LINEAR := 5.0
+## Highest per-player and overall volume (linear).
+const VOLUME_MAX := 2.0
 
 const ENCODER_CLASS := "TwovoipOpusEncoder"
 const STREAM_CLASS := "AudioStreamOpus"
@@ -88,11 +71,8 @@ var _encoder: Object
 var _audio_chunk := 882
 var _mic_state: StringName = &""
 var _mic_active := false
+var _mic_since := 0.0
 var _mic_frames_seen := false
-var _mic_last_frames := 0.0
-var _mic_last_sound := 0.0
-var _mic_device := ""
-var _encoder_input_rate := 0
 var _want_input_until := -1.0
 var _meter_requests := 0
 var _level := 0.0
@@ -114,9 +94,6 @@ var _last_outside := -1
 var _transition_text := ""
 var _transition_until := 0.0
 var _peer_check_left := 0.0
-var _fx: RadioFx                   # radio_fx.gd: the SuitRadio bus, clicks, hiss, dropouts, the no-signal beep
-var _no_signal_until := -1.0       # the speaker's "No signal" line shows until then (once per press)
-var _mic_retry_left := MIC_RETRY_S
 
 
 ## One speaker's player on one route. Proximity: AudioStreamPlayer3D at the speaker (no engine attenuation: the
@@ -132,8 +109,6 @@ class VoiceOut extends RefCounted:
 	var fec := 0
 	var overflow := 0
 	var seq := -1
-	## Suit radio garble of the utterance playing now (0 = clear; proximity is always 0).
-	var garble := 0.0
 
 	func ensure_playing() -> void:
 		var p := player
@@ -229,26 +204,7 @@ static func library_problem() -> String:
 
 func _ready() -> void:
 	add_to_group(GROUP)
-	PlayerInput.ensure_actions()
 	process_mode = Node.PROCESS_MODE_ALWAYS          # voice keeps working while the game is paused
-	process_priority = -100                       # drain voice before ordinary gameplay work
-
-
-## Keep the existing action id so saved key remaps continue to work. GUI text fields, puzzle controls and
-## key-binding capture handle their events first. Repeats and key-up never toggle the switch.
-func _unhandled_input(event: InputEvent) -> void:
-	if settings == null or not event.is_action_pressed(&"push_to_talk", false, true):
-		return
-	var focus := get_viewport().gui_get_focus_owner()
-	if focus is LineEdit or focus is TextEdit:
-		return
-	set_mic_muted(not mic_muted())
-	get_viewport().set_input_as_handled()
-
-
-static func toggle_key_label() -> String:
-	var label := PlayerInput.describe(&"push_to_talk") if InputMap.has_action(&"push_to_talk") else ""
-	return label if label != "" else "V"
 
 
 ## Presenter entry point. `world` may be null (tests); `game` is GameMain or null.
@@ -261,18 +217,12 @@ func setup(p_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 		var s: Variant = p_game.get(&"settings") if p_game != null else null
 		settings = s as GameSettings if s is GameSettings else GameSettings.new()
 	_stream_id = randi() & 0xffff
-	# Every colony session starts off, including when an older settings file saved the microphone as enabled.
-	settings.voice_mic_muted = true
 	_library_problem = library_problem()
 	_library = _library_problem == ""
 	if _library:
 		_make_encoder()
 	_probe_mic()
 	_build_portals()
-	if _fx == null:
-		_fx = RadioFx.new()
-		_fx.name = "RadioFx"
-		add_child(_fx)
 	if services != null and services.net != null:
 		var net := services.net
 		if not net.voice_packet_received.is_connected(_on_voice_packet):
@@ -298,7 +248,6 @@ func _make_encoder() -> void:
 		_library_problem = "the encoder could not be created"
 		return
 	var in_rate := int(AudioServer.get_input_mix_rate())
-	_encoder_input_rate = in_rate
 	# create_sampler(input mix rate, Opus sample rate, channels, noise suppression), as the TwoVoIP helper calls it
 	var ok_sampler := bool(_encoder.call(&"create_sampler", in_rate, VoiceScheduler.SAMPLE_RATE, VoiceScheduler.CHANNELS, false))
 	var ok_encoder := bool(_encoder.call(&"create_opus_encoder", OPUS_BITRATE, OPUS_COMPLEXITY, true))
@@ -325,24 +274,24 @@ func _probe_mic() -> void:
 		_set_mic_state(&"headless")
 	elif not bool(ProjectSettings.get_setting("audio/driver/enable_input", false)):
 		_set_mic_state(&"input_off")
-	elif built_in_device(AudioServer.get_input_device_list()).is_empty():
+	elif AudioServer.get_input_device_list().is_empty():
 		_set_mic_state(&"no_device")
 	else:
-		_set_mic_state(&"available")
+		_set_mic_state(&"ready")
 
 
-## available/opening, ready (sound received), quiet (silent PCM), or a concrete capture failure.
+## &"ready", &"synthetic" (tests), &"headless", &"no_library", &"input_off", &"no_device", &"failed" or &"no_signal".
 func mic_state() -> StringName:
 	return _mic_state
 
 
 ## True when this computer can send voice (a working or synthetic microphone, not muted).
 func can_capture() -> bool:
-	return _mic_state in [&"ready", &"quiet", &"synthetic"] and not mic_muted()
+	return (_mic_state == &"ready" or _mic_state == &"synthetic") and not mic_muted()
 
 
 func mic_muted() -> bool:
-	return settings == null or settings.voice_mic_muted
+	return settings != null and settings.voice_mic_muted
 
 
 func set_mic_muted(on: bool) -> void:
@@ -351,24 +300,15 @@ func set_mic_muted(on: bool) -> void:
 	if on:
 		_stop_transmit()
 		_stop_mic()
-		_synthetic.clear()
-		_want_input_until = -1.0
-		_no_signal_until = -1.0
-	else:
-		retry_microphone()
 
 
 ## The microphone's state in words for the HUD and the voice settings.
 func mic_state_text() -> String:
 	if mic_muted():
-		return "Voice chat OFF. Microphone muted. Press %s to turn it on. You can still hear other players." % toggle_key_label()
+		return "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
 	match _mic_state:
-		&"available", &"opening":
-			return "Opening the built-in microphone. Speak to check the input level."
 		&"ready":
-			return "✓ Built-in microphone receiving audio. Voice chat is on: just talk."
-		&"quiet":
-			return "✖ No sound detected. Speak, then check the microphone mute key and system input volume."
+			return "✓ Microphone ready. Hold V to talk."
 		&"synthetic":
 			return "✓ Test sound instead of a microphone (synthetic input)."
 		&"headless":
@@ -378,67 +318,43 @@ func mic_state_text() -> String:
 		&"input_off":
 			return "✖ No microphone: microphone input is switched off in this build. You can still listen."
 		&"no_device":
-			return "✖ Built-in microphone not found. Enable it in system sound settings. You can still listen."
+			return "✖ No microphone found. Plug one in and pick it here. You can still listen."
 		&"failed":
-			return "✖ Microphone could not open. Check microphone permission in Windows settings. Retrying automatically."
+			return "✖ No microphone: it could not be opened. It may be in use, or blocked in Windows privacy settings. You can still listen."
 		&"no_signal":
-			return "✖ Microphone stopped delivering audio. Check system microphone access. Retrying automatically."
+			return "✖ No microphone signal. Check it is plugged in and allowed in Windows privacy settings. You can still listen."
 	return "✖ No microphone. You can still listen."
 
 
 ## Short form for the HUD.
 func mic_short_text() -> String:
 	if mic_muted():
-		return "Microphone muted · Press %s to turn voice chat on" % toggle_key_label()
-	if _mic_state == &"quiet":
-		return "✖ Microphone silent — check the system mute key"
-	if _mic_state in [&"available", &"opening"]:
-		return "Opening built-in microphone…"
+		return "✖ Microphone muted"
 	if can_capture():
 		return ""
 	return "✖ No microphone — you can still listen"
 
 
-## Godot exposes endpoint names, not hardware form factors. Recognize the built-in endpoint names used by
-## Windows laptop drivers; never fall back to Default, USB, Bluetooth or a virtual input.
-static func built_in_device(devices: PackedStringArray) -> String:
-	for device: String in devices:
-		var label := device.to_lower().replace("_", " ").replace("-", " ")
-		var external := false
-		for word: String in ["usb", "bluetooth", "airpods", "headset", "iphone", "virtual", "webcam", "brio", "voicemeeter", "cable"]:
-			if label.contains(word):
-				external = true
-				break
-		if external:
-			continue
-		if label.contains("microphone array") or label.contains("internal mic") or label.contains("built in mic"):
-			return device
-	return ""
-
-
-## Only the built-in microphone is offered, even if the system default changes to a headset.
+## Microphones the computer offers.
 func input_devices() -> PackedStringArray:
-	var device := built_in_device(AudioServer.get_input_device_list())
-	return PackedStringArray([device]) if device != "" else PackedStringArray()
+	return AudioServer.get_input_device_list()
 
 
-## Older settings/callers cannot select an external microphone. Resolve the built-in input on this computer.
-func set_input_device(_device: String) -> void:
-	retry_microphone()
-
-
-func retry_microphone() -> void:
-	_stop_transmit()
-	_stop_mic()
+## Picks a microphone (saved in the settings). Restarts capture if it was open.
+func set_input_device(device: String) -> void:
 	if settings != null:
-		settings.voice_input_device = built_in_device(AudioServer.get_input_device_list())
-	_probe_mic()
-	_mic_retry_left = MIC_RETRY_S
-	if not mic_muted():
+		settings.voice_input_device = device
+	var was := _mic_active
+	_stop_mic()
+	if device != "" and AudioServer.get_input_device_list().has(device):
+		AudioServer.input_device = device
+	if _mic_state == &"failed" or _mic_state == &"no_signal" or _mic_state == &"no_device":
+		_probe_mic()
+	if was:
 		_start_mic(_now())
 
 
-## The meter uses the same capture as voice. Opening settings never enables a muted microphone.
+## The voice settings ask for the level meter while they are open (the microphone opens; nothing is sent).
 func request_meter(on: bool) -> void:
 	_meter_requests = maxi(0, _meter_requests + (1 if on else -1))
 
@@ -466,98 +382,48 @@ func _set_mic_state(s: StringName) -> void:
 
 
 func _start_mic(now: float) -> void:
-	if _mic_active or synthetic_input or _mic_state not in [&"available", &"ready", &"quiet", &"no_signal"] or mic_muted():
+	if _mic_active or synthetic_input or _mic_state not in [&"ready", &"no_signal"] or mic_muted():
 		return
-	var device := built_in_device(AudioServer.get_input_device_list())
-	if device.is_empty():
-		_set_mic_state(&"no_device")
-		return
-	AudioServer.input_device = device
-	if settings != null:
-		settings.voice_input_device = device
+	var device := settings.voice_input_device if settings != null else ""
+	if device != "" and AudioServer.get_input_device_list().has(device):
+		AudioServer.input_device = device
 	var err := AudioServer.set_input_device_active(true)
 	if err != OK:
 		_set_mic_state(&"failed")
 		return
 	_mic_active = true
-	_mic_device = device
+	_mic_since = now
 	_mic_frames_seen = false
-	_mic_last_frames = now
-	_mic_last_sound = now
-	# Some drivers only report their actual input rate after opening the endpoint.
-	if _encoder_input_rate != int(AudioServer.get_input_mix_rate()):
-		_make_encoder()
-	if not _library:
-		_stop_mic()
-		_set_mic_state(&"no_library")
-		return
-	_set_mic_state(&"opening")
-
-
-## Looks for the microphone again every MIC_RETRY_S while it is missing or failed, so voice starts by itself once a
-## microphone is plugged in or allowed.
-func _retry_mic(delta: float) -> void:
-	_mic_retry_left -= delta
-	if _mic_retry_left > 0.0:
-		return
-	_mic_retry_left = MIC_RETRY_S
-	if synthetic_input or not _library or mic_muted():
-		return
-	var device := built_in_device(AudioServer.get_input_device_list())
-	if _mic_state in [&"failed", &"no_device", &"no_signal"] \
-			or (_mic_active and (_mic_device != device or AudioServer.input_device != device \
-			or _encoder_input_rate != int(AudioServer.get_input_mix_rate()))):
-		retry_microphone()
 
 
 func _stop_mic() -> void:
-	_stop_transmit()
 	if _mic_active:
 		AudioServer.set_input_device_active(false)
 	_mic_active = false
-	_level = 0.0
-	if _mic_state in [&"opening", &"ready", &"quiet", &"no_signal"]:
-		_set_mic_state(&"available")
 
 
-func _observe_input(chunk: PackedVector2Array, now: float) -> void:
-	_mic_frames_seen = true
-	_mic_last_frames = now
-	var peak := 0.0
-	for sample: Vector2 in chunk:
-		peak = maxf(peak, maxf(absf(sample.x), absf(sample.y)))
-	_level = maxf(_level * 0.85, minf(peak, 1.0))
-	if peak > MIC_SILENCE_PEAK:
-		_mic_last_sound = now
-		if not synthetic_input:
-			_set_mic_state(&"ready")
-
-
-func _check_mic_health(now: float) -> void:
-	if not _mic_active or synthetic_input:
-		return
-	if now - _mic_last_frames > MIC_SIGNAL_TIMEOUT_S:
-		_set_mic_state(&"no_signal")
-		_stop_transmit()
-	elif _mic_frames_seen and now - _mic_last_sound > MIC_SIGNAL_TIMEOUT_S:
-		_set_mic_state(&"quiet")
-
-
-## After toggling on, capture continues until toggled off (tests can separately gate transmission).
 func _ptt_held() -> bool:
 	if _ptt_override >= 0:
 		return _ptt_override == 1
-	return not mic_muted()
+	if not InputMap.has_action(&"push_to_talk") or not Input.is_action_pressed(&"push_to_talk"):
+		return false
+	# typing in a text field or changing a key binding is not talking
+	var vp := get_viewport()
+	var focus := vp.gui_get_focus_owner() if vp != null else null
+	if focus is LineEdit or focus is TextEdit:
+		return false
+	# the settings panel waiting for a new key: that key press is for the binding
+	var n: Node = focus
+	while n != null:
+		if n is SettingsPanel:
+			return (n as SettingsPanel).capturing() == &""
+		n = n.get_parent()
+	return true
 
 
 func _next_chunk() -> PackedVector2Array:
 	if synthetic_input:
 		return _synthetic.pop_front() if not _synthetic.is_empty() else PackedVector2Array()
-	# A driver may switch to Default when an endpoint disappears. Never consume that replacement input.
-	if _mic_active and AudioServer.input_device != _mic_device:
-		_stop_mic()
-		_set_mic_state(&"no_device")
-		return PackedVector2Array()
 	if not _mic_active or AudioServer.get_input_frames_available() < _audio_chunk:
 		return PackedVector2Array()
 	return AudioServer.get_input_frames(_audio_chunk)
@@ -572,10 +438,6 @@ func is_transmitting() -> bool:
 func _capture(now: float) -> void:
 	if not _library or _encoder == null:
 		return
-	if mic_muted():
-		_stop_mic()
-		_synthetic.clear()
-		return
 	var held := _ptt_held()
 	if (held or _meter_requests > 0) and not mic_muted():
 		_want_input_until = now + MIC_HANG_S
@@ -583,54 +445,31 @@ func _capture(now: float) -> void:
 		_start_mic(now)
 	elif _mic_active:
 		_stop_mic()
-	var talk := held and can_capture() and services != null and services.has_game() and services.local_character() != null and not comms_down()
+	var talk := held and can_capture() and services != null and services.has_game() and services.local_character() != null
 	if talk and not _transmitting:
 		_start_transmit()
-		_on_press(now)
 	var got_audio := false
 	while true:
 		var chunk := _next_chunk()
 		if chunk.is_empty():
 			break
 		got_audio = true
-		_observe_input(chunk, now)
+		_mic_frames_seen = true
+		if _mic_state == &"no_signal":
+			_set_mic_state(&"ready")
+		var peak := 0.0
+		for v: Vector2 in chunk:
+			peak = maxf(peak, maxf(absf(v.x), absf(v.y)))
+		_level = maxf(_level * 0.85, minf(peak, 1.0))
 		_encoder.call(&"process_pre_encoded_chunk", chunk, VoiceScheduler.FRAME_SAMPLES, false, false)
 		if _transmitting:
 			_send_frame()
 	if not got_audio:
 		_level *= 0.9
-	_check_mic_health(now)
+	if _mic_active and not _mic_frames_seen and now - _mic_since > MIC_SIGNAL_TIMEOUT_S:
+		_set_mic_state(&"no_signal")
 	if _transmitting and not talk:
 		_stop_transmit()
-
-
-## A new press of the talk key (not the restart of a very long hold): once per press, tell the speaker when the suit
-## radio has no signal (line + beep), or key the suit radio with a click when it carries the voice.
-func _on_press(now: float) -> void:
-	var st := speaker_radio_status()
-	var vol := settings.voice_volume if settings != null else 1.0
-	if bool(st.no_signal):
-		_no_signal_until = now + NO_SIGNAL_HOLD_S
-		if _fx != null:
-			_fx.no_signal_beep(vol)
-	else:
-		_no_signal_until = -1.0
-		if bool(st.radio) and _fx != null:
-			_fx.click(vol)
-
-
-## What the local player's voice does now over the suit radio (SuitRadio.speaker_status), {} pieces filled with
-## defaults when there is no game.
-func speaker_radio_status() -> Dictionary:
-	if services == null or not services.has_game() or services.local_character() == null:
-		return {"radio": false, "no_signal": false, "delay_s": 0.0, "garble": 0.0, "nearby": 0}
-	var st := services.state()
-	var mine := services.local_peer()
-	var others: Array = []
-	for c: CharacterState in st.active_characters():
-		if c.owner_peer != mine:
-			others.append(SuitRadio.participant(st, c, services.zones))
-	return SuitRadio.speaker_status(st, _listener(), others, services.zones, portals, door_openings())
 
 
 func _character_id() -> String:
@@ -692,7 +531,7 @@ func _on_voice_packet(from_peer: int, packet: PackedByteArray) -> void:
 	if h.is_empty():
 		counters.bad_packets += 1
 		return
-	if is_player_muted(from_peer) or comms_down():
+	if is_player_muted(from_peer):
 		return
 	var now := _now()
 	var stream := int(h.stream)
@@ -707,10 +546,8 @@ func _on_voice_packet(from_peer: int, packet: PackedByteArray) -> void:
 		&"new":
 			var route := route_for(from_peer)
 			var lane: StringName = route.route if route.route != VoiceRouter.ROUTE_NONE else &""
-			# the suit radio's delay (real seconds) is applied here on the listener's side by the scheduler; its
-			# garble rides in the utterance info to the player (radio_fx.gd)
 			scheduler.open(from_peer, stream, seq, lane, now - VoiceScheduler.elapsed_s(h), float(route.delay_s),
-				{"reason": route.reason, "character": h.character, "garble": float(route.get("garble", 0.0))}, now)
+				{"reason": route.reason, "character": h.character}, now)
 			if lane == &"":
 				_unheard[from_peer] = {"reason": String(route.reason), "until": now + HEARD_HOLD_S, "seq": seq}
 				return
@@ -722,22 +559,21 @@ func _on_voice_packet(from_peer: int, packet: PackedByteArray) -> void:
 			scheduler.end(from_peer, stream, seq, int(h.index), now)
 
 
-## The route from `peer`'s character to this machine's player now: face to face inside (VoiceRouter's proximity rule,
-## unchanged) or the suit radio with its delay and garble (SuitRadio.decide, by the Communication level).
+## The route from `peer`'s character to this machine's player now (VoiceRouter.decide).
 func route_for(peer: int) -> Dictionary:
 	var st := services.state() if services != null and services.has_game() else null
 	var speaker := st.character_of_peer(peer) if st != null else null
 	if speaker == null:
-		return {"route": VoiceRouter.ROUTE_NONE, "gain": 0.0, "delay_s": 0.0, "garble": 0.0, "reason": "unknown_speaker", "via_door": -1}
+		return {"route": VoiceRouter.ROUTE_NONE, "gain": 0.0, "delay_s": 0.0, "reason": "unknown_speaker", "via_door": -1}
 	var zones := services.zones
-	return SuitRadio.decide(st, SuitRadio.participant(st, speaker, zones), _listener(), zones, portals, door_openings())
+	return VoiceRouter.decide(VoiceRouter.participant(st, speaker, zones), _listener(), CommsStage.stage(st), portals, door_openings())
 
 
 func _listener() -> Dictionary:
 	var me := services.local_character() if services != null and services.has_game() else null
 	if me == null:
-		return {"id": &"", "position": Vector3(1e6, 0.0, 1e6), "outside": false, "zone": "(nobody)", "seated": false, "suit": false}
-	return SuitRadio.participant(services.state(), me, services.zones)
+		return {"id": &"", "position": Vector3(1e6, 0.0, 1e6), "outside": false, "zone": "(nobody)", "seated": false}
+	return VoiceRouter.participant(services.state(), me, services.zones)
 
 
 ## How far each known door is open now, by door id (0..1).
@@ -806,7 +642,6 @@ func _door_controllers() -> Array[DoorController]:
 
 func _process(delta: float) -> void:
 	var now := _now()
-	_retry_mic(delta)
 	_capture(now)
 	_watch_session(delta)
 	_play(now)
@@ -823,8 +658,6 @@ func _play(now: float) -> void:
 		match e.type:
 			&"start":
 				out.begin(int(e.seq))
-				if out.lane == VoiceRouter.ROUTE_RADIO:
-					_radio_begin(out, e)
 			&"frame":
 				var key := "%d|%d|%d" % [peer, int(e.seq), int(e.index)]
 				if _arrived.has(key):
@@ -840,8 +673,7 @@ func _play(now: float) -> void:
 						counters.fec_frames += 1
 				else:
 					counters.overflow_frames += 1
-				_heard[peer] = {"lane": e.lane, "until": now + HEARD_HOLD_S, "delay_s": float(e.delay_s), "start_local": float(e.start_local),
-					"garble": out.garble}
+				_heard[peer] = {"lane": e.lane, "until": now + HEARD_HOLD_S, "delay_s": float(e.delay_s), "start_local": float(e.start_local)}
 			&"lost":
 				counters.lost_frames += 1
 			&"end":
@@ -850,45 +682,16 @@ func _play(now: float) -> void:
 						out.finish()
 					_:
 						out.stop()
-				if out.lane == VoiceRouter.ROUTE_RADIO:
-					_radio_end(out)
 	_apply_levels()
-
-
-## A suit radio utterance starts playing here: its bus (garbled -> SuitRadio, clear -> Master), the bus tuning and the
-## squelch click.
-func _radio_begin(out: VoiceOut, e: Dictionary) -> void:
-	var info: Dictionary = e.get("info", {})
-	out.garble = clampf(float(info.get("garble", 0.0)), 0.0, 1.0)
-	out.player.set(&"bus", RadioFx.bus_for(out.garble))
-	if _fx != null:
-		if out.garble > 0.0:
-			_fx.tune(out.garble)
-		_fx.click(settings.voice_volume if settings != null else 1.0)
-
-
-## A suit radio utterance ended (or was cleared): the closing click; its hiss and dropouts stop.
-func _radio_end(out: VoiceOut) -> void:
-	out.garble = 0.0
-	if _fx != null:
-		_fx.forget("%d|%s" % [out.peer, out.lane])
-		_fx.click(settings.voice_volume if settings != null else 1.0)
 
 
 ## Sets each player's level and position: the router's gain for proximity (re-read every frame), and the volumes.
 func _apply_levels() -> void:
 	var master := settings.voice_volume if settings != null else 1.0
-	var now := _now()
-	var hiss := 0.0
 	for key: String in _outs:
 		var out: VoiceOut = _outs[key]
 		var vol := master * player_volume(out.peer)
 		var gain := 1.0
-		if out.lane == VoiceRouter.ROUTE_RADIO and out.garble > 0.0 and _fx != null:
-			# suit radio garble: short random dropouts, and the hiss while it plays
-			gain = _fx.gate(key, out.garble, now)
-			if bool(out.player.get(&"playing")):
-				hiss = maxf(hiss, out.garble)
 		if out.lane == VoiceRouter.ROUTE_PROXIMITY:
 			var r := route_for(out.peer)
 			# the utterance keeps its proximity route; if the pair is no longer both inside, it simply fades out
@@ -898,26 +701,7 @@ func _apply_levels() -> void:
 			if c != null and out.player is Node3D and (out.player as Node3D).is_inside_tree():
 				var pos: Vector3 = VoiceRouter.participant(st, c, services.zones).position
 				(out.player as Node3D).global_position = pos + Vector3(0.0, MOUTH_HEIGHT_M, 0.0)
-		var level := gain * vol
-		if out.player is AudioStreamPlayer3D:
-			level /= BOOST_LINEAR  # the VoiceBoost bus multiplies it back
-		out.player.set(&"volume_db", linear_to_db(maxf(level, 1e-5)))
-	if _fx != null:
-		_fx.set_hiss(hiss, master)
-
-
-## The VoiceBoost bus (made on first use): one Amplify effect of BOOST_LINEAR, sending to Master.
-static func _ensure_boost_bus() -> StringName:
-	if AudioServer.get_bus_index(BOOST_BUS) >= 0:
-		return BOOST_BUS
-	AudioServer.add_bus()
-	var idx := AudioServer.bus_count - 1
-	AudioServer.set_bus_name(idx, BOOST_BUS)
-	AudioServer.set_bus_send(idx, &"Master")
-	var amp := AudioEffectAmplify.new()
-	amp.volume_db = linear_to_db(BOOST_LINEAR)
-	AudioServer.add_bus_effect(idx, amp)
-	return BOOST_BUS
+		out.player.set(&"volume_db", linear_to_db(maxf(gain * vol, 1e-5)))
 
 
 func _out_for(peer: int, lane: StringName) -> VoiceOut:
@@ -940,8 +724,6 @@ func _out_for(peer: int, lane: StringName) -> VoiceOut:
 		p3.attenuation_model = AudioStreamPlayer3D.ATTENUATION_DISABLED
 		p3.max_distance = 0.0
 		p3.doppler_tracking = AudioStreamPlayer3D.DOPPLER_TRACKING_DISABLED
-		p3.max_db = 6.0
-		p3.bus = _ensure_boost_bus()
 		p3.stream = stream
 		out.player = p3
 	else:
@@ -1054,15 +836,9 @@ func _watch_session(delta: float) -> void:
 
 # ================================================================ words for the HUD
 
-## Old radio card stage (0..4, CommsStage). The voice path no longer uses it: the suit radio follows the
-## Communication level (suit_radio_level()).
+## Radio stage now (0..4).
 func stage() -> int:
 	return CommsStage.stage(services.state()) if services != null and services.has_game() else 0
-
-
-## Communication level that drives the suit radio (AreaLevels "command"), 1 without a game.
-func suit_radio_level() -> int:
-	return SuitRadio.level(services.state()) if services != null and services.has_game() else 1
 
 
 ## Number of other players outside right now.
@@ -1081,33 +857,17 @@ func _me_outside() -> bool:
 	return bool(_listener().outside)
 
 
-## Demo build: crew voice is never cut off (the tutorial radio gate is ignored); see own_line for the label.
-func comms_down() -> bool:
-	return false
-
-
-## The HUD follows the same switch as capture.
-func voice_label_off() -> bool:
-	return mic_muted()
-
-
 ## The local player's own line: what their voice does now (talking) or would do (idle).
 func own_line() -> String:
 	var short := mic_short_text()
 	if short != "":
 		return short
-	if _transmitting or _now() < _no_signal_until:
-		var status := speaker_radio_status()
-		# the "No signal" line of this press stays for NO_SIGNAL_HOLD_S even after a quick press
-		if _now() < _no_signal_until:
-			status.no_signal = true
-		var text := SuitRadio.speaking_text(status)
-		if _transmitting and services != null and services.net != null and not services.net.is_online():
+	if _transmitting:
+		var text := VoiceRouter.speaking_text(_me_outside(), stage(), crew_outside())
+		if services != null and services.net != null and not services.net.is_online():
 			text += " (playing alone: nobody else is here)"
 		return text
-	if services == null or not services.has_game():
-		return "Voice chat is on: people near you hear you."
-	return SuitRadio.idle_text(services.state(), _listener(), services.zones)
+	return VoiceRouter.idle_text(_me_outside(), stage())
 
 
 ## Lines about other players: heard now, waiting in the radio, or talking with no route to this player.
@@ -1122,17 +882,16 @@ func heard_lines() -> PackedStringArray:
 		if now > float(h.until):
 			_heard.erase(peer)
 			continue
-		out.append(SuitRadio.heard_text(_name_of(peer), h.lane, now - float(h.start_local) if float(h.delay_s) >= 1.0 else 0.0,
-			float(h.get("garble", 0.0))))
+		out.append(VoiceRouter.heard_text(_name_of(peer), h.lane, now - float(h.start_local) if float(h.delay_s) >= 1.0 else 0.0))
 	for u: Dictionary in scheduler.utterances():
 		if not bool(u.started) and String(u.lane) == String(VoiceRouter.ROUTE_RADIO) and float(u.due0) - now >= 1.0:
-			out.append(SuitRadio.pending_text(_name_of(int(u.peer)), float(u.due0) - now))
+			out.append(VoiceRouter.pending_text(_name_of(int(u.peer)), float(u.due0) - now))
 	for peer: int in _unheard.keys():
 		var u: Dictionary = _unheard[peer]
 		if now > float(u.until):
 			_unheard.erase(peer)
 			continue
-		var line := SuitRadio.unheard_text(_name_of(peer), String(u.reason))
+		var line := VoiceRouter.unheard_text(_name_of(peer), String(u.reason), _me_outside())
 		if line != "":
 			out.append(line)
 	return out
@@ -1149,7 +908,7 @@ func _watch_transition(now: float) -> void:
 		return
 	var outside := 1 if _me_outside() else 0
 	if _last_outside >= 0 and outside != _last_outside:
-		_transition_text = SuitRadio.transition_text(services.state(), outside == 1)
+		_transition_text = VoiceRouter.transition_text(outside == 1, stage())
 		_transition_until = now + TRANSITION_NOTE_S
 	_last_outside = outside
 

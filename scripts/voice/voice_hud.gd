@@ -6,10 +6,6 @@ extends PanelContainer
 ## "✖ No microphone — you can still listen", or the hint for holding V. Then, for a few seconds, what changed when you
 ## went outside or came in. Then who you hear ("♪ Ana — nearby", "♪ Ben — by radio, said 15 s ago"), radio messages
 ## still in the radio ("… heard in 12 s") and anyone talking whom you cannot hear (no radio link).
-## Suit radio (2026-11-15, suit_radio.gd): while talking over it, "📡 Radio: delay 30 s (crackly, words drop out)" or
-## "✖ No signal: the suit radio needs a comms upgrade" (once per press, held a few seconds); a listener sees
-## "📡 Incoming (delayed) from Ana: heard in 12 s", then "📡 Ana — suit radio, said 30 s ago (crackly …)".
-## The first line shows the microphone's ON/OFF toggle and its key (V by default).
 ## VoiceService adds it under GameHud, so it hides with the HUD while a panel is open.
 
 ## Distance from the screen edges, pixels (the HUD's own margin).
@@ -21,7 +17,6 @@ const MAX_LINES := 4
 
 var voice: VoiceService
 
-var _head: Label
 var _own: Label
 var _note: Label
 var _heard: Label
@@ -40,8 +35,6 @@ func setup(p_voice: VoiceService) -> void:
 	box.name = "Box"
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(box)
-	_head = _make_label(box, "Header", UiTheme.GOOD)
-	_head.text = "🎙 Voice chat OFF"
 	_own = _make_label(box, "Own", &"")
 	_note = _make_label(box, "Transition", UiTheme.MUTED)
 	_heard = _make_label(box, "Heard", &"")
@@ -50,10 +43,6 @@ func setup(p_voice: VoiceService) -> void:
 
 
 ## The lines shown now (tests read them).
-func header_text() -> String:
-	return _head.text if _head != null else ""
-
-
 func own_text() -> String:
 	return _own.text if _own != null else ""
 
@@ -77,11 +66,6 @@ func _process(delta: float) -> void:
 func refresh() -> void:
 	if voice == null or not is_instance_valid(voice) or _own == null:
 		return
-	var listen_only := not voice.can_capture()
-	var off := voice.voice_label_off()
-	var key := VoiceService.toggle_key_label()
-	_head.text = "🎙 Voice chat OFF · %s to turn on" % key if off else "🎙 Voice chat ON · %s to turn off" % key
-	_head.theme_type_variation = UiTheme.MUTED if off else (UiTheme.WARN if listen_only else UiTheme.GOOD)
 	var own := voice.own_line()
 	_own.text = own
 	if own.begins_with("✖"):
@@ -98,7 +82,7 @@ func refresh() -> void:
 		lines = lines.slice(0, MAX_LINES)
 	_heard.text = "\n".join(lines)
 	_heard.visible = not lines.is_empty()
-	var sig := "%s|%s|%s|%s|%s" % [_head.text, _own.text, _note.text, _heard.text, get_viewport_rect().size if is_inside_tree() else Vector2.ZERO]
+	var sig := "%s|%s|%s|%s" % [_own.text, _note.text, _heard.text, get_viewport_rect().size if is_inside_tree() else Vector2.ZERO]
 	_place_left -= 1
 	if sig != _last or _place_left <= 0:
 		_last = sig
@@ -129,7 +113,6 @@ func _place() -> void:
 
 
 var _strip: Array[Control] = []
-var _feed: Control
 
 
 ## The HUD's bottom-edge boxes (GameHud names them "Hints" and "Status").
@@ -139,11 +122,6 @@ func _bottom_strip() -> Array[Control]:
 			var c := get_parent().find_child(n, true, false) as Control
 			if c != null and c != self:
 				_strip.append(c)
-	# UI overhaul: the mission HUD's mast camera card also sits bottom right; the voice lines stay clear above it.
-	if _feed == null and get_parent() != null:
-		_feed = get_parent().find_child("MastFeed", true, false) as Control
-		if _feed != null:
-			_strip.append(_feed)
 	return _strip
 
 
