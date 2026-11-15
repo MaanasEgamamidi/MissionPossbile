@@ -38,8 +38,8 @@ static func register(service: ActionService) -> void:
 			if not st.has_upgrade(card):
 				st.upgrades[card] = {"installed": true, "by": "demo", "at_hours": st.sim_hours, "parts": 0,
 					"station": CommsStage.INSTALL_STATION, "sector": "energy"}
-		fix_all_areas(ctx)
-		var text := "Demo: radio communication maxed out."
+		fix_all_areas(ctx, ["med_bay"])  # the Med Bay stays broken: T10 is the two-player demo task
+		var text := "Demo: radio communication maxed out; every area fixed except the Med Bay."
 		if bool(ctx.request.params.get("summon", false)):
 			var me := st.character_of_peer(ctx.request.peer_id)
 			var other: CharacterState = null
@@ -74,13 +74,18 @@ static func register(service: ActionService) -> void:
 		service.register(definition)
 
 
-## Demo cheats: every repair in every area finished, so every room looks fixed. Returns how many changed.
-static func fix_all_areas(ctx: ActionService.Context) -> int:
+## Demo cheats: every repair in every area finished, so every room looks fixed, except the tasks of the rooms in
+## `skip_rooms` (RepairCatalog.ROOMS ids, e.g. "med_bay"). Returns how many changed.
+static func fix_all_areas(ctx: ActionService.Context, skip_rooms: Array = []) -> int:
 	var fixed := 0
+	var skip := {}
+	for room_id: String in skip_rooms:
+		for task_id: String in (RepairCatalog.ROOMS.get(room_id, {}) as Dictionary).get("tasks", []):
+			skip[task_id] = true
 	for task_id: String in TutorialSystem.required_fixes():
-		if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
+		if not skip.has(task_id) and ctx.session.repair_runtime.force_complete(ctx.session, task_id):
 			fixed += 1
 	for task_id: String in ctx.state.repair.tasks.keys():
-		if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
+		if not skip.has(task_id) and ctx.session.repair_runtime.force_complete(ctx.session, task_id):
 			fixed += 1
 	return fixed
