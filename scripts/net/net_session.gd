@@ -14,12 +14,19 @@ extends Node
 ##   client -> host   _rpc_request(request dict)  _rpc_position(character, position, yaw)
 ##   host -> client   _rpc_welcome(full)  _rpc_update(full, events)  _rpc_result(result dict)  _rpc_positions(poses)
 ## A "full" record is the colony (ColonyState.to_dict plus display flows), the clock and the session replica
-## (peers, pause votes, suit checks). It is a few kilobytes; sent 5 times a second and at once after any action.
+## (peers, pause votes, suit checks): tens of kilobytes, sent ONCE, in the welcome.
+## Speed (owner, 2026-11-15, "pure speed"):
+##   * Updates carry only the colony sections that changed since the last update to THAT client (the host keeps a
+##     hash per section per client), the clock, and the session replica only when it changed. The client keeps the
+##     last full colony and merges the changed sections in.
+##   * ENet range-coder compression on both ends (PROTOCOL 3: both sides must have it).
+##   * After a client's request only that client gets its update at once; the others get theirs with the next
+##     update, at most DIRTY_MIN_INTERVAL_S later.
 
 const DEFAULT_PORT := 24680
 const MAX_PLAYERS := 4
 ## Bumped when the messages change shape. A client of another version is turned away with a plain reason.
-const PROTOCOL := 2
+const PROTOCOL := 3
 const CHANNEL_STATE := 0
 const CHANNEL_MOTION := 1
 const CHANNEL_VOICE := 2
@@ -29,6 +36,11 @@ const CHANNEL_COUNT := 3
 const VOICE_PACKET_MAX := 4000
 ## Colony snapshots per second while nothing else happens (the simulation itself ticks at 5 Hz).
 const STATE_HZ := 5.0
+## After something happened (an action, an alert), the other clients get their update at the earliest this long
+## after the last update to everyone: many events in a burst travel together.
+const DIRTY_MIN_INTERVAL_S := 0.05
+## Key of the session replica in a client's table of section hashes.
+const SESSION_KEY := "__session"
 ## Body positions per second, each way.
 const MOTION_HZ := 20.0
 ## A join that has not received the colony after this long gives up.
@@ -65,8 +77,15 @@ var port := DEFAULT_PORT
 
 var _peer: ENetMultiplayerPeer
 var _role: StringName = &"offline"     # offline, host, joining, client
-var _queue: Array = []                 # host: [signal name, args] waiting for the next update
-var _dirty := false                    # host: send an update this frame
+var _queue: Array = []                 # (unused since the per-client queues below; kept for callers that clear it)
+var _dirty := false                    # host: something happened, send an update soon
+var _dirty_left := 0.0                 # host: time until a "dirty" update may go to everyone
+## Host: per welcomed client, the hash of every colony section last sent to it (and SESSION_KEY).
+var _sent := {}                        # peer id -> {section -> hash}
+## Host: per welcomed client, the forwarded events waiting for its next update ([signal name, args]).
+var _events_for := {}                  # peer id -> Array
+## Client: the last full colony record, with every changed section merged in.
+var _colony_cache := {}
 var _state_left := 0.0
 var _motion_left := 0.0
 var _send_left := 0.0                  # client: time until the next position may go out
@@ -107,6 +126,8 @@ func host(p_port := DEFAULT_PORT) -> Error:
 	var err := peer.create_server(p_port, MAX_PLAYERS - 1, CHANNEL_COUNT)
 	if err != OK:
 		return err
+	# Speed: ENet's range coder shrinks the repetitive state packets (both ends must use it: PROTOCOL 3).
+	peer.host.compress(ENetConnection.COMPRESS_RANGE_CODER)
 	_peer = peer
 	port = p_port
 	_role = &"host"
@@ -130,6 +151,7 @@ func join(p_address: String, p_port := DEFAULT_PORT) -> Error:
 	var err := peer.create_client(p_address, p_port, CHANNEL_COUNT)
 	if err != OK:
 		return err
+	peer.host.compress(ENetConnection.COMPRESS_RANGE_CODER)
 	_peer = peer
 	address = p_address
 	port = p_port
@@ -161,6 +183,9 @@ func leave() -> void:
 	_role = &"offline"
 	_queue.clear()
 	_dirty = false
+	_sent.clear()
+	_events_for.clear()
+	_colony_cache = {}
 	_last_sent_pose.clear()
 	if services != null:
 		services.mode = &"offline"
@@ -322,7 +347,8 @@ func _process(delta: float) -> void:
 				return
 			_beacon.poll(delta, services.session.peers.size(), MAX_PLAYERS)
 			_state_left -= delta
-			if _dirty or _state_left <= 0.0:
+			_dirty_left -= delta
+			if (_dirty and _dirty_left <= 0.0) or _state_left <= 0.0:
 				_flush()
 			_motion_left -= delta
 			if _motion_left <= 0.0:
@@ -343,15 +369,45 @@ func flush_now() -> void:
 		_flush()
 
 
-## Host: sends the colony and every event queued since the last update to all clients.
-func _flush() -> void:
-	_state_left = 1.0 / STATE_HZ
-	_dirty = false
-	var events := _queue
-	_queue = []
-	if multiplayer.get_peers().is_empty():
+## Host: sends every welcomed client (or only `only_peer`) the colony sections that changed since its last update,
+## the clock, the session replica when it changed, and the events queued for it.
+func _flush(only_peer := 0) -> void:
+	if only_peer == 0:
+		_state_left = 1.0 / STATE_HZ
+		_dirty = false
+		_dirty_left = DIRTY_MIN_INTERVAL_S
+	if _sent.is_empty():
 		return
-	_rpc_update.rpc(_full_record(), events)
+	var session := services.session
+	var colony := session.state.to_dict()
+	colony["flows"] = session.state.flows_dict()
+	var replica := session.replica_dict()
+	var now := _section_hashes(colony, replica)
+	var clock := session.clock.to_dict()
+	for peer: int in _sent.keys():
+		if only_peer != 0 and peer != only_peer:
+			continue
+		var had: Dictionary = _sent[peer]
+		var changed := {}
+		for key: String in colony:
+			if had.get(key) != now[key]:
+				changed[key] = colony[key]
+		var record := {"colony": changed, "clock": clock}
+		if had.get(SESSION_KEY) != now[SESSION_KEY]:
+			record["session"] = replica
+		_sent[peer] = now
+		var events: Array = _events_for.get(peer, [])
+		_events_for[peer] = []
+		_rpc_update.rpc_id(peer, record, events)
+
+
+## One hash per colony section and one for the session replica.
+static func _section_hashes(colony: Dictionary, replica: Dictionary) -> Dictionary:
+	var out := {}
+	for key: String in colony:
+		out[key] = hash(colony[key])
+	out[SESSION_KEY] = hash(replica)
+	return out
 
 
 func _full_record() -> Dictionary:
@@ -390,7 +446,11 @@ func _on_peer_connected(id: int) -> void:
 		if session.state.characters[crew_id].owner_peer == 0:
 			session.request(&"claim_character", crew_id, {}, id)
 			break
-	_rpc_welcome.rpc_id(id, PROTOCOL, _full_record())
+	var full := _full_record()
+	_rpc_welcome.rpc_id(id, PROTOCOL, full)
+	# From here this client gets only what changes.
+	_sent[id] = _section_hashes(full.colony, full.session)
+	_events_for[id] = []
 	_dirty = true
 	peer_connected.emit(id)
 
@@ -398,6 +458,8 @@ func _on_peer_connected(id: int) -> void:
 func _on_peer_disconnected(id: int) -> void:
 	if _role != &"host":
 		return
+	_sent.erase(id)
+	_events_for.erase(id)
 	if services.has_game() and services.session.peers.has(id):
 		services.session.peer_left(id)
 		_dirty = true
@@ -414,8 +476,10 @@ func _rpc_request(d: Dictionary) -> void:
 	var req := ActionRequest.from_dict(d, sender)
 	var result := services.session.submit(req)
 	result.peer = sender
-	# The answer must not overtake the state it describes: send the update first, on the same reliable channel.
-	_flush()
+	# The answer must not overtake the state it describes: send the sender's update first, on the same reliable
+	# channel. Only the sender gets it at once; the others get theirs with the next update (_dirty).
+	_flush(sender)
+	_dirty = true
 	_rpc_result.rpc_id(sender, result.to_dict())
 
 
@@ -509,7 +573,8 @@ func _on_event(sig: StringName, args: Array) -> void:
 		return
 	if sig == &"state_changed" and args[0] == &"tick":
 		return                     # ticks travel as the regular snapshot; the client emits its own "tick"
-	_queue.append([String(sig), args])
+	for peer: int in _events_for:
+		(_events_for[peer] as Array).append([String(sig), args])
 	_dirty = true
 
 
@@ -522,6 +587,7 @@ func _rpc_welcome(protocol: int, full: Dictionary) -> void:
 	if protocol != PROTOCOL:
 		_fail_join("The host is running a different version of the game. Both players need the same version.")
 		return
+	_colony_cache = (full.get("colony", {}) as Dictionary).duplicate()
 	var st := ColonyState.from_dict(full.get("colony", {}))
 	st.assign_from(full.get("colony", {}))          # also copies the display flows
 	var c := SolClock.from_dict(full.get("clock", {}))
@@ -538,10 +604,18 @@ func _rpc_update(full: Dictionary, events: Array) -> void:
 	var me := services.local_character()
 	var keep := me.id if me != null else &""
 	# Events that move this client's own body on the host: take the host's pose once instead of keeping ours.
+	var take_pose := false
 	for e: Array in events:
 		if String(e[0]) == "character_recovered" and StringName(e[1][0]) == keep:
 			keep = &""
-	services.state().assign_from(full.get("colony", {}), keep)
+			take_pose = true
+	# `full.colony` holds only the sections that changed: merge them into the last full colony. Nothing changed and
+	# no pose to take: the colony is not rebuilt at all.
+	var changed: Dictionary = full.get("colony", {})
+	for key: Variant in changed:
+		_colony_cache[key] = changed[key]
+	if not changed.is_empty() or take_pose:
+		services.state().assign_from(_colony_cache, keep)
 	var clock_d: Dictionary = full.get("clock", {})
 	var fresh := SolClock.from_dict(clock_d)
 	var clock := services.clock()
@@ -550,7 +624,8 @@ func _rpc_update(full: Dictionary, events: Array) -> void:
 	clock.phase = fresh.phase
 	clock.ticks = fresh.ticks
 	clock.real_seconds = fresh.real_seconds
-	services.session.apply_replica(full.get("session", {}))
+	if full.has("session"):
+		services.session.apply_replica(full.get("session", {}))
 	for e: Array in events:
 		var sig := StringName(String(e[0]))
 		if FORWARDED.has(sig):

@@ -378,6 +378,15 @@ func assign_from(d: Dictionary, keep_pose_of: StringName = &"") -> void:
 	weather = fresh.weather
 	campaign = fresh.campaign
 	scout = fresh.scout
+	# 2026-11-15: these never reached joined players before (upgrade levels, the drone, and the phase 1 systems).
+	levels = fresh.levels
+	drone = fresh.drone
+	build = fresh.build
+	ores = fresh.ores
+	schedule = fresh.schedule
+	comms = fresh.comms
+	radiation = fresh.radiation
+	colony_over = fresh.colony_over
 	event_queue = fresh.event_queue
 	rng_seed = fresh.rng_seed
 	rng_state = fresh.rng_state
