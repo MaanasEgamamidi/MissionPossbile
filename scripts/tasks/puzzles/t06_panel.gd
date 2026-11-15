@@ -174,6 +174,9 @@ func _redraw() -> void:
 ## The feedback line after the host accepted a move (shown in the shell's cue bar).
 func _status_line() -> String:
 	var wet := _shown_water.size()
+	if not succeeded and _last_move.is_empty():
+		# The answer to the claim on opening: no move yet, so the standing cue stays.
+		return ""
 	if succeeded:
 		_say("The kale has water!", &"good")
 	elif String(_last_move.get("move", "")) == "reset":

@@ -259,8 +259,8 @@ func _panel_checks() -> void:
 			_check("pressing a placed piece takes it back out", (RULE.state_of(_task()).placed[0] as Array).is_empty())
 			await _keyboard_place(panel, frame, tray, 0, lay.pieces[0].solution)
 	_check("keyboard solves the pane through the host", float(_task().progress) >= 1.0 and bool(_task().first_completed), "progress %s placed %s" % [_task().progress, RULE.state_of(_task()).placed])
-	_check("panel shows the host's completion", bool(panel.get("succeeded")) and "Complete" in panel.status_label.text)
-	_check("hint says the pane is whole", "whole" in (panel.get("hint_label") as Label).text, (panel.get("hint_label") as Label).text)
+	_check("panel shows the host's completion", bool(panel.get("succeeded")) and "sealed" in panel.status_label.text, panel.status_label.text)
+	_check("hint says the dome is sealed", "sealed" in (panel.get("hint_label") as Label).text, (panel.get("hint_label") as Label).text)
 	ui.close_all()
 	await _frames()
 

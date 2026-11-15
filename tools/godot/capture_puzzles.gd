@@ -228,6 +228,8 @@ func _solve_t02() -> void:
 	for i in R02.PAIRS:
 		await _press(left_buttons[i])
 		await _press(right_buttons[(lay.right as Array).find(lay.left[i])])
+	# On a fast display the 90 frames before the stamp shot can be shorter than the shell's STAMP_DELAY.
+	await create_timer(0.3).timeout
 
 
 func _solve_t03() -> void:
@@ -238,6 +240,8 @@ func _solve_t03() -> void:
 		panel.set("ring_start_ms", Time.get_ticks_msec() - int(lay.rings[ring].first_ms))
 		_key(KEY_ENTER)
 		await _frames()
+	# A light panel runs at a high frame rate: wait in time, so the stamp shot really comes after the success mark.
+	await create_timer(0.4).timeout
 
 
 func _solve_t04() -> void:
@@ -254,6 +258,8 @@ func _solve_t04() -> void:
 			guard += 1
 		_key(KEY_ENTER)
 		await _frames(2)
+	# On a fast display the 90 frames before the stamp shot can be shorter than the shell's STAMP_DELAY.
+	await create_timer(0.3).timeout
 
 
 func _next_turn_t06(task: Dictionary) -> Array:
@@ -311,6 +317,8 @@ func _solve_t08() -> void:
 			await _frames(1)
 		_key(KEY_ENTER)
 		await _frames(2)
+	# A light panel runs at a high frame rate: wait in time, so the stamp shot really comes after the success mark.
+	await create_timer(0.4).timeout
 
 
 ## Shortest list of [from, to] pours that sorts the tubes (copied from tests/test_puzzle_t09.gd).
@@ -363,6 +371,8 @@ func _solve_t10() -> void:
 		await _press(leads[kind])
 		await _press(sockets[(start.sockets as Array).find(kind)])
 	await _press(panel.get("test_button"))
+	# On a fast display the 90 frames before the stamp shot can be shorter than the shell's STAMP_DELAY.
+	await create_timer(0.3).timeout
 
 
 static func _next_stroke(task: Dictionary) -> Array:
@@ -394,6 +404,10 @@ func _solve_t11() -> void:
 
 
 func _solve_t12() -> void:
+	# Find the leaking seam, fit the new seal, then press the points in their order.
+	await _press(panel.get("seam_buttons")[int(R12.current_state(_task()).leak)])
+	await _press(panel.get("gasket_button"))
+	await _frames(4)
 	for i in R12.POINTS:
 		await _press(panel.get("press_buttons")[R12.next_point(R12.current_state(_task()))])
 

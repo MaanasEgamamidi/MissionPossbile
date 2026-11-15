@@ -194,7 +194,7 @@ func _panel_checks() -> void:
 	rings.set("ring_start_ms", Time.get_ticks_msec() - int(lay.rings[0].first_ms) - _ms_for(lay, 0, 120.0))
 	_key(KEY_ENTER)
 	await _frames()
-	_check("keyboard miss is explained and locks nothing", rings.status_label.text.contains("Missed") and int(Rule.state_of(state.repair.tasks[TASK]).ring) == 0, rings.status_label.text)
+	_check("keyboard miss is explained and locks nothing", rings.status_label.text.contains("Wait for the green") and int(Rule.state_of(state.repair.tasks[TASK]).ring) == 0, rings.status_label.text)
 	_check("a miss restarts the active ring", int(rings.call("ring_time_ms")) < 1000)
 	for ring in Rule.RINGS:
 		# Start the ring's clock so the pointer reaches the mark now, then press Enter on STOP.

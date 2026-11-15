@@ -282,6 +282,6 @@ func _panel_checks() -> void:
 		await _press(buttons[int(p[0])])
 		await _press(buttons[int(p[1])])
 	_check("keyboard path solves T09 through the session", bool(task.first_completed) and float(task.progress) >= 1.0, panel.status_label.text)
-	_check("panel shows the host's success", panel.succeeded and "Fixed" in panel.status_label.text)
+	_check("panel shows the host's success", panel.succeeded and panel.status_label.text == panel.solved_text() and "sorted" in panel.status_label.text, panel.status_label.text)
 	ui.close_all()
 	await _frames()

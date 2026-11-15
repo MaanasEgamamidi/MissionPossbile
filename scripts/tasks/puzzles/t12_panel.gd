@@ -8,9 +8,9 @@ extends "res://scripts/tasks/puzzles/med_ui.gd"
 ## Three steps, each with one obvious control:
 ##   1 Find  click the seam where the vapor comes out (a wrong seam gets an amber cross and "Not here. Follow the vapor.").
 ##   2 Fit   click the gasket (target ring): it slides onto the damaged seam.
-##   3 Press five press tabs appear along the gasket; the one to press next carries the target ring, pressed ones a
-##           tick. Each right press is one host move ("press", the rule's numbers 1..5 in their seeded order); the
-##           needle climbs, the vapor thins, and after the fifth the needle swings into the green band.
+##   3 Press three press tabs appear along the gasket; the one to press next carries the target ring, pressed ones a
+##           tick. Each right press is one host move ("press", the rule's numbers 1..3 in their seeded order); the
+##           needle climbs, the vapor thins, and after the last the needle swings into the green band.
 ## Steps 1 and 2 are the panel's own (they change nothing in the colony); a half-pressed seal found on opening starts
 ## at step 3. The owner's time limit (2026-11-14) stays: TIME_LIMIT_S seconds from the first press, drawn as a bar
 ## draining in the empty gasket holder; when it runs out the gasket springs back to the holder (host move "reset")
@@ -20,7 +20,7 @@ extends "res://scripts/tasks/puzzles/med_ui.gd"
 ## the job (after a step the focus moves to the part to use next).
 
 const Rule := preload("res://scripts/tasks/puzzles/t12_rule.gd")
-## Designer balance: seconds to press all five tabs once the first one is down (0 = no time limit).
+## Designer balance: seconds to press all the tabs once the first one is down (0 = no time limit).
 const TIME_LIMIT_S := 10.0
 enum Stage { FIND, FIT, PRESS, DONE }
 
@@ -61,7 +61,7 @@ const DRIFT := [Vector2(0.86, -0.5), Vector2(-0.8, -0.6), Vector2(0.82, -0.57), 
 const SEAM_NAMES := ["Top seam", "Left seam", "Middle seam, upper half", "Middle seam, lower half", "Right seam", "Bottom seam"]
 ## Needle angles in degrees from straight up (the green band of the gauge face spans -57.5 .. 57.5).
 const NEEDLE_LOW := -128.0
-const NEEDLE_STEP := 14.5
+const NEEDLE_STEP := 24.0
 const BAND_DEG := 57.5
 const CUE_FIND := "Find the leak [Enter]"
 const CUE_FIT := "Fit the new seal [Enter]"
@@ -79,12 +79,12 @@ var airlock: Control
 var seam_buttons: Array[Button] = []
 ## The gasket in its holder (step 2).
 var gasket_button: Button
-## The five press tabs, by spot (0 = top or left end of the gasket) (step 3).
+## The press tabs, by spot (0 = top or left end of the gasket) (step 3).
 var press_buttons: Array[Button] = []
 ## Steps 1 and 2 are local: the leak has been pointed at; the gasket lies on the seam.
 var leak_found := false
 var gasket_fitted := false
-## The client-side clock: running from the first right press until the fifth, or until the time is up.
+## The client-side clock: running from the first right press until the last, or until the time is up.
 var timer_running := false
 var time_left := TIME_LIMIT_S
 var timed_out := false
@@ -179,6 +179,10 @@ func _part(node_name: String, tip: String) -> Button:
 	b.focus_mode = Control.FOCUS_ALL
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	b.tooltip_text = tip
+	# The picture draws the shared focus ring (Kit.focus_ring); the button's own focus box stays invisible.
+	var clear := StyleBoxFlat.new()
+	clear.draw_center = false
+	b.add_theme_stylebox_override(&"focus", clear)
 	airlock.add_child(b)
 	return b
 
@@ -490,7 +494,8 @@ func _leak_point() -> Vector2:
 ## A press tab: (across the seam, along the seam).
 func _tab_size() -> Vector2:
 	var run := _span(RUNS[int(puzzle.leak)])
-	var along := clampf((run[0] as Vector2).distance_to(run[1]) / float(Rule.POINTS) - 4.0, 30.0, 72.0)
+	# Small enough that the gasket shows between the tabs.
+	var along := clampf((run[0] as Vector2).distance_to(run[1]) / (float(Rule.POINTS) + 1.6), 42.0, 58.0)
 	return Vector2(along * 1.43, along)
 
 
@@ -506,7 +511,7 @@ func _tab_rect(spot: int) -> Rect2:
 func _seated() -> Array:
 	var run := _span(RUNS[int(puzzle.leak)])
 	var length := (run[0] as Vector2).distance_to(run[1]) * 1.05
-	return [((run[0] as Vector2) + (run[1] as Vector2)) * 0.5, Vector2(length * 0.13, length), 0.0 if _upright() else PI * 0.5]
+	return [((run[0] as Vector2) + (run[1] as Vector2)) * 0.5, Vector2(length * 0.19, length), 0.0 if _upright() else PI * 0.5]
 
 
 func _layout() -> void:
@@ -636,7 +641,7 @@ func _hourglass(c: Control, at: Vector2, r: float) -> void:
 	c.draw_line(at + Vector2(-r * 1.2, r), at + Vector2(r * 1.2, r), ink, 3.0)
 
 
-## The gasket (in its holder, sliding, or on the seam) and the five press tabs along it.
+## The gasket (in its holder, sliding, or on the seam) and the press tabs along it.
 func _paint_seal(c: Control, now: int) -> void:
 	var holder := _holder_rect()
 	var seated := _seated()
