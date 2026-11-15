@@ -1182,7 +1182,7 @@ static func effect_words(track: String, key: String, value: Variant) -> String:
 	return "%s: %s" % [key.replace("_", " "), shown]
 
 
-## Who may upgrade a track, in words ("the biology and food specialist", "anyone in the crew").
+## Who may upgrade a track, in words ("the agriculture specialist", "anyone in the crew").
 static func upgrade_who_text(track: String) -> String:
 	var spec := StringName(String(AreaLevels.track(track).get("specialty", "")))
 	if spec == &"":

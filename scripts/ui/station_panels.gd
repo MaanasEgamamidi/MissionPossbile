@@ -50,7 +50,7 @@ const SYMBOLS := {
 const SPECIALTY_WORDS := {
 	&"electrical_comms": "Electrical and comms",
 	&"medical_life_support": "Medical and life support",
-	&"biology_food": "Biology and food",
+	&"biology_food": "Agriculture",
 	&"field_engineering_geology": "Field engineering and geology",
 }
 
@@ -68,6 +68,7 @@ const SPECIALTY_SYMBOLS := {
 static func for_station(station_id: StringName, services: GameServices) -> UiPanel:
 	if services == null or not services.has_game():
 		return null
+	station_id = StringName(RepairCatalog.interaction_station_id(services.state(), String(station_id)))
 	var record: Dictionary = services.state().stations.get(String(station_id), {})
 	if record.is_empty():
 		return null
@@ -82,10 +83,9 @@ static func for_station(station_id: StringName, services: GameServices) -> UiPan
 	# Broken parts: while a repair task's spot is still broken, E opens its mini-game (PuzzleRegistry), not maintenance.
 	if kind == "repair_task":
 		var task_id := String(record.get("task_id", ""))
-		if PuzzleRegistry.is_broken(services.state(), task_id):
-			var game := PuzzleRegistry.make_panel(task_id, station_id, services)
-			if game != null:
-				return game
+		if PuzzleRegistry.is_broken(services.state(), task_id) and PuzzleRegistry.has_puzzle(task_id):
+			# Never fall through to machine controls when a damaged machine's puzzle cannot be loaded.
+			return PuzzleRegistry.make_panel(task_id, station_id, services)
 	var panel: StationPanel
 	# A later milestone adds a panel for a kind by creating res://scripts/ui/stations/<kind>_station_panel.gd
 	# (a script extending StationPanel). It takes precedence over the built-in panels below.
@@ -117,7 +117,7 @@ const SECTION_PANEL_PATH := "res://scripts/ui/section_panel.gd"
 
 
 ## The section id whose core spot `station_id` is ("" = not a core spot): the power panel (Energy), the Greenhouse
-## console (Biology), the med station (Health), the workbench and the lab glovebox (Science), the comms console
+## console (Agriculture), the med station (Health), the workbench and the lab glovebox (Science), the comms console
 ## (Communication). The list is data/area_levels.json "sections".
 static func section_of_station(station_id: StringName, services: GameServices) -> String:
 	if services == null or not services.has_game():

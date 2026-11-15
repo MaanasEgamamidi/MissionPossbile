@@ -541,6 +541,7 @@ func _submit(action: StringName, target: StringName, params: Dictionary) -> Acti
 	if action == &"use_station" and OreCatalog.is_deposit(String(target)):
 		return services.request(&"ore_collect", target)
 	if action == &"use_station":
+		target = StringName(RepairCatalog.interaction_station_id(services.state(), String(target)))
 		var record: Dictionary = services.state().stations.get(String(target), {})
 		if String(record.get("kind", "")) == "cassette_anchor":
 			return services.request(&"cassette_collect", target)

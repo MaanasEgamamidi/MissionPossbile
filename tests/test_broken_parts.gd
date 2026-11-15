@@ -290,7 +290,7 @@ func _test_prompts() -> void:
 	hud.set_target({"kind": "station", "id": &"repair_t05", "node": null})
 	_check("task without a broken part: plain Use prompt", hud.cue_text() == "[E] Use elements station", hud.cue_text())
 	hud.set_target({"kind": "station", "id": &"pw_panel", "node": null})
-	_check("other stations unchanged", hud.cue_text() == "[E] Use power panel", hud.cue_text())
+	_check("linked station uses its repair target", hud.cue_text() == "[E] " + GameHud.repair_cue(host.state(), host.state().stations.repair_t04), hud.cue_text())
 	_check("station name in words", GameHud.repair_station_name({"name": "T01 - Comms"}) == "comms station" and GameHud.repair_station_name({}) == "station")
 	for task_id: String in BrokenParts.FALLBACK_PROMPTS:
 		var words := BrokenParts.prompt_for(task_id).to_lower()
@@ -361,6 +361,7 @@ func _test_transition_and_coop(p: BrokenParts, w: Dictionary) -> void:
 	# T11: completion cleans the hangar and shows the floor markings again.
 	var task: Dictionary = host.state().repair.tasks.T11
 	task.first_completed = true
+	task.broken = false
 	p.step(0.0)
 	_run(p, 0.4)
 	var west: MeshInstance3D = w.hangar[0]
@@ -372,6 +373,7 @@ func _test_transition_and_coop(p: BrokenParts, w: Dictionary) -> void:
 func _test_low_preset(p: BrokenParts, w: Dictionary) -> void:
 	GraphicsQuality.apply(self, GraphicsQuality.Level.LOW)
 	host.state().repair.tasks.T12.first_completed = true
+	host.state().repair.tasks.T12.broken = false
 	p.step(0.0)
 	var stars := p.last_burst.get(&"particles") as GeometryInstance3D if p.last_burst != null else null
 	_check("Low preset uses CPU particles", stars is CPUParticles3D and p.last_burst.call(&"is_cpu"))
@@ -472,6 +474,7 @@ func _test_real_registry() -> void:
 		if PuzzleRegistry.has_puzzle(task_id):
 			_check("installed puzzle %s: new colony starts broken" % task_id, BrokenParts.is_task_broken(st, task_id))
 			st.repair.tasks[task_id].first_completed = true
+			st.repair.tasks[task_id].broken = false
 			_check("installed puzzle %s: fixed after completion" % task_id, not BrokenParts.is_task_broken(st, task_id))
 	var hud := get_meta(&"hud") as GameHud
 	if hud != null:

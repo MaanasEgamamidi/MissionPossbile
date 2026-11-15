@@ -109,6 +109,8 @@ static func from_dict(d: Dictionary) -> CharacterState:
 	c.id = StringName(String(d.get("id", "")))
 	c.specialty = StringName(String(d.get("specialty", "")))
 	c.display_name = String(d.get("display_name", ""))
+	if c.specialty == &"biology_food" and c.display_name in ["Biology", "Biology and food", "Biologist"]:
+		c.display_name = "Agriculture"
 	c.owner_peer = int(d.get("owner_peer", 0))
 	c.position = _v3(d.get("position", [0, 0, 0]))
 	c.yaw = float(d.get("yaw", 0.0))

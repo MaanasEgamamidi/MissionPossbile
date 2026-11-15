@@ -146,6 +146,10 @@ func _resolve_new(session: SessionService, request: ActionRequest) -> ActionResu
 		var locked := TutorialLock.refusal(ctx)
 		if locked != null:
 			return locked
+		if d.target_kind == &"station" and String(ctx.target.get("kind", "")) != "repair_task":
+			var machine_task := RepairCatalog.task_for_station(ctx.state, String(request.target))
+			if RepairCatalog.is_broken(ctx.state, machine_task):
+				return ActionResult.failure(request.request_id, &"machine_broken", "Repair this machine before using its controls.")
 		var closed := ScheduleGate.refusal(ctx)
 		if closed != null:
 			return closed
@@ -159,7 +163,8 @@ func _resolve_new(session: SessionService, request: ActionRequest) -> ActionResu
 	if specialty == &"" and d.target_kind == &"station":
 		specialty = StringName(ctx.target.get("specialty", ""))
 	if specialty != &"" and (ctx.actor == null or ctx.actor.specialty != specialty):
-		return ActionResult.failure(request.request_id, &"wrong_specialty", "This job needs %s. Switch to that specialist in the Med Bay." % String(specialty).replace("_", " "))
+		var role := "Agriculture" if specialty == &"biology_food" else String(specialty).replace("_", " ")
+		return ActionResult.failure(request.request_id, &"wrong_specialty", "This job needs %s. Switch to that specialist in the Med Bay." % role)
 	if d.check.is_valid():
 		var failure: ActionResult = d.check.call(ctx)
 		if failure != null:

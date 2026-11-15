@@ -1,5 +1,5 @@
 {
-	"_about": "Upgrade paths (owner 2026-11-14, rebuilt for the upgrade paths plan 2026-11-15: docs/revisions/UPGRADE_PATHS_PLAN.md). Every track belongs to one of five sections (Energy, Biology, Health, Science, Communication); a section's tracks are chosen at its core spot (sections[].core_station_ids). The colony finishes ONE build a day, voted in the evening Plan block (scripts/upgrades/colony_builds.gd). A track has `levels` levels (V1..Vn, V1 = today's model); its level lives in state.levels[track] (missing = 1). costs[i] is what reaching level i+1 costs: spare parts (state.parts) and ores (state.ores.stock[ore_id]); costs[0] is always {}. upkeep_kw[i] is the extra power the track draws at level i+1 (total, not per step). Effects are lists indexed by level - 1, read with AreaLevels.effect(state, track, key, default). A fork (forks{}) is a permanent choice at one level of a track; the chosen side's effects override the track's (state.build.forks[fork_id]). requires{level: {track: level}} = another track must be at least that level first. Numbers follow the plan's big-jump-first curve (+60 %, +30 %, +15 %, +8 %) and are designer balance, never NASA figures, unless source_ids say so. The rover is bought like every track since 2026-11-15; its garage modules still upgrade on their own.",
+	"_about": "Upgrade paths (owner 2026-11-14, rebuilt for the upgrade paths plan 2026-11-15: docs/revisions/UPGRADE_PATHS_PLAN.md). Every track belongs to one of five sections (Energy, Agriculture, Health, Science, Communication); a section's tracks are chosen at its core spot (sections[].core_station_ids). The colony finishes ONE build a day, voted in the evening Plan block (scripts/upgrades/colony_builds.gd). A track has `levels` levels (V1..Vn, V1 = today's model); its level lives in state.levels[track] (missing = 1). costs[i] is what reaching level i+1 costs: spare parts (state.parts) and ores (state.ores.stock[ore_id]); costs[0] is always {}. upkeep_kw[i] is the extra power the track draws at level i+1 (total, not per step). Effects are lists indexed by level - 1, read with AreaLevels.effect(state, track, key, default). A fork (forks{}) is a permanent choice at one level of a track; the chosen side's effects override the track's (state.build.forks[fork_id]). requires{level: {track: level}} = another track must be at least that level first. Numbers follow the plan's big-jump-first curve (+60 %, +30 %, +15 %, +8 %) and are designer balance, never NASA figures, unless source_ids say so. The rover is bought like every track since 2026-11-15; its garage modules still upgrade on their own.",
 	"max_level": 5,
 	"sections": [
 		{
@@ -13,7 +13,7 @@
 		},
 		{
 			"id": "biology",
-			"name": "Biology",
+			"name": "Agriculture",
 			"symbol": "❀",
 			"spot": "the Greenhouse console",
 			"core_station_ids": ["gh_console"],

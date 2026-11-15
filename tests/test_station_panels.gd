@@ -31,6 +31,9 @@ func _initialize() -> void:
 	_gs.saves = SaveService.new(ProjectSettings.globalize_path("res://").path_join("_test_saves/wD"), "colony", 2)
 	root.add_child(_gs)
 	_gs.start_new_game(1)
+	# Normal station controls are tested after the machines have been repaired.
+	for task: Dictionary in _gs.state().repair.tasks.values():
+		task.broken = false
 	await process_frame
 	_test_for_station()
 	await _test_power()
@@ -322,7 +325,7 @@ func _test_blueprint() -> void:
 				listed = true
 		if not keys.has(sym) or not listed:
 			missing.append(sym)
-	var expected_used := ["▭", "✖", "▢", "◯", "◌", "▲", "■", "!", "↑", "⚡", "B"]
+	var expected_used := ["▭", "✖", "▢", "◯", "◌", "▲", "■", "!", "↑", "⚡", "A"]
 	for sym: String in expected_used:
 		if not view.symbols_used.has(sym):
 			missing.append("(not drawn) " + sym)

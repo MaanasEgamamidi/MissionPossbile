@@ -20,7 +20,7 @@ const MAX_SHOWN := 6
 const ROLE_WORDS := {
 	"electrical_comms": "Electrical engineer",
 	"medical_life_support": "Medic",
-	"biology_food": "Biologist",
+	"biology_food": "Agriculture specialist",
 	"field_engineering_geology": "Field engineer",
 	"general": "anyone",
 }

@@ -14,7 +14,7 @@ extends RefCounted
 ##   Sleep, Wake up, Base chores, Plan, Free time   anywhere (Plan: the build helper's vote; this file only shows it)
 ##   Meal (07:00)            Mess hall
 ##   Systems round (07:30)   Power Room, Life Support (air and water) or outside (the solar panels)
-##   Work block (08:00)      by role: Biologist (biology_food) Greenhouse or Garden dome; Field engineer
+##   Work block (08:00)      by role: Agriculture specialist (biology_food) Greenhouse or Garden dome; Field engineer
 ##                           (field_engineering_geology) outside; Electrical engineer (electrical_comms) Power Room,
 ##                           Command Room (comms), or at any repair (holding a repair / maintenance job, or standing
 ##                           at a broken spot); Medic (medical_life_support) Med Bay
@@ -298,7 +298,9 @@ static func emergency(state: ColonyState) -> bool:
 			return true
 	if String(state.weather.get("phase", "calm")) != "calm":
 		return true
-	if bool(state.radiation.get("active", false)) or bool(state.radiation.get("storm", false)) \
+	var storm: Variant = state.radiation.get("storm", false)
+	var storm_active: bool = not (storm as Dictionary).is_empty() if storm is Dictionary else storm == true
+	if bool(state.radiation.get("active", false)) or storm_active \
 			or String(state.radiation.get("phase", "calm")) not in ["", "calm"]:
 		return true
 	if bool(state.colony_over.get("active", false)) or bool(state.colony_over.get("counting", false)):

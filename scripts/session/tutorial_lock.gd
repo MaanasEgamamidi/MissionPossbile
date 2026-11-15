@@ -1,7 +1,6 @@
 extends RefCounted
-## Tutorial station access: suit racks and pickups always work. A pickup unlocks
-## its room's broken spots and playback at the Command Room deck. Playing the first
-## collected tape restores the other station features. Uncollected rooms stay locked.
+## Tutorial station access: only tape pickups, playback and the appropriate room repairs.
+## Other stations stay locked until every tape is found and played and every broken spot is fixed.
 ## Still working all along: doors (not stations), the crew screen (C, not a station) and everything those need.
 ## A locked station shows no "[E]" prompt (GameHud), its panel closes at once with a plain message
 ## (TutorialPresenter), and its actions are refused on the host (ActionService) with the same message. After the
@@ -9,14 +8,14 @@ extends RefCounted
 ## Loaded by path (no class_name): const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
 
 ## Station kinds that always work during the tutorial.
-const OPEN_KINDS: PackedStringArray = ["suits", "cassette_anchor"]
+const OPEN_KINDS: PackedStringArray = ["cassette_anchor"]
 ## Playback works with the first pickup.
 const AFTER_TAPES_KINDS: PackedStringArray = ["cassette_player_anchor"]
 ## Actions that only end or release something; they never do work, so they are never refused.
 const RELEASE_ACTIONS: Array[StringName] = [&"task_release", &"cassette_close", &"maintenance_cancel"]
 const REASON := &"tutorial_locked"
-const MESSAGE := "Play a collected tape at the Command Room cassette player to unlock the other station features."
-const FIXED_MESSAGE := "This spot is fixed. Play a collected tape in the Command Room to unlock the other station features."
+const MESSAGE := "Find and play all six tapes and finish every repair to unlock the other stations."
+const FIXED_MESSAGE := "This machine is fixed. Finish all six tapes and the remaining repairs to unlock its controls."
 ## Before the first tape is found (%d = the number of tapes).
 const TAPES_MESSAGE := "Find a room tape first: follow the gold lines (%d tapes to find)."
 

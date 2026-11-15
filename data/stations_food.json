@@ -1,5 +1,5 @@
 {
-	"note": "Greenhouse food stations (Prompt 08, food part). Beds are the six garden-dome planters and the hydroponics unit; the greenhouse console is the overview and the grow-light and water control. Anyone may use them; the biology and food specialist is the expert.",
+	"note": "Greenhouse food stations (Prompt 08, food part). Beds are the six garden-dome planters and the hydroponics unit; the greenhouse console is the overview and the grow-light and water control. Anyone may use them; the agriculture specialist is the expert.",
 	"stations": [
 		{"object": "gd_planter", "kind": "bed", "name": "Planter 1", "symbol": "❀", "specialty": ""},
 		{"object": "gd_planter.001", "kind": "bed", "name": "Planter 2", "symbol": "❀", "specialty": ""},

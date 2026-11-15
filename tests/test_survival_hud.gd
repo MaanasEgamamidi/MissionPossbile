@@ -191,6 +191,7 @@ func _initialize() -> void:
 	services.state().repair.tasks.T01.condition = 0.6
 	# T01 is a broken part at the start, so E would open its puzzle; this check is about maintenance on a fixed part.
 	services.state().repair.tasks.T01.first_completed = true
+	services.state().repair.tasks.T01.broken = false
 	var maintenance := StationPanels.for_station(&"repair_t01", services) as MaintenanceStationPanel
 	ui.open(maintenance)
 	maintenance._start.pressed.emit()

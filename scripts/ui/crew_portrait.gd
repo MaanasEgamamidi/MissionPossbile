@@ -20,7 +20,7 @@ const SYMBOLS := {
 const WORDS := {
 	&"electrical_comms": "Electrical and comms",
 	&"medical_life_support": "Medical and life support",
-	&"biology_food": "Biology and food",
+	&"biology_food": "Agriculture",
 	&"field_engineering_geology": "Field engineering and geology",
 }
 ## Crew colours, hair, skin and height come from CrewLooks (the same table the 3D bodies use).
