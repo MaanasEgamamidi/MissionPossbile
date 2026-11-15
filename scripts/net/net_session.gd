@@ -80,6 +80,8 @@ var _forwarders := {}                  # signal name -> Callable, so leave() can
 var _last_sent_pose := {}              # client: character id -> [position, yaw] last sent
 ## Host: returns {key: value} sent to every client with the body positions (for example {"rover": pose}).
 var motion_extras_provider: Callable = Callable()
+## Host: announces this game on the local network so the Join screen can list it (see LanDiscovery).
+var _beacon := LanDiscovery.Beacon.new()
 
 
 func setup(p_services: GameServices) -> void:
@@ -114,6 +116,7 @@ func host(p_port := DEFAULT_PORT) -> Error:
 	_connect_forwarders()
 	_state_left = 0.0
 	_motion_left = 0.0
+	_beacon.start(p_port)
 	hosted.emit(p_port)
 	return OK
 
@@ -147,6 +150,7 @@ func leave() -> void:
 		for peer: int in services.session.peers.duplicate():
 			if peer != SessionService.HOST_PEER:
 				services.session.peer_left(peer)
+	_beacon.stop()
 	_disconnect_forwarders()
 	_disconnect_api()
 	if _peer != null:
@@ -316,6 +320,7 @@ func _process(delta: float) -> void:
 		&"host":
 			if not services.has_game():
 				return
+			_beacon.poll(delta, services.session.peers.size(), MAX_PLAYERS)
 			_state_left -= delta
 			if _dirty or _state_left <= 0.0:
 				_flush()

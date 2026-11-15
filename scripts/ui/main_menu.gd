@@ -42,6 +42,14 @@ var _join_box: VBoxContainer
 var _join_address: LineEdit
 var _join_port: LineEdit
 var _join_start: Button
+## Open games found on the network (LanDiscovery), one Join button each.
+var _server_list: VBoxContainer
+var _server_status: Label
+var _manual_toggle: Button
+var _manual_box: VBoxContainer
+var _browser := LanDiscovery.Browser.new()
+var _browser_failed := false
+const SEARCHING_TEXT := "Looking for games on your network… Ask a friend to choose Host a game."
 var _settings_button: Button
 var _sources_button: Button
 var _quit_button: Button
@@ -127,12 +135,24 @@ func setup(p_services: GameServices) -> void:
 	_join_box = _sub_box(session)
 	_join_box.name = "JoinSetup"
 	_join_box.add_child(_label("Join a game on your network", UiTheme.HEADING))
-	_join_box.add_child(_label(JOIN_HELP, UiTheme.MUTED))
-	_join_box.add_child(_label("Host address"))
-	_join_address = _field(_join_box, "", "192.168.1.20")
-	_join_box.add_child(_label("Port"))
-	_join_port = _field(_join_box, str(NetSession.DEFAULT_PORT), "")
-	_join_start = _button(_join_box, "Connect", UiTheme.PRIMARY_BUTTON)
+	_join_box.add_child(_label("Open games", UiTheme.HEADING))
+	_server_list = VBoxContainer.new()
+	_server_list.name = "OpenGames"
+	_join_box.add_child(_server_list)
+	_server_status = _label(SEARCHING_TEXT, UiTheme.MUTED)
+	_join_box.add_child(_server_status)
+	_manual_toggle = _button(_join_box, "Type an address instead")
+	_manual_toggle.pressed.connect(func() -> void: _set_manual_visible(not _manual_box.visible))
+	_manual_box = VBoxContainer.new()
+	_manual_box.name = "ManualAddress"
+	_manual_box.visible = false
+	_join_box.add_child(_manual_box)
+	_manual_box.add_child(_label(JOIN_HELP, UiTheme.MUTED))
+	_manual_box.add_child(_label("Host address"))
+	_join_address = _field(_manual_box, "", "192.168.1.20")
+	_manual_box.add_child(_label("Port"))
+	_join_port = _field(_manual_box, str(NetSession.DEFAULT_PORT), "")
+	_join_start = _button(_manual_box, "Connect", UiTheme.PRIMARY_BUTTON)
 	_join_start.pressed.connect(_on_join)
 	_join_address.text_submitted.connect(func(_t: String) -> void: _on_join())
 	_join_port.text_submitted.connect(func(_t: String) -> void: _on_join())
@@ -213,7 +233,77 @@ func notice_text() -> String:
 ## Opens the join section and returns its address field (tests and the integrator use it).
 func open_join_section() -> LineEdit:
 	_show_nav_fields(_join_button)
+	_set_manual_visible(true)
 	return _join_address
+
+
+## The Join buttons for the open games on show (tests use it).
+func open_game_buttons() -> Array[Button]:
+	var out: Array[Button] = []
+	for c in _server_list.get_children():
+		if c is Button and not c.is_queued_for_deletion():
+			out.append(c)
+	return out
+
+
+func _exit_tree() -> void:
+	_browser.stop()
+
+
+func _set_manual_visible(on: bool) -> void:
+	_manual_box.visible = on
+	_manual_toggle.text = "Hide the address form" if on else "Type an address instead"
+
+
+## Listens for hosts while the Join form is on show, and rebuilds the list when it changes.
+func _update_browser() -> void:
+	var showing := is_visible_in_tree() and _join_box != null and (_join_box.get_parent() as Control).visible \
+		and not (services != null and services.has_game())
+	if not showing:
+		if _browser.is_running():
+			_browser.stop()
+			_rebuild_server_list()
+		_browser_failed = false
+		return
+	if not _browser.is_running():
+		if _browser_failed:
+			return
+		if not _browser.start():
+			_browser_failed = true
+			_server_status.text = "Could not look for games (another copy of the game may be open on this computer). Type the host's address instead."
+			return
+		_rebuild_server_list()
+	if _browser.poll():
+		_rebuild_server_list()
+
+
+func _rebuild_server_list() -> void:
+	var had_focus := _server_list.get_viewport() != null and _server_list.is_ancestor_of(_server_list.get_viewport().gui_get_focus_owner())
+	for c in _server_list.get_children():
+		_server_list.remove_child(c)
+		c.queue_free()
+	var games := _browser.servers()
+	for g: Dictionary in games:
+		var full := int(g.players) >= int(g.max)
+		var b := _button(_server_list, "Join %s's PC   (%d/%d players)" % [g.name, int(g.players), int(g.max)],
+			UiTheme.PRIMARY_BUTTON)
+		b.name = "JoinGame"
+		b.tooltip_text = "%s, port %d" % [g.address, int(g.port)]
+		if not g.same_version:
+			b.disabled = true
+			b.text = "%s's PC has a different version of the game" % g.name
+		elif full:
+			b.disabled = true
+			b.text = "%s's PC is full (%d/%d players)" % [g.name, int(g.players), int(g.max)]
+		var address := String(g.address)
+		var port := int(g.port)
+		b.pressed.connect(func() -> void:
+			show_notice("")
+			join_pressed.emit(address, port))
+	if not _browser_failed:
+		_server_status.text = SEARCHING_TEXT if games.is_empty() else "Click a game to join it."
+	if had_focus and _server_list.get_child_count() > 0:
+		(_server_list.get_child(0) as Control).grab_focus()
 
 
 ## Opens the host section.
@@ -308,6 +398,7 @@ static func _field(parent: Control, text: String, placeholder: String) -> LineEd
 ## Composition follows the supplied 1920×1080 reference; native controls scroll when text grows.
 func _process(_delta: float) -> void:
 	if _canvas == null: return
+	_update_browser()
 	var viewport := get_viewport_rect().size if is_inside_tree() else Vector2(1920, 1080)
 	var available := size if size.x > 100 and size.y > 100 else viewport
 	var scale := clampf(viewport.y / 1080.0, 0.75, 1.35)

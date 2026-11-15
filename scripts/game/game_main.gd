@@ -356,9 +356,7 @@ func _on_net_joined(_peer: int) -> void:
 
 
 func _announce_hosting() -> void:
-	var addrs := NetSession.lan_addresses()
-	var where := " or ".join(Array(addrs.slice(0, 3))) if not addrs.is_empty() else "this computer's address"
-	ui.show_subtitle("Hosting. Other players choose Join a colony and type %s, port %d. The pause menu shows this again." % [where, services.net.port], 14.0, "Network", true)
+	ui.show_subtitle("Hosting. Other players choose Join a game and click \"Join %s's PC\". The pause menu shows your address if they need to type it." % LanDiscovery.local_name(), 14.0, "Network", true)
 
 
 func _say_crew_change(peer: int, joined_now: bool) -> void:
