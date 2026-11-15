@@ -323,9 +323,9 @@ func _history_and_recovery_tick() -> void:
 	_check("forget peer clears history", not result.duplicate and result.reason == &"not_held")
 	s.request(&"pick_up", &"logbox")
 	c.health = 0.001
-	s.state.stores[&"oxygen_kg"] = 0.0
-	s.state.cabin_o2_kg = 0.0
-	s.state.zones["Life Support"].powered = false
+	# Atmospheric harm now has its own four-real-second rule. Keep this check about
+	# simulation-triggered non-exposure recovery, cargo caching and exactly-once cost.
+	s.state.stores[&"food_meals"] = 0.0
 	var recovered: Array = []
 	s.events.character_recovered.connect(func(id: StringName, info: Dictionary) -> void: recovered.append([id, info]))
 	s.advance(0.2)

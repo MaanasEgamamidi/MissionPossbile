@@ -163,6 +163,9 @@ func _test_assemble() -> void:
 
 func _test_trip() -> void:
 	_become(&"crew_2")
+	# This operator waits at the exterior scout bay throughout the simulated trip.
+	# A working suit keeps the trip/recall fixture independent of fatal exposure.
+	me().suit_on = true
 	_at("scout_bay")
 	var r := _req(&"scout_send", &"scout_bay", {"site": "nowhere"})
 	_check("send: an unknown place is refused", not r.ok)

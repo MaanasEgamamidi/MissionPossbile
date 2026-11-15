@@ -19,6 +19,19 @@ const MARS_GRAVITY := 3.73
 @export var sim_tick_hz := 5.0
 ## Most simulation ticks processed in one rendered frame; the remainder carries over, no time is dropped.
 @export var max_ticks_per_frame := 25
+## Host hazard integration step in unpaused real seconds, independent of the playable sol length.
+@export_range(0.01, 0.2, 0.01) var hazard_step_seconds := 0.05
+## Gameplay deadlines, not physiological predictions.
+@export var exposure_lethal_seconds := 4.0
+@export var exposure_safe_recovery_seconds := 2.0
+@export_range(0.0, 1.0, 0.01) var suit_min_integrity := 0.5
+## The explicit local exit vestibule uses a pressure proxy, not another colony gas-mass simulation.
+@export var airlock_pressure_nominal_kpa := 101.3
+@export var airlock_pressure_mars_kpa := 0.6
+@export var airlock_pressure_unsafe_kpa := 70.0
+@export var airlock_pressure_safe_kpa := 80.0
+@export var airlock_pressure_loss_kpa_per_second := 200.0
+@export var airlock_pressure_recovery_seconds := 5.0
 ## Phase of the sol a new game starts at (0 = midnight, 0.5 = noon).
 @export_range(0.0, 1.0) var start_phase := 0.3
 

@@ -22,11 +22,19 @@ var suit_rack: StringName = &""
 var suit_slot := -1
 ## Portable tank charge, 0..100. Never refilled by equipping the suit or changing the camera.
 var suit_charge := 100.0
+## A closed suit with a failed seal is not protective even if its tank still has oxygen.
+var suit_integrity := 1.0
 ## True while the character is outside the pressurised habitat (set by the host from SessionService.outside_test).
 var outside := false
-## Durable real-second exposure accumulator reserved for the later survival slice. F04 adds persistence only.
-## A future hazard must advance this field, so saving/reloading cannot restart its lethal countdown.
+## Durable unpaused real-second hazard time. Only the authoritative SurvivalRuntime advances it.
 var lethal_exposure_seconds := 0.0
+var exposure_safe_seconds := 0.0
+var exposure_active := false
+var exposure_protected := false
+var exposure_cause := ""
+var exposure_area := ""
+## Spatial hysteresis across the explicit airlock boundary; unrelated to lighting-zone membership.
+var in_airlock_pressure_volume := false
 var equipment: Array[StringName] = []
 ## Item ids carried by this character (see ColonyState.items).
 var cargo: Array[StringName] = []
@@ -42,6 +50,9 @@ func to_dict() -> Dictionary:
 		"position": [position.x, position.y, position.z], "yaw": yaw, "hub_spot": [hub_spot.x, hub_spot.y, hub_spot.z],
 		"health": health, "stamina": stamina, "suit_on": suit_on, "suit_charge": suit_charge, "outside": outside,
 		"lethal_exposure_seconds": lethal_exposure_seconds,
+		"exposure_safe_seconds": exposure_safe_seconds, "exposure_active": exposure_active,
+		"exposure_protected": exposure_protected, "exposure_cause": exposure_cause, "exposure_area": exposure_area,
+		"in_airlock_pressure_volume": in_airlock_pressure_volume, "suit_integrity": suit_integrity,
 		"suit_rack": String(suit_rack), "suit_slot": suit_slot,
 		"equipment": equipment.map(func(e: StringName) -> String: return String(e)),
 		"cargo": cargo.map(func(e: StringName) -> String: return String(e)),
@@ -67,6 +78,13 @@ func assign_from(d: Dictionary, keep_pose := false) -> void:
 	suit_charge = c.suit_charge
 	outside = c.outside
 	lethal_exposure_seconds = c.lethal_exposure_seconds
+	exposure_safe_seconds = c.exposure_safe_seconds
+	exposure_active = c.exposure_active
+	exposure_protected = c.exposure_protected
+	exposure_cause = c.exposure_cause
+	exposure_area = c.exposure_area
+	in_airlock_pressure_volume = c.in_airlock_pressure_volume
+	suit_integrity = c.suit_integrity
 	equipment = c.equipment
 	cargo = c.cargo
 
@@ -88,6 +106,13 @@ static func from_dict(d: Dictionary) -> CharacterState:
 	c.suit_charge = float(d.get("suit_charge", 100.0))
 	c.outside = bool(d.get("outside", false))
 	c.lethal_exposure_seconds = maxf(0.0, float(d.get("lethal_exposure_seconds", 0.0)))
+	c.exposure_safe_seconds = maxf(0.0, float(d.get("exposure_safe_seconds", 0.0)))
+	c.exposure_active = bool(d.get("exposure_active", false))
+	c.exposure_protected = bool(d.get("exposure_protected", false))
+	c.exposure_cause = String(d.get("exposure_cause", ""))
+	c.exposure_area = String(d.get("exposure_area", ""))
+	c.in_airlock_pressure_volume = bool(d.get("in_airlock_pressure_volume", false))
+	c.suit_integrity = clampf(float(d.get("suit_integrity", 1.0)), 0.0, 1.0)
 	for e in d.get("equipment", []):
 		c.equipment.append(StringName(String(e)))
 	for e in d.get("cargo", []):

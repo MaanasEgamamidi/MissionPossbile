@@ -198,10 +198,11 @@ func _safe_switching() -> void:
 	actor.position = s.config.hub_position
 	actor.health = 36.0
 	actor.suit_charge = 27.0
-	actor.outside = true
+	# Hazard classification is now recomputed from the host query on every request.
+	s.outside_test = func(_position: Vector3) -> bool: return true
 	_check("exposed switch rejected", s.request(&"claim_character", &"crew_2").reason == &"unsafe_switch")
 	_check("release cannot bypass exposure", s.request(&"release_character").reason == &"unsafe_switch" and actor.owner_peer == 1)
-	actor.outside = false
+	s.outside_test = func(_position: Vector3) -> bool: return false
 	actor.lethal_exposure_seconds = 1.0
 	_check("persisted exposure blocks switching", s.request(&"claim_character", &"crew_2").reason == &"unsafe_switch")
 	actor.lethal_exposure_seconds = 0.0

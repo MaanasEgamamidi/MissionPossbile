@@ -19,6 +19,8 @@ signal action_resolved(result: ActionResult)
 signal system_alert(alert_id: StringName, level: StringName, text: String)
 ## A character reached zero condition and was brought back to the hub. `info` holds the cost and the cache location.
 signal character_recovered(character_id: StringName, info: Dictionary)
+## Host atmospheric exposure facts; presentation never decides death or protection.
+signal hazard_changed(character_id: StringName, status: Dictionary)
 ## The suit check began; it takes `seconds` real seconds and can still be cancelled.
 signal suit_check_started(character_id: StringName, seconds: float)
 ## The suit check ended. `completed` false = cancelled, nothing changed. Tank charge is never changed by a check.

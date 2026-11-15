@@ -77,6 +77,8 @@ var upgrades := {}
 var tasks := {}
 ## F02/F04 foundation data, separate from established campaign tasks. Operator locks are session-only.
 var repair := {}
+## S04: localized exit-vestibule pressure proxy. Door motion and active operators remain transient session facts.
+var pressure := LocalPressure.fresh()
 var discoveries: Array = []
 var rover := {"built": false, "levels": {"speed": 1, "torque": 1, "range": 1, "cargo": 1, "traction": 1}, "battery_kwh": 0.0, "cargo": []}
 
@@ -305,6 +307,7 @@ func to_dict() -> Dictionary:
 		"pending_airlock_cycles": pending_airlock_cycles, "alerts": alerts.duplicate(true), "sim_hours": sim_hours,
 		"knowledge": knowledge.duplicate(true), "evidence": evidence.duplicate(true), "upgrades": upgrades.duplicate(true), "tasks": tasks.duplicate(true),
 		"repair": repair.duplicate(true),
+		"pressure": pressure.duplicate(true),
 		"discoveries": discoveries.duplicate(true), "rover": rover.duplicate(true),
 		"crops": crops.duplicate(true), "science": science.duplicate(true), "progress": progress.duplicate(true), "weather": weather.duplicate(true),
 		"campaign": campaign.duplicate(true), "scout": scout.duplicate(true),
@@ -343,6 +346,7 @@ func assign_from(d: Dictionary, keep_pose_of: StringName = &"") -> void:
 	upgrades = fresh.upgrades
 	tasks = fresh.tasks
 	repair = fresh.repair
+	pressure = fresh.pressure
 	discoveries = fresh.discoveries
 	rover = fresh.rover
 	data_snapshot_id = fresh.data_snapshot_id
@@ -469,4 +473,5 @@ static func from_dict(d: Dictionary) -> ColonyState:
 	s.rng_seed = int(String(d.get("rng_seed", "0")))
 	s.rng_state = int(String(d.get("rng_state", "0")))
 	s.repair = RepairCatalog.restore(d.get("repair", {}), s.rng_seed)
+	s.pressure = LocalPressure.restore(d.get("pressure", {}))
 	return s

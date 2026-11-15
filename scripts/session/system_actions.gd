@@ -86,6 +86,7 @@ static func _apply(ctx: ActionService.Context) -> Dictionary:
 			text = "Panel %d is clean: it makes its full power again." % (index + 1)
 		&"repair_cleaner":
 			ctx.state.equipment["cleaner"]["condition"] = 1.0
+			ctx.session.wear_runtime.on_legacy_repaired(ctx.session, "cleaner")
 			text = "Panel cleaner repaired: it will wipe every panel at sunrise while it has power."
 		&"refill_suit":
 			var cap := ctx.balance.suit_o2_capacity_kg

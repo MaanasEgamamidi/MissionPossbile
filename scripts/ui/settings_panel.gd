@@ -1,7 +1,7 @@
 class_name SettingsPanel
 extends UiPanel
-## Settings in three tabs. Display: menu size, text size, high contrast, subtitles, reduce motion. Controls: mouse,
-## camera, sprint, and the key list where every action can be changed or reset. Graphics: Low / Medium / High / Ultra.
+## Display, Controls, Graphics and Audio tabs share live settings and keyboard focus.
+## Audio exposes warning mute/volume; voice and microphone keep their existing controls.
 ## Changes apply at once and are saved when the panel closes (settings and key bindings).
 ## While it waits for a new key, the panel cannot close and the key it catches never reaches the game.
 
@@ -18,6 +18,10 @@ var _text_size: OptionButton
 var _high_contrast: CheckButton
 var _subtitles: CheckButton
 var _reduce_motion: CheckButton
+var _reduce_flashes: CheckButton
+var _warning_muted: CheckButton
+var _warning_volume: HSlider
+var _warning_volume_label: Label
 var _mouse: HSlider
 var _mouse_label: Label
 var _invert_y: CheckButton
@@ -55,6 +59,7 @@ func setup(p_services: GameServices) -> void:
 	_build_display(_tab("Display"))
 	_build_controls(_tab("Controls"))
 	_build_graphics(_tab("Graphics"))
+	_build_audio(_tab("Audio"))
 	var done := Button.new()
 	done.text = "Done"
 	done.theme_type_variation = UiTheme.PRIMARY_BUTTON
@@ -249,6 +254,22 @@ func _build_display(box: VBoxContainer) -> void:
 	_reduce_motion = _check(box, "Reduce motion (no camera bob, no fades)", func(on: bool) -> void:
 		settings.reduce_motion = on
 		_apply())
+	_reduce_flashes = _check(box, "Static danger warnings (no border pulse)", func(on: bool) -> void:
+		settings.reduce_flashes = on
+		_apply())
+
+
+func _build_audio(box: VBoxContainer) -> void:
+	_warning_muted = _check(box, "Mute warning sounds", func(on: bool) -> void:
+		settings.warning_sound_muted = on
+		_apply())
+	_warning_volume_label = _label(box, "")
+	_warning_volume = _slider(box, 0.0, 1.0, 0.05)
+	_warning_volume.value_changed.connect(func(value: float) -> void:
+		settings.warning_sound_volume = value
+		_apply())
+	var note := _label(box, "Danger banners and countdowns remain visible with sound muted. Voice and microphone controls are in the Controls tab.")
+	note.theme_type_variation = UiTheme.MUTED
 
 
 func _build_controls(box: VBoxContainer) -> void:
@@ -341,6 +362,9 @@ func _read_settings() -> void:
 	_high_contrast.set_pressed_no_signal(settings.high_contrast)
 	_subtitles.set_pressed_no_signal(settings.subtitles)
 	_reduce_motion.set_pressed_no_signal(settings.reduce_motion)
+	_reduce_flashes.set_pressed_no_signal(settings.reduce_flashes)
+	_warning_muted.set_pressed_no_signal(settings.warning_sound_muted)
+	_warning_volume.set_value_no_signal(settings.warning_sound_volume)
 	_mouse.set_value_no_signal(settings.mouse_sensitivity)
 	_invert_y.set_pressed_no_signal(settings.invert_y)
 	_fov.set_value_no_signal(settings.fov_degrees)
@@ -359,6 +383,7 @@ func _update_value_labels() -> void:
 	_mouse_label.text = "Mouse speed: %.1f (normal 2.0)" % (settings.mouse_sensitivity * 1000.0)
 	_fov_label.text = "Field of view: %d°" % roundi(settings.fov_degrees)
 	_quality_info.text = GraphicsQuality.DESCRIPTIONS[settings.graphics_quality]
+	_warning_volume_label.text = "Warning sound volume: %d %%" % roundi(settings.warning_sound_volume * 100.0)
 
 
 func _update_bindings() -> void:

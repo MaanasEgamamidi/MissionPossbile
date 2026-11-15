@@ -53,6 +53,9 @@ var rigged_bodies := false
 var prop_collision_stats := {}
 ## C01: shared room cassettes and the single Command Room playback deck.
 var cassette_presenter: CassettePresenter
+## S01–S04: warning presentation and explicit exit vestibule pressure boundary.
+var survival_hud: SurvivalHud
+var airlock_hazard: AirlockHazardPresenter
 
 var _crew_visuals := {}          # character id -> PlayerVisual (crew the local player does not control)
 var _item_nodes := {}            # item id -> CarryItem
@@ -150,6 +153,13 @@ func _begin_play() -> void:
 	hud.name = "Hud"
 	add_child(hud)
 	hud.setup(services)
+	survival_hud = SurvivalHud.new()
+	add_child(survival_hud)
+	survival_hud.setup(services, settings, ui)
+	airlock_hazard = AirlockHazardPresenter.new()
+	airlock_hazard.name = "AirlockHazardPresenter"
+	add_child(airlock_hazard)
+	airlock_hazard.setup(services, airlock_doors, world != null)
 	# Prompt 12: tutorial tracker, hints, specialist cues and the colony journal (J).
 	tutorial = TutorialPresenter.new()
 	tutorial.name = "TutorialPresenter"

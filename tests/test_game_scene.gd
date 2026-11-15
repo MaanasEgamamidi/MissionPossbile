@@ -41,12 +41,17 @@ func _suit_checks() -> void:
 	var player := main.player
 	var rack: Dictionary = services.state().stations["al_suit_rack"]
 	var rack_pos := CharacterState._v3(rack.position)
-	# The rendered walkthrough uses this measured clear approach, facing the rack from inside the Airlock.
-	# Do not choose an arbitrary point whose short probe capsule can miss a low fixture or the head clearance.
-	var spot := Vector3(16.4, 0.0, 7.5)
+	# Probe the actual headless collision assembly with the full player capsule.
+	# Its rack clearance differs from the rendered map's prop-collision assembly.
+	var spot := _free_spot_near(rack_pos, 1.6)
 	await _place(spot, 0.0)
+	await _frames(20)
+	var contacts: Array[String] = []
+	for index in player.get_slide_collision_count():
+		var contact := player.get_slide_collision(index)
+		contacts.append(str(contact.get_collider().get_path()))
 	_check("suit approach is grounded, reported and within real reach", player.is_on_floor() and absf(player.global_position.y) < 0.1 and me.position.distance_to(player.global_position) < 0.05 and me.position.distance_to(rack_pos) <= services.config.interact_distance_m,
-		"body=%s host=%s rack=%s distance=%.2f" % [player.global_position, me.position, rack_pos, me.position.distance_to(rack_pos)])
+		"body=%s host=%s rack=%s distance=%.2f contacts=%s" % [player.global_position, me.position, rack_pos, me.position.distance_to(rack_pos), contacts])
 	var tank := me.suit_charge
 	var result := main._submit(&"begin_suit_check", &"al_suit_rack", {"on": true})
 	_check("suit check starts at the rack", result.ok, "%s (planned %.2f m; body %s; host %s; rack %s; actual %.2f m)" % [result.message, spot.distance_to(rack_pos), player.global_position, me.position, rack_pos, me.position.distance_to(rack_pos)])
@@ -200,7 +205,7 @@ func _initialize() -> void:
 	var load_before := st.load_kw
 	r = services.session.request(&"set_zone_power", &"pw_panel", {"zone": "Greenhouse", "on": false})
 	await _frames(15)
-	_check("switching the Greenhouse off lowers the load by its 9 kW", r.ok and absf((load_before - st.load_kw) - 9.0) < 0.01, "%.1f -> %.1f kW" % [load_before, st.load_kw])
+	_check("switching the Greenhouse off lowers the load by its 9 kW", r.ok and absf((load_before - st.load_kw) - 9.0) < 0.01, "%.1f -> %.1f kW; %s; actor=%s" % [load_before, st.load_kw, r.message, me.position])
 	main.ui.close_all()
 	await _place(services.config.hub_position, 0.0)
 	r = services.session.request(&"set_zone_power", &"pw_panel", {"zone": "Greenhouse", "on": true})
@@ -227,10 +232,12 @@ func _initialize() -> void:
 	var tank_before_recovery := me.suit_charge
 	services.events.character_recovered.connect(func(_id: StringName, _info: Dictionary) -> void:
 		seen["health"] = me.health)
-	# Outside with an empty suit tank: no air, so health falls until the hub recovery (Prompt 07 rules).
+	# Production exposure is four real seconds, independent of the previous tiny health value.
 	me.suit_charge = 0.0
 	me.health = 0.01
-	await _frames(60)
+	await _frames(180)
+	_check("empty suit does not trigger the legacy one-tick recovery", float(seen["health"]) < 0.0 and me.lethal_exposure_seconds < services.config.exposure_lethal_seconds)
+	await _frames(90)
 	_check("recovered to the hub with health 50, suit kept", me.position.distance_to(me.hub_spot) < 0.6 and float(seen["health"]) == services.balance.recovery_health and me.suit_on,
 		"health at recovery %.1f" % float(seen["health"]))
 	_check("body moved to the hub too", player.global_position.distance_to(me.hub_spot) < 1.0)
@@ -283,7 +290,8 @@ func _free_spot_near(around: Vector3, radius: float) -> Vector3:
 	shape.height = main.player.tuning.body_height_m + 0.04
 	var q := PhysicsShapeQueryParameters3D.new()
 	q.shape = shape
-	q.collision_mask = Layers.WORLD | Layers.DOOR
+	q.collision_mask = main.player.collision_mask
+	q.exclude = [main.player.get_rid()]
 	for ring: float in [radius, radius * 0.8, radius * 1.2, radius * 0.6]:
 		for i in 16:
 			var a := TAU * float(i) / 16.0

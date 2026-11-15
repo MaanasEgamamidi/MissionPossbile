@@ -63,6 +63,8 @@ func check(ctx: ActionService.Context) -> ActionResult:
 	var task: Dictionary = ctx.state.repair.tasks.get(task_id, {})
 	if task.is_empty() or String(task.anchor_id) != String(ctx.request.target):
 		return ActionResult.failure(ctx.request.request_id, &"unknown_target")
+	if ctx.session.wear_runtime.jobs.has(task_id):
+		return ActionResult.failure(ctx.request.request_id, &"task_busy", "Equipment maintenance is already running here.")
 	if int(ctx.request.params.generation) != int(task.fault_generation):
 		return ActionResult.failure(ctx.request.request_id, &"stale_fault", "This fault changed. Reopen the task to refresh it.")
 	var specialty := String(task.required_specialty)
@@ -114,6 +116,7 @@ func apply(ctx: ActionService.Context) -> Dictionary:
 		task.first_completed = true
 		task.condition = 1.0
 		locks.erase(task_id)
+		ctx.session.wear_runtime.on_task_repaired(ctx.session, task_id)
 		_update_room(ctx.state, String(task.room_id))
 	return {"task_id": task_id, "progress": task.progress, "first_completion": first_completion,
 		"generation": int(task.fault_generation)}
@@ -129,6 +132,7 @@ func begin_fault(state: ColonyState, task_id: String, puzzle_seed: int, conditio
 	task.condition = clampf(condition, 0.0, 1.0)
 	task.puzzle_state = {}
 	task.resume_supported = false
+	task.maintenance_fault = true
 	locks.erase(task_id)
 	_update_room(state, String(task.room_id))
 	return true

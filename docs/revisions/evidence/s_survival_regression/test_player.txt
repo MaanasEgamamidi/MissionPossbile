@@ -1,0 +1,115 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS input move_forward
+PASS input move_back
+PASS input move_left
+PASS input move_right
+PASS input sprint
+PASS input jump
+PASS input interact
+PASS input grab
+PASS input toggle_view
+PASS input map
+PASS input push_to_talk
+PASS input back
+PASS input source_register
+PASS F5 unbound
+PASS view and map separate
+PASS grab help
+PASS ensure preserves remap
+PASS remap save reset load
+PASS capsule and collision layers
+PASS Mars free fall 1.3000 s
+PASS jump apex 0.5004 m airtime 1.0500 s
+PASS standing jump plays jump_start, jump, land in order
+PASS jump arc time follows vertical velocity: rise, apex, fall
+PASS running jump skips land, keeps speed 4.80 -> 4.80 m/s
+PASS walking off a ledge enters the arc at the apex (0.500), no jump_start, no standing land
+PASS sprint key from standing: walk first, sprint by speed
+PASS locomotion clip scale stays within 0.75-1.5
+PASS stopping settles into idle within 0.25 s (frame 8)
+PASS steady suited walk shows walk at 1.20x
+PASS steady unsuited walk shows sprint at 0.75x
+PASS walk speed 3.0000 m/s
+PASS suit speed 2.4000 m/s
+PASS sprint ratio 1.6000
+PASS local sprint stamina drains
+PASS climbs 20 degree ramp
+PASS rejects 50 degree ramp
+PASS climbs 0.2 m step
+PASS a step-up plays neither jump nor land
+PASS wall blocks for two seconds
+PASS starts first person
+PASS first person FOV
+PASS first person head hidden limbs visible
+PASS zone layers keep the head shadow-only and lit by the room
+PASS third person draws the head normally
+PASS third person FOV and distance 2.500 m
+PASS third person level look: boots 0.080 of screen height above the bottom edge
+PASS third-person fill light only in third person
+PASS first person hides the fill light
+PASS camera stays before wall
+PASS spring arm sphere and mask
+PASS one current camera true
+PASS one current camera false
+PASS look and pitch clamp
+PASS 20 view toggles and suit preserve authority
+PASS map never toggles perspective
+PASS aim identifies item
+PASS grab sends one pickup and attaches
+PASS held item follows hand within 1 cm
+PASS drop sends once and restores free body
+PASS controller never changes cargo or owner
+PASS refused pickup attaches nothing
+PASS refused drop keeps prop held
+PASS sprint drop throws forward
+PASS E picks up and puts down
+PASS suit station dispatch
+PASS other station returns host failure
+PASS four distinct identity patches
+PASS both hand anchors exist
+PASS a held one-shot clip is not replaced by a movement state
+PASS visual state idle
+PASS visual state walk
+PASS visual state sprint
+PASS visual state jump_start
+PASS visual state jump
+PASS visual state land
+PASS visual state carry
+PASS visual state use
+PASS visual state suit
+PASS visual state seated
+PASS suit toggles helmet and pack
+PASS replacement model anchors and head layers
+PASS clip_length reads the rig clip or falls back
+PASS a rig without jump_start skips it and does not hold
+PASS a rig clip that exists is held
+PASS jump clip is non-looping, walk loops
+PASS per-transition blend times
+PASS walk to sprint keeps the step phase (0.3 of 1.0 s -> 0.15 of 0.5 s)
+PASS set_jump_phase seeks the arc and holds the fall pose
+PASS a finished non-looping clip is not restarted by play()
+PASS landing hold: walk may cut it after 0.2 s, idle waits (process-time hold)
+PASS running-landing hip dip goes 5 cm down and back
+PASS first frame after a clip change advances the clip
+PASS jump arc run past its end resumes on the held fall pose
+PASS running landing starts sprint at the contact phase
+PASS looks: each crew member shows only their own hair
+PASS looks: changing identity swaps the hair
+PASS looks: suited shows the in-helmet hair (beard stays), the crew's own symbol and band
+PASS looks: hair is hidden from the first-person camera like the head
+PASS looks: Feminine shape follows the identity on body and suit
+PASS looks: skin and hair are per-body copies in the crew's colours
+PASS looks: accent and darkened accent surfaces
+PASS looks: the face glows faintly only under the helmet
+PASS looks: height scales the model, not the body node (feet stay at the origin)
+PASS looks: name tag is the crew symbol in the accent colour and a near-white word, higher over a helmet
+PASS looks: tags of crew standing together: the farther one collapses to its symbol
+PASS looks: tags are staggered by crew index
+PASS looks: small glyphs are drawn larger so every symbol matches the capitals
+PASS looks: name tag about 22 px at 6 and 20 m, gone up close and far away
+PASS looks: name tag can be removed; a short display name is shown as is
+PASS looks: stand-in and bare models take every identity without the new parts
+PASS looks: real astronaut gets per-body skin (hair meshes in this build: 5)
+PASS position reported every physics frame
+RESULT 112/112

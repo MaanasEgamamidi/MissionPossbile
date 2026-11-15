@@ -10,7 +10,7 @@ const TEXT_SCALES: Array[float] = [1.0, 1.25, 1.5]
 ## Names of the stored values, in file order.
 const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov_degrees", &"mouse_sensitivity",
 	&"invert_y", &"toggle_sprint", &"reduce_motion", &"high_contrast", &"graphics_quality",
-	&"voice_input_device", &"voice_mic_muted", &"voice_volume"]
+	&"voice_input_device", &"voice_mic_muted", &"voice_volume", &"reduce_flashes", &"warning_sound_muted", &"warning_sound_volume"]
 
 ## Size of all menus and the HUD (0.75 to 2.0).
 @export var ui_scale := 1.0:
@@ -63,6 +63,24 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 	set(v):
 		if v != reduce_motion:
 			reduce_motion = v
+			emit_changed()
+## Static urgent warnings by default. Turning this off permits only a gentle border pulse.
+@export var reduce_flashes := true:
+	set(v):
+		if v != reduce_flashes:
+			reduce_flashes = v
+			emit_changed()
+## Warning sounds are separate from multiplayer microphone and voice preferences.
+@export var warning_sound_muted := false:
+	set(v):
+		if v != warning_sound_muted:
+			warning_sound_muted = v
+			emit_changed()
+@export var warning_sound_volume := 0.65:
+	set(v):
+		v = clampf(v, 0.0, 1.0)
+		if v != warning_sound_volume:
+			warning_sound_volume = v
 			emit_changed()
 ## Stronger colours and borders.
 @export var high_contrast := false:

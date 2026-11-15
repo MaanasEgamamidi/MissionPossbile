@@ -29,6 +29,10 @@ var outside_test: Callable = func(_point: Vector3) -> bool: return false
 var zone_at_position := Callable()
 var repair_runtime := RepairRuntime.new()
 var cassette_runtime: CassetteRuntime
+var survival: SurvivalRuntime
+var wear_runtime := WearRuntime.new()
+## A replicated client can inspect state and presentation, but cannot advance survival, pressure or wear.
+var authoritative := true
 ## True when every connected peer votes to pause.
 var paused: bool = false
 var _votes: Dictionary = {}
@@ -41,13 +45,16 @@ func _init(p_config: GameConfig, p_balance: GameBalance, p_events: GameEvents) -
 	balance = p_balance
 	events = p_events
 	cassette_runtime = CassetteRuntime.new(self)
+	survival = SurvivalRuntime.new(self)
 	sim = ColonySim.new()
+	sim.exposure_managed = true
 	sim.set_events(events)
 	rng = RandomNumberGenerator.new()
 	actions = ActionService.new()
 	BuiltinActions.register(actions)
 	RepairActions.register(actions)
 	CassetteActions.register(actions)
+	WearRuntime.register_actions(actions)
 	SystemActions.register(actions)
 	# Prompts 08 and 09: each part registers its actions and adds its simulation system.
 	FoodActions.register(actions)
@@ -70,6 +77,7 @@ func begin(p_state: ColonyState, p_clock: SolClock) -> void:
 	for peer: int in peers:
 		actions.forget_peer(peer)
 	state = p_state
+	authoritative = true
 	clock = p_clock
 	peers = [HOST_PEER]
 	rng.seed = state.rng_seed
@@ -78,41 +86,64 @@ func begin(p_state: ColonyState, p_clock: SolClock) -> void:
 	_suit_checks.clear()
 	repair_runtime.clear_session()
 	cassette_runtime.clear_session()
+	survival.clear_session()
+	wear_runtime.clear_session()
 	_accumulator = 0.0
 	_restore_suit_slots()
 	_recompute_pause()
+	survival.pressure.advance(self, 0.0)
+	survival.refresh_all()
 
 ## Advances real-time checks and fixed simulation ticks without dropping time.
 func advance(real_delta: float) -> int:
-	if state == null:
+	if state == null or not authoritative:
 		return 0
 	cassette_runtime.prune(self)
-	_advance_suit_checks(0.0 if paused else real_delta)
 	if paused:
+		_advance_suit_checks(0.0)
 		return 0
-	repair_runtime.advance(self, real_delta)
-	_accumulator += real_delta
 	var tick: float = 1.0 / config.sim_tick_hz
 	var count: int = 0
-	while _accumulator >= tick - 1e-9 and count < config.max_ticks_per_frame:
-		_accumulator -= tick
-		var phase_before: float = clock.phase
-		var dt_hours: float = clock.advance(tick)
-		for id: StringName in sim.step(state, balance, phase_before, dt_hours):
-			recover_character(id)
-		for rollover: int in clock.rolled_over:
-			events.sol_started.emit(clock.sol_index - clock.rolled_over + rollover + 1)
-		count += 1
+	var remaining := maxf(0.0, real_delta)
+	var first_pass := true
+	# Interleave protection/resource updates with the real-time timer. A tank that empties mid-frame
+	# cannot grant the remainder of that rendered frame as free protection; hazards also outlive a tick backlog.
+	while first_pass or remaining > 1e-8:
+		first_pass = false
+		var step := minf(remaining, clampf(config.hazard_step_seconds, 0.01, 0.2))
+		repair_runtime.advance(self, step)
+		wear_runtime.advance(self, step)
+		survival.pressure.advance(self, step)
+		survival.refresh_all()
+		_advance_suit_checks(step)
+		_accumulator += step
+		while _accumulator >= tick - 1e-9 and count < config.max_ticks_per_frame:
+			_accumulator -= tick
+			var phase_before: float = clock.phase
+			var dt_hours: float = clock.advance(tick)
+			for id: StringName in sim.step(state, balance, phase_before, dt_hours):
+				recover_character(id)
+			for rollover: int in clock.rolled_over:
+				events.sol_started.emit(clock.sol_index - clock.rolled_over + rollover + 1)
+			count += 1
+		survival.advance(step)
+		remaining -= step
 	if count > 0:
 		events.state_changed.emit(&"tick")
 	return count
 
 ## Submits a request to the authoritative validator.
 func submit(action_request: ActionRequest) -> ActionResult:
+	if not authoritative:
+		return ActionResult.failure(action_request.request_id, &"host_only", "Only the authoritative host can apply gameplay actions.")
 	if state != null:
+		survival.refresh_all()
 		repair_runtime.prune(self)
 		cassette_runtime.prune(self)
-	return actions.resolve(self, action_request)
+		wear_runtime.prune(self)
+	var answer := actions.resolve(self, action_request)
+	survival.refresh_all()
+	return answer
 
 ## Builds a fresh request using the peer's current character.
 func request(action: StringName, target: StringName = &"", params: Dictionary = {}, peer: int = HOST_PEER) -> ActionResult:
@@ -132,8 +163,8 @@ func peer_left(peer: int) -> void:
 	if actor != null:
 		# A dropped connection cannot replace an ongoing lethal encounter with a free teleport.
 		# Resolve through the same recovery/cache/resource-cost flow used by ordinary death.
-		var exterior := actor.outside or (outside_test.is_valid() and bool(outside_test.call(actor.position)))
-		var protected := actor.suit_on and actor.suit_charge > 0.0
+		var exterior := not survival.breathable_at(actor.position, actor.in_airlock_pressure_volume)
+		var protected := survival.functional_suit(actor)
 		if actor.lethal_exposure_seconds > 0.0 or actor.health <= 0.0 or (exterior and not protected):
 			recover_character(actor.id)
 		_release(actor)
@@ -150,6 +181,8 @@ func set_pause_vote(peer: int, wants_pause: bool) -> void:
 
 ## Accepts position reports only from the character's owner.
 func report_position(peer: int, character_id: StringName, position: Vector3, yaw: float) -> bool:
+	if not authoritative:
+		return false
 	var actor: CharacterState = state.character(character_id) if state != null else null
 	if actor == null or peer <= 0 or actor.owner_peer != peer:
 		return false
@@ -157,24 +190,29 @@ func report_position(peer: int, character_id: StringName, position: Vector3, yaw
 	actor.yaw = yaw
 	if outside_test.is_valid():
 		actor.outside = bool(outside_test.call(position))
+	survival.refresh_actor(actor)
 	repair_runtime.prune(self)
 	cassette_runtime.prune(self)
+	wear_runtime.prune(self)
 	return true
 
 ## Queues one airlock cycle (host). The next tick takes its air loss from the cabin; the regulator then tops the
 ## cabin up from the oxygen and nitrogen reserves.
 func note_airlock_cycle() -> void:
-	if state != null:
+	if state != null and authoritative:
 		state.pending_airlock_cycles += 1
 
 ## Recovers a downed character and leaves carried items at the incident.
 func recover_character(id: StringName) -> Dictionary:
-	var actor := state.character(id)
 	var info: Dictionary = {"meals": 0.0, "water_l": 0.0, "cache_id": "", "cache_position": []}
+	if state == null or not authoritative:
+		return info
+	var actor := state.character(id)
 	if actor == null:
 		return info
 	repair_runtime.release_character(id)
 	cassette_runtime.release_character(id)
+	wear_runtime.release_character(id)
 	if not actor.cargo.is_empty():
 		var cache_id: String = "cache_%d" % int(state.counters["cache"])
 		state.counters["cache"] = int(state.counters["cache"]) + 1
@@ -196,7 +234,7 @@ func recover_character(id: StringName) -> Dictionary:
 	if outside_test.is_valid():
 		actor.outside = bool(outside_test.call(actor.position))
 	actor.health = balance.recovery_health
-	actor.lethal_exposure_seconds = 0.0
+	survival.reset_character(actor)
 	_cancel_suit_check(id)
 	events.character_recovered.emit(id, info)
 	return info
@@ -207,7 +245,7 @@ func is_at_hub(position: Vector3) -> bool:
 
 ## Switching never cancels a dangerous atmosphere encounter. Read gas masses so this also works before a tick.
 func safe_to_switch(actor: CharacterState) -> bool:
-	if actor.health <= 0.0 or actor.lethal_exposure_seconds > 0.0 or actor.outside or (outside_test.is_valid() and bool(outside_test.call(actor.position))):
+	if actor.health <= 0.0 or actor.lethal_exposure_seconds > 0.0 or not survival.breathable_at(actor.position, actor.in_airlock_pressure_volume):
 		return false
 	return balance.gas_kpa(state.cabin_o2_kg, GameBalance.MOLAR_O2) >= balance.o2_low_kpa and balance.gas_kpa(state.cabin_co2_kg, GameBalance.MOLAR_CO2) <= balance.co2_danger_kpa
 
@@ -224,13 +262,16 @@ func replica_dict() -> Dictionary:
 	var votes := {}
 	for peer: int in _votes:
 		votes[peer] = bool(_votes[peer])
-	return {"peers": peers.duplicate(), "paused": paused, "votes": votes, "suit_checks": checks, "repair": repair_runtime.replica_dict(), "cassettes": cassette_runtime.replica_dict()}
+	return {"peers": peers.duplicate(), "paused": paused, "votes": votes, "suit_checks": checks, "repair": repair_runtime.replica_dict(), "cassettes": cassette_runtime.replica_dict(), "survival": survival.replica_dict(), "wear": wear_runtime.replica_dict()}
 
 
 ## Client: copies the host's session facts (see replica_dict). Emits nothing; the host's forwarded events do that.
 func apply_replica(d: Dictionary) -> void:
+	authoritative = false
 	repair_runtime.apply_replica(d.get("repair", {}))
 	cassette_runtime.apply_replica(d.get("cassettes", {}))
+	survival.apply_replica(d.get("survival", {}))
+	wear_runtime.apply_replica(d.get("wear", {}))
 	peers.clear()
 	for p in d.get("peers", [HOST_PEER]):
 		peers.append(int(p))
@@ -270,6 +311,7 @@ func _recompute_pause() -> void:
 func _release(actor: CharacterState) -> void:
 	repair_runtime.release_character(actor.id)
 	cassette_runtime.release_character(actor.id)
+	wear_runtime.release_character(actor.id)
 	_cancel_suit_check(actor.id)
 	actor.owner_peer = 0
 	actor.position = actor.hub_spot

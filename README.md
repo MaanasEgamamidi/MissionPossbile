@@ -1,8 +1,8 @@
 # Mars Colony — Godot 4.7.2 project
 
-The `revisions` branch implements F01-F06 foundations and C01-C04 cassettes (pages 1-21). Collect six shared room tapes with E, then read their local NASA photos and two-page briefings at the Command Room cassette player. Inventory shows collection status only. See [the cassette handoff](docs/revisions/CASSETTE_HANDOFF.md) and [foundation handoff](docs/revisions/HANDOFF.md) for APIs, verification and limitations.
+The `revisions` branch implements F01-F06 foundations, C01-C04 cassettes and S01-S04 survival (pages 1-25). Collect six shared room tapes with E, then read their local NASA photos and two-page briefings at the Command Room cassette player. Inventory shows collection status only. See [the survival handoff](docs/revisions/SURVIVAL_HANDOFF.md), [cassette handoff](docs/revisions/CASSETTE_HANDOFF.md) and [foundation handoff](docs/revisions/HANDOFF.md) for APIs, verification and limitations.
 
-The user-approved briefings clearly preview the twelve future repair puzzles; exact puzzle controls remain deferred. New hazard timing, restoration art and completion shots also remain later work. The performance update from `main` is merged. No human playtest has been run for these changes.
+Unprotected exposure to unbreathable air causes recovery after four unpaused real seconds. A failed seal or open outer door depressurizes only the exit vestibule; retreat through the inner door or wear a sealed suit with oxygen. Use the safe interior T12 station as the field engineer for 20-second seal maintenance. All twelve repair stations provide role-checked operational maintenance as condition wears continuously. Maintenance preserves puzzle achievements; the twelve actual puzzles, restoration art and completion shots remain future T-section work. The performance update from `main` is merged. No human playtest has been run for these changes.
 
 Open `project.godot` with Godot 4.7.2. The main scene is `scenes/game.tscn` (the map alone is `scenes/world/colony_world.tscn`).
 
@@ -28,7 +28,7 @@ Doors open when you walk up to them. The top-left text shows the sol clock, the 
 & .\tools\run_tests.ps1 -Import
 ```
 
-The runner includes the existing gameplay suites and the new repair-foundation, task-panel and anchor checks. Current results and visual evidence are recorded in [the foundation handoff](docs/revisions/HANDOFF.md). Historical Prompt 03/04 records remain in `docs/milestones/03_simulation/HANDOFF.md` and `docs/milestones/04_player/HANDOFF.md`.
+The runner includes the existing gameplay suites and repair, cassette and survival checks. Current results and visual evidence are recorded in [the survival verification](docs/revisions/SURVIVAL_VERIFICATION.md). Historical Prompt 03/04 records remain in `docs/milestones/03_simulation/HANDOFF.md` and `docs/milestones/04_player/HANDOFF.md`.
 
 ## Collision data
 
@@ -48,6 +48,7 @@ godot --headless --path . --script res://tools/godot/heightmap_level_rooms.gd
 | `scripts/state/` | `ColonyState`, `CharacterState` |
 | `scripts/sim/` | `SolClock`, `ColonySim` |
 | `scripts/session/` | `SessionService`, `ActionService`, built-in actions, legacy station facade |
+| `scripts/survival/` | Host exposure, localized exit pressure and continuous operational wear |
 | `scripts/save/` | `SaveService`, migrations |
 | `scripts/world/` | zones, lighting, stations, collision, doors, terrain height |
 | `scripts/player/` | controller, camera rig, input map, tuning, body, carried props |

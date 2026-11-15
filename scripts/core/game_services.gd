@@ -86,11 +86,15 @@ func local_peer() -> int:
 
 ## True when this machine owns the colony: it ticks the simulation, validates actions and writes the save.
 func is_authority() -> bool:
-	return mode != &"client"
+	return mode != &"client" and session.authoritative
 
 
 ## The character this machine's player controls, or null.
 func local_character() -> CharacterState:
+	# A disconnected replica has no local host identity. Do not display another
+	# astronaut's hazard just because offline peer numbering returns to one.
+	if mode != &"client" and not session.authoritative:
+		return null
 	return session.state.character_of_peer(local_peer()) if has_game() else null
 
 
@@ -101,6 +105,8 @@ func request(action: StringName, target: StringName = &"", params := {}) -> Acti
 		if net == null:
 			return ActionResult.failure("", &"offline")
 		return net.send_request(action, target, params)
+	if not is_authority():
+		return ActionResult.failure("", &"offline")
 	return session.request(action, target, params, local_peer())
 
 
@@ -110,7 +116,8 @@ func report_position(character_id: StringName, position: Vector3, yaw: float) ->
 		if net != null:
 			net.send_position(character_id, position, yaw)
 		return
-	session.report_position(local_peer(), character_id, position, yaw)
+	if is_authority():
+		session.report_position(local_peer(), character_id, position, yaw)
 
 
 ## Starts a fresh colony. The host takes `host_character`. `seed_value` < 0 picks a seed from the system clock.
@@ -174,8 +181,9 @@ func restore(payload: Dictionary) -> void:
 				st.stations[station_id] = catalog[station_id].duplicate(true)
 	var c := SolClock.from_dict(payload.get("clock", {}))
 	var host_character := StringName(String((payload.get("session", {}) as Dictionary).get("host_character", "")))
-	_place_crew_at_hub(st, false, host_character)
 	session.begin(st, c)
+	# Saved local pressure must be attached before deciding whether a remote encounter is safe to park.
+	_place_crew_at_hub(st, false, host_character)
 	if st.characters.has(host_character):
 		session.request(&"claim_character", host_character)
 	_autosave_left = config.autosave_seconds
@@ -242,10 +250,12 @@ func _place_crew_at_hub(st: ColonyState, everyone: bool, keep: StringName = &"")
 		elif c.id != keep:
 			# A save may contain a remote astronaut in danger. Keep that encounter at its saved location
 			# until the astronaut is controlled again; loading must not supply a free rescue or reset.
-			var exterior := c.outside or (session.outside_test.is_valid() and bool(session.outside_test.call(c.position)))
-			if c.lethal_exposure_seconds <= 0.0 and c.health > 0.0 and not (exterior and not (c.suit_on and c.suit_charge > 0.0)):
+			var exterior := not session.survival.breathable_at(c.position, c.in_airlock_pressure_volume)
+			if c.lethal_exposure_seconds <= 0.0 and c.health > 0.0 and not (exterior and not session.survival.functional_suit(c)):
 				c.position = c.hub_spot
-		if session.outside_test.is_valid():
+		if session.state == st:
+			c.outside = not session.survival.breathable_at(c.position, c.in_airlock_pressure_volume)
+		elif session.outside_test.is_valid():
 			c.outside = bool(session.outside_test.call(c.position))
 
 

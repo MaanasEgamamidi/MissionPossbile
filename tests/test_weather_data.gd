@@ -374,17 +374,21 @@ func _check_register_entries() -> void:
 		file_ids.append(String(s.get("id", "")))
 	var extra_ids: Array = []
 	for s: Dictionary in SourceLibrary.extra_sources():
-		extra_ids.append(String(s.get("id", "")))
+		if file_ids.has(String(s.get("id", ""))):
+			extra_ids.append(String(s.get("id", "")))
 	var in_register := false
 	for s: Dictionary in SourceLibrary.sources():
 		if file_ids.has(String(s.get("id", ""))):
 			in_register = true
 	_check("SourceLibrary loads data/sources_weather.json beside the register",
 		file_ids.size() >= 10 and extra_ids == file_ids and not in_register \
-		and SourceLibrary.all_sources().size() == SourceLibrary.sources().size() + extra_ids.size(),
+		and SourceLibrary.all_sources().size() == SourceLibrary.sources().size() + SourceLibrary.extra_sources().size(),
 		"%d weather entries; register %d" % [extra_ids.size(), SourceLibrary.sources().size()])
 	var fields_bad: PackedStringArray = []
 	for s: Dictionary in SourceLibrary.extra_sources():
+		# Other extension bundles (cassette photographs) have their own schema checks.
+		if not file_ids.has(String(s.get("id", ""))):
+			continue
 		for f: String in ["title", "publisher", "url", "status", "checked_on", "kind", "category", "values_read", "supports", "mission_site", "observation_dates", "units"]:
 			if not s.has(f):
 				fields_bad.append("%s lacks %s" % [s.get("id", "?"), f])

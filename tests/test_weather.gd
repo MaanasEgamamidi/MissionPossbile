@@ -130,6 +130,10 @@ func _session(seed_value: int, active: int = 1, balance: GameBalance = null) -> 
 ## Advances by `hours` game hours in ticks of `dt`; returns the number of characters that reached zero health.
 ## `each(t)` is called after every tick.
 func _hours(s: SessionService, hours: float, dt: float = 0.1, each: Callable = Callable()) -> int:
+	# These long-horizon weather checks call the model directly. Reconcile fixture
+	# teleports exactly as Session.advance does before ticking, so returning from
+	# panel cleaning cannot leave an indoor astronaut classified as outside.
+	s.survival.refresh_all()
 	var downs := 0
 	var t := 0.0
 	while t < hours - 1e-9:

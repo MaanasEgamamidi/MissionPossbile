@@ -87,11 +87,18 @@
 
 	"health_loss_per_hour_low_o2": {"category": "balance", "source_ids": [], "note": "Up to 40 health per game hour, scaled by how far cabin O2 is below o2_low_kpa (replaces health_loss_per_hour_no_oxygen)."},
 	"health_loss_per_hour_co2": {"category": "balance", "source_ids": [], "note": "Up to 20 per game hour, scaled by how far CO2 is above co2_danger_kpa."},
-	"health_loss_per_hour_no_air": {"category": "balance", "source_ids": [], "note": "25 per game hour outside without air (suit off or tank empty); no instant death."},
+	"health_loss_per_hour_no_air": {"category": "balance", "source_ids": [], "note": "Legacy pure-ColonySim fallback of 25 per game hour. Production SessionService delegates atmospheric danger to its real-second exposure rule; this number is not physiological evidence."},
 	"health_loss_per_hour_no_water": {"category": "balance", "source_ids": [], "note": "6 per game hour, scaled by the unmet share (unchanged)."},
 	"health_loss_per_hour_no_food": {"category": "balance", "source_ids": [], "note": "3 per game hour, scaled by the unmet share (unchanged)."},
 	"recovery_health": {"category": "balance", "source_ids": [], "note": "50 (unchanged)."},
 	"cargo_slots": {"category": "balance", "source_ids": [], "note": "6 (unchanged)."},
+	"maintenance_enabled": {"category": "balance", "source_ids": [], "note": "Enables the one host-owned operational wear ticker. No room, panel or client advances wear."},
+	"maintenance_wear_per_second": {"category": "balance", "source_ids": [], "note": "Condition lost per unpaused REAL second, default 1/480. Full condition reaches warning at 120 seconds and fault at 240 seconds before repair grace. A playtest target, not a NASA hardware lifetime."},
+	"maintenance_warning_condition": {"category": "balance", "source_ids": [], "note": "Default warning condition 0.75; game tuning independent of mission milestones."},
+	"maintenance_fault_condition": {"category": "balance", "source_ids": [], "note": "Default maintenance fault condition 0.5. One fault generation is created until repaired; this is game tuning."},
+	"maintenance_repair_seconds": {"category": "balance", "source_ids": [], "note": "Default host-validated maintenance job lasts 20 unpaused REAL seconds. It restores mapped condition and does not complete a room minigame."},
+	"maintenance_repair_cooldown_seconds": {"category": "balance", "source_ids": [], "note": "Default 15 REAL seconds of repair grace before wear resumes. Remaining grace persists through saves; no offline wear."},
+	"cleaner_wear_per_second": {"category": "balance", "source_ids": [], "note": "Default 1/480 condition per REAL second for the already-repairable legacy panel cleaner. Other legacy units are not assigned unrepairable faults; the existing game-hour panel-dust ticker is unchanged."},
 
 	"_removed": {"category": "index", "source_ids": [], "note": "Removed placeholder fields: water_recycle_fraction, oxygen_kg_per_hour_generated, oxygen_generation_kw, health_loss_per_hour_no_oxygen (replaced by the recycler, the two oxygen processes and health_loss_per_hour_low_o2). SOL_HOURS (S02) and MARS_GRAVITY (S01) stay in GameConfig."}
 }

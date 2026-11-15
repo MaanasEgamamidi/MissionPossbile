@@ -254,8 +254,10 @@ static func suit_kg(balance: GameBalance, c: CharacterState) -> float:
 
 
 ## Health lost per game hour by one active character, each cause scaled by how bad it is.
-static func health_loss_per_hour(state: ColonyState, balance: GameBalance, c: CharacterState, no_air_share: float, water_share: float, food_share: float) -> float:
+static func health_loss_per_hour(state: ColonyState, balance: GameBalance, c: CharacterState, no_air_share: float, water_share: float, food_share: float, atmosphere_damage := true) -> float:
 	var loss := balance.health_loss_per_hour_no_water * water_share + balance.health_loss_per_hour_no_food * food_share
+	if not atmosphere_damage:
+		return loss
 	if c.outside:
 		loss += balance.health_loss_per_hour_no_air * no_air_share
 	else:

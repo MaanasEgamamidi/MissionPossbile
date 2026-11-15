@@ -1,0 +1,79 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS register file readable  res://docs/source_register.md
+PASS every S, T, M and L register entry is in sources.json  38 entries; missing []
+PASS source statuses match the register  30 statuses compared; 
+PASS source categories use the contract words
+PASS every https:// address is well formed and equals the register's  30 addresses; 
+PASS is_safe_url refuses anything that is not a plain https address
+PASS status in plain words  ["Checked on 11 Nov 2026", "Partly checked", "Not yet checked", "Could not be opened"]
+PASS citable means VERIFIED or PARTIAL only
+PASS every claim's source ids exist and categories are valid  28 claims; 
+PASS no archive claim cites only SEARCH-ONLY or FAILED sources  unsourced claims: ["solar_dust", "earth_radio_delay"]; 
+PASS required claims present with the right sources
+PASS solar dust claim follows S18's status  S18 is SEARCH-ONLY; claim category words: source not yet checked
+PASS every required explanation exists with short and long text and valid ids  37 explanations; 
+PASS unknown explanation id gives an empty entry
+PASS credits data: every required credit, licences stated (unknown where unknown), urls well formed
+PASS panels use no network classes and open the browser only through SourceLibrary.open_url  shell_open calls: 1; 
+PASS register explains what it is at the top
+PASS register lists every claim and source  66 of 66
+PASS SourceRegisterPanel at 1280x720, text 1.0: layout  root (1280, 720); 
+PASS SourceRegisterPanel at 1280x720, text 1.0: focus
+PASS SourceRegisterPanel at 1920x1080, text 1.0: layout  root (1920, 1080); 
+PASS SourceRegisterPanel at 1920x1080, text 1.0: focus
+PASS SourceRegisterPanel at 1280x720, text 1.5: layout  root (1280, 720); 
+PASS SourceRegisterPanel at 1280x720, text 1.5: focus
+PASS search 'moxie' finds S09 and the MOXIE claim, not S01  ["oxygen_from_co2", "oxygen_scale_up", "S09", "S10"]
+PASS category 'Engine and tools' shows only T, M and L entries  ["T01", "T02", "T03", "T04", "T05", "T06", "T07", "T08", "T09", "T10", "T11", "M01", "M02", "M03", "M04", "L01", "L02", "L03", "L04"]
+PASS category 'ISS and Earth tests' shows ISS sources and their claims  ["oxygen_from_water", "water_recycling", "plants_in_space", "S08", "S19", "S11", "S13", "S14", "S12", "S16"]
+PASS category 'Game balance' shows balance and game-time claims  ["sol_compression", "crew_rates", "battery_numbers", "weather_not_forecast", "weather_game_speed", "weather_severity_balance", "weather_solar_formula"]
+PASS search and category combine  ["mars_air"]
+PASS no match shows an empty list and a hint
+PASS show_entry clears a filter that hides the entry
+PASS every displayed link equals the register's address for that id
+PASS unchecked sources are shown as 'not yet checked', never as a citation
+PASS long entries wrap without clipping (1280x720, text 1.5)
+PASS a claim lists its source as a button  shown: gravity; Gravity on Mars | Gravity on Mars is 3.73 m/s². Things fall more slowly than on Earth, so you can jump higher. | Kind of fact: measured on Mars | Sources | ✓ S01 · Mars Fact Sheet (Checked on 11 Nov 2026) | Note: Mean surface gravity from the NASA Mars Fact Sheet. The game uses this value for walking and jumping.
+PASS pressing the source button shows the source  S01
+PASS nothing opened before a button press  []
+PASS Open in browser opens exactly the register's address once  ["https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"]
+PASS open_url refuses a non-https address
+PASS an entry without an address has no browser button
+PASS first focus lands on the list when an entry is shown
+PASS show_entry called before setup opens at that entry
+PASS Close button asks to close
+PASS no HTTPRequest nodes anywhere in the tree (register works offline)
+PASS ? button shows '?' with the short text as tooltip  Oxygen is the gas the crew breathes, counted in kg.
+PASS pressing ? opens the popup
+PASS popup shows title, long text and each claim's kind in words  Oxygen | Mars air is mostly carbon dioxide and has far too little oxygen to breathe. The colony makes oxygen in life support, which needs power. On the space station, water is split to make oxygen. A small test machine called MOXIE made oxygen from Mars air. How much the crew uses is game balance. | What kind of facts these are: | • What Mars air is made of: measured on Mars | • Oxygen from water: ISS or Earth test | • Oxygen from Mars air: technology test | • The colony's big oxygen machines: made up for the game | • How fast the crew uses supplies: game balance | Sources | Close
+PASS popup is inside the same window
+PASS no HTTPRequest nodes anywhere in the tree (register works offline)
+PASS keyboard focus moves to the popup's Sources button  SourcesButton:<Button#677900191611>
+PASS popup layout at 1280x720, text 1.0  popup (468, 584) at (294, 68); fits without scrolling: true;  
+PASS popup focus at 1280x720, text 1.0
+PASS popup layout at 1920x1080, text 1.0  popup (468, 584) at (614, 248); fits without scrolling: true;  
+PASS popup focus at 1920x1080, text 1.0
+PASS popup layout at 1280x720, text 1.5  popup (702, 648) at (89, 36); fits without scrolling: false;  
+PASS popup focus at 1280x720, text 1.5
+PASS Esc closes the popup first  popup visible false, game saw Esc 0 times
+PASS focus returns to the ? button
+PASS with the popup closed, Esc goes on to the game (sentinel works)  1
+PASS Sources emits sources_requested with the first linked claim  ["mars_air"]
+PASS Sources asks the owning panel to open a SourceRegisterPanel
+PASS the register opens at that entry  mars_air
+PASS a button outside any panel still emits sources_requested  [""]
+PASS an unknown id shows a plain 'not written yet' popup without errors
+PASS credits grouped by kind  ["Engine", "Tools", "Assets", "Science sources"]
+PASS credits show licences in words
+PASS CreditsPanel at 1280x720, text 1.0: layout  root (1280, 720); 
+PASS CreditsPanel at 1280x720, text 1.0: focus
+PASS CreditsPanel at 1920x1080, text 1.0: layout  root (1920, 1080); 
+PASS CreditsPanel at 1920x1080, text 1.0: focus
+PASS CreditsPanel at 1280x720, text 1.5: layout  root (1280, 720); 
+PASS CreditsPanel at 1280x720, text 1.5: focus
+PASS credit entries wrap without clipping (1280x720, text 1.5)
+PASS science credits link to the source register
+PASS no HTTPRequest nodes anywhere in the tree (register works offline)
+PASS no browser opened except by the one button press  ["https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html"]
+RESULT 76/76

@@ -17,6 +17,8 @@ extends RefCounted
 
 ## Optional: where new alerts are announced. Set by SessionService.
 var events: GameEvents
+## SessionService's real-time exposure rule owns atmospheric harm. Standalone model checks retain legacy defaults.
+var exposure_managed := false
 ## Systems added by later milestones, run every tick. Each is an object with
 ##   func step(state: ColonyState, balance: GameBalance, phase: float, dt_hours: float, events: GameEvents) -> void
 ## pre_systems run first (weather sets dust_tau before solar power is worked out);
@@ -74,7 +76,7 @@ func step(state: ColonyState, balance: GameBalance, phase: float, dt_hours: floa
 	for c in crew:
 		if c.health <= 0.0:
 			continue
-		var loss := LifeSupportModel.health_loss_per_hour(state, balance, c, float(no_air.get(c.id, 0.0)), water_share, food_share)
+		var loss := LifeSupportModel.health_loss_per_hour(state, balance, c, float(no_air.get(c.id, 0.0)), water_share, food_share, not exposure_managed)
 		if loss > 0.0:
 			c.health = maxf(0.0, c.health - loss * dt)
 			if c.health <= 0.0:
@@ -100,6 +102,10 @@ func _update_alerts(state: ColonyState, balance: GameBalance, phase_end: float, 
 	var fresh: Array = []
 	for entry: Array in PowerModel.alerts(state, balance, phase_end) + LifeSupportModel.alerts(state, balance, no_air):
 		var id := String(entry[0])
+		# Real-time survival publishes peer-specific warnings. A global legacy no-air urgent alert
+		# would incorrectly interrupt protected or sheltered peers' task/cassette panels too.
+		if exposure_managed and id.begins_with("no_air_"):
+			continue
 		var since := state.sim_hours
 		if previous.has(id):
 			since = float((previous[id] as Dictionary).since_hours)

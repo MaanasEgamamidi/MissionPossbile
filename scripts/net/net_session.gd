@@ -56,7 +56,7 @@ signal motion_extras_received(extras: Dictionary)
 ## game_saved and game_loaded describe the host's own files and stay there.
 const FORWARDED := [&"state_changed", &"objective_changed", &"weather_changed", &"upgrade_eligibility_changed",
 	&"crew_ownership_changed", &"zone_power_changed", &"sol_settings_changed", &"pause_changed", &"sol_started",
-	&"system_alert", &"character_recovered", &"suit_check_started", &"suit_check_finished"]
+	&"system_alert", &"character_recovered", &"hazard_changed", &"suit_check_started", &"suit_check_finished"]
 
 var services: GameServices
 ## Address and port this client joined, for status_text().
@@ -99,7 +99,7 @@ func _exit_tree() -> void:
 ## Starts hosting the colony already loaded in `services`. Returns OK or an engine error.
 func host(p_port := DEFAULT_PORT) -> Error:
 	leave()
-	if services == null:
+	if services == null or not services.is_authority():
 		return ERR_UNCONFIGURED
 	var peer := ENetMultiplayerPeer.new()
 	var err := peer.create_server(p_port, MAX_PLAYERS - 1, CHANNEL_COUNT)

@@ -1,0 +1,18 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS shipped bundle validates (fields, sha256, sizes, units, columns, time order, ranges, episodes, refresh)  10 products, 2490 rows, 720 missing cells, 9 episodes; 
+PASS the game's WeatherArchive loader accepts the shipped bundle (count columns such as 'samples' are not held to the ratio range), so an offline boot uses it
+PASS shipped bundle has pressure, air temperature, wind and dust opacity products  ["pressure", "wind", "air_temperature", "dust_opacity"]
+PASS shipped bundle has observation-derived episodes and a seasonal background  9 episodes (1 with measured wind), 37 background points
+PASS every product is from one site, Jezero crater, and MEDA products keep their PDS ids
+PASS manifest says archive observations, not live weather or a forecast  Archived observations from Jezero crater (2019-2022), not live weather and not a forecast for the colony. The game plays them faster and scales them; those changes are game transformation.
+PASS fixture bundle validates with 2 products and 2 episodes
+PASS a wrong sha256, a unit outside the set, a missing field and a changed episodes file are each rejected  caught: ["sha256", "unit", "field", "episodes"]
+PASS bundle CSVs are kept as plain files (no translation import)
+PASS every product's source id resolves to a VERIFIED weather entry with the same address
+PASS SourceLibrary loads data/sources_weather.json beside the register  12 weather entries; register 38
+PASS weather register entries have the register fields and a check date
+PASS weather claims resolve in SourceLibrary with checked sources
+PASS weather claims cover archive, game time and balance  ["archive", "game_time", "balance"]
+PASS the 'not a forecast' claim says archive observations played faster  The weather screen shows old measurements from Jezero crater, played faster. It is not live weather and not a forecast for this colony.
+RESULT 15/15

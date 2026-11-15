@@ -9,8 +9,9 @@ extends Resource
 ##   S01/S02  Mars gravity and the length of a sol (see GameConfig)
 ##   balance  game tuning with no source. NEVER present a balance number as a NASA figure.
 ## The same categories are listed per field in data/model_sources.json.
-## Rates are per GAME hour (one sol = GameConfig.SOL_HOURS game hours), so the real length of a sol never changes how
-## much is produced or used per sol. kW is a rate of energy use, kWh an amount; they are never mixed.
+## Resource rates are per GAME hour (one sol = GameConfig.SOL_HOURS game hours), so the real length of a sol never
+## changes resource use per sol. Equipment maintenance explicitly uses unpaused REAL seconds instead.
+## kW is a rate of energy use, kWh an amount; they are never mixed.
 
 # ---- physics constants (not tuning)
 ## Water used per kg of oxygen made by electrolysis: 2 H2O -> 2 H2 + O2, 36 g of water gives 32 g of oxygen. (physics)
@@ -191,6 +192,22 @@ const MOLAR_CO2 := 0.044
 @export_group("Carrying")
 ## balance
 @export var cargo_slots := 6
+
+@export_group("Equipment maintenance (real seconds)")
+## balance: the authoritative session is the single owner of operational wear. No room/panel ticker is used.
+@export var maintenance_enabled := true
+## balance: condition lost per unpaused real second; 1 -> 0.75 at 120 s and 0.5 at 240 s before repair grace.
+@export var maintenance_wear_per_second := 1.0 / 480.0
+## balance: a warning threshold, independent of the first-repair narrative milestone.
+@export_range(0.0, 1.0) var maintenance_warning_condition := 0.75
+## balance: a maintenance fault advances its generation once at this condition.
+@export_range(0.0, 1.0) var maintenance_fault_condition := 0.5
+## balance: a role-checked equipment maintenance job, not a replacement for a future room minigame.
+@export var maintenance_repair_seconds := 20.0
+## balance: safe grace after repair before wear resumes; the remaining grace is saved.
+@export var maintenance_repair_cooldown_seconds := 15.0
+## balance: only the already repairable legacy panel cleaner receives additional condition wear.
+@export var cleaner_wear_per_second := 1.0 / 480.0
 
 
 func load_of_zone(zone: String) -> float:

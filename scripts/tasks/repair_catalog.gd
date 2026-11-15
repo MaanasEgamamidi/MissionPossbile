@@ -2,7 +2,8 @@ class_name RepairCatalog
 extends RefCounted
 ## Stable foundation contract. These records do not implement any room puzzle or cassette behavior.
 
-const VERSION := 1
+const VERSION := 2
+const MAINTENANCE_SCHEMA := 1
 const ROOMS := {
 	"command_center": {"title": "Command center", "zones": ["Command Room"], "tasks": ["T01", "T02"]},
 	"power_supply": {"title": "Power supply", "zones": ["Power Room"], "tasks": ["T03", "T04"]},
@@ -30,17 +31,19 @@ static func anchor_id(task_id: String) -> String:
 	return "repair_" + task_id.to_lower()
 
 static func fresh(seed_value: int) -> Dictionary:
-	var result := {"version": VERSION, "rooms": {}, "tasks": {}, "collected_cassettes": [], "seen_beauty_shots": []}
+	var result := {"version": VERSION, "maintenance_schema": MAINTENANCE_SCHEMA, "rooms": {}, "tasks": {}, "collected_cassettes": [], "seen_beauty_shots": [],
+		"legacy_maintenance": {"cleaner": {"last_condition": -1.0, "wear_elapsed_seconds": 0.0, "maintenance_cooldown_seconds": 0.0, "warning_active": false}}}
 	for room_id: String in ROOMS:
-		result.rooms[room_id] = {"first_completed": false, "condition": 0.0, "wear_hours": 0.0}
+		result.rooms[room_id] = {"first_completed": false, "condition": 1.0, "wear_hours": 0.0}
 	var random := RandomNumberGenerator.new()
 	random.seed = seed_value
 	for task_id: String in TASKS:
 		var info: Array = TASKS[task_id]
 		result.tasks[task_id] = {"task_id": task_id, "room_id": info[0], "title": info[1],
 			"required_specialty": info[2], "anchor_id": anchor_id(task_id), "puzzle_seed": random.randi(),
-			"fault_generation": 1, "progress": 0.0, "condition": 0.0, "first_completed": false,
-			"puzzle_state": {}, "resume_supported": false}
+			"fault_generation": 1, "progress": 0.0, "condition": 1.0, "first_completed": false,
+			"puzzle_state": {}, "resume_supported": false, "maintenance_schema": MAINTENANCE_SCHEMA,
+			"maintenance_fault": false, "wear_elapsed_seconds": 0.0, "maintenance_cooldown_seconds": 0.0, "warning_active": false}
 	return result
 
 ## Save-only projection. LAN snapshots keep all live moves; disk resumes only explicitly supported puzzles.
@@ -52,7 +55,7 @@ static func for_save(records: Dictionary) -> Dictionary:
 			task.puzzle_state = {}
 	return saved
 
-## Nested v0 (absent in existing saves) -> v1 migration; the surrounding save envelope stays compatible.
+## Nested v0/v1 -> v2 maintenance migration; the surrounding save envelope stays compatible.
 ## Catalog identity and role fields always come from this host build.
 static func restore(saved: Dictionary, seed_value: int) -> Dictionary:
 	var result := fresh(seed_value)
@@ -68,6 +71,14 @@ static func restore(saved: Dictionary, seed_value: int) -> Dictionary:
 		task.first_completed = bool(incoming.get("first_completed", false))
 		task.puzzle_state = (incoming.get("puzzle_state", {}) as Dictionary).duplicate(true)
 		task.resume_supported = bool(incoming.get("resume_supported", false))
+		var old_placeholder: bool = not incoming.has("maintenance_schema") and int(task.fault_generation) == 1 and not bool(task.first_completed) and float(task.progress) <= 0.0 and task.puzzle_state.is_empty() and float(task.condition) <= 0.0
+		# F/C zeroes were unimplemented-puzzle placeholders, not failed operational hardware.
+		if old_placeholder:
+			task.condition = 1.0
+		task.maintenance_fault = bool(incoming.get("maintenance_fault", int(task.fault_generation) > 1 and float(task.condition) < 1.0 and float(task.progress) < 1.0))
+		for key: String in ["wear_elapsed_seconds", "maintenance_cooldown_seconds"]:
+			task[key] = maxf(0.0, float(incoming.get(key, 0.0)))
+		task.warning_active = bool(incoming.get("warning_active", false))
 	var saved_rooms: Dictionary = saved.get("rooms", {})
 	for room_id: String in ROOMS:
 		var room: Dictionary = result.rooms[room_id]
@@ -75,6 +86,15 @@ static func restore(saved: Dictionary, seed_value: int) -> Dictionary:
 		room.first_completed = bool(incoming.get("first_completed", false))
 		room.condition = clampf(float(incoming.get("condition", 0.0)), 0.0, 1.0)
 		room.wear_hours = maxf(0.0, float(incoming.get("wear_hours", 0.0)))
+		room.condition = 0.0
+		for task_id: String in ROOMS[room_id].tasks:
+			room.condition += float(result.tasks[task_id].condition) / float((ROOMS[room_id].tasks as Array).size())
+	var old_cleaner: Dictionary = (saved.get("legacy_maintenance", {}) as Dictionary).get("cleaner", {})
+	var cleaner: Dictionary = result.legacy_maintenance.cleaner
+	cleaner.last_condition = float(old_cleaner.get("last_condition", -1.0))
+	for key: String in ["wear_elapsed_seconds", "maintenance_cooldown_seconds"]:
+		cleaner[key] = maxf(0.0, float(old_cleaner.get(key, 0.0)))
+	cleaner.warning_active = bool(old_cleaner.get("warning_active", false))
 	for key: String in ["collected_cassettes", "seen_beauty_shots"]:
 		for id: Variant in saved.get(key, []):
 			var known := ROOMS.has(String(id)) if key == "seen_beauty_shots" else String(id).begins_with("cassette_") and ROOMS.has(String(id).trim_prefix("cassette_"))

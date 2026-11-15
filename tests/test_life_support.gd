@@ -63,6 +63,10 @@ func _session(active: int = 4) -> SessionService:
 	var ev := GameEvents.new()
 	_event_nodes.append(ev)
 	var s := SessionService.new(GameConfig.new(), GameBalance.new(), ev)
+	# _hours deliberately exercises the standalone game-hour model directly, bypassing
+	# Session.advance. Retain that model's legacy gas-health compatibility here;
+	# test_survival verifies production's replacement real-time atmospheric rule.
+	s.sim.exposure_managed = false
 	var st := ColonyState.new_game(s.balance, 4242, _zones.names)
 	st.stations = _catalog.duplicate(true)
 	for c: CharacterState in st.characters.values():

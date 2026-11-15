@@ -1,6 +1,6 @@
 # Revisions execution ledger
 
-This ledger records the original PDF pages 1-17 assignment. The subsequently authorized C01-C04 batch is tracked in `CASSETTE_HANDOFF.md`; S01 and later sections remain outside the current assignment.
+This ledger records the original PDF pages 1-17 assignment and the later authorized C01-C04 and S01-S04 batches. Their current scope and evidence are tracked in `CASSETTE_HANDOFF.md` and `SURVIVAL_HANDOFF.md`. Stop before T01 on page 26.
 
 | Unit | Dependencies | Owner | Implementation / evidence |
 | --- | --- | --- | --- |
@@ -34,3 +34,9 @@ F01-F06 were implemented and verified within the original assignment. `FINAL_VER
 ## Subsequent cassette batch
 
 C01-C04 are complete within the user's approved scope, including truthful preview briefings while T puzzles remain deferred. Current affected-suite verification is 17 suites and 1261/1261 checks; compilation covers 258 scripts and actual exported offline cassette assets pass 6/6. `CASSETTE_VERIFICATION.md` contains the selected current evidence matrix and corrected save-isolation/P07-mapping/suit-placement fixture explanations. `CASSETTE_HANDOFF.md` contains the C execution ledger, public APIs, six photo credits/content records and remaining human/rendering limits. Stop before S01; no later section is implemented by this batch.
+
+## Subsequent survival batch
+
+The user's "run next section" authorizes S01-S04 on pages 22-25; stop before T01 on page 26. `SURVIVAL_HANDOFF.md` and `SURVIVAL_VERIFICATION.md` record this batch. The existing orchestrator owns wear and the implementation audit, the foundation engineer owns exposure and local pressure, the UI engineer owns critical warnings and accessibility, and the parent integrates world doors, maintenance panels, LAN checks and Git delivery. The runtime still permits only three child agents.
+
+Operational condition starts at full for the old F/C placeholder records while puzzle completion remains false. Role-checked twenty-second maintenance restores mapped condition without completing a future puzzle or replaying rewards. T12 is reachable from the safe interior; the 4-second hazard occupies only the explicit exit vestibule. The colony-wide gas ledger retains its single existing airlock-cycle accounting path. `main` was fetched during S work and contained no commits missing from `revisions`.

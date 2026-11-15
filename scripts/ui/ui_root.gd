@@ -115,9 +115,15 @@ func show_critical_alert(message: String, seconds := 6.0) -> void:
 	_critical_text.text = "! " + message
 	_critical_banner.visible = true
 	_critical_left = maxf(seconds, 0.1)
-	var panel := top()
-	if panel != null and panel.interrupt_on_critical:
-		panel.interrupt(message)
+	interrupt_critical_panels(message)
+
+
+## Urgent world overlays can release all reading/task surfaces, including one hidden by settings.
+## This never changes pause votes or closes the player's normal menus.
+func interrupt_critical_panels(message: String) -> void:
+	for panel: UiPanel in _stack.duplicate():
+		if is_instance_valid(panel) and panel.interrupt_on_critical:
+			panel.interrupt(message)
 
 
 func _on_system_alert(_id: StringName, level: StringName, message: String) -> void:

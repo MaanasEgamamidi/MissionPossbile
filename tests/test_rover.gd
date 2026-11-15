@@ -117,14 +117,20 @@ func _by_rover() -> void:
 	me().position = RoverModel.pose_position(st()) + RoverModel.pose_quat(st()) * Vector3(2.4, 0.0, 0.0)
 
 
-## Hands the local player over to crew member `id` (the old one is walked to the hub first).
+## Hands the local player over to crew member `id` after a valid safe-hub switch.
 func _become(id: StringName) -> void:
 	if me() != null and me().id == id:
 		return
 	if me() != null:
 		RoverSystem.free_seat_of(st(), String(me().id))
-		me().position = me().hub_spot
-	services.session.request(&"claim_character", id)
+		# Position-only fixture travel must still pass the authoritative pressure query. A brief prior
+		# unprotected garage tick carries exposure debt until the configured continuous safe interval.
+		services.report_position(me().id, me().hub_spot, me().yaw)
+		if me().lethal_exposure_seconds > 0.0:
+			var safe_left := maxf(0.0, services.config.exposure_safe_recovery_seconds - me().exposure_safe_seconds)
+			services.session.advance(safe_left + 0.001)
+	var claimed := services.session.request(&"claim_character", id)
+	assert(claimed.ok and me() != null and me().id == id, "Rover fixture could not switch safely: " + claimed.message)
 
 
 func _req(action: StringName, target: StringName, params := {}) -> ActionResult:

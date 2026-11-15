@@ -1,0 +1,59 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS fresh start
+PASS round trip write
+PASS round trip status
+PASS colony deep round trip
+PASS whole payload round trip
+PASS 64-bit RNG state string
+PASS RNG next 20 numbers
+PASS five writes
+PASS rotation main fifth
+PASS rotation bak1 fourth
+PASS rotation bak2 third
+PASS rotation exact files
+PASS interrupted setup
+PASS interrupted write error and 100 bytes
+PASS interrupted preserves old main
+PASS normal write after interruption
+PASS recovery setup
+PASS truncated main recovers bak1
+PASS truncated main problem named
+PASS recovery setup
+PASS move main to temp
+PASS complete temp beats backup
+PASS recovery setup
+PASS bit rot changes one digit in valid JSON
+PASS bit rot falls back
+PASS all damaged corrupt
+PASS damaged files untouched
+PASS newer schema refused untouched
+PASS unsupported wins over corruption
+PASS older schema without path
+PASS migration setup
+PASS migration paths
+PASS migration deep copy
+PASS migration in memory
+PASS migration next write
+PASS migration schema 2 and original backup
+PASS offline setup
+PASS no offline effect
+PASS invalid JSON rejected
+PASS non-dictionary rejected
+PASS missing format
+PASS missing schema
+PASS missing game_version
+PASS missing saved_at_unix
+PASS missing reason
+PASS missing checksum
+PASS missing payload
+PASS wrong format rejected
+PASS non-dictionary payload rejected
+PASS checksum checked before schema
+PASS canonical numeric and key normalization
+PASS zero backups
+PASS delete all
+PASS awkward numbers: save accepted and loads
+PASS awkward numbers: a loaded game saves and loads again
+PASS awkward numbers: values within 1e-12 relative after two save/load cycles
+RESULT 56/56

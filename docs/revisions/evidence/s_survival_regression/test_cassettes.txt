@@ -1,0 +1,91 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS six distinct room cassette identities
+PASS collect cassette_command_center once with full cargo
+PASS simultaneous other peer cannot duplicate cassette_command_center
+PASS network replay is idempotent cassette_command_center
+PASS pickup exposes metadata only cassette_command_center
+PASS collect cassette_power_supply once with full cargo
+PASS simultaneous other peer cannot duplicate cassette_power_supply
+PASS network replay is idempotent cassette_power_supply
+PASS pickup exposes metadata only cassette_power_supply
+PASS collect cassette_greenhouse once with full cargo
+PASS simultaneous other peer cannot duplicate cassette_greenhouse
+PASS network replay is idempotent cassette_greenhouse
+PASS pickup exposes metadata only cassette_greenhouse
+PASS collect cassette_green_dome once with full cargo
+PASS simultaneous other peer cannot duplicate cassette_green_dome
+PASS network replay is idempotent cassette_green_dome
+PASS pickup exposes metadata only cassette_green_dome
+PASS collect cassette_med_bay once with full cargo
+PASS simultaneous other peer cannot duplicate cassette_med_bay
+PASS network replay is idempotent cassette_med_bay
+PASS pickup exposes metadata only cassette_med_bay
+PASS collect cassette_hangar once with full cargo
+PASS simultaneous other peer cannot duplicate cassette_hangar
+PASS network replay is idempotent cassette_hangar
+PASS pickup exposes metadata only cassette_hangar
+PASS collection independent of cargo and resources
+PASS another peer cannot act as owned crew
+PASS dead crew cannot collect
+PASS pickup rejects mismatched canonical room metadata
+PASS pickup validates actual actor room
+PASS direct open/read away rejected cassette_command_center
+PASS direct open/read away rejected cassette_power_supply
+PASS direct open/read away rejected cassette_greenhouse
+PASS direct open/read away rejected cassette_green_dome
+PASS direct open/read away rejected cassette_med_bay
+PASS direct open/read away rejected cassette_hangar
+PASS read requires station opening first
+PASS initial damaged room player opens without repair prerequisite
+PASS packaged local photograph and briefing cassette_command_center
+PASS each collected tape selectable only at player cassette_command_center
+PASS host authorizes real page cassette_command_center
+PASS page beyond packaged record rejected cassette_command_center
+PASS packaged local photograph and briefing cassette_power_supply
+PASS each collected tape selectable only at player cassette_power_supply
+PASS host authorizes real page cassette_power_supply
+PASS page beyond packaged record rejected cassette_power_supply
+PASS packaged local photograph and briefing cassette_greenhouse
+PASS each collected tape selectable only at player cassette_greenhouse
+PASS host authorizes real page cassette_greenhouse
+PASS page beyond packaged record rejected cassette_greenhouse
+PASS packaged local photograph and briefing cassette_green_dome
+PASS each collected tape selectable only at player cassette_green_dome
+PASS host authorizes real page cassette_green_dome
+PASS page beyond packaged record rejected cassette_green_dome
+PASS packaged local photograph and briefing cassette_med_bay
+PASS each collected tape selectable only at player cassette_med_bay
+PASS host authorizes real page cassette_med_bay
+PASS page beyond packaged record rejected cassette_med_bay
+PASS packaged local photograph and briefing cassette_hangar
+PASS each collected tape selectable only at player cassette_hangar
+PASS host authorizes real page cassette_hangar
+PASS page beyond packaged record rejected cassette_hangar
+PASS negative page rejected
+PASS missing tape remains locked
+PASS fake playback anchor rejected
+PASS player room metadata must be canonical
+PASS player checks actual actor room
+PASS playback library is not exclusive between peers
+PASS walking away revokes reader immediately
+PASS cached old open cannot restore revoked permission
+PASS death revokes playback
+PASS recovery releases playback
+PASS disconnect releases playback
+PASS station invalidation revokes playback
+PASS close always releases even away from station
+PASS cassette UI never pauses simulation
+PASS shared collection writes real save fixture
+PASS cassette reader permission never persists
+PASS all six remain collected after disk restore
+PASS late snapshot has shared collection and live reader
+PASS six locally distinct original cassette models
+PASS collected props disappear and cannot be targeted after late load
+PASS new colony props are visible and interactable
+PASS cassette models create no solid collision traps
+PASS successful pickup HUD shows only title and collection guidance
+PASS duplicate pickup success does not repeat HUD completion
+PASS fresh duplicate pickup failure does not claim another completion
+PASS another peer's pickup does not emit local completion toast
+RESULT 88/88

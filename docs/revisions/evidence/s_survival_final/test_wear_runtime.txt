@@ -1,0 +1,56 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+PASS new operational condition does not award any puzzle milestone
+PASS v1 placeholder condition migrates operational without achievement
+PASS migration preserves a real partial puzzle
+PASS migration preserves explicit fault generations and milestone
+PASS migration preserves collection and beauty history
+PASS migration does not mutate old payload
+PASS condition measurably changes within thirty real seconds
+PASS all twelve systems wear without presentation nodes
+PASS default warning is reached near two minutes
+PASS default maintenance fault is reached near four minutes
+PASS one unattended fault advances generation only once
+PASS wear never directly changes resource ledgers or stores
+PASS genuine global pause freezes wear
+PASS low and high frame rates reach the same condition and fault
+PASS session wears by real time independent of sol length
+PASS maintenance starts with configured twenty-second duration
+PASS maintenance cannot finish early
+PASS maintenance restores only the mapped condition and fault
+PASS maintenance leaves task progress and puzzle state unchanged
+PASS maintenance does not award milestones rewards or replay beauty shots
+PASS repair retains generation and starts saved cooldown
+PASS cooldown prevents immediate rewear
+PASS a later neglected repair can fault again without achievement reset
+PASS stale maintenance generation is rejected
+PASS debug fault hook is not exposed as a player action
+PASS wrong specialist cannot start maintenance
+PASS specialist and helper maintain different tasks concurrently
+PASS another peer cannot cancel a maintenance job
+PASS a future puzzle cannot claim equipment being maintained
+PASS losing reach cancels maintenance
+PASS role is revalidated during maintenance
+PASS fatal atmospheric danger cancels backend maintenance without UI
+PASS unsafe atmospheric entry blocks a direct maintenance request
+PASS death cancels maintenance
+PASS disconnect releases helper maintenance
+PASS crew release clears the operator
+PASS cleanup remains possible without an actor
+PASS repairable legacy cleaner wears and becomes nonfunctional
+PASS unrepairable legacy units receive no second wear ticker
+PASS existing panel dust ticker is not duplicated
+PASS cleaner repair grants durable grace immediately
+PASS existing cleaner repair restores only its own equipment and gets grace
+PASS wear condition elapsed and flags survive serialization
+PASS maintenance operators never enter disk state
+PASS late client 0 reconstructs the current job
+PASS client 0 never advances authoritative wear
+PASS late client 1 reconstructs the current job
+PASS client 1 never advances authoritative wear
+PASS two clients cannot double the host wear
+PASS restart clears transient maintenance ownership
+PASS reload preserves remaining repair grace
+PASS only real resumed time consumes grace and condition
+PASS a real host validator completion shares mapped maintenance restoration
+RESULT 53/53
