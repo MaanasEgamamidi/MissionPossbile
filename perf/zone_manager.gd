@@ -61,8 +61,8 @@ func setup(game_main: Node) -> void:
 	_build_doors()
 	_build_windows()
 	_build_graph()
-	_pin_all(get_tree().root)
-	get_tree().node_added.connect(_pin)
+	_classify_all(get_tree().root)
+	get_tree().node_added.connect(_on_node_added)
 	is_graph_ready = true
 	graph_ready.emit()
 	snap()
@@ -72,6 +72,16 @@ func player() -> Node3D:
 	return game.get("player") if game != null else null
 
 
+## Where the rooms are decided from: the player, or a camera flown away from the player (the scout drone's chase / FPV
+## camera, 2026-11-14). The player's own first- and third-person cameras sit under the player and count as the player.
+func viewer_position() -> Vector3:
+	var p := player()
+	var cam := get_viewport().get_camera_3d() if is_inside_tree() else null
+	if cam != null and p != null and not p.is_ancestor_of(cam):
+		return cam.global_position
+	return p.global_position if p != null else Vector3.ZERO
+
+
 func zone(id: String) -> Zone:
 	return _by_id.get(id)
 
@@ -79,6 +89,7 @@ func zone(id: String) -> Zone:
 func _process(delta: float) -> void:
 	if not is_graph_ready:
 		return
+	_props_tick(delta)
 	if not Perf.cfg().zones_enabled:
 		if _was_enabled:
 			_was_enabled = false
@@ -93,11 +104,11 @@ func _process(delta: float) -> void:
 		_was_enabled = true
 		snap()
 		return
-	var p := player()
-	if p == null:
+	if player() == null:
 		return
-	# Teleport, respawn, rover exit, save load: a jump between two frames applies everything at once, this frame.
-	var pos := p.global_position
+	# Teleport, respawn, rover exit, drone take-off / hand-back, save load: a jump between two frames applies everything
+	# at once, this frame.
+	var pos := viewer_position()
 	if _last_frame_p != Vector3.INF and pos.distance_to(_last_frame_p) > Perf.cfg().snap_distance:
 		_last_frame_p = pos
 		_acc = 0.0
@@ -277,18 +288,56 @@ func _build_graph() -> void:
 const META_PINNED := &"perf_pinned_layer"
 
 
-func _pin_all(n: Node) -> void:
-	_pin(n)
+func _classify_all(n: Node) -> void:
+	_classify(n)
 	for c in n.get_children():
-		_pin_all(c)
+		_classify_all(c)
+
+
+## node_added: lights and other effects are pinned at once. Everything else is decided at the end of the frame, after
+## the code that added it has set its layers and position (broken_part_presenter.gd sets a model's zone layer right
+## after add_child, and treats layers == 1 as "not set yet").
+func _on_node_added(n: Node) -> void:
+	if not (n is VisualInstance3D):
+		return
+	if _is_effect(n):
+		_pin(n)
+		return
+	if _pending.is_empty():
+		_flush_pending.call_deferred()
+	_pending.append(n)
+
+
+func _flush_pending() -> void:
+	var list := _pending
+	_pending = []
+	for n in list:
+		if is_instance_valid(n) and n.is_inside_tree():
+			_classify(n)
+
+
+## Effects -> always-drawn layer. Map content -> left alone. Other content on layer 1 -> tied to its room if it is a
+## static prop standing in one (room_props_enabled), else pinned to the always-drawn layer as before.
+func _classify(n: Node) -> void:
+	var vi := n as VisualInstance3D
+	if vi == null or vi.has_meta(META_PINNED) or vi.has_meta(META_ROOM):
+		return
+	if not _is_effect(vi) and vi.layers & 1 and not _is_map_content(vi):
+		if Perf.cfg().room_props_enabled and _tie_to_room(vi):
+			return
+	_pin(vi)
+
+
+static func _is_effect(n: Node) -> bool:
+	return n is Light3D or n is ReflectionProbe or n is Decal or n is FogVolume or n is VoxelGI or n is LightmapGI
 
 
 func _pin(n: Node) -> void:
 	var vi := n as VisualInstance3D
-	if vi == null or vi.has_meta(META_PINNED):
+	if vi == null or vi.has_meta(META_PINNED) or vi.has_meta(META_ROOM):
 		return
 	var always := colony_zones.sun_bit()
-	var effect := n is Light3D or n is ReflectionProbe or n is Decal or n is FogVolume or n is VoxelGI or n is LightmapGI
+	var effect := _is_effect(n)
 	if effect or (vi.layers & 1 and not _is_map_content(n)):
 		if vi.layers & always == 0:
 			vi.set_meta(META_PINNED, true)
@@ -313,6 +362,133 @@ func _unpin_all(n: Node) -> void:
 		vi.remove_meta(META_PINNED)
 	for c in n.get_children():
 		_unpin_all(c)
+
+
+# ---------------------------------------------------------------- runtime room props
+# Props the presenters add while the game runs (cassettes and their sparkles, broken parts, task effects, labels...)
+# that are still on the default layer 1 used to be pinned to the always-drawn layer, so they were drawn and their
+# particles simulated even while their room slept. Layer 1 is also the Hangar bay's zone layer, which made every
+# runtime Hangar prop always drawn. Now a static prop standing in a room gets that room's layer instead and sleeps
+# with it. Anything that moves is never tied to a room: the MOVERS below, any non-static physics body, and any prop
+# found outside its room on the 0.5 s check (it goes back to the always-drawn layer).
+
+const META_ROOM := &"perf_room_prop"
+const META_ROOM_LAYERS := &"perf_room_prop_layers"
+const PROP_CHECK_INTERVAL := 0.5
+const PROP_LEAVE_MARGIN := 0.5
+## GameMain fields that hold things which move or are carried through the rooms: [field, sub-field or ""]. The field
+## may be a Node or a Dictionary of Nodes; a sub-field names the moving node inside it (the drone's body and the scout
+## presenter's root live under the world, not under their presenter). A new moving feature gets a line here.
+const MOVERS: Array = [
+	["player", ""],
+	["_crew_visuals", ""],
+	["_item_nodes", ""],
+	["rover", ""],
+	["rover", "body"],
+	["drone", "body"],
+	["scout_presenter", "_root"],
+]
+
+var _pending: Array[Node] = []
+var _room_props := {}        # VisualInstance3D -> Zone
+var _props_acc := 0.0
+var _props_were_enabled := true
+
+
+func room_prop_count() -> int:
+	return _room_props.size()
+
+
+## Only a prop on the default layer alone: a presenter that chose other layers has already said where it belongs.
+func _tie_to_room(vi: VisualInstance3D) -> bool:
+	if vi.layers != 1 or _is_mover(vi):
+		return false
+	var room := room_at(vi.global_position)
+	if room == null or room.render_bit == 0:
+		return false
+	vi.set_meta(META_ROOM, room)
+	vi.set_meta(META_ROOM_LAYERS, vi.layers)
+	vi.layers = room.render_bit
+	_room_props[vi] = room
+	return true
+
+
+func _is_mover(n: Node) -> bool:
+	var a := n
+	while a != null:
+		if a is PhysicsBody3D and not (a is StaticBody3D):
+			return true
+		a = a.get_parent()
+	if game == null:
+		return false
+	for m: Array in MOVERS:
+		var v: Variant = game.get(String(m[0]))
+		if v is Object and is_instance_valid(v) and String(m[1]) != "":
+			v = (v as Object).get(String(m[1]))
+		if v is Node and is_instance_valid(v) and ((v as Node) == n or (v as Node).is_ancestor_of(n)):
+			return true
+		if v is Dictionary:
+			for d: Variant in (v as Dictionary).values():
+				if d is Node and is_instance_valid(d) and ((d as Node) == n or (d as Node).is_ancestor_of(n)):
+					return true
+	return false
+
+
+func _props_tick(delta: float) -> void:
+	var on: bool = Perf.cfg().room_props_enabled
+	if on != _props_were_enabled:
+		_props_were_enabled = on
+		if on:
+			_reclassify_all(get_tree().root)
+		else:
+			_release_all_props(true)
+		return
+	_props_acc += delta
+	if _props_acc < PROP_CHECK_INTERVAL:
+		return
+	_props_acc = 0.0
+	for k: Variant in _room_props.keys():
+		if not is_instance_valid(k):
+			_room_props.erase(k)
+			continue
+		var vi := k as VisualInstance3D
+		var room := _room_props[k] as Zone
+		if not vi.is_inside_tree() or not room.contains_point(vi.global_position, PROP_LEAVE_MARGIN):
+			_release_prop(vi)
+			if vi.is_inside_tree():
+				_pin(vi)
+
+
+## Gives a room prop its own layers back (unless the game has changed them since).
+func _release_prop(vi: VisualInstance3D) -> void:
+	var room := _room_props.get(vi) as Zone
+	_room_props.erase(vi)
+	if room != null and vi.layers == room.render_bit:
+		vi.layers = int(vi.get_meta(META_ROOM_LAYERS, 1))
+	vi.remove_meta(META_ROOM)
+	vi.remove_meta(META_ROOM_LAYERS)
+
+
+func _release_all_props(pin_again: bool) -> void:
+	for k: Variant in _room_props.keys():
+		if not is_instance_valid(k):
+			continue
+		var vi := k as VisualInstance3D
+		_release_prop(vi)
+		if pin_again and vi.is_inside_tree():
+			_pin(vi)
+	_room_props.clear()
+
+
+## room_props_enabled switched back on: pinned props are looked at again.
+func _reclassify_all(n: Node) -> void:
+	var vi := n as VisualInstance3D
+	if vi != null and vi.has_meta(META_PINNED) and not _is_effect(vi):
+		vi.layers &= ~colony_zones.sun_bit()
+		vi.remove_meta(META_PINNED)
+		_classify(vi)
+	for c in n.get_children():
+		_reclassify_all(c)
 
 
 func _door_centre(door: DoorController) -> Vector3:
@@ -454,7 +630,7 @@ func zones_visible_through_open_doors(start: Zone, hops: int) -> Array[Zone]:
 # ---------------------------------------------------------------- targets
 
 func _update_targets(initial: bool) -> void:
-	var p := player().global_position
+	var p := viewer_position()
 	var found := _locate(p)
 	if found != null:
 		_none_time = 0.0
@@ -620,10 +796,15 @@ func hidden_bits() -> int:
 func _apply_camera_mask() -> void:
 	var cam := get_viewport().get_camera_3d() if is_inside_tree() else null
 	if cam != _camera:
+		var inherited := _removed_bits
 		if is_instance_valid(_camera):
 			_camera.cull_mask |= _removed_bits
 		_removed_bits = 0
 		_camera = cam
+		# A camera made current with a copy of the old one's mask (the scout drone copies the player camera's) copied the
+		# bits this manager had cleared too: give those back, then hide what is hidden now.
+		if _camera != null:
+			_camera.cull_mask |= inherited
 	if _camera == null:
 		return
 	var want := hidden_bits()
@@ -635,8 +816,9 @@ func _apply_camera_mask() -> void:
 
 
 func _exit_tree() -> void:
-	if get_tree().node_added.is_connected(_pin):
-		get_tree().node_added.disconnect(_pin)
+	if get_tree().node_added.is_connected(_on_node_added):
+		get_tree().node_added.disconnect(_on_node_added)
+	_release_all_props(false)
 	_unpin_all(get_tree().root)
 	if is_instance_valid(_camera):
 		_camera.cull_mask |= _removed_bits

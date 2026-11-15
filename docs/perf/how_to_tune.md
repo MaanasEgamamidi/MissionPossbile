@@ -48,3 +48,9 @@ hidden, 20 sun) and put its fixtures under `world/Lights/<zone>` with `metadata/
 side), marks glazed door leaves transparent, adds window links for glazed meshes touching two zones, and sets
 `has_exterior_view` for zones with a glass link to the plaza or a door to Mars. Nothing is placed by hand.
 Note: all 20 render layers are in use; a 19th zone needs a layer plan first.
+
+## Runtime props and moving features (2026-11-15)
+
+`PerfSettings.room_props_enabled` (default ON) ties static props added at run time on layer 1 to the room they stand
+in. When you add a feature whose nodes move through the colony (a vehicle, a carried object, an NPC), add its GameMain
+field to `ZoneManager.MOVERS` (`[field, sub-field or ""]`) so it is never tied to one room.

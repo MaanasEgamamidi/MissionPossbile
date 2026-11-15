@@ -82,7 +82,7 @@ func exterior_needed() -> bool:
 			return true
 
 	# 2. Is the player about to open a door that leads toward the outside?
-	var p := zm.player().global_position
+	var p := zm.viewer_position()
 	for d in zm.doors:
 		if d.is_window or not d.joins(zm.current):
 			continue

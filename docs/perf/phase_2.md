@@ -76,3 +76,18 @@ within drift; outdoors -25 to -29 % draw calls with no GPU-time change.
   `_zone_state_changed` hook are there for future room content.
 - Reflection probes and lamp emission are left alone (a COLD room is not drawn, so they show nothing).
 - Defaults: warm_hops 1, glass_view_hops 2, prewarm 4 m, cold_delay 2 s, budget 1500 us, 10 Hz poll.
+
+## Update 2026-11-15: newer game content
+
+- **Runtime room props** (`room_props_enabled`, default ON). Props added while the game runs that are still on the
+  default layer 1 (cassettes, broken parts, task effects, labels...) used to be pinned to the always-drawn layer, so
+  they drew and simulated while their room slept. Layer 1 is also the Hangar's zone layer. Now, at the end of the frame
+  they were added (after their presenter has set layers and position), a static prop standing in a room gets that
+  room's layer. Movers are never tied to a room: `ZoneManager.MOVERS` (GameMain fields: player, crew visuals, carried
+  items, rover, drone body, scout root; add a line for each new moving feature), any non-static physics body, and any
+  prop found outside its room on the 0.5 s check (it goes back to the always-drawn layer).
+- This also fixes broken-part models: they were pinned before `broken_part_presenter.gd` set their zone layer, which
+  then OR'd onto layer 1 + the always layer, so they were always drawn.
+- **Scout drone:** rooms are now chosen from `viewer_position()` (a camera that is not under the player, i.e. the
+  drone's, counts instead of the player), and a camera made current with a copy of the old camera's mask gets back
+  the zone bits that were cleared on the old one (the drone copies the player camera's mask).
