@@ -29,9 +29,16 @@ const GREENHOUSE_ZONE := "Greenhouse"
 const SUNRISE := 0.25
 const SUNSET := 0.75
 
+## The science behind the plain names (owner decision 2026-11-15: players see "Water splitter" and "CO2 splitter";
+## each control's tooltip keeps the real name).
+const SCIENCE_TIPS := {
+	"electrolyser": "Water splitter (electrolyser): splits water into oxygen and hydrogen.",
+	"co2_unit": "CO2 splitter (solid oxide electrolysis, like NASA's MOXIE): makes oxygen from the carbon dioxide in Mars air.",
+}
+
 ## Plain names for alerts and panels.
 const LABELS := {
-	"lights": "Room lights", "greenhouse": "Greenhouse lights", "co2_unit": "CO2-oxygen unit", "electrolyser": "Electrolyser",
+	"lights": "Room lights", "greenhouse": "Greenhouse lights", "co2_unit": "CO2 splitter", "electrolyser": "Water splitter",
 	"recycler": "Water recycler", "trackers": "Sun trackers", "cleaner": "Panel cleaner", "scrubber": "CO2 scrubber",
 	"cabin_fans": "Cabin fans", "base": "Control and heating",
 }
@@ -39,8 +46,8 @@ const LABELS := {
 const SHED_TEXT := {
 	"lights": "Room lights stopped: no power. Rooms that are not critical go dark.",
 	"greenhouse": "Greenhouse lights stopped: no power. The plants get no light.",
-	"co2_unit": "CO2-oxygen unit stopped: no power. It makes no oxygen.",
-	"electrolyser": "Electrolyser stopped: no power. It makes no oxygen.",
+	"co2_unit": "CO2 splitter stopped: no power. It makes no oxygen.",
+	"electrolyser": "Water splitter stopped: no power. It makes no oxygen.",
 	"recycler": "Water pump stopped: no power. Wastewater is building up.",
 	"trackers": "Sun trackers stopped: no power. The panels stay fixed and make less power.",
 	"cleaner": "Panel cleaner stopped: no power. Dust stays on the panels.",

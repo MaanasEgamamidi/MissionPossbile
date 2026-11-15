@@ -89,10 +89,10 @@ func _tank(k: Kit, x: float, y: float, r: float, h: float, band_key: String, tex
 
 ## Twin electrolyser stacks against the west wall (x 34.3..35.0, y 6.35..8.1), in a blue water loop with a pump.
 func _electrolysers(s: Node3D) -> void:
-	var k := Kit.new("Electrolysers", 34.7, 7.22, 0.0, "floor")
+	var k := Kit.new("Water splitters", 34.7, 7.22, 0.0, "floor")
 	for i in 2:
 		var cy := 6.72 + i * 1.01
-		k.at(34.65, cy, 0.0, -PI * 0.5).named("electrolyser stack")      # front east, local x = south
+		k.at(34.65, cy, 0.0, -PI * 0.5).named("water splitter stack")      # front east, local x = south
 		k.span(Vector3(-0.375, -0.35, 0.0), Vector3(0.375, 0.35, 0.1), "frame")
 		for sx: float in [-1.0, 1.0]:
 			k.span(Vector3(sx * 0.26, -0.3, 0.12), Vector3(sx * 0.33, 0.3, 1.22), "steel")
@@ -111,7 +111,7 @@ func _electrolysers(s: Node3D) -> void:
 		k.cyl(Vector3(0.12, 0.0, 1.6), 0.07, 0.12, "white", "z", 14)
 		k.span(Vector3(-0.17, 0.33, 1.25), Vector3(0.17, 0.37, 1.45), "panel")
 		k.screen(Vector3(0.0, 0.37, 1.35), 0.24, 0.13, Screen.POWER, 0.4 + i, 0.012)
-		k.label("ELECTROLYSER %d" % (i + 1), Vector3(0.0, 0.352, 1.08), 0.0014)
+		k.label("WATER SPLITTER %d" % (i + 1), Vector3(0.0, 0.352, 1.08), 0.0014)
 	# water loop: in front at the bottom, up both ends, back over the stacks
 	k.at(0.0, 0.0).named("water loop")
 	var loop := [Vector3(34.9, 6.28, 1.8), Vector3(34.9, 6.28, 0.3), Vector3(35.1, 6.28, 0.3), Vector3(35.1, 8.17, 0.3), Vector3(34.9, 8.17, 0.3), Vector3(34.9, 8.17, 1.8), Vector3(34.9, 6.28, 1.8)]

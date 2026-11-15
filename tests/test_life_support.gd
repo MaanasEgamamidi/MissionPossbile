@@ -590,8 +590,8 @@ func _water_quality() -> void:
 	var start := _snap(st, s.balance)
 	_hours(s, 2.0)
 	var a := _alert(st, "electrolyser_dirty_water")
-	_check("electrolyser stops below water quality 0.9, with 'Electrolyser stopped: the water is not clean enough.'",
-		_ledger_delta(st, start, "electrolysis_o2_kg") == 0.0 and String(a.get("text", "")) == "Electrolyser stopped: the water is not clean enough." and int(counts.get("electrolyser_dirty_water", 0)) == 1)
+	_check("electrolyser stops below water quality 0.9, with 'Water splitter stopped: the water is not clean enough.'",
+		_ledger_delta(st, start, "electrolysis_o2_kg") == 0.0 and String(a.get("text", "")) == "Water splitter stopped: the water is not clean enough." and int(counts.get("electrolyser_dirty_water", 0)) == 1)
 	st.water_quality = 0.9
 	start = _snap(st, s.balance)
 	_hours(s, 1.0)

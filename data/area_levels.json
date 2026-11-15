@@ -52,7 +52,7 @@
 			"station_kinds": ["lifesupport"],
 			"specialty": "medical_life_support",
 			"cost_parts": [0, 2, 3, 4],
-			"stages": ["Today's air plant", "Second scrubber bed and an O2 buffer tank", "Twin electrolysers in a water loop", "Backup plant: three tanks, filter bank and labelled pipes"],
+			"stages": ["Today's air plant", "Second scrubber bed and an O2 buffer tank", "Twin water splitters in a water loop", "Backup plant: three tanks, filter bank and labelled pipes"],
 			"effects": {
 				"scrubber_factor": [1.0, 1.25, 1.5, 2.0],
 				"o2_production_factor": [1.0, 1.25, 1.5, 2.0],

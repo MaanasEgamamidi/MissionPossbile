@@ -86,23 +86,23 @@
 		{
 			"id": "ls_q_two_paths", "sector": "life_support", "role": "guided", "title": "Two ways to make oxygen",
 			"variants": [
-				{"example": "water_needed", "text": "The colony has two oxygen makers: the electrolyser and the CO2-oxygen unit. Which one needs water?",
-					"answers": ["The CO2-oxygen unit", "The electrolyser", "Both"], "correct": 1,
-					"explanation": "The electrolyser splits water into hydrogen and oxygen (about 1.1 L of water per kg of oxygen), like on the ISS (S08). The CO2-oxygen unit takes carbon dioxide from the Mars air and uses only power, like MOXIE (S09)."},
+				{"example": "water_needed", "text": "The colony has two oxygen makers: the water splitter and the CO2 splitter. Which one needs water?",
+					"answers": ["The CO2 splitter", "The water splitter", "Both"], "correct": 1,
+					"explanation": "The water splitter splits water into hydrogen and oxygen (about 1.1 L of water per kg of oxygen), like on the ISS (S08). The CO2 splitter takes carbon dioxide from the Mars air and uses only power, like MOXIE (S09)."},
 				{"example": "power_only", "text": "Clean water is low, but there is plenty of power. Which oxygen maker can still run without taking water?",
-					"answers": ["The CO2-oxygen unit", "The electrolyser", "Neither"], "correct": 0,
-					"explanation": "The CO2-oxygen unit uses the carbon dioxide in the Mars air and power, no water. The electrolyser needs feed water."}
+					"answers": ["The CO2 splitter", "The water splitter", "Neither"], "correct": 0,
+					"explanation": "The CO2 splitter uses the carbon dioxide in the Mars air and power, no water. The water splitter needs feed water."}
 			]
 		},
 		{
 			"id": "ls_q_diagnose", "sector": "life_support", "role": "diagnosis", "changed_from": "ls_q_two_paths", "title": "Fix an oxygen problem in a new case",
 			"variants": [
-				{"example": "water_needed", "text": "The electrolyser is switched on but makes no oxygen. The console says 'no feed water'. What do you do?",
+				{"example": "water_needed", "text": "The water splitter is switched on but makes no oxygen. The console says 'no feed water'. What do you do?",
 					"answers": ["Switch off the CO2 scrubber", "Send water to it with the water allocation", "Refill a suit"], "correct": 1,
-					"explanation": "The electrolyser needs feed water. Set the electrolyser water allocation at the life-support console (drinking water always comes first)."},
-				{"example": "dirty_water", "text": "The electrolyser stopped: 'water not clean enough'. The water recycler is in poor condition. What is a good plan?",
-					"answers": ["Switch the electrolyser off and on again", "Run the CO2-oxygen unit meanwhile and get the recycler working well so the water becomes clean", "Open the airlock"], "correct": 1,
-					"explanation": "The cause is the water quality, which comes from the recycler. The CO2-oxygen unit needs no water, so it can make oxygen while the water gets clean again."},
+					"explanation": "The water splitter needs feed water. Set the water splitter water allocation at the life-support console (drinking water always comes first)."},
+				{"example": "dirty_water", "text": "The water splitter stopped: 'water not clean enough'. The water recycler is in poor condition. What is a good plan?",
+					"answers": ["Switch the water splitter off and on again", "Run the CO2 splitter meanwhile and get the recycler working well so the water becomes clean", "Open the airlock"], "correct": 1,
+					"explanation": "The cause is the water quality, which comes from the recycler. The CO2 splitter needs no water, so it can make oxygen while the water gets clean again."},
 				{"example": "no_power_night", "text": "At night the battery is low and both oxygen makers stopped with 'no power'. The oxygen reserve has 50 kg and falls about 3 kg per sol. What is the right call?",
 					"answers": ["The cabin air runs out tonight", "Switch off the CO2 scrubber", "The reserve covers many sols: switch off lights so the battery lasts, and the makers restart when the sun is up"], "correct": 2,
 					"explanation": "The tanks are a store: 50 kg at 3 kg per sol lasts many sols. Save power for the scrubber and fans tonight."}
@@ -148,7 +148,7 @@
 				{"example": "one_kg", "text": "Making 1 kg of oxygen by electrolysis uses about how much water?",
 					"answers": ["About 1.1 L", "About 10 L", "No water"], "correct": 0,
 					"explanation": "2 H2O → 2 H2 + O2: 36 g of water gives 32 g of oxygen, so 1 kg of oxygen needs about 1.13 kg (1.1 L) of water. That is chemistry, not a game number."},
-				{"example": "two_kg", "text": "The electrolyser made 2 kg of oxygen today. About how much water did it use?",
+				{"example": "two_kg", "text": "The water splitter made 2 kg of oxygen today. About how much water did it use?",
 					"answers": ["0.2 L", "About 2.3 L", "20 L"], "correct": 1,
 					"explanation": "About 1.13 L per kg, so 2 kg uses about 2.3 L. The hydrogen that is left over is vented."}
 			]
@@ -156,10 +156,10 @@
 		{
 			"id": "ls_q_moxie", "sector": "life_support", "role": "check", "title": "Oxygen from the Mars air",
 			"variants": [
-				{"example": "source", "text": "Where does the CO2-oxygen unit get its oxygen from?",
+				{"example": "source", "text": "Where does the CO2 splitter get its oxygen from?",
 					"answers": ["From the water tanks", "From the carbon dioxide in the Mars air", "From the greenhouse plants"], "correct": 1,
 					"explanation": "It takes one oxygen atom from each CO2 molecule of the Mars air. MOXIE did this on Mars, best 12 g per hour (S09). Our colony-size unit is fiction scaled up from it."},
-				{"example": "leftover", "text": "The CO2-oxygen unit takes one oxygen atom from each CO2 molecule. What is left over?",
+				{"example": "leftover", "text": "The CO2 splitter takes one oxygen atom from each CO2 molecule. What is left over?",
 					"answers": ["Water", "Nitrogen", "Carbon monoxide, which is vented outside"], "correct": 2,
 					"explanation": "CO2 minus one O is CO, carbon monoxide. It is poisonous, so the unit vents it outside."}
 			]

@@ -766,8 +766,9 @@ func _test_panels() -> void:
 		and lab.feedback_text().begins_with("✓ Right") and lab.results_text().contains("nutrient setting") and lab.results_text().contains("±"),
 		fb + " | " + lab.feedback_text())
 	var apply := lab.apply_buttons.values()
+	# UI overhaul: the result line says "Use it at a garden bed."; the greenhouse console is in its tooltip
 	_check("panel lab: without the upgrade 'Use for every bed' is disabled and says where to use the result", not apply.is_empty() and (apply[0] as Button).disabled
-		and lab.results_text().contains("garden bed or the greenhouse console"), lab.results_text())
+		and lab.results_text().contains("Use it at a garden bed"), lab.results_text())
 	await _close(lab)
 
 	# salvage: wrong choice, then a right one, then take it out

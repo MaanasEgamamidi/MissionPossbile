@@ -252,7 +252,7 @@ func _test_power_forecast_and_shedding() -> void:
 		and missing.is_empty() and text.contains("Not enough power") and panel.reading_text(&"served").contains("some loads have no power"),
 		"shed %s, missing %s, text: %s" % [st.shed, missing, text.replace("\n", " | ")])
 	_check("power panel: shedding order explained", PowerStationPanel.shedding_order_text().begins_with("When power is short")
-		and PowerStationPanel.shedding_order_text().contains("room lights, greenhouse lights, CO₂-oxygen unit"), PowerStationPanel.shedding_order_text())
+		and PowerStationPanel.shedding_order_text().contains("room lights, greenhouse lights, CO₂ splitter, water splitter"), PowerStationPanel.shedding_order_text())
 	var shed_status := panel.equipment_status_text(String(st.shed[st.shed.size() - 1])) if not st.shed.is_empty() and ColonyState.EQUIPMENT_IDS.has(String(st.shed[st.shed.size() - 1])) else ""
 	_check("power panel: a shed machine's switch says it has no power", shed_status == "" or shed_status.contains("No power"), shed_status)
 	var alerts := "\n".join(panel.alert_texts())
@@ -346,7 +346,14 @@ func _test_oxygen_processes() -> void:
 	var c_card := panel.process_card_text("co2_unit")
 	_check("life support: the electrolyser shows its water use (L per hour)", kg > 0.0 and e_water == "Takes %s L of water per hour" % StationPanel.num(kg * GameBalance.WATER_KG_PER_KG_O2, 3)
 		and String(st.oxygen_process.electrolyser) in ["running", "feed_short"], "%s (status %s, %.4f kg/h)" % [e_water, st.oxygen_process.electrolyser, kg])
-	_check("life support: the CO2-oxygen unit shows no water use", c_water.contains("no water") and not c_card.contains("L of water")
+	# owner decision 2026-11-15: players see "Water splitter" / "CO₂ splitter"; the science names are in the tooltips
+	var e_switch := panel.equipment_switches.get("electrolyser") as Button
+	var c_switch := panel.equipment_switches.get("co2_unit") as Button
+	_check("life support: plain names on the cards, the science names in the switches' tooltips",
+		panel.process_card_text("electrolyser").contains("Water splitter") and panel.process_card_text("co2_unit").contains("CO₂ splitter")
+		and e_switch != null and e_switch.tooltip_text.contains("electrolyser") and c_switch != null and c_switch.tooltip_text.contains("MOXIE"),
+		"%s | %s" % [e_switch.tooltip_text if e_switch != null else "?", c_switch.tooltip_text if c_switch != null else "?"])
+	_check("life support: the CO₂ splitter shows no water use", c_water.contains("no water") and not c_card.contains("L of water")
 		and StationPanel.process_o2_kg_per_hour(st, bal, "co2_unit") > 0.0 and panel.process_card_text("co2_unit").contains("Makes"), c_card.replace("\n", " | "))
 	_check("life support: both processes side by side with kg per hour and kW", panel.process_card_text("electrolyser").contains("kg of oxygen per hour")
 		and panel.process_card_text("electrolyser").contains(" kW") and panel.process_card_text("co2_unit").contains(" kW"), panel.process_card_text("electrolyser").replace("\n", " | "))

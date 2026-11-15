@@ -367,12 +367,14 @@ func _test_ui_root() -> void:
 	field.release_focus()
 	await _frames(1)
 	_check("gameplay_has_focus() true again once the field lets go", ui.gameplay_has_focus())
+	# The blueprint map is switched off since 301d499 (owner: the big goals screen, J, has the map). M opens no panel;
+	# its "map" action still reaches gameplay (the binding stays).
 	_key(KEY_M, "m".unicode_at(0))
 	await _frames(1)
-	_check("M from gameplay opens the blueprint", ui.top() is BlueprintPanel)
+	_check("M from gameplay opens no blueprint (off since 301d499); the map action reaches gameplay", ui.depth() == 0 and probe.seen == [&"map"], str(probe.seen))
 	_key(KEY_M, "m".unicode_at(0))
 	await _frames(1)
-	_check("M again closes the blueprint", ui.depth() == 0 and probe.seen.is_empty(), str(probe.seen))
+	_check("M again: still no panel (blueprint off since 301d499)", ui.depth() == 0 and probe.seen == [&"map", &"map"], str(probe.seen))
 	field.queue_free()
 	var menu := MainMenu.new()
 	ui.open(menu)

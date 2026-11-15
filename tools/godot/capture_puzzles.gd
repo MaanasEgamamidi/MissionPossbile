@@ -9,6 +9,9 @@ extends SceneTree
 ## Saves go to res://_test_saves/capture_puzzles and are deleted at the end; the player's settings are never written.
 ## Writes <out>/Tnn_start.png, <out>/Tnn_solved.png (just after the last move, before the shell's success mark),
 ## <out>/Tnn_stamp.png (a second later, with the success mark) and <out>/T02_wrong_specialist.png ("--only wrong").
+## Mid-game shots taken by the solvers: T02_mid_held / T10_mid_held (a plug picked, not yet seated), T02_mid_wrong /
+## T10_mid_wrong (a plug pushed into the wrong socket: amber cross), T04_mid_wrong_volts (the path joined to the lamp
+## through the wrong voltage part), T09_mid_lifted (a tube lifted, its pour targets ringed) and T09_mid_half.
 
 const R01 := preload("res://scripts/tasks/puzzles/t01_rule.gd")
 const R02 := preload("res://scripts/tasks/puzzles/t02_rule.gd")
@@ -231,6 +234,12 @@ func _solve_t02() -> void:
 	var lay := R02.layout(int(_task().puzzle_seed))
 	var left_buttons: Array = panel.get("left_buttons")
 	var right_buttons: Array = panel.get("right_buttons")
+	# A plug held, then pushed into the wrong socket (the host refuses it and the plug goes back).
+	var right := (lay.right as Array).find(lay.left[0])
+	await _press(left_buttons[0])
+	await _shot("T02_mid_held")
+	await _press(right_buttons[(right + 1) % R02.PAIRS])
+	await _shot("T02_mid_wrong")
 	for i in R02.PAIRS:
 		await _press(left_buttons[i])
 		await _press(right_buttons[(lay.right as Array).find(lay.left[i])])
@@ -253,19 +262,39 @@ func _solve_t03() -> void:
 func _solve_t04() -> void:
 	var lay := R04.layout(int(_task().puzzle_seed))
 	var cells: Array = panel.get("cells")
-	for step: Dictionary in lay.solution:
+	# First the whole path with the -1 V decoy (the last tray slot) in place of the last voltage part: joined to the
+	# lamp at the wrong voltage. Then the decoy comes out (Delete) and the right part goes in.
+	var decoy := (lay.slots as Array).size() - 1
+	var volt_step := -1
+	for k in (lay.solution as Array).size():
+		if int(lay.slots[int(lay.solution[k].slot)].kind) == R04.VOLT:
+			volt_step = k
+	for k in (lay.solution as Array).size():
+		var step: Dictionary = lay.solution[k]
+		await _place_t04(cells, int(step.cell), decoy if k == volt_step else int(step.slot), int(step.rot))
+	await _shot("T04_mid_wrong_volts")
+	if volt_step >= 0:
+		var step: Dictionary = lay.solution[volt_step]
 		(cells[int(step.cell)] as Button).grab_focus()
 		await _frames(1)
-		if int(panel.get("_hand_slot")) != int(step.slot):
-			_key(KEY_1 + int(step.slot))
-		var guard := 0
-		while int(panel.get("_hand_rot")) != int(step.rot) and guard < 4:
-			_key(KEY_R)
-			guard += 1
-		_key(KEY_ENTER)
+		_key(KEY_DELETE)
 		await _frames(2)
+		await _place_t04(cells, int(step.cell), int(step.slot), int(step.rot))
 	# On a fast display the 90 frames before the stamp shot can be shorter than the shell's STAMP_DELAY.
 	await create_timer(0.3).timeout
+
+
+func _place_t04(cells: Array, cell: int, slot: int, rot: int) -> void:
+	(cells[cell] as Button).grab_focus()
+	await _frames(1)
+	if int(panel.get("_hand_slot")) != slot:
+		_key(KEY_1 + slot)
+	var guard := 0
+	while int(panel.get("_hand_rot")) != rot and guard < 4:
+		_key(KEY_R)
+		guard += 1
+	_key(KEY_ENTER)
+	await _frames(2)
 
 
 func _next_turn_t06(task: Dictionary) -> Array:
@@ -364,15 +393,29 @@ func _solve_t09() -> void:
 	for i in R09.TUBES:
 		if not bool(state.racked[i]):
 			await _press(buttons[i])
-	for p: Array in _solve_tubes(R09.current_state(_task()).tubes):
+	var path := _solve_tubes(R09.current_state(_task()).tubes)
+	for k in path.size():
+		var p: Array = path[k]
 		await _press(buttons[int(p[0])])
+		if k == 0:
+			await _shot("T09_mid_lifted")
 		await _press(buttons[int(p[1])])
+		if k == path.size() / 2:
+			await _shot("T09_mid_half")
 
 
 func _solve_t10() -> void:
 	var start := R10.current_state(_task())
 	var leads: Array = panel.get("lead_buttons")
 	var sockets: Array = panel.get("socket_buttons")
+	# A plug held, then pushed into a socket that is not its own (the host refuses it and the plug goes back).
+	await _press(leads[0])
+	await _shot("T10_mid_held")
+	for j in (start.sockets as Array).size():
+		if int(start.sockets[j]) != 0:
+			await _press(sockets[j])
+			break
+	await _shot("T10_mid_wrong")
 	for kind in 2:
 		await _press(leads[kind])
 		await _press(sockets[(start.sockets as Array).find(kind)])

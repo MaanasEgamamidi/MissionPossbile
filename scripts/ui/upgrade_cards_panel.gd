@@ -409,11 +409,11 @@ func _refresh_card(st: ColonyState, def: UpgradeDefinition, install: Button) -> 
 	if String(ui.get("look", "")) == look:
 		return
 	ui["look"] = look
-	var px := 22.0 * UiTheme.text_scale()
+	var px := 22.0                   # at text size 1; the pictogram follows the text size
 	if state == "ready":
-		(ui.state_icon as TextureRect).texture = MenuKit.pic(&"star", px, &"good")
+		(ui.state_icon as TextureRect).texture = MenuKit.scaled_pic(&"star", px, &"good")
 	elif not why.is_empty():
-		(ui.state_icon as TextureRect).texture = MenuKit.pic(why.icon, px, &"good" if state == "go" else &"text")
+		(ui.state_icon as TextureRect).texture = MenuKit.scaled_pic(why.icon, px, &"good" if state == "go" else &"text")
 	install.theme_type_variation = UiTheme.PRIMARY_BUTTON if state == "ready" else &""
 	match state:
 		"done":
@@ -493,7 +493,7 @@ func _build() -> void:
 	var chip_row := HBoxContainer.new()
 	chip_row.add_theme_constant_override(&"separation", 8)
 	chip.add_child(chip_row)
-	chip_row.add_child(MenuKit.picture(&"gear", 24.0 * UiTheme.text_scale(), &"heading"))
+	chip_row.add_child(MenuKit.scaled_picture(&"gear", 24.0, &"heading"))
 	_parts_label = Label.new()
 	_parts_label.theme_type_variation = UiTheme.HEADING
 	chip_row.add_child(_parts_label)
@@ -583,7 +583,7 @@ func _make_sector_head(sector: String) -> Control:
 	sl.text = String(SECTORS[sector][1])
 	sl.theme_type_variation = UiTheme.HEADING
 	head.add_child(sl)
-	var pips := GoalArt.Pips.new(0, ProgressionSystem.MAX_TIER, 13.0 * UiTheme.text_scale(), art[1])
+	var pips := GoalArt.Pips.new(0, ProgressionSystem.MAX_TIER, 13.0, art[1]).follow_text(13.0)
 	pips.name = "Level"
 	pips.mouse_filter = Control.MOUSE_FILTER_PASS
 	head.add_child(pips)
@@ -602,7 +602,7 @@ func _make_sector_head(sector: String) -> Control:
 	var toggle := Button.new()
 	toggle.name = "NextLevel"
 	toggle.text = "Next level"
-	toggle.icon = MenuKit.pic(&"up", 20.0 * UiTheme.text_scale())
+	toggle.icon = MenuKit.scaled_pic(&"up", 20.0)
 	toggle.toggle_mode = true
 	toggle.tooltip_text = "What the next %s level needs." % String(SECTORS[sector][1]).to_lower()
 	head.add_child(toggle)
@@ -624,7 +624,6 @@ func _make_sector_head(sector: String) -> Control:
 func _make_card(def: UpgradeDefinition) -> Control:
 	var sector: Array = SECTORS.get(def.sector, ["●", "Other"])
 	var art := _art(def.sector, def.id)
-	var ts := UiTheme.text_scale()
 	var card := PanelContainer.new()
 	card.name = "Card_%s" % def.id
 	card.theme_type_variation = UiTheme.CARD
@@ -649,7 +648,7 @@ func _make_card(def: UpgradeDefinition) -> Control:
 	gives.name = "Gives"
 	words.add_child(gives)
 	var me := services.local_character() if services != null else null
-	var who := GoalArt.Who.new(String(def.specialty), 36.0 * ts, def.specialty != &"" and (me == null or me.specialty != def.specialty))
+	var who := GoalArt.Who.new(String(def.specialty), 36.0, def.specialty != &"" and (me == null or me.specialty != def.specialty)).follow_text(36.0)
 	who.name = "Who"
 	who.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
 	who.mouse_filter = Control.MOUSE_FILTER_PASS
@@ -661,7 +660,7 @@ func _make_card(def: UpgradeDefinition) -> Control:
 	cost_row.name = "Cost"
 	cost_row.add_theme_constant_override(&"separation", 8)
 	box.add_child(cost_row)
-	cost_row.add_child(MenuKit.picture(&"gear", 20.0 * ts, &"muted"))
+	cost_row.add_child(MenuKit.scaled_picture(&"gear", 20.0, &"muted"))
 	var cost := Label.new()
 	cost_row.add_child(cost)
 	var have := Label.new()
@@ -672,7 +671,7 @@ func _make_card(def: UpgradeDefinition) -> Control:
 	state_row.name = "State"
 	state_row.add_theme_constant_override(&"separation", 8)
 	box.add_child(state_row)
-	var state_icon := MenuKit.picture(&"lock", 22.0 * ts)
+	var state_icon := MenuKit.scaled_picture(&"lock", 22.0)
 	state_row.add_child(state_icon)
 	var reason := _wrap_label("", &"")
 	state_row.add_child(reason)
@@ -705,7 +704,7 @@ func _make_card(def: UpgradeDefinition) -> Control:
 	var more_button := Button.new()
 	more_button.name = "MoreButton"
 	more_button.text = "More"
-	more_button.icon = MenuKit.pic(&"down", 18.0 * ts)
+	more_button.icon = MenuKit.scaled_pic(&"down", 18.0)
 	more_button.toggle_mode = true
 	more_button.focus_mode = Control.FOCUS_ALL
 	more_button.tooltip_text = "What it does, the numbers, and everything it needs."
@@ -734,7 +733,7 @@ func _make_card(def: UpgradeDefinition) -> Control:
 	more_button.toggled.connect(func(on: bool) -> void:
 		more.visible = on
 		more_button.text = "Less" if on else "More"
-		more_button.icon = MenuKit.pic(&"up" if on else &"down", 18.0 * UiTheme.text_scale()))
+		more_button.icon = MenuKit.scaled_pic(&"up" if on else &"down", 18.0))
 	_cards[def.id] = {"cost_row": cost_row, "cost": cost, "have": have, "state_row": state_row, "state_icon": state_icon, "more": more, "look": ""}
 	return card
 

@@ -377,6 +377,9 @@ func refresh() -> void:
 		else:
 			_line(_loads, &"dot" if on2 else &"close", AstraStyle.C_O2 if on2 else AstraStyle.TEXT_3, StationPanel.equipment_name(id),
 				"%s kW" % ColonySummaryPanel.num(float(e.get("kw", 0.0))) if on2 else "Off", AstraStyle.TEXT if on2 else AstraStyle.TEXT_2)
+		# the science name of the oxygen machines is the line's tooltip
+		if StationPanel.equipment_tip(id) != "":
+			(_loads.get_child(_loads.get_child_count() - 1) as Control).tooltip_text = StationPanel.equipment_tip(id)
 	if _loads.get_child_count() == 0:
 		_line(_loads, &"check", AstraStyle.GOOD, "Everything is switched on.", "", AstraStyle.TEXT)
 	for c: Dictionary in VitalsBar.extra_counts(st):

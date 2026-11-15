@@ -4,7 +4,8 @@ extends RefCounted
 ##
 ## Layout from task.puzzle_seed (deterministic): 3 of the 4 reagents, 5 tubes that each hold 4 doses, 2 of them empty
 ## when sorted. The start is made by scrambling the sorted rack with legal reverse pours, so it is always solvable in at
-## most the number of scramble steps. A few tubes have fallen out of the rack: they go back first ("rack").
+## most the number of scramble steps. On later breakdowns a tube has fallen out of the rack: it goes back first ("rack").
+## The first run (task not yet completed once) opens with every tube standing, so it starts straight at the sorting.
 ##
 ## Moves {"move", "value"}: value = step * STEP_BASE + payload, where step is puzzle_state.step (the number of moves the
 ## host already accepted). A doubled, replayed or stale request carries an old step and is refused.
@@ -21,9 +22,12 @@ const REAGENTS := ["Zentra", "Morla", "Kivo", "Pluxa"]
 ## Designer balance: a short scramble keeps it at kid level (ages 9-12).
 const SCRAMBLE_STEPS := 9
 const MIN_MIXED_TUBES := 3
-## Tubes lying on the bench at the start. One (was 3; owner, UI overhaul 2026-11-15: "try opening with the tubes
-## already standing for a shorter first puzzle"): the rack still gets refilled, in one press, then the sorting starts.
+## Tubes lying on the bench at the start of a later breakdown. One (was 3): the rack gets refilled in one press,
+## then the sorting starts.
 const FALLEN_TUBES := 1
+## Tubes lying on the bench on the first run (owner, UI overhaul 2026-11-15: "try opening with the tubes already
+## standing for a shorter first puzzle"), the same way T11 opens its first run with fewer patches.
+const FIRST_RUN_FALLEN := 0
 const STEP_BASE := 1000
 ## Share of the progress bar for putting the fallen tubes back (designer balance).
 const RACK_SHARE := 0.2
@@ -33,8 +37,14 @@ static func supports_resume() -> bool:
 	return true
 
 
-## The seeded start: {seed, step, racked: [bool x TUBES], tubes: [[reagent ids, bottom first] x TUBES]}.
-static func initial_state(puzzle_seed: int) -> Dictionary:
+## True until the task has been completed once.
+static func is_first_run(task: Dictionary) -> bool:
+	return not bool(task.get("first_completed", false))
+
+
+## The seeded start: {seed, step, racked: [bool x TUBES], tubes: [[reagent ids, bottom first] x TUBES]}. first_run:
+## FIRST_RUN_FALLEN tubes lie on the bench instead of FALLEN_TUBES (the liquids are the same either way).
+static func initial_state(puzzle_seed: int, first_run := false) -> Dictionary:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = puzzle_seed
 	var pool := [0, 1, 2, 3]
@@ -56,16 +66,18 @@ static func initial_state(puzzle_seed: int) -> Dictionary:
 		racked.append(true)
 	var fallen := range(TUBES)
 	_shuffle(fallen, rng)
-	for i in FALLEN_TUBES:
+	for i in (FIRST_RUN_FALLEN if first_run else FALLEN_TUBES):
 		racked[fallen[i]] = false
 	return {"seed": puzzle_seed, "step": 0, "racked": racked, "tubes": placed}
 
 
-## The host's puzzle_state when it is a valid state of this seed, else the seeded start. Always plain ints and bools
-## (a JSON save turns numbers into floats).
+## The host's puzzle_state when it is a valid state of this seed and run, else the seeded start. Always plain ints and
+## bools (a JSON save turns numbers into floats). A saved state that does not fit this run's start (a tube lying down
+## that the start has standing, e.g. an older save from before the first run opened with every tube standing, or an
+## already sorted rack on an unfinished task) falls back to the fresh start, so the board can always be finished.
 static func current_state(task: Dictionary) -> Dictionary:
 	var puzzle_seed := int(task.get("puzzle_seed", 0))
-	var start := initial_state(puzzle_seed)
+	var start := initial_state(puzzle_seed, is_first_run(task))
 	var raw: Variant = task.get("puzzle_state", {})
 	if not raw is Dictionary or (raw as Dictionary).is_empty():
 		return start
@@ -77,8 +89,11 @@ static func current_state(task: Dictionary) -> Dictionary:
 	if racked_in.size() != TUBES or tubes_in.size() != TUBES or int(ps.get("step", -1)) < 0:
 		return start
 	var racked: Array = []
-	for r: Variant in racked_in:
-		racked.append(bool(r))
+	for i in TUBES:
+		racked.append(bool(racked_in[i]))
+		# Tubes only ever go back into the rack: one lying down must be lying down at the start too.
+		if not racked[i] and bool(start.racked[i]):
+			return start
 	var tubes: Array = []
 	var counts := {}
 	for t: Variant in tubes_in:
@@ -92,7 +107,11 @@ static func current_state(task: Dictionary) -> Dictionary:
 	# The same reagents in the same amounts as the seeded start.
 	if counts != _counts(start.tubes):
 		return start
-	return {"seed": puzzle_seed, "step": int(ps.step), "racked": racked, "tubes": tubes}
+	var state := {"seed": puzzle_seed, "step": int(ps.step), "racked": racked, "tubes": tubes}
+	# A finished board only exists once the task is complete (no move could finish it again).
+	if is_complete(state) and float(task.get("progress", 0.0)) < 1.0:
+		return start
+	return state
 
 
 static func validate(task: Dictionary, move: Dictionary) -> Dictionary:
@@ -118,7 +137,7 @@ static func validate(task: Dictionary, move: Dictionary) -> Dictionary:
 				return refused
 			(tubes[to] as Array).append((tubes[from] as Array).pop_back())
 		"reset":
-			var start: Array = initial_state(int(state.seed)).tubes
+			var start: Array = initial_state(int(state.seed), is_first_run(task)).tubes
 			if payload != 0 or tubes == start:
 				return refused
 			state.tubes = start

@@ -31,7 +31,7 @@ const CAUSES := {
 	"cabin_air": {"title": "Base air too thin",
 		"text": "The air pressure inside the base fell too low to breathe. Keep the oxygen and nitrogen tanks filled, and put on a suit when the air warning shows."},
 	"low_oxygen": {"title": "Not enough oxygen",
-		"text": "The air in the base ran low on oxygen. Keep the electrolyser or the CO2-oxygen unit running so the oxygen tanks stay full."},
+		"text": "The air in the base ran low on oxygen. Keep the water splitter or the CO2 splitter running so the oxygen tanks stay full."},
 	"co2": {"title": "Too much carbon dioxide",
 		"text": "The air filled up with carbon dioxide, the gas we breathe out. Keep the CO2 scrubber and the cabin fans switched on and powered."},
 	"starvation": {"title": "Out of food",

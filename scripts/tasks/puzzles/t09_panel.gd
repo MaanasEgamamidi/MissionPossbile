@@ -5,6 +5,7 @@ extends "res://scripts/tasks/puzzles/med_ui.gd"
 ##           shape (teal circle, rose triangle, amber square, purple diamond); the strip on the rack's front shows the
 ##           kinds in play. A tube full of one kind is settled: it gets a tick.
 ##   Right   the bench mat where the fallen tubes lie (target rings on them, a ghost outline at their empty slot).
+##           Only on later breakdowns: the first run opens with every tube standing, no mat, the rack centred.
 ## Play: click a fallen tube to stand it back in its slot ("rack"). Then click a tube: it lifts out of the rack, the
 ## tubes it may pour into get the target ring, and it tilts toward the one you point at; click that one and a dose
 ## pours across ("pour"). Click the lifted tube again to put it back.
@@ -44,6 +45,9 @@ var _pour: Dictionary = {}
 var _wrong := -1
 var _wrong_left := 0.0
 var _calm := false
+## True once this panel has shown a fallen tube. The first run opens with every tube standing (Rule.FIRST_RUN_FALLEN):
+## then there is no bench mat and the rack sits in the middle; a later breakdown keeps the mat to the end.
+var mat_shown := false
 
 
 func rule_script() -> Script:
@@ -52,7 +56,7 @@ func rule_script() -> Script:
 
 func setup(p_services: GameServices) -> void:
 	task_title = "Sort the Lab Samples"
-	instructions = ("Some tubes fell over: click them to stand them back in the rack. Then sort the practice liquids "
+	instructions = ("If a tube fell over, click it to stand it back in the rack. Then sort the practice liquids "
 		+ "(made up, not real medicine) so each tube holds one kind: pick a tube, then the tube to pour into. A dose "
 		+ "goes into an empty tube or onto the same kind.")
 	super.setup(p_services)
@@ -89,7 +93,7 @@ func build_game() -> void:
 			b.focus_neighbor_right = NodePath("../Tube%d" % (i + 2))
 		bench.add_child(b)
 		tube_buttons.append(b)
-	set_cue(CUE_RACK)
+	set_cue(CUE_PICK)
 
 
 func _all_racked() -> bool:
@@ -136,6 +140,8 @@ func redraw() -> void:
 	if puzzle.is_empty():
 		return
 	var tubes: Array = puzzle.tubes
+	if not _all_racked():
+		mat_shown = true
 	# A dose that just moved: pour it across from the tube that lost one to the tube that gained one.
 	if _prev_tubes.size() == tubes.size() and not _calm:
 		var from := -1
@@ -236,6 +242,10 @@ func first_focus() -> Control:
 	for i in Rule.TUBES:
 		if not bool(puzzle.racked[i]):
 			return tube_buttons[i]
+	# All standing: the first tube that has something to pour (Enter on an empty one would only say "empty").
+	for i in Rule.TUBES:
+		if not (puzzle.tubes[i] as Array).is_empty():
+			return tube_buttons[i]
 	return tube_buttons[0]
 
 
@@ -265,7 +275,7 @@ func _rack_rect() -> Rect2:
 	var m := 16.0
 	var rw := minf(s.x * 0.64, (s.y * 0.86 - m) / 0.55)
 	var rh := rw / 3.4
-	var x := m + (s.x * 0.72 - m - rw) * 0.5
+	var x := m + ((s.x * 0.72 if mat_shown else s.x - m) - m - rw) * 0.5
 	return Rect2(x, s.y - m - rh, rw, rh)
 
 
@@ -341,8 +351,9 @@ func _paint(c: Control) -> void:
 	var tubes: Array = puzzle.tubes
 	var racked: Array = puzzle.racked
 	var mat := _mat_rect()
-	Kit.box(c, mat.grow(6.0), Kit.HOUSING_DARK, 16.0)
-	Kit.draw_fill(c, Kit.tex("samples/bench_mat"), mat.grow(3.0))
+	if mat_shown:
+		Kit.box(c, mat.grow(6.0), Kit.HOUSING_DARK, 16.0)
+		Kit.draw_fill(c, Kit.tex("samples/bench_mat"), mat.grow(3.0))
 	var rack := _rack_rect()
 	Kit.draw_fill(c, Kit.tex("samples/tube_rack"), rack)
 	_paint_strip(c, rack, tubes)

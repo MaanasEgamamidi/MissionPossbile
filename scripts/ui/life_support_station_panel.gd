@@ -14,7 +14,7 @@ const ALERT_PREFIXES: Array[String] = ["recycler", "wastewater", "water_", "elec
 ## The two allocation sliders: key in ColonyState.water_allocation -> words.
 const ALLOCATIONS := {
 	"greenhouse_l_per_hour": "To the greenhouse",
-	"electrolysis_feed_l_per_hour": "To the electrolyser",
+	"electrolysis_feed_l_per_hour": "To the water splitter",
 }
 const SLIDER_MAX := 20.0
 const SLIDER_STEP := 0.5
@@ -121,7 +121,7 @@ func _build_body() -> void:
 		row.add_child(value)
 		sliders[key] = s
 		_slider_values[key] = value
-	_reserve_note = _add_note(water, "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the electrolyser. If there is not enough for both, they get the same share." % num(bal.water_reserve_l, 0))
+	_reserve_note = _add_note(water, "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the water splitter. If there is not enough for both, they get the same share." % num(bal.water_reserve_l, 0))
 
 	# ---- oxygen
 	_add_heading_with_help(_body, "Oxygen", "oxygen")
@@ -130,7 +130,7 @@ func _build_body() -> void:
 	_body.add_child(oxygen)
 	_add_reading(&"oxygen", "⛑", "Oxygen tanks", "oxygen", oxygen)
 	_oxygen_forecast = _add_text(oxygen, "", UiTheme.MUTED)
-	_add_note(oxygen, "Two machines can fill the oxygen tanks. Either, both or neither may run. Only the electrolyser uses water.")
+	_add_note(oxygen, "Two machines can fill the oxygen tanks. Either, both or neither may run. Only the water splitter uses water.")
 	var pair := HBoxContainer.new()
 	pair.name = "Processes"
 	oxygen.add_child(pair)
@@ -166,11 +166,14 @@ func _add_process_card(parent: Control, id: String, explanation_id: String, uses
 	head.add_child(StationKit.picture(&"water" if id == "electrolyser" else &"air", 26.0, &"heading"))
 	labels["title"] = _add_heading(head, StationPanel.equipment_name(id))
 	(labels["title"] as Label).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	# the science name ("electrolyser", MOXIE) is the tooltip of the card and its switch
+	card.tooltip_text = StationPanel.equipment_tip(id)
 	head.add_child(_help_only(ExplainButton.make(explanation_id)))
 	labels["uses"] = _add_note(box, uses)
 	var button := CheckButton.new()
 	button.name = "Switch_%s" % id
 	button.text = "Run"
+	button.tooltip_text = StationPanel.equipment_tip(id)
 	button.set_pressed_no_signal(services.state().is_on(id))
 	button.toggled.connect(_on_equipment_toggled.bind(id))
 	box.add_child(button)
@@ -190,7 +193,7 @@ static func process_status_words(status: String, balance: GameBalance) -> String
 	match status:
 		"running": return "✓ Running."
 		"feed_short": return "! Running, but short of feed water: it makes less oxygen. Send it more water."
-		"no_feed": return "! Stopped: no water is sent to it. Set \"To the electrolyser\" above 0 L per hour."
+		"no_feed": return "! Stopped: no water is sent to it. Set \"To the water splitter\" above 0 L per hour."
 		"dirty_water": return "! Stopped: the water is not clean enough. It needs %s %% or better." % num(balance.electrolyser_min_quality * 100.0, 0)
 		"broken": return "! Stopped: it is broken."
 		"no_power": return "✖ Stopped: no power. It was shed because power is short."
@@ -204,7 +207,7 @@ static func quality_word(quality: float, balance: GameBalance) -> String:
 		return "Very clean"
 	if quality >= balance.electrolyser_min_quality:
 		return "Clean"
-	return "Not clean enough for the electrolyser"
+	return "Not clean enough for the water splitter"
 
 
 func _refresh_body(st: ColonyState) -> void:
@@ -228,7 +231,7 @@ func _refresh_body(st: ColonyState) -> void:
 			s.set_value_no_signal(float(st.water_allocation.get(key, 0.0)))
 		(_slider_values[key] as Label).text = "%s L per hour" % num(s.value)
 	var spare := maxf(0.0, water - bal.water_reserve_l)
-	_reserve_note.text = "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the electrolyser (%s L spare now). If there is not enough for both, they get the same share." % [num(bal.water_reserve_l, 0), num(spare, 0)]
+	_reserve_note.text = "Drinking water always comes first. %s L stays in the tank as a drinking reserve, and only water above it goes to the greenhouse or the water splitter (%s L spare now). If there is not enough for both, they get the same share." % [num(bal.water_reserve_l, 0), num(spare, 0)]
 
 	# oxygen
 	var oxygen := st.store(&"oxygen_kg")

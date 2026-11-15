@@ -247,6 +247,19 @@ func _words(text: String) -> int:
 	return n
 
 
+## The tutorial view's words as the (switched off) tracker widget showed them, one field per line.
+static func _view_text(v: Dictionary) -> String:
+	var out := PackedStringArray()
+	for key: String in ["title", "mission", "progress", "objective", "cue", "explain", "hints", "reminder", "list", "goal", "footer"]:
+		var value: Variant = v.get(key, "")
+		if value is PackedStringArray or value is Array:
+			for item: Variant in value:
+				out.append(str(item))
+		elif str(value) != "":
+			out.append(str(value))
+	return "\n".join(out)
+
+
 func _mentions_switch(text: String) -> bool:
 	var t := text.to_lower()
 	return t.contains("switch at the hub") or t.contains("switch crew") or t.contains("play as") or t.contains("and choose them") \
@@ -859,18 +872,12 @@ func _test_presentation() -> void:
 	await process_frame
 	var st := gs.state()
 	var w := presenter.hud_widget
-	var lines := "\n".join(w.lines())
+	var lines := _view_text(presenter.current_view())
 	_check("hud: a new game is in tutorial mode (the presenter switches it on from the game's settings)", TutorialSystem.tutorial_active(st) and gs.config.tutorial_start_outside)
-	_check("hud: the tracker is under the GameHud and shows Mission Control, step 1 and its newest line", w.get_parent() == game.hud and w.visible
+	# The Mission Control tracker widget is switched off since 301d499 (owner: the goals card shows the list); the
+	# presenter's view, which the widget drew, still carries the step and its newest line.
+	_check("hud: the tracker widget is off (301d499); the presenter's view shows Mission Control, step 1 and its newest line", w == null
 		and lines.contains("Mission Control · step 1 of 3: Arrival") and lines.contains("Walk into the base") and lines.contains("“"), lines)
-	var rect := w.get_global_rect()
-	var top_right := game.hud.root_control().find_child("TopRight", true, false) as Control
-	var top_left := game.hud.root_control().find_child("TopLeft", true, false) as Control
-	var screen := Rect2(Vector2.ZERO, Vector2(1280, 720))
-	var centre := Rect2(Vector2(640 - 120, 360 - 80), Vector2(240, 160))
-	_check("hud: at 1280x720 the tracker is on screen and covers neither the colony corner, the crew box nor the crosshair",
-		screen.encloses(rect) and not rect.intersects(top_right.get_global_rect()) and not rect.intersects(top_left.get_global_rect()) and not rect.intersects(centre)
-		and UiLayoutCheck.problems(w, Vector2(1280, 720)).is_empty(), "%s vs %s / %s %s" % [rect, top_right.get_global_rect(), top_left.get_global_rect(), UiLayoutCheck.problems(w, Vector2(1280, 720))])
 	# hints come with time without progress and on request; progress clears them
 	presenter._process(80.0)
 	presenter.refresh()
@@ -937,9 +944,10 @@ func _test_presentation() -> void:
 	var claim := t09.request_host(&"task_claim")
 	var line := t09.unreadable_label.text if t09.unreadable_label != null else ""
 	var scrambled := (t09.play_area.find_child("Scrambled", true, false) as Control)
-	_check("scrambled panel: the wrong specialist sees the mini-game frame with scrambled symbols, no controls, and 'Only the ✚ Medical and life support specialist can read this. Press C to swap to them at the Med Bay hub.'",
+	# wording "in the Med Bay" since 9119d0c (Med Bay wording)
+	_check("scrambled panel: the wrong specialist sees the mini-game frame with scrambled symbols, no controls, and 'Only the ✚ Medical and life support specialist can read this. Press C to swap to them in the Med Bay.'",
 		t09.unreadable and game.ui.top() == t09 and scrambled != null and scrambled.get_child_count() == 12 and buttons == 0 and not t09.reset_button.visible
-		and line == "Only the ✚ Medical and life support specialist can read this. Press C to swap to them at the Med Bay hub.", "%s buttons=%d" % [line, buttons])
+		and line == "Only the ✚ Medical and life support specialist can read this. Press C to swap to them in the Med Bay.", "%s buttons=%d" % [line, buttons])
 	_check("scrambled panel: no move is possible (nothing reaches the host)", not t09.pending and not claim.ok and resolved[0] == n_before, "%d %d" % [resolved[0], n_before])
 	_check("scrambled panel: the scramble is the same for the same seed and unreadable (no words)", TaskPanel.scrambled_text(7, 8) == TaskPanel.scrambled_text(7, 8)
 		and not TaskPanel.scrambled_text(7, 8).to_lower().contains("pour"))
@@ -987,7 +995,7 @@ func _test_presentation() -> void:
 		(TutorialSystem.tutorial_of(st).played as Array).append(id)
 	gs.session.advance(0.4)
 	presenter.refresh()
-	var team_lines := "\n".join(presenter.hud_widget.lines())
+	var team_lines := _view_text(presenter.current_view())       # the tracker widget is off since 301d499
 	journal.refresh()
 	var journal_text := journal._objective_label.text + " " + journal._cue_label.text + " " + journal._list_label.text
 	var t09b := PuzzleRegistry.make_panel("T09", &"repair_t09", gs) as TaskPanel

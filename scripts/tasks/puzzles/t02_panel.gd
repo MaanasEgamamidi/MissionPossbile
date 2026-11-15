@@ -11,6 +11,10 @@ extends "res://scripts/tasks/puzzles/electric_ui.gd"
 ## sockets, Enter / Space picks and places. The host rule (t02_rule.gd) checks every connection; a wrong socket is
 ## refused (gentle amber shake, the plug goes back), a right one locks.
 ## Public members read by tests and tools/godot/capture_puzzles.gd: left_buttons (plugs), right_buttons (sockets).
+## Wrong specialist (concept: "show the electrical specialist badge where the first plug would be"): PuzzleRegistry
+## opens this panel locked (set_locked) instead of the shell's scrambled view. The bay is dimmed with no plugs, the
+## badge (padlock + the specialist's symbol) sits in a target ring where the first plug would be, every plug and
+## socket is disabled, and nothing is ever sent (TaskPanel.unreadable blocks the claim, the moves and the release).
 
 const Rule := preload("res://scripts/tasks/puzzles/t02_rule.gd")
 ## Rule.SHAPES (electric_ui order: triangle, circle, square, diamond) as Kit shape kinds.
@@ -66,6 +70,25 @@ var _seat := PackedFloat32Array([1, 1, 1, 1])
 var _trace := PackedFloat32Array([0, 0, 0, 0])
 var _shake_socket := -1
 var _shake_left := 0.0
+## Locked for a crew member who cannot do this repair (set_locked). The badge drawn where the first plug would be.
+var locked := false
+var badge: PanelContainer
+var _locked_line := ""
+
+
+## This panel draws its own wrong-specialist view (PuzzleRegistry.make_panel asks).
+static func supports_locked_view() -> bool:
+	return true
+
+
+## Locks (or unlocks) the panel for a crew member of another specialty. Call before setup() (make_panel does).
+## line: how to get the right specialist (PuzzleRegistry.unreadable_line), shown under the bay.
+func set_locked(on: bool, line := "") -> void:
+	locked = on
+	unreadable = on
+	_locked_line = line
+	if ui_ready and on:
+		_apply_locked()
 
 
 func setup(p_services: GameServices) -> void:
@@ -116,6 +139,63 @@ func setup(p_services: GameServices) -> void:
 	set_cue("Match the shapes [Enter]")
 	ui_ready = true
 	refresh_from_host()
+	if locked:
+		_apply_locked()
+
+
+## The locked view: the badge over the first plug's place, one short cue, the how-to line, nothing to press.
+func _apply_locked() -> void:
+	if badge == null:
+		badge = PanelContainer.new()
+		badge.name = "SpecialistBadge"
+		badge.theme_type_variation = UiTheme.CARD
+		badge.mouse_filter = Control.MOUSE_FILTER_PASS
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override(&"separation", 10)
+		row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		badge.add_child(row)
+		var padlock := Control.new()
+		padlock.name = "Padlock"
+		padlock.custom_minimum_size = Vector2(60, 70)
+		padlock.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		padlock.draw.connect(func() -> void:
+			Kit.lock(padlock, padlock.size * 0.5 + Vector2(0, 6), 26.0, true, UiTheme.palette().warn))
+		row.add_child(padlock)
+		var symbol := Label.new()
+		symbol.name = "Symbol"
+		symbol.text = String(StationPanels.SPECIALTY_SYMBOLS.get(StringName(required_role), "●"))
+		symbol.theme_type_variation = UiTheme.DISPLAY
+		symbol.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		symbol.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		row.add_child(symbol)
+		canvas.add_child(badge)
+		badge.resized.connect(_place)
+		unreadable_label = _label("UnreadableLine", UiTheme.WARN)
+		unreadable_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		play_area.add_child(unreadable_label)
+	badge.tooltip_text = _locked_line
+	unreadable_label.text = _locked_line
+	unreadable_label.visible = not _locked_line.is_empty()
+	_selected = -1
+	_drag_left = -1
+	progress_bar.visible = false
+	reset_button.visible = false
+	set_cue("Electrical engineer only")
+	_update_enabled()
+	_place()
+	_repaint()
+
+
+## TaskPanel re-enables the equipment after every host answer; a locked bay stays shut.
+func _update_enabled() -> void:
+	super._update_enabled()
+	if not locked:
+		return
+	for b: Button in left_buttons + right_buttons:
+		b.disabled = true
+		b.focus_mode = Control.FOCUS_NONE
+		b.mouse_default_cursor_shape = Control.CURSOR_ARROW
+		b.tooltip_text = _locked_line
 
 
 func _hit_button(node_name: String) -> Button:
@@ -134,7 +214,7 @@ func _hit_button(node_name: String) -> Button:
 
 ## The keyboard starts on the first plug still out.
 func first_focus() -> Control:
-	if pending or left_buttons.is_empty():
+	if pending or locked or left_buttons.is_empty():
 		return cancel_button
 	for i in Rule.PAIRS:
 		if int(_links[i]) < 0 and not succeeded:
@@ -172,7 +252,9 @@ func _on_host_state(seed_value: int, _puzzle: Dictionary, record: Dictionary) ->
 		left_buttons[i].tooltip_text = "Plug, %s%s" % [_pair_name(lp), " (in)" if int(_links[i]) >= 0 else ""]
 		var rp := int(_layout.right[i])
 		right_buttons[i].tooltip_text = "Socket, %s%s" % [_pair_name(rp), " (full)" if _links.has(i) else ""]
-	if fresh > 0 and not succeeded:
+	if locked:
+		_update_enabled()          # the plug and socket names are not for the wrong specialist
+	elif fresh > 0 and not succeeded:
 		_say("Click! It fits.", &"good")
 	_place()
 	_repaint()
@@ -200,7 +282,7 @@ func _on_left_pressed(i: int) -> void:
 
 
 func _on_left_down(i: int) -> void:
-	if int(_links[i]) >= 0 or pending or succeeded:
+	if int(_links[i]) >= 0 or pending or succeeded or locked:
 		return
 	_drag_left = i
 	_drag_active = false
@@ -221,6 +303,8 @@ func _on_right_pressed(j: int) -> void:
 
 
 func _connect(i: int, j: int) -> void:
+	if locked:
+		return
 	_attempt = Vector2i(i, j)
 	send_move("connect", i * 10 + j)
 	refresh_from_host()
@@ -318,6 +402,9 @@ func _place() -> void:
 		var rect := _socket_rect(j).grow(6.0)
 		right_buttons[j].position = rect.position
 		right_buttons[j].size = rect.size
+	if badge != null:
+		badge.reset_size()
+		badge.position = (_plug_rect(0, 1.0).get_center() - badge.size * 0.5).round()
 
 
 ## The plug of left terminal i, where it is drawn: in its dock, or (seat 0..1 of the way) in its socket.
@@ -382,6 +469,10 @@ func _paint_equipment(c: Control) -> void:
 	for i in Rule.PAIRS:
 		var dock := _r(Rect2(DOCK_X + 30.0, float(ROW_Y[i]) - 30.0, PLUG_W - 60.0, 60.0))
 		Kit.box(c, dock, Color(0, 0, 0, 0.18), 10.0 * _k, Color(Kit.BAY_LIP, 0.6), 2.0)
+	if locked:
+		# No plugs for the wrong specialist: the bay dims and the badge (a child control) sits on the first dock.
+		c.draw_rect(Rect2(Vector2.ZERO, c.size), Color(0, 0, 0, 0.5))
+		return
 	# Cables and plugs: the ones in their sockets first, the held one last (on top).
 	var order: Array = []
 	for i in Rule.PAIRS:
@@ -531,6 +622,10 @@ func _paint_marks(c: Control) -> void:
 	if _k <= 0.0:
 		return
 	var less := wants_less_motion()
+	if locked:
+		if badge != null:
+			Kit.target_ring(c, Rect2(badge.position, badge.size).grow(8.0), 18.0 * _k, less)
+		return
 	for list: Array in [left_buttons, right_buttons]:
 		for b: Button in list:
 			if b.is_hovered() and not b.disabled and not b.has_focus():

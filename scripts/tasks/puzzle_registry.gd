@@ -65,6 +65,8 @@ static func register_all(runtime: RepairRuntime) -> int:
 ## Wrong specialist (owner 2026-11-14): a specialised task opened by anyone else shows the same frame with scrambled
 ## symbols in place of the controls and one clear line naming who can read it (unreadable_line); no move can be sent.
 ## General tasks open for anyone. The host still refuses every move of a wrong specialist (RepairRuntime).
+## A panel script with `static func supports_locked_view() -> bool` (T02) draws its own locked view instead: the real
+## panel opens with set_locked(true, line) before configure_task, and sends nothing either.
 static func make_panel(task_id: String, station_id: StringName, services: GameServices) -> UiPanel:
 	if services == null or not services.has_game() or not ResourceLoader.exists(panel_path(task_id)):
 		return null
@@ -75,21 +77,34 @@ static func make_panel(task_id: String, station_id: StringName, services: GameSe
 	var specialty := String(record.get("required_specialty", "general"))
 	var me := services.local_character()
 	var readable := specialty == "general" or (me != null and String(me.specialty) == specialty)
-	if readable:
-		var script := load(panel_path(task_id)) as Script
+	var script := load(panel_path(task_id)) as Script
+	var locked_view := not readable and _has_locked_view(script)
+	if readable or locked_view:
 		panel = script.new() as TaskPanel if script != null else null
 	else:
 		panel = TaskPanel.new()
 	if panel == null:
 		return null
+	if locked_view:
+		panel.call(&"set_locked", true, unreadable_line(services, specialty))
 	var room: Dictionary = RepairCatalog.ROOMS.get(String(record.get("room_id", "")), {})
 	panel.configure_task(record, String(TITLES.get(task_id, record.get("title", "Repair task"))), String(room.get("title", "")))
 	panel.set_meta(&"station_surface", true)
 	panel.set_meta(&"station_id", station_id)
 	panel.setup(services)
-	if not readable:
+	if not readable and not locked_view:
 		panel.show_unreadable(unreadable_line(services, specialty), int(record.get("puzzle_seed", 0)))
 	return panel
+
+
+## True when a panel script draws its own wrong-specialist view (declares supports_locked_view() returning true).
+static func _has_locked_view(script: Script) -> bool:
+	if script == null:
+		return false
+	for m: Dictionary in script.get_script_method_list():
+		if String(m.get("name", "")) == "supports_locked_view":
+			return bool(script.call(&"supports_locked_view"))
+	return false
 
 
 ## The one clear line of the scrambled panel, following the real crew-switching rules (CrewSelectPanel / the host's

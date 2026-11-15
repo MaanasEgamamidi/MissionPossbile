@@ -326,6 +326,8 @@ func _test_transition_and_coop(p: BrokenParts, w: Dictionary) -> void:
 	var claim := host.request(&"task_claim", &"repair_t02", {"generation": gen})
 	var finish := host.request(&"task_move", &"repair_t02", {"generation": gen, "move": "finish", "value": 1})
 	_check("host rule completes T02", claim.ok and finish.ok and bool(host.state().repair.tasks.T02.first_completed), "%s / %s" % [claim.reason, finish.reason])
+	# The overlay the broken wires carry before the fix (the role glow, or none): it must be back after the transition.
+	var wires_before := (_model(p, "T02").get_node("loose_wires") as GeometryInstance3D).material_overlay
 	p.step(0.0)
 	_check("transition starts on the host from the state change", p.transitions_started == 1 and p.in_transition("T02"))
 	var burst := p.last_burst
@@ -344,7 +346,12 @@ func _test_transition_and_coop(p: BrokenParts, w: Dictionary) -> void:
 	_run(p, 0.2)
 	_check("at 0.35 s: intact back, broken gone, effects stopped", (w.rack as Node3D).visible and not model.visible and not (model.get_node("spray") as Node3D).visible and not p.shows_broken("T02"))
 	_run(p, 0.7)
-	_check("transition ends after about 1 s, glow removed", not p.in_transition("T02") and (w.rack as MeshInstance3D).material_overlay == null and (model.get_node("loose_wires") as GeometryInstance3D).material_overlay == null)
+	# Started at 0 s, now at 1.1 s (BrokenParts.SECONDS is 1.0): over, and the warm glow is off both models. The broken
+	# wires get back the overlay they had before (the role glow, BrokenParts._apply_role_glow), not the warm glow.
+	var wires_after := (model.get_node("loose_wires") as GeometryInstance3D).material_overlay
+	_check("transition ends after about 1 s, glow removed", not p.in_transition("T02") and p.parts.T02.glow == null
+		and (w.rack as MeshInstance3D).material_overlay == null and wires_after == wires_before and not wires_after is StandardMaterial3D,
+		"in_transition=%s rack=%s wires=%s (before %s)" % [p.in_transition("T02"), (w.rack as MeshInstance3D).material_overlay, wires_after, wires_before])
 	# Replication: the client applies the host's state the way NetSession._rpc_update does.
 	client.state().assign_from(host.state().to_dict(), &"")
 	cp.step(0.0)

@@ -375,7 +375,7 @@ func _test_summary() -> void:
 	_check("summary: cause line for the battery", cause == "Battery draining: the colony uses 53 kW and the sun gives 19 kW.", cause)
 	_check("summary: net flow shows the drain", _row_value(panel, "Reading_Battery_change") == "−34 kW", _row_value(panel, "Reading_Battery_change"))
 	_check("summary: oxygen flow and each process from the model", _row_value(panel, "Reading_Oxygen_reserve_per_sol") == "−%s kg per sol" % String.num(0.1 * GameConfig.SOL_HOURS, 2)
-		and (panel.find_child("OxygenMade", true, false) as Label).text.contains("electrolyser 0 kg per sol"), _row_value(panel, "Reading_Oxygen_reserve_per_sol"))
+		and (panel.find_child("OxygenMade", true, false) as Label).text.contains("water splitter 0 kg per sol"), _row_value(panel, "Reading_Oxygen_reserve_per_sol"))
 	_check("summary: cabin air line in kPa", _row_value(panel, "Reading_Cabin_air").begins_with("O₂ 21 kPa"), _row_value(panel, "Reading_Cabin_air"))
 	st.solar_kw = 60.0
 	st.load_kw = 20.0
@@ -390,6 +390,16 @@ func _test_summary() -> void:
 	_check("summary: rooms list shows power with ✓/✖ and kW", rooms_text.contains("✖ Off") and rooms_text.contains("✓ On") and rooms_text.contains("0 kW (9 kW when on)"),
 		rooms_text.substr(0, 200).replace("\n", " | "))
 	st.zones["Greenhouse"]["powered"] = true
+	# UI overhaul §8: the pictograms follow a text-size change while the panel stays open (not only when it opens)
+	var head_pic := (panel.find_child("Header", true, false) as Control).get_child(0) as TextureRect
+	var pic_before := head_pic.get_combined_minimum_size().y
+	UiTheme.apply_text_scale(1.5)
+	await _frames()
+	var pic_large := head_pic.get_combined_minimum_size().y
+	UiTheme.apply_text_scale(1.0)
+	await _frames()
+	_check("summary: the header pictogram follows the text size live (x1.5 and back)", pic_large >= pic_before * 1.4 and is_equal_approx(head_pic.get_combined_minimum_size().y, pic_before),
+		"%s -> %s -> %s" % [pic_before, pic_large, head_pic.get_combined_minimum_size().y])
 	var all_text := _all_text(panel)
 	_check("summary: stock vs flow and body energy vs electricity boxes", all_text.contains("Stock or flow?") and all_text.contains("Body energy or electricity?")
 		and _has_explain(panel, "stock_vs_flow") and _has_explain(panel, "stamina_vs_electricity"))

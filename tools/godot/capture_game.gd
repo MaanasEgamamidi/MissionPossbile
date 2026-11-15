@@ -184,6 +184,25 @@ func _hud_shots(save_dir: String, size: Vector2i) -> void:
 	await _shot("hud_busy" + tag)
 	main.set_process(true)
 
+	# 2b. the Power & life support drawer (P) with messages in its Messages list (the pop-ups above, plus a life-support one)
+	main.services.events.system_alert.emit(&"electrolyser_dirty_water", &"warn", "Water splitter stopped: the water is not clean enough.")
+	await _frames(10)
+	mh.open_power()
+	await _frames(30)
+	await _shot("hud_power_messages" + tag)
+	mh.ui.close_all()
+	await _frames(10)
+
+	# 2c. the "B Build here" chip: standing by a sun tracker in the solar field
+	for id: String in st.stations:
+		if String((st.stations[id] as Dictionary).get("kind", "")) == "solar":
+			var at := CharacterState._v3(st.stations[id].position)
+			player.teleport(at + Vector3(2.0, 0.0, 2.0), deg_to_rad(-150.0))
+			break
+	await _frames(40)
+	mh.refresh()
+	await _shot("hud_build_chip" + tag)
+
 	# 3. the scout's report (Mission Control) with the mast camera's picture
 	mh.mission_control.dismiss()
 	st.scout["position"] = [40.0, 0.0, 40.0]

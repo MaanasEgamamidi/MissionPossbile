@@ -65,7 +65,6 @@ func first_focus() -> Control:
 
 
 func _build() -> void:
-	var ts := UiTheme.text_scale()
 	var margin := MarginContainer.new()
 	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
 		margin.add_theme_constant_override(side, 12)
@@ -78,7 +77,7 @@ func _build() -> void:
 	header.name = "Header"
 	header.add_theme_constant_override(&"separation", 12)
 	column.add_child(header)
-	header.add_child(MenuKit.picture(&"book", 34.0 * ts, &"heading"))
+	header.add_child(MenuKit.scaled_picture(&"book", 34.0, &"heading"))
 	var title := Label.new()
 	title.text = "Colony journal"
 	title.theme_type_variation = UiTheme.TITLE
@@ -119,13 +118,13 @@ func _build() -> void:
 	hint_button = Button.new()
 	hint_button.name = "Hint"
 	hint_button.text = "Show a hint"
-	hint_button.icon = MenuKit.pic(&"flash", 22.0 * ts)
+	hint_button.icon = MenuKit.scaled_pic(&"flash", 22.0)
 	hint_button.pressed.connect(_on_hint)
 	row.add_child(hint_button)
 	answer_button = Button.new()
 	answer_button.name = "Answer"
 	answer_button.text = "Answer the question"
-	answer_button.icon = MenuKit.pic(&"bubble", 22.0 * ts, &"primary_text")
+	answer_button.icon = MenuKit.scaled_pic(&"bubble", 22.0, &"primary_text")
 	answer_button.theme_type_variation = UiTheme.PRIMARY_BUTTON
 	answer_button.pressed.connect(_on_answer)
 	row.add_child(answer_button)
@@ -146,7 +145,7 @@ func _build() -> void:
 	replay_button = Button.new()
 	replay_button.name = "Replay"
 	replay_button.text = "Remind me"
-	replay_button.icon = MenuKit.pic(&"sound", 22.0 * ts)
+	replay_button.icon = MenuKit.scaled_pic(&"sound", 22.0)
 	replay_button.pressed.connect(_on_replay)
 	rrow.add_child(replay_button)
 	stop_button = Button.new()
@@ -191,7 +190,7 @@ func _section(parent: Control, text: String, kind: StringName) -> VBoxContainer:
 	var head := HBoxContainer.new()
 	head.add_theme_constant_override(&"separation", 10)
 	col.add_child(head)
-	head.add_child(MenuKit.picture(kind, 26.0 * UiTheme.text_scale(), &"heading"))
+	head.add_child(MenuKit.scaled_picture(kind, 26.0, &"heading"))
 	var l := Label.new()
 	l.text = text
 	l.theme_type_variation = UiTheme.HEADING

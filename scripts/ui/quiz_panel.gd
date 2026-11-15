@@ -230,7 +230,6 @@ func _refresh_feedback(id: StringName) -> void:
 # ---------------------------------------------------------------- building
 
 func _build() -> void:
-	var ts := UiTheme.text_scale()
 	var margin := MarginContainer.new()
 	for side in ["margin_left", "margin_right", "margin_top", "margin_bottom"]:
 		margin.add_theme_constant_override(side, 12)
@@ -242,7 +241,7 @@ func _build() -> void:
 	header.name = "Header"
 	header.add_theme_constant_override(&"separation", 12)
 	column.add_child(header)
-	header.add_child(MenuKit.picture(&"bubble", 34.0 * ts, &"heading"))
+	header.add_child(MenuKit.scaled_picture(&"bubble", 34.0, &"heading"))
 	var title := Label.new()
 	title.text = heading
 	title.theme_type_variation = UiTheme.TITLE

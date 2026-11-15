@@ -158,10 +158,12 @@ func _test_console() -> void:
 	_check("the console has a short description and no 'more controls later' note",
 		all.contains("Plant more of the Garden dome.") and not all.contains(StationPanel.LATER_NOTE), all)
 	var lines := panel.upgrade_lines("garden")
-	_check("garden strip: name, pips and stage", lines.size() > 2 and lines[0] == "Garden dome planting"
-		and lines[1] == "● V1 ○ V2 ○ V3 ○ V4" and lines[2] == "Now: V1: Bare planters", str(lines))
-	_check("garden strip: next level words and its effect in plain words", "\n".join(lines).contains("Next: V2: Ground cover and herbs")
-		and "\n".join(lines).contains("plants add 0.01 kg of oxygen an hour") and "\n".join(lines).contains("0.5 extra meals each sol"), "\n".join(lines))
+	var details := panel.upgrade_details("garden")
+	# UI overhaul (2026-11-15): one line per card on screen (the next stage); the stage now and the effects are the tooltip
+	_check("garden strip: name, pips and the next stage", lines.size() > 2 and lines[0] == "Garden dome planting"
+		and lines[1] == "● V1 ○ V2 ○ V3 ○ V4" and lines[2] == "Next: Ground cover and herbs" and details.contains("Now: V1: Bare planters"), str(lines) + " | " + details)
+	_check("garden strip tooltip: next level words and its effect in plain words", details.contains("Next: V2: Ground cover and herbs")
+		and details.contains("plants add 0.01 kg of oxygen an hour") and details.contains("0.5 extra meals each sol"), details)
 	_check("the console's first focus is its upgrade button", panel.first_focus() == panel.upgrade_button("garden"))
 	# lay out in real pixels at a small screen, as test_station_panels does (the stricter check)
 	var stretch := root.content_scale_mode
@@ -199,11 +201,15 @@ func _test_blocked_and_press() -> void:
 	panel.refresh()
 	var b := panel.upgrade_button("food")
 	var text := "\n".join(panel.upgrade_lines("food"))
-	_check("greenhouse console: strip with the grow racks", b != null and text.contains("Greenhouse grow racks") and text.contains("Now: V1: One layer of grow beds"), text)
+	var details := panel.upgrade_details("food")
+	var cost_row := panel.upgrade_rows["food"] as StationPanel.UpgradeRow
+	_check("greenhouse console: strip with the grow racks", b != null and text.contains("Greenhouse grow racks") and text.contains("Next: Two-layer rack with LED bars")
+		and details.contains("Now: V1: One layer of grow beds"), text + " | " + details)
 	_check("too few parts: button greyed out and says why", b != null and b.disabled and b.text == "Upgrade to V2"
-		and text.contains("✖ Needs 2 spare parts (the colony has 0).") and text.contains("Costs 2 spare parts · the colony has 0"), text)
-	_check("the right specialist is told it is them", text.contains("Who can do it: the biology and food specialist (you)"), text)
-	_check("the next level's effect in plain words", text.contains("It gives: 2 grow layers · 1.9× the food of the first rack"), text)
+		and text.contains("✖ Needs 2 spare parts (the colony has 0).") and text.contains("⚙ 2") and cost_row.cost_label.theme_type_variation == UiTheme.WARN
+		and details.contains("Costs 2 spare parts · the colony has 0"), text + " | " + details)
+	_check("the right specialist is told it is them", details.contains("Who can do it: the biology and food specialist (you)"), details)
+	_check("the next level's effect in plain words", details.contains("It gives: 2 grow layers · 1.9× the food of the first rack"), details)
 	_check("upgrade button takes keyboard focus like the other panel buttons", b != null and b.focus_mode == Control.FOCUS_ALL
 		and UiLayoutCheck.focus_problems(panel).is_empty(), "\n".join(UiLayoutCheck.focus_problems(panel)))
 
@@ -213,7 +219,8 @@ func _test_blocked_and_press() -> void:
 	panel.refresh()
 	text = "\n".join(panel.upgrade_lines("food"))
 	_check("wrong specialist: greyed out with the specialist reason", b.disabled
-		and text.contains("✖ Only the biology and food specialist can upgrade this.") and not text.contains("(you)"), text)
+		and text.contains("✖ Only the biology and food specialist can upgrade this.") and not panel.upgrade_details("food").contains("(you)")
+		and cost_row.cost_label.theme_type_variation == UiTheme.GOOD, text)
 
 	# the right one presses it: one upgrade_area request through the panel, the level rises
 	me = _play_as(&"biology_food", console)
@@ -233,8 +240,8 @@ func _test_blocked_and_press() -> void:
 	_check("the panel shows the host's answer", panel.message_text() == "✓ Greenhouse grow racks upgraded to V2: Two-layer rack with LED bars.", panel.message_text())
 	var lines := panel.upgrade_lines("food")
 	_check("after the upgrade: V2 pips, the new stage and the next button", lines[1] == "● V1 ● V2 ○ V3 ○ V4"
-		and lines[2] == "Now: V2: Two-layer rack with LED bars" and b.text == "Upgrade to V3"
-		and "\n".join(lines).contains("Costs 3 spare parts · the colony has 8"), str(lines))
+		and lines[2] == "Next: Three-layer rack with drip lines" and panel.upgrade_details("food").contains("Now: V2: Two-layer rack with LED bars") and b.text == "Upgrade to V3"
+		and "\n".join(lines).contains("⚙ 3") and panel.upgrade_details("food").contains("Costs 3 spare parts · the colony has 8"), str(lines))
 
 	# refused by the host (moved away): the reason shows, nothing changes
 	me.position += Vector3(60.0, 0.0, 0.0)
@@ -268,7 +275,7 @@ func _test_rover() -> void:
 	st.rover.levels = {"speed": 4, "torque": 3, "range": 2, "cargo": 1, "traction": 1}
 	panel.refresh()
 	var text := "\n".join(panel.upgrade_lines("rover"))
-	_check("garage: the rover's V level follows its modules", text.contains("Now: " + AreaLevels.stage_text("rover", 3)) and text.contains("● V3 ○ V4"), text)
+	_check("garage: the rover's V level follows its modules", panel.upgrade_details("rover").contains("Now: " + AreaLevels.stage_text("rover", 3)) and text.contains("● V3 ○ V4"), text)
 	_check("garage: no upgrade button for the rover, a garage hint instead", panel.upgrade_button("rover") == null
 		and text.contains("Upgrade modules in the garage"), text)
 	st.rover.levels = before

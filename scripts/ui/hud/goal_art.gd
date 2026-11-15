@@ -290,12 +290,31 @@ class Who extends Control:
 	var spec := ""
 	var locked := false
 
+	## The side at text size 1 when it follows the player's text size (follow_text); 0 = a fixed side.
+	var base_side := 0.0
+
 	func _init(p_spec := "", side := 32.0, p_locked := false) -> void:
 		spec = p_spec
 		locked = p_locked
 		custom_minimum_size = Vector2(side, side)
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		size_flags_vertical = Control.SIZE_SHRINK_CENTER
+
+	## From now on the side is `base` times the player's text size, also after a later text-size change.
+	func follow_text(base: float) -> Who:
+		base_side = base
+		_fit_text()
+		return self
+
+	func _fit_text() -> void:
+		if base_side > 0.0:
+			var side := roundf(base_side * UiTheme.text_scale())
+			custom_minimum_size = Vector2(side, side)
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_THEME_CHANGED:
+			_fit_text()
+			queue_redraw()
 
 	func _draw() -> void:
 		Art.draw_who(self, Rect2(Vector2.ZERO, size), spec, locked)
@@ -309,15 +328,34 @@ class Pips extends Control:
 	var colour := AstraStyle.ACCENT
 	var dot := 12.0
 
+	## The dot at text size 1 when it follows the player's text size (follow_text); 0 = a fixed dot.
+	var base_dot := 0.0
+
 	func _init(p_have := 0, p_need := 0, p_dot := 12.0, p_colour := AstraStyle.ACCENT) -> void:
 		have = p_have
 		need = maxi(1, p_need)
 		dot = p_dot
 		colour = p_colour
-		custom_minimum_size = Vector2(dot * 1.5 * mini(need, MAX_PIPS) - dot * 0.5 if need <= MAX_PIPS else dot * 8.0, dot)
+		_fit_dot()
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 		size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+
+	## From now on the dot is `base` times the player's text size, also after a later text-size change.
+	func follow_text(base: float) -> Pips:
+		base_dot = base
+		_fit_dot()
+		return self
+
+	func _fit_dot() -> void:
+		if base_dot > 0.0:
+			dot = roundf(base_dot * UiTheme.text_scale())
+		custom_minimum_size = Vector2(dot * 1.5 * mini(need, MAX_PIPS) - dot * 0.5 if need <= MAX_PIPS else dot * 8.0, dot)
+
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_THEME_CHANGED and base_dot > 0.0:
+			_fit_dot()
+			queue_redraw()
 
 	func _draw() -> void:
 		var y := size.y * 0.5

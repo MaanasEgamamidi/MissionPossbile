@@ -49,7 +49,7 @@
 		"energy_predict_net_power": {"sector": "energy", "words": "Predict the battery from the readings (question at the power panel)"},
 		"energy_diagnose_output_loss": {"sector": "energy", "words": "Clean a dusty panel or repair the cleaner while the panels give less than 80 % of their clean power"},
 		"energy_verify_recovery": {"sector": "energy", "words": "See the panels back above 95 % of their clean power within a sol of that fix"},
-		"ls_distinguish_inputs": {"sector": "life_support", "words": "Run the electrolyser and the CO2-oxygen unit for at least one hour each"},
+		"ls_distinguish_inputs": {"sector": "life_support", "words": "Run the water splitter and the CO2 splitter for at least one hour each"},
 		"ls_co2_removal": {"sector": "life_support", "words": "Bring cabin CO2 back below the warning level after it rose"},
 		"ls_storage_vs_pressure": {"sector": "life_support", "words": "Explain oxygen tanks vs cabin pressure (question at the life-support console)"},
 		"food_compare_symptom": {"sector": "food", "words": "Inspect a plant symptom and read the measurement that proves it"},
@@ -97,15 +97,15 @@
 		{
 			"id": "ls_water_reliability", "title": "Reliable water recycler", "sector": "life_support", "tier": 1,
 			"function": "Adds a second filter stage and a pump service kit to the water recycler.",
-			"effect": "The recycler cleans 1 L more wastewater per hour (3 → 4 L/h) and its condition never drops below 0.8, so its water stays clean enough for the electrolyser.",
+			"effect": "The recycler cleans 1 L more wastewater per hour (3 → 4 L/h) and its condition never drops below 0.8, so its water stays clean enough for the water splitter.",
 			"questions": ["ls_q_recycler", "ls_q_two_paths"], "evidence": ["ls_distinguish_inputs"],
 			"cost_parts": 2, "specialty": "medical_life_support", "install_station": "ls_console", "install_kind": "lifesupport", "zone": "Life Support",
 			"effect_owner": "G", "automation": false, "source_ids": ["S08"],
 			"source_labels": ["ISS analog (S08): water recovery of about 90 percent.", "Game balance: the extra litre per hour and the condition floor."]
 		},
 		{
-			"id": "ls_electrolysis", "title": "Stronger electrolyser", "sector": "life_support", "tier": 1,
-			"function": "Adds more cell stacks to the electrolyser that splits water into oxygen and hydrogen.",
+			"id": "ls_electrolysis", "title": "Stronger water splitter", "sector": "life_support", "tier": 1,
+			"function": "Adds more cell stacks to the water splitter that splits water into oxygen and hydrogen.",
 			"effect": "Up to 50 % more oxygen per hour (0.2 → 0.3 kg/h) at the same 6 kWh per kg. It still uses 1.126 L of water per kg of oxygen, so it needs more feed water when it runs flat out.",
 			"questions": ["ls_q_electrolysis", "ls_q_two_paths"], "evidence": ["ls_distinguish_inputs"],
 			"cost_parts": 3, "specialty": "medical_life_support", "install_station": "ls_console", "install_kind": "lifesupport", "zone": "Life Support",
@@ -113,7 +113,7 @@
 			"source_labels": ["ISS analog (S08): oxygen made by electrolysis of water.", "Physics: 1.126 L of water per kg of oxygen.", "Game balance: the output and the energy per kg."]
 		},
 		{
-			"id": "ls_co2_processing", "title": "Bigger CO2-oxygen unit", "sector": "life_support", "tier": 2,
+			"id": "ls_co2_processing", "title": "Bigger CO2 splitter", "sector": "life_support", "tier": 2,
 			"function": "Adds a second processing core to the unit that takes oxygen from the carbon dioxide in the Mars air.",
 			"effect": "Up to 50 % more oxygen per hour (0.15 → 0.225 kg/h) at the same 20 kWh per kg. It still needs no water.",
 			"questions": ["ls_q_moxie", "ls_q_diagnose"], "evidence": ["ls_storage_vs_pressure"],

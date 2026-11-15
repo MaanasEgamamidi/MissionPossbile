@@ -9,8 +9,8 @@ const SWITCH_TEXT := {
 	"cleaner": ["Panel cleaner on: it wipes the panels every sunrise while it works and has power.", "Panel cleaner off: dust will settle on the panels."],
 	"recycler": ["Water recycler on: it cleans wastewater back into clean water.", "Water recycler off: wastewater will build up."],
 	"scrubber": ["CO2 scrubber on: it removes carbon dioxide from the cabin air.", "CO2 scrubber off: carbon dioxide will build up in the cabin."],
-	"electrolyser": ["Electrolyser on: it splits clean feed water into oxygen and hydrogen while it has power.", "Electrolyser off: it makes no oxygen."],
-	"co2_unit": ["CO2-oxygen unit on: it makes oxygen from the carbon dioxide in the Mars air, using power but no water.", "CO2-oxygen unit off: it makes no oxygen."],
+	"electrolyser": ["Water splitter on: it splits clean feed water into oxygen and hydrogen while it has power.", "Water splitter off: it makes no oxygen."],
+	"co2_unit": ["CO2 splitter on: it makes oxygen from the carbon dioxide in the Mars air, using power but no water.", "CO2 splitter off: it makes no oxygen."],
 	"cabin_fans": ["Cabin fans on: air moves through the CO2 scrubber.", "Cabin fans off: the CO2 scrubber cleans the air more slowly."],
 }
 
@@ -77,7 +77,7 @@ static func _apply(ctx: ActionService.Context) -> Dictionary:
 				if ctx.request.params.has(key):
 					ctx.state.water_allocation[key] = float(ctx.request.params[key])
 			changes["water_allocation"] = ctx.state.water_allocation.duplicate()
-			text = "Water allocation: %.1f L per hour to the greenhouse, %.1f L per hour to the electrolyser. Drinking water always comes first." % [
+			text = "Water allocation: %.1f L per hour to the greenhouse, %.1f L per hour to the water splitter. Drinking water always comes first." % [
 				float(ctx.state.water_allocation.greenhouse_l_per_hour), float(ctx.state.water_allocation.electrolysis_feed_l_per_hour)]
 		&"clean_panel":
 			var index := _tracker_index(ctx)

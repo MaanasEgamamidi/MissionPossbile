@@ -201,6 +201,52 @@ func _host_checks() -> void:
 	services.session.peer_left(2)
 
 
+## Wrong specialist: E opens the T02 panel itself, locked, with the specialist badge where the first plug would be.
+## Nothing can be pressed and nothing is sent; the host still refuses the medic.
+func _locked_checks(ui: UiRoot, actor: CharacterState) -> void:
+	actor.specialty = &"medical_life_support"
+	var task: Dictionary = services.state().repair.tasks[TASK]
+	var gen := int(task.fault_generation)
+	var panel := StationPanels.for_station(STATION, services) as TaskPanel
+	_check("wrong specialist: the T02 panel opens locked", panel != null and (panel.get_script() as Script).resource_path.ends_with("t02_panel.gd")
+		and bool(panel.get("locked")) and panel.unreadable)
+	if panel == null:
+		actor.specialty = &"electrical_comms"
+		return
+	ui.open(panel)
+	await _frames(8)
+	var before: Dictionary = (task.puzzle_state as Dictionary).duplicate(true)
+	var plugs: Array = panel.get("left_buttons")
+	var sockets: Array = panel.get("right_buttons")
+	var shut := plugs.size() == Rule.PAIRS and sockets.size() == Rule.PAIRS
+	for b: Button in plugs + sockets:
+		shut = shut and b.disabled and b.focus_mode == Control.FOCUS_NONE
+	var focus := root.gui_get_focus_owner()
+	_check("locked: every plug and socket disabled, none focused", shut and not (plugs + sockets).has(focus))
+	var badge := panel.get("badge") as Control
+	_check("locked: the specialist badge sits where the first plug would be", badge != null and badge.is_visible_in_tree()
+		and badge.get_global_rect().has_point((plugs[0] as Button).get_global_rect().get_center()), str(badge.get_global_rect() if badge != null else null))
+	_check("locked: one short cue and the how-to line", panel.cue_text == "Electrical engineer only" and panel.unreadable_label != null
+		and panel.unreadable_label.text.contains("Only the") and not panel.progress_bar.visible and not panel.reset_button.visible, panel.cue_text)
+	var issues := UiLayoutCheck.problems(panel, root.get_visible_rect().size)
+	_check("locked: layout fits 1280x720", issues.is_empty(), " | ".join(issues))
+	# Every way in: a click on a plug then a socket, the panel's own senders.
+	for b: Button in [plugs[0], sockets[0]]:
+		_mouse(MOUSE_BUTTON_LEFT, b.get_global_rect().get_center(), true)
+		_mouse(MOUSE_BUTTON_LEFT, b.get_global_rect().get_center(), false)
+		await _frames(1)
+	panel.call(&"_connect", 0, 0)
+	panel.call(&"send_move", "connect", 0)
+	panel.submit_move({"move": "connect", "value": 0})
+	await _frames()
+	_check("locked: nothing is sent (no claim, no move)", not panel.pending and not services.session.repair_runtime.locks.has(TASK)
+		and (task.puzzle_state as Dictionary) == before and float(task.progress) == 0.0)
+	_check("locked: the host still refuses the medic", services.request(&"task_claim", STATION, {"generation": gen}).reason == &"wrong_specialty")
+	ui.close_all()
+	await _frames()
+	actor.specialty = &"electrical_comms"
+
+
 func _panel_checks() -> void:
 	services.start_new_game(4271)
 	await _frames()
@@ -214,6 +260,7 @@ func _panel_checks() -> void:
 	ui.setup(services, GameSettings.new())
 	root.size = Vector2i(1280, 720)
 	await _frames()
+	await _locked_checks(ui, actor)
 	var panel := StationPanels.for_station(STATION, services)
 	_check("E opens the T02 mini-game while broken", panel != null and (panel.get_script() as Script).resource_path.ends_with("t02_panel.gd"))
 	if panel == null:

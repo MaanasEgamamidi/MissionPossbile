@@ -337,18 +337,18 @@ static func alerts(state: ColonyState, balance: GameBalance, no_air: Dictionary)
 	if state.store(&"water_l") <= 0.0:
 		out.append(["water_empty", "urgent", "No clean water left. The crew is getting thirsty and losing health."])
 	elif state.store(&"water_l") < balance.water_reserve_l:
-		out.append(["water_low", "warn", "Clean water is below the drinking reserve. Nothing goes to the greenhouse or the electrolyser."])
+		out.append(["water_low", "warn", "Clean water is below the drinking reserve. Nothing goes to the greenhouse or the water splitter."])
 	if state.water_quality < balance.recycler_good_condition + 0.1 and state.water_quality < 1.0 - 1e-9 and state.water_quality >= balance.electrolyser_min_quality:
-		out.append(["water_quality", "info", "Water quality is %.0f %%. Below %.0f %% the electrolyser stops." % [state.water_quality * 100.0, balance.electrolyser_min_quality * 100.0]])
+		out.append(["water_quality", "info", "Water quality is %.0f %%. Below %.0f %% the water splitter stops." % [state.water_quality * 100.0, balance.electrolyser_min_quality * 100.0]])
 	# oxygen processes
 	var e_status := String(state.oxygen_process.get("electrolyser", "off"))
 	match e_status:
-		"dirty_water": out.append(["electrolyser_dirty_water", "warn", "Electrolyser stopped: the water is not clean enough."])
-		"no_feed": out.append(["electrolyser_no_feed", "info", "Electrolyser is waiting: no water is sent to it. Set the water allocation at life support."])
-		"broken": out.append(["electrolyser_broken", "warn", "Electrolyser is broken. It makes no oxygen."])
-		"feed_short": out.append(["electrolyser_feed_short", "info", "Electrolyser is short of feed water, so it makes less oxygen."])
+		"dirty_water": out.append(["electrolyser_dirty_water", "warn", "Water splitter stopped: the water is not clean enough."])
+		"no_feed": out.append(["electrolyser_no_feed", "info", "Water splitter is waiting: no water is sent to it. Set the water allocation at life support."])
+		"broken": out.append(["electrolyser_broken", "warn", "Water splitter is broken. It makes no oxygen."])
+		"feed_short": out.append(["electrolyser_feed_short", "info", "Water splitter is short of feed water, so it makes less oxygen."])
 	if String(state.oxygen_process.get("co2_unit", "off")) == "broken":
-		out.append(["co2_unit_broken", "warn", "CO2-oxygen unit is broken. It makes no oxygen."])
+		out.append(["co2_unit_broken", "warn", "CO2 splitter is broken. It makes no oxygen."])
 	# oxygen reserve and cabin air (ls_oxygen_monitoring: earlier warnings that say how long is left, and a forecast)
 	var monitor := state.has_upgrade("ls_oxygen_monitoring")
 	var pb := ProgressionBalance.shared()
@@ -358,11 +358,11 @@ static func alerts(state: ColonyState, balance: GameBalance, no_air: Dictionary)
 	var reserve := state.store(&"oxygen_kg")
 	var reserve_rate := float(state.rates.get("oxygen_kg", 0.0))
 	if reserve <= 0.0:
-		out.append(["oxygen_reserve_empty", "urgent", "Oxygen reserve is empty. Cabin oxygen will slowly fall. Start the electrolyser or the CO2-oxygen unit."])
+		out.append(["oxygen_reserve_empty", "urgent", "Oxygen reserve is empty. Cabin oxygen will slowly fall. Start the water splitter or the CO2 splitter."])
 	elif reserve < reserve_warn:
-		var text := "Oxygen reserve low: %.1f kg left. Start the electrolyser or the CO2-oxygen unit." % reserve
+		var text := "Oxygen reserve low: %.1f kg left. Start the water splitter or the CO2 splitter." % reserve
 		if monitor:
-			text = "Oxygen reserve low: %.1f kg left, %s. Start the electrolyser or the CO2-oxygen unit." % [reserve, _time_left_words(reserve, reserve_rate)]
+			text = "Oxygen reserve low: %.1f kg left, %s. Start the water splitter or the CO2 splitter." % [reserve, _time_left_words(reserve, reserve_rate)]
 		out.append(["oxygen_reserve_low", "warn", text])
 	if state.cabin_o2_kpa < balance.o2_low_kpa:
 		out.append(["cabin_o2_danger", "urgent", "Cabin oxygen is too low (%.1f kPa). The crew is losing health." % state.cabin_o2_kpa])

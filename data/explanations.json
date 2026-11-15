@@ -177,28 +177,28 @@
  "water_quality": {
   "title": "Water quality",
   "short": "Water quality says how clean the clean water is, in % (100 % is perfectly clean).",
-  "long": "A recycler in good condition makes very clean water. A worn recycler makes water that is less clean, and it mixes with the water in the tank. The electrolyser needs very clean water, so it stops when the quality is too low. In the game the crew can always drink the water. These numbers are game balance.",
+  "long": "A recycler in good condition makes very clean water. A worn recycler makes water that is less clean, and it mixes with the water in the tank. The water splitter needs very clean water, so it stops when the quality is too low. In the game the crew can always drink the water. These numbers are game balance.",
   "source_ids": ["S08"],
   "claim_ids": ["water_recycling", "crew_rates"]
  },
  "water_allocation": {
   "title": "Where spare water goes",
-  "short": "The water allocation says how many litres per hour go to the greenhouse and to the electrolyser.",
-  "long": "Drinking water always comes first. A drinking reserve always stays in the tank, and only water above it can be sent. If there is not enough for both, the greenhouse and the electrolyser get the same share. The amounts are game balance.",
+  "short": "The water allocation says how many litres per hour go to the greenhouse and to the water splitter.",
+  "long": "Drinking water always comes first. A drinking reserve always stays in the tank, and only water above it can be sent. If there is not enough for both, the greenhouse and the water splitter get the same share. The amounts are game balance.",
   "source_ids": [],
   "claim_ids": ["crew_rates"]
  },
  "electrolysis": {
-  "title": "Electrolyser",
-  "short": "The electrolyser uses electricity to split water into oxygen and hydrogen.",
+  "title": "Water splitter",
+  "short": "The water splitter (an electrolyser) uses electricity to split water into oxygen and hydrogen.",
   "long": "This is how the space station makes oxygen from water. Each kilogram of oxygen uses a little more than one litre of water. The hydrogen is let out of the colony. The machine needs power and very clean water. The colony's big machine is made up for the game.",
   "source_ids": ["S08"],
   "claim_ids": ["oxygen_from_water", "oxygen_scale_up"]
  },
  "co2_oxygen_unit": {
-  "title": "CO₂-oxygen unit",
-  "short": "The CO₂-oxygen unit makes oxygen from the carbon dioxide in Mars air, using electricity but no water.",
-  "long": "Mars air is mostly carbon dioxide. A small test machine called MOXIE made oxygen from it on Mars. The colony's unit works the same way but is much bigger, and that size is made up for the game. It needs more electricity than the electrolyser for each kilogram of oxygen, but it uses no water at all.",
+  "title": "CO₂ splitter",
+  "short": "The CO₂ splitter (a MOXIE-style oxygen unit) makes oxygen from the carbon dioxide in Mars air, using electricity but no water.",
+  "long": "Mars air is mostly carbon dioxide. A small test machine called MOXIE made oxygen from it on Mars. The colony's unit works the same way but is much bigger, and that size is made up for the game. It needs more electricity than the water splitter for each kilogram of oxygen, but it uses no water at all.",
   "source_ids": ["S01", "S09"],
   "claim_ids": ["mars_air", "oxygen_from_co2", "oxygen_scale_up"]
  },

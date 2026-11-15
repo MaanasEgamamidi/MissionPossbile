@@ -1051,9 +1051,9 @@ func _test_panel_and_presenter() -> void:
 	var labels := "\n".join(panel.call("label_texts") as PackedStringArray)
 	_check("weather screen: the panel for stations of kind weather (scripts/ui/stations/weather_station_panel.gd) shows both labels ('archive observations from Jezero, played faster', 'not a forecast for this colony')",
 		panel.get_script().resource_path.ends_with("weather_station_panel.gd") and labels.contains("Archive observations from Jezero, played faster") and labels.contains("Not a forecast for this colony"), labels)
-	_check("weather screen: active data (site, archive dates, status, data id), opacity and solar effect in words, and the warning",
+	_check("weather screen: active data (site, archive dates, status, data id), opacity and solar effect in words, and the warning (UI overhaul: the opacity reading is words, its τ the tooltip)",
 		panel.reading_text(&"site") == "Jezero crater" and panel.reading_text(&"dates").begins_with("2022-01-01 to 2022-01-31") and panel.reading_text(&"status").begins_with("validated")
-		and panel.reading_text(&"snapshot") == "fixture-weather-w-v1@1" and panel.reading_text(&"opacity").begins_with("τ ") and panel.reading_text(&"sunlight").contains("% of usual")
+		and panel.reading_text(&"snapshot") == "fixture-weather-w-v1@1" and panel.reading_text(&"opacity").to_lower() == WeatherSystem.opacity_words(st.dust_tau).to_lower() and panel.reading_text(&"sunlight").contains("% of usual")
 		and String(panel.call("warning_text")).contains("Dust warning"),
 		"%s | %s | %s | %s | %s" % [panel.reading_text(&"site"), panel.reading_text(&"dates"), panel.reading_text(&"status"), panel.reading_text(&"opacity"), panel.call("warning_text")])
 	var button := panel.call("acknowledge_button") as Button

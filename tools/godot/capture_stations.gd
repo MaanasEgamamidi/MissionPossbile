@@ -20,6 +20,7 @@ const PLAN := [
 	["garage", "garage"], ["lab", "lab"], ["salvage", "salvage"], ["sample_site", "sample_site"], ["scout_bay", "scout_bay"],
 	["drone_pad", "drone_pad"], ["rover_charger", "rover_charger"], ["ore_deposit", "ore_deposit"], ["record", "record"],
 	["upgrade_console", "upgrade_console"], ["board", "board"], ["survivor", "survivor"],
+	["lab_sample", "@lab_sample"], ["weather_warn", "@weather_warn"],
 	# "+help": the same panel with its "?" switch on (the sentences, the notes and the "?" buttons of the readings).
 	["power_help", "power+help"], ["lifesupport_help", "lifesupport+help"], ["suits_help", "suits+help"], ["bed_help", "bed+help"],
 ]
@@ -137,6 +138,42 @@ func _make(what: String) -> UiPanel:
 			if what == "@cassette_tape" and player != null:
 				_select_later(player)
 			return player
+		"@lab_sample":
+			# two samples carried: one measured and worked out (a lab result), one measured (its comparison shown)
+			var site := _first_of_kind("sample_site")
+			var lab := _first_of_kind("lab")
+			if site == "" or lab == "":
+				return null
+			# samples are taken by the field engineering and geology specialist (crew_4, as tests/test_science.gd)
+			me.position = me.hub_spot
+			services.request(&"claim_character", &"crew_4")
+			me = services.local_character()
+			# (the same samples serve the later window sizes: a site gives only three)
+			for i in maxi(0, 2 - ScienceActions.carried(services.state(), me, ScienceActions.SAMPLE_KIND).size()):
+				_stand_at(site)
+				var taken := services.request(&"take_sample", StringName(site))
+				if not taken.ok:
+					print("lab_sample: take_sample refused: %s %s" % [taken.reason, taken.message if "message" in taken else ""])
+			_stand_at(lab)
+			var samples: Array[String] = ScienceActions.carried(services.state(), me, ScienceActions.SAMPLE_KIND)
+			for s: String in samples:
+				services.request(&"analyze_sample", StringName(lab), {"sample": s, "reference": ScienceActions.default_reference()})
+			if not samples.is_empty():
+				for choice in 3:
+					var r := services.request(&"interpret_sample", StringName(lab), {"sample": samples[0], "choice": choice})
+					if r.ok and bool(r.changes.get("correct", false)):
+						break
+			return StationPanels.for_station(StringName(lab), services)
+		"@weather_warn":
+			var wx := _first_of_kind("weather")
+			if wx == "":
+				return null
+			_stand_at(wx)
+			var st := services.state()
+			st.weather["warning"] = {"event_id": "wx_shot", "starts_at_hours": st.sim_hours + 6.0, "lead_hours": 6.0,
+				"text": WeatherSystem.warning_text({"lead_hours": 6.0}, 31.0, services.clock().hours_per_real_second()), "acknowledged_by": []}
+			st.weather["history"] = [{"at_hours": 30.0, "duration_hours": 12.0, "peak_tau": 1.4, "severity": 0.8, "episode_id": "ep_shot"}]
+			return StationPanels.for_station(StringName(wx), services)
 		"@maintenance":
 			var id := _first_of_kind("repair_task")
 			if id == "":

@@ -55,9 +55,11 @@ func _what_you_can_do() -> PackedStringArray:
 
 
 func _build_body() -> void:
-	_add_reading(&"carried", "◈", "Samples in your pack", "cargo")
-	_add_reading(&"references", "≡", "Reference samples", "sources")
-	_add_reading(&"uncertainty", "±", "Measurement uncertainty", "sources")
+	# UI overhaul: two readings stand (samples carried, results); the reference count and the uncertainty are details
+	# behind the "?" switch.
+	_add_reading(&"carried", "◈", "Samples carried", "cargo")
+	_help_only(_add_reading(&"references", "≡", "Reference samples", "sources"))
+	_help_only(_add_reading(&"uncertainty", "±", "Measurement uncertainty", "sources"))
 	_add_reading(&"results", "✓", "Lab results", "food")
 
 	_add_heading_with_help(_body, "Your samples", "cargo")
@@ -80,7 +82,7 @@ func _build_body() -> void:
 	_results_box = VBoxContainer.new()
 	_results_box.name = "Results"
 	_body.add_child(_results_box)
-	_add_text(_body, String(ScienceActions.samples_data().get("use_note", "")), UiTheme.MUTED)
+	_add_note(_body, String(ScienceActions.samples_data().get("use_note", "")))
 
 
 func _refresh_body(st: ColonyState) -> void:
@@ -96,7 +98,7 @@ func _refresh_body(st: ColonyState) -> void:
 	_show_reading(&"references", "%d of %d available" % [refs.size(), (ScienceActions.samples_data().get("references", []) as Array).size()], &"ok")
 	_show_reading(&"uncertainty", "± %s percentage points%s" % [num(ScienceActions.mineral_uncertainty(st), 0),
 		" · calibrated" if st.has_upgrade("sci_instrument_calibration") else ""], &"ok")
-	_show_reading(&"results", "%d · %d used" % [results.size(), used], &"ok")
+	_show_reading(&"results", "%d · %d used" % [results.size(), used] if used > 0 else "%d" % results.size(), &"ok")
 
 	if _shown_sample == "" or not carried.has(_shown_sample) or not ScienceActions.read(st, "lab").has(_shown_sample):
 		_shown_sample = ""
@@ -119,7 +121,8 @@ func _refresh_samples(st: ColonyState, carried: Array[String], refs: PackedStrin
 	_clear(_samples_box)
 	compare_buttons.clear()
 	if carried.is_empty():
-		_add_text(_samples_box, "You carry no sample. The field engineering and geology specialist ⛏ takes them at the sample sites outside.", UiTheme.MUTED)
+		var none := _add_text(_samples_box, "No samples yet. ⛏ Fetch one outside.", UiTheme.MUTED)
+		_tip(none, "The field engineering and geology specialist ⛏ takes samples at the sample sites outside.")
 		return
 	var samples := ScienceActions.read(st, "samples")
 	for id in carried:
@@ -129,9 +132,10 @@ func _refresh_samples(st: ColonyState, carried: Array[String], refs: PackedStrin
 		_samples_box.add_child(card)
 		var col := VBoxContainer.new()
 		card.add_child(col)
-		_add_text(col, "%s from the %s" % [id.replace("_", " ").capitalize(), String(s.get("site_name", "?"))], UiTheme.HEADING)
+		var head := _add_text(col, "%s from the %s" % [id.replace("_", " ").capitalize(), String(s.get("site_name", "?"))], UiTheme.HEADING)
 		var cond: Dictionary = s.get("conditions", {})
-		_add_text(col, "Label: %s, %s, dust in the air %s." % [String(s.get("time_text", "")), String(cond.get("sky", "")), num(float(cond.get("dust_tau", 0.0)), 2)], UiTheme.MUTED)
+		# the sample's label (time, sky, dust) is its tooltip
+		_tip(head, "Label: %s, %s, dust in the air %s." % [String(s.get("time_text", "")), String(cond.get("sky", "")), num(float(cond.get("dust_tau", 0.0)), 2)])
 		var row := HFlowContainer.new()
 		col.add_child(row)
 		for ref: Dictionary in ScienceActions.samples_data().get("references", []):
@@ -140,12 +144,15 @@ func _refresh_samples(st: ColonyState, carried: Array[String], refs: PackedStrin
 			b.name = "Compare_%s_%s" % [id, ref_id]
 			b.text = "Compare with reference %d" % (1 + (ScienceActions.samples_data().references as Array).find(ref))
 			b.disabled = not refs.has(ref_id)
+			if not b.disabled:
+				b.theme_type_variation = UiTheme.PRIMARY_BUTTON
+				StationKit.button_pic(b, &"flask", 22.0)
 			b.tooltip_text = "Needs the sample comparison upgrade." if b.disabled else "Measure the sample next to %s and the empty holder." % String(ref.name).to_lower()
 			b.pressed.connect(_on_compare.bind(id, ref_id))
 			row.add_child(b)
 			compare_buttons["%s|%s" % [id, ref_id]] = b
 		if refs.size() < (ScienceActions.samples_data().get("references", []) as Array).size():
-			_add_text(col, "Reference 2 becomes available with the sample comparison upgrade.", UiTheme.MUTED)
+			_add_note(col, "Reference 2 becomes available with the sample comparison upgrade.")
 
 
 # ---------------------------------------------------------------- comparison
@@ -159,7 +166,7 @@ func _refresh_comparison(st: ColonyState) -> void:
 	_clear(_compare_box)
 	choice_buttons.clear()
 	if _shown_sample == "" or lab.is_empty():
-		_add_text(_compare_box, "Press \"Compare\" next to a sample to measure it.", UiTheme.MUTED)
+		_add_text(_compare_box, "Press \"Compare\" on a sample.", UiTheme.MUTED)
 		return
 	var sample: Dictionary = ScienceActions.read(st, "samples").get(_shown_sample, {})
 	var variant := int(lab.get("variant", 0))
@@ -167,7 +174,9 @@ func _refresh_comparison(st: ColonyState) -> void:
 	var control := ScienceActions.control_info()
 	var readout := ScienceActions.sample_readout(String(sample.get("site", "")), variant)
 	var unc := num(ScienceActions.mineral_uncertainty(st), 0)
-	_add_text(_compare_box, "%s, measurement %d. Shares of the powder, in %% (each ± %s points):" % [_shown_sample.replace("_", " ").capitalize(), variant + 1, unc])
+	var shares := "Shares of the powder, in %% (each ± %s percentage points)." % unc
+	_tip(_add_text(_compare_box, "%s · measurement %d" % [_shown_sample.replace("_", " ").capitalize(), variant + 1]), shares)
+	_add_note(_compare_box, shares)
 	var grid := GridContainer.new()
 	grid.name = "Table"
 	grid.columns = 4
@@ -176,6 +185,8 @@ func _refresh_comparison(st: ColonyState) -> void:
 	for head in ["Mineral group", "Control (empty)", "Reference", "Your sample"]:
 		var h := _add_text(grid, head, UiTheme.HEADING)
 		h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		if head == "Control (empty)":
+			_tip(h, String(control.get("why", "")))
 	var ref_values: Dictionary = ref.get("readout", {})
 	var control_values: Dictionary = control.get("readout", {})
 	for g: Dictionary in ScienceActions.samples_data().get("groups", []):
@@ -184,17 +195,25 @@ func _refresh_comparison(st: ColonyState) -> void:
 		_add_text(grid, "%d %%" % int(control_values.get(gid, 0)))
 		_add_text(grid, "%d %%" % int(ref_values.get(gid, 0)))
 		_add_text(grid, "%d %%" % int(readout.get(gid, 0)))
-	_add_text(_compare_box, "Control: %s" % String(control.get("why", "")), UiTheme.MUTED)
-	var where := _add_text(_compare_box, "%s. Mission: %s. Instrument: %s. Site: %s. Archive: %s (source %s). %s" % [
+	_add_note(_compare_box, "Control: %s" % String(control.get("why", "")))
+	# Where the reference comes from stays on screen in short (place, instrument, "illustrative"); the whole record is
+	# the line's tooltip.
+	var full := "%s. Mission: %s. Instrument: %s. Site: %s. Archive: %s (source %s). %s" % [
 		String(ref.get("name", "")), String(ref.get("mission", "")), String(ref.get("instrument", "")), String(ref.get("site", "")),
-		String(ref.get("archive", "")), String(ref.get("source_id", "")), String(ref.get("values_label", ""))], UiTheme.MUTED)
+		String(ref.get("archive", "")), String(ref.get("source_id", "")), String(ref.get("values_label", ""))]
+	var where := _add_text(_compare_box, "Reference: %s · %s · illustrative, not from the archive" % [
+		String(ref.get("site", "")).get_slice(" (", 0), String(ref.get("instrument", "")).get_slice(",", 0)], UiTheme.MUTED)
 	where.name = "Provenance"
+	_tip(where, full)
 	_add_text(_compare_box, "What is this sample?", UiTheme.HEADING)
 	var options := ScienceActions.interpretation_options(variant)
 	for i in options.size():
 		var b := Button.new()
 		b.name = "Choice_%d" % i
-		b.text = "%d. %s" % [i + 1, String((options[i] as Dictionary).get("text", ""))]
+		# the idea in a few words on the button; the whole sentence is its tooltip
+		var idea := String((options[i] as Dictionary).get("text", ""))
+		b.text = "%d. %s" % [i + 1, idea.get_slice(":", 0)]
+		b.tooltip_text = idea
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -224,17 +243,23 @@ func _refresh_results(st: ColonyState, results: Dictionary) -> void:
 		var row := HBoxContainer.new()
 		_results_box.add_child(row)
 		var applied := bool(r.get("applied", false))
-		var mark := "✓ Used" if applied else "• Not used yet"
-		var text := "%s %s: nutrient setting %s ± %s (%s, %s)." % [mark, id.replace("_", " ").capitalize(), num(float(r.get("value", 0.0)), 2),
-			num(float(r.get("uncertainty", 0.0)), 2), String((rock_types.get(String(r.get("rock_type", "")), {}) as Dictionary).get("name", "")),
+		var lines := VBoxContainer.new()
+		lines.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(lines)
+		# one short line: the setting with its plus-or-minus; the rock type, the site and where it goes are the tooltip
+		var text := "%s %s: nutrient setting %s ± %s%s" % ["✓" if applied else "•", id.replace("_", " ").capitalize(), num(float(r.get("value", 0.0)), 2),
+			num(float(r.get("uncertainty", 0.0)), 2), " · used" if applied else ""]
+		var tip := "%s, from the %s." % [String((rock_types.get(String(r.get("rock_type", "")), {}) as Dictionary).get("name", "")).capitalize(),
 			String(ScienceActions.site_info(String(r.get("site", ""))).get("name", ""))]
 		if applied:
 			var to := String(r.get("applied_to", ""))
-			text += " Used for %s." % ("every garden bed" if to == "all_beds" else to)
-		elif not direct:
-			text += " Use it at a garden bed or the greenhouse console."
-		var l := _add_text(row, text, UiTheme.GOOD if applied else &"")
-		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			tip += " Used for %s." % ("every garden bed" if to == "all_beds" else to)
+		else:
+			tip += " Use it at a garden bed or the greenhouse console."
+		var l := _add_text(lines, text, UiTheme.GOOD if applied else &"")
+		_tip(l, tip)
+		if not applied and not direct:
+			_add_text(lines, "Use it at a garden bed.", UiTheme.MUTED)
 		if not applied:
 			var b := Button.new()
 			b.name = "Apply_%s" % id
@@ -286,6 +311,12 @@ func _on_choice_answer(result: ActionResult) -> void:
 
 
 # ---------------------------------------------------------------- helpers
+
+## Gives a label a tooltip (labels ignore the mouse unless told otherwise).
+static func _tip(l: Label, text: String) -> void:
+	l.tooltip_text = text
+	l.mouse_filter = Control.MOUSE_FILTER_PASS
+
 
 static func _clear(box: Node) -> void:
 	for child in box.get_children():

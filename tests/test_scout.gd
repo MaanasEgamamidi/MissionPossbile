@@ -261,11 +261,17 @@ func _test_goals() -> void:
 	var by := {}
 	for g in goals:
 		by[String(g.id)] = g
-	_check("goals: checked from the colony (scout finished, 2 places surveyed, ore collected)", bool(by.scout_built.done) and int(by.scout_survey.fraction * 3.0 + 0.01) >= 2
-		and float(by.collect_ore.fraction) >= 1.0, str(goals))
+	# the scout, survey and ore goals are switched off since 301d499 (owner: kept for later; the goals are the tapes and repairs)
+	_check("goals: the scout, survey and ore goals are off (301d499)", not by.has("scout_built") and not by.has("scout_survey")
+		and not by.has("collect_ore"), str(by.keys()))
 	_check("goals: at most %d shown, unfinished first" % ColonyGoals.MAX_SHOWN, ColonyGoals.shown(st()).size() <= ColonyGoals.MAX_SHOWN and not bool(ColonyGoals.shown(st())[0].done))
 	st().campaign["objectives"] = [{"text": "Tutorial step", "done": false}]
-	_check("goals: objectives published by the campaign come first", String(ColonyGoals.all(st())[0].text) == "Tutorial step")
+	# since 301d499 the tape and repair goals lead; a campaign objective follows them (before the tapes are all found,
+	# finding them is the only goal)
+	var titles := ColonyGoals.all(st()).map(func(g: Dictionary) -> String: return String(g.text))
+	_check("goals: objectives published by the campaign come after the tape and repair goals (301d499)",
+		titles == ["Find the tapes"] if not TutorialSystem.repairs_unlocked(st()) else (titles.size() > 1 and titles[0] == "Play the tapes" and titles.back() == "Tutorial step"),
+		str(titles))
 	st().campaign.erase("objectives")
 
 

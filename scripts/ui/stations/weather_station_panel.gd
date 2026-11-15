@@ -55,11 +55,15 @@ func _build_body() -> void:
 	card.add_child(_labels_card)
 	_add_text(_labels_card, "! " + ARCHIVE_LABEL + ".", UiTheme.WARN)
 	_add_text(_labels_card, "! " + NOT_FORECAST_LABEL + ".", UiTheme.WARN)
-	_add_text(_labels_card, "The dust events replay dust measured at Jezero crater on Mars. The time between events is a game choice (much faster than on Mars), not how often NASA saw dust storms.", UiTheme.MUTED)
+	# UI overhaul: the two labels stand; why (the archive replay, the game's own timing) is behind the "?" switch.
+	var why := "The dust events replay dust measured at Jezero crater on Mars. The time between events is a game choice (much faster than on Mars), not how often NASA saw dust storms."
+	_add_note(_labels_card, why)
+	card.tooltip_text = why
 
 	_add_heading_with_help(_body, "Dust warning", "panel_dust")
 	_warning_text = _add_text(_body, "")
 	_warning_text.name = "WarningText"
+	_warning_text.mouse_filter = Control.MOUSE_FILTER_PASS
 	_ack_text = _add_text(_body, "", UiTheme.MUTED)
 	var row := HBoxContainer.new()
 	_body.add_child(row)
@@ -70,24 +74,30 @@ func _build_body() -> void:
 	_ack_button.pressed.connect(_on_acknowledge)
 	row.add_child(_ack_button)
 
+	# The sky in words and bars; wind and season are details behind the "?" switch.
 	_add_heading_with_help(_body, "The sky now", "solar_power")
-	_add_reading(&"opacity", "τ", "Dust in the air (opacity)", "solar_power", _body)
-	_add_reading(&"sunlight", "☀", "Sunlight on the panels", "solar_power", _body)
-	_add_reading(&"panels", "▦", "Dust on the panels", "panel_dust", _body)
-	_add_reading(&"wind", "≈", "Wind", "sources", _body)
-	_add_reading(&"season", "◷", "Season in the game (Ls)", "sol_clock", _body)
+	_add_reading(&"opacity", "τ", "Dust in the air", "solar_power", _body)
+	_add_reading(&"sunlight", "☀", "Sunlight on panels", "solar_power", _body)
+	_add_reading(&"panels", "▦", "Dust on panels", "panel_dust", _body)
 	_add_reading(&"phase", "•", "Dust event", "panel_dust", _body)
+	_help_only(_add_reading(&"wind", "≈", "Wind", "sources", _body))
+	_help_only(_add_reading(&"season", "◷", "Season in the game (Ls)", "sol_clock", _body))
 
-	_add_heading_with_help(_body, "Archive data in use", "sources")
-	_add_reading(&"site", "⌖", "Place", "sources", _body)
-	_add_reading(&"dates", "▤", "Observed (archive dates)", "sources", _body)
-	_add_reading(&"status", "✓", "Data check", "sources", _body)
-	_add_reading(&"snapshot", "#", "Data used by this game", "sources", _body)
-	_add_reading(&"last_check", "⧗", "Last check for new data", "sources", _body)
-	_newer_text = _add_text(_body, "", UiTheme.MUTED)
+	# Which archive data the game runs on: all of it behind the "?" switch.
+	var archive := VBoxContainer.new()
+	archive.name = "Archive"
+	_body.add_child(archive)
+	_help_only(archive)
+	_add_heading_with_help(archive, "Archive data in use", "sources")
+	_add_reading(&"site", "⌖", "Place", "sources", archive)
+	_add_reading(&"dates", "▤", "Observed (archive dates)", "sources", archive)
+	_add_reading(&"status", "✓", "Data check", "sources", archive)
+	_add_reading(&"snapshot", "#", "Data used by this game", "sources", archive)
+	_add_reading(&"last_check", "⧗", "Last check for new data", "sources", archive)
+	_newer_text = _add_text(archive, "", UiTheme.MUTED)
 	_newer_text.name = "NewerData"
 
-	_add_heading(_body, "Past dust events in this game (game time)")
+	_add_heading(_body, "Past dust events")
 	_history_box = VBoxContainer.new()
 	_history_box.name = "History"
 	_body.add_child(_history_box)
@@ -105,14 +115,16 @@ func _refresh_body(st: ColonyState) -> void:
 	var bal := services.balance
 	var w: Dictionary = st.weather
 	var tau := st.dust_tau
-	_show_reading(&"opacity", "τ %s · %s" % [num(tau, 2), WeatherSystem.opacity_words(tau)], &"ok" if tau < 0.9 else (&"warn" if tau < 2.0 else &"urgent"))
+	# states, not numbers: the sky in words (its opacity τ is the tooltip), sunlight and panel dust as bars
+	var sky := WeatherSystem.opacity_words(tau)
+	_show_reading(&"opacity", sky.left(1).to_upper() + sky.substr(1),&"ok" if tau < 0.9 else (&"warn" if tau < 2.0 else &"urgent"))
+	(readings[&"opacity"] as Reading).tooltip_text = "Opacity τ %s: how much dust is in the air." % num(tau, 2)
 	var share := WeatherSystem.sunlight_share(st, bal)
-	_show_reading(&"sunlight", "%d %% of usual · %s" % [roundi(share * 100.0), "panels make less power" if share < 0.97 else "normal power"],
-		&"ok" if share >= 0.8 else (&"warn" if share >= 0.5 else &"urgent"))
-	(readings[&"sunlight"] as Reading).name_label.text = "Sunlight on the panels"
+	_show_reading(&"sunlight", "%d %% of usual" % roundi(share * 100.0), &"ok" if share >= 0.8 else (&"warn" if share >= 0.5 else &"urgent"), share)
 	(readings[&"sunlight"] as Reading).tooltip_text = WeatherSystem.solar_words(st, bal)
 	var dust := PowerModel.average_dust(st)
-	_show_reading(&"panels", "%d %% covered%s" % [roundi(dust * 100.0), " · clean them" if dust >= 0.2 else ""], &"ok" if dust < 0.2 else &"warn")
+	_show_reading(&"panels", "Clean them" if dust >= 0.2 else "Clean", &"ok" if dust < 0.2 else &"warn")
+	(readings[&"panels"] as Reading).tooltip_text = "%d %% of the panels is covered with dust." % roundi(dust * 100.0)
 	var wind := float(w.get("wind_ms", -1.0))
 	if wind < 0.0:
 		_show_reading(&"wind", "not measured in the archive", &"ok")
@@ -128,13 +140,17 @@ func _refresh_body(st: ColonyState) -> void:
 			_warning_text.text = "✓ No dust warning right now."
 			_warning_text.theme_type_variation = UiTheme.GOOD
 		else:
-			_warning_text.text = "! Dust is in the air now. Stay near the airlock and clean the panels when it has passed."
+			_warning_text.text = "! Dust now. Stay near the airlock."
 			_warning_text.theme_type_variation = UiTheme.WARN
+		_warning_text.tooltip_text = "Clean the panels when the dust has passed." if not active.is_empty() else ""
 		_ack_text.visible = false
 		_ack_button.visible = false
 	else:
-		var left := float(warning.get("starts_at_hours", 0.0)) - st.sim_hours
-		_warning_text.text = "! %s (starts in about %d game hours.)" % [StationPanel.words(String(warning.get("text", ""))), maxi(0, roundi(left))]
+		# short on screen (when, and what to do); the whole warning is the tooltip
+		var left := maxf(0.0, float(warning.get("starts_at_hours", 0.0)) - st.sim_hours)
+		var minutes := maxi(1, roundi(left / maxf(services.clock().hours_per_real_second(), 1e-9) / 60.0))
+		_warning_text.text = "! Dust warning: in about %d minute%s.\nWalk back to the airlock." % [minutes, "" if minutes == 1 else "s"]
+		_warning_text.tooltip_text = "%s (Starts in about %d game hours.)" % [StationPanel.words(String(warning.get("text", ""))), roundi(left)]
 		_warning_text.theme_type_variation = UiTheme.WARN
 		var by: Array = warning.get("acknowledged_by", [])
 		var names := PackedStringArray()
@@ -177,13 +193,16 @@ func _refresh_body(st: ColonyState) -> void:
 		_newer_text.visible = false
 
 	var lines: Array = []
+	var details := PackedStringArray()
 	var history: Array = w.get("history", [])
 	for i in range(history.size() - 1, maxi(-1, history.size() - 4), -1):
 		var h: Dictionary = history[i]
-		lines.append({"text": "Sol %d: dust for about %d game hours, darkest sky τ %s (severity %s of the archive episode %s)" % [
-			int(float(h.get("at_hours", 0.0)) / GameConfig.SOL_HOURS), roundi(float(h.get("duration_hours", 0.0))), num(float(h.get("peak_tau", 0.0)), 2),
-			num(float(h.get("severity", 0.0)), 2), String(h.get("episode_id", ""))], "level": "info"})
+		lines.append({"text": "Sol %d: dust for about %d hours" % [int(float(h.get("at_hours", 0.0)) / GameConfig.SOL_HOURS), roundi(float(h.get("duration_hours", 0.0)))],
+			"level": "info"})
+		details.append("Sol %d: darkest sky τ %s, severity %s of the archive episode %s (game time)." % [int(float(h.get("at_hours", 0.0)) / GameConfig.SOL_HOURS),
+			num(float(h.get("peak_tau", 0.0)), 2), num(float(h.get("severity", 0.0)), 2), String(h.get("episode_id", ""))])
 	_fill_alerts(_history_box, lines, "No dust events yet.")
+	_history_box.tooltip_text = "\n".join(details)
 
 
 static func _phase_words(w: Dictionary) -> String:

@@ -160,12 +160,13 @@ func _test_computer() -> void:
 	await process_frame
 	var opened: Array[UiPanel] = []
 	panel.open_requested.connect(func(p: UiPanel) -> void: opened.append(p))
-	for key: String in ["summary", "upgrades", "blueprint"]:
+	for key: String in ["summary", "upgrades"]:
 		var b := panel.computer_buttons.get(key) as Button
 		if b != null:
 			b.pressed.emit()
-	_check("computer buttons open Colony summary, Upgrades and Blueprint", opened.size() == 3 and opened[0] is ColonySummaryPanel
-		and opened[1] is UpgradeCardsPanel and opened[2] is BlueprintPanel, str(opened))
+	# the Blueprint map button is switched off since 301d499 (owner: the big goals screen, J, has the map)
+	_check("computer buttons open Colony summary and Upgrades; no Blueprint button (off since 301d499)", opened.size() == 2 and opened[0] is ColonySummaryPanel
+		and opened[1] is UpgradeCardsPanel and not panel.computer_buttons.has("blueprint"), str(opened))
 	for p in opened:
 		p.free()
 	panel.queue_free()

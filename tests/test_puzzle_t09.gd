@@ -110,6 +110,8 @@ func _rule_checks() -> void:
 	var worst := 0
 	var all_good := true
 	var detail := ""
+	var first_good := true
+	var first_detail := ""
 	for s in 60:
 		var start := Rule.initial_state(1000 + s * 7919)
 		layouts[str(start.tubes)] = true
@@ -123,11 +125,44 @@ func _rule_checks() -> void:
 			all_good = false
 			detail = "seed %d sorted=%s path=%s mixed=%d fallen=%d" % [s, Rule.is_sorted(start.tubes), path, mixed, fallen]
 		worst = maxi(worst, path.size())
-	_check("60 seeds: scrambled, always solvable, %d tube(s) fallen" % Rule.FALLEN_TUBES, all_good, detail)
+		# The first run: the same liquids, every tube standing.
+		var first := Rule.initial_state(1000 + s * 7919, true)
+		var first_fallen := (first.racked as Array).count(false)
+		if first.tubes != start.tubes or first_fallen != Rule.FIRST_RUN_FALLEN:
+			first_good = false
+			first_detail = "seed %d fallen=%d same liquids=%s" % [s, first_fallen, first.tubes == start.tubes]
+	_check("60 seeds: scrambled, always solvable, %d tube(s) fallen on a later breakdown" % Rule.FALLEN_TUBES, all_good, detail)
+	_check("60 seeds: the first run has the same liquids and every tube standing", first_good and Rule.FIRST_RUN_FALLEN == 0, first_detail)
 	_check("kid-sized: every seed solves in at most 12 pours", worst <= 12, "longest shortest solution %d" % worst)
 	_check("seeds give different layouts", layouts.size() >= 40, "%d distinct of 60" % layouts.size())
-	var task := {"puzzle_seed": 77, "puzzle_state": {}}
+	# First run (never completed): every tube standing, pouring works at once, nothing to rack.
+	var fresh := {"puzzle_seed": 77, "puzzle_state": {}, "first_completed": false}
+	var first_start := Rule.current_state(fresh)
+	_check("rule: first run opens with every tube standing", Rule.is_first_run(fresh) and (first_start.racked as Array).all(func(r: bool) -> bool: return r))
+	var first_pour: Array = solve(first_start.tubes)[0]
+	var mid := Rule.validate(fresh, {"move": "pour", "value": int(first_pour[0]) * 10 + int(first_pour[1])})
+	_check("rule: first run pours at once", bool(mid.accepted))
+	_check("rule: first run has nothing to rack", not bool(Rule.validate(fresh, {"move": "rack", "value": 0}).accepted))
+	var resumed := {"puzzle_seed": 77, "first_completed": false, "progress": mid.progress, "puzzle_state": mid.puzzle_state}
+	_check("rule: a first-run save in progress is kept", Rule.current_state(resumed) == mid.puzzle_state)
+	# Old saves that do not fit the first run's start fall back to the fresh board (never a dead end).
+	var old_save := {"puzzle_seed": 77, "first_completed": false, "progress": 0.1, "puzzle_state": Rule.initial_state(77)}
+	_check("rule: an old first-run save with a tube lying down falls back to the fresh board", Rule.current_state(old_save) == first_start)
+	var sorted_tubes: Array = []
+	for t: Array in first_start.tubes:
+		sorted_tubes.append([])
+	var n := 0
+	for kind: int in Rule._counts(first_start.tubes):
+		for d in Rule.CAPACITY:
+			(sorted_tubes[n] as Array).append(kind)
+		n += 1
+	var dead_end := {"puzzle_seed": 77, "first_completed": false, "progress": 0.5,
+		"puzzle_state": {"seed": 77, "step": 5, "racked": [true, true, true, true, true], "tubes": sorted_tubes}}
+	_check("rule: a sorted board on an unfinished task falls back to the fresh board", Rule.current_state(dead_end) == first_start)
+	# A later breakdown (completed once before): FALLEN_TUBES lie on the bench and go back first.
+	var task := {"puzzle_seed": 77, "puzzle_state": {}, "first_completed": true}
 	var start := Rule.current_state(task)
+	_check("rule: a later breakdown has %d tube(s) fallen" % Rule.FALLEN_TUBES, not Rule.is_first_run(task) and (start.racked as Array).count(false) == Rule.FALLEN_TUBES)
 	var fallen := (start.racked as Array).find(false)
 	var standing := (start.racked as Array).find(true)
 	_check("rule: rack a fallen tube", bool(Rule.validate(task, {"move": "rack", "value": fallen}).accepted))
@@ -137,10 +172,10 @@ func _rule_checks() -> void:
 	_check("rule: negative value refused", not bool(Rule.validate(task, {"move": "rack", "value": -1}).accepted))
 	_check("rule: unknown move refused", not bool(Rule.validate(task, {"move": "complete", "value": 0}).accepted))
 	_check("rule: wrong step refused", not bool(Rule.validate(task, {"move": "rack", "value": Rule.STEP_BASE + fallen}).accepted))
-	var bad := {"puzzle_seed": 77, "puzzle_state": {"seed": 77, "step": 0, "racked": [true, true, true, true, true],
+	var bad := {"puzzle_seed": 77, "first_completed": true, "puzzle_state": {"seed": 77, "step": 0, "racked": [true, true, true, true, true],
 		"tubes": [[0, 0, 0, 0, 0], [1, 1, 1], [9, 9, 9, 9], [], []]}}
 	_check("rule: malformed state falls back to the seeded start", Rule.current_state(bad) == start)
-	var other := {"puzzle_seed": 77, "puzzle_state": (Rule.initial_state(78) as Dictionary)}
+	var other := {"puzzle_seed": 77, "first_completed": true, "puzzle_state": (Rule.initial_state(78) as Dictionary)}
 	_check("rule: state of another seed falls back to the seeded start", Rule.current_state(other) == start)
 
 
@@ -173,36 +208,26 @@ func _session_checks() -> void:
 	_check("move without a claim refused", _move(1, "rack", 0).reason == &"task_unclaimed")
 	var claim := s.request(&"task_claim", STATION, {"generation": gen})
 	_check("medic at the station claims T09", claim.ok, "%s %s (zone %s)" % [claim.reason, claim.message, s.zone_at_position.call(pos) if s.zone_at_position.is_valid() else "-"])
-	var start := Rule.current_state(task)
-	var fallen: Array = []
-	for i in Rule.TUBES:
-		if not bool(start.racked[i]):
-			fallen.append(i)
-	_check("forged completion flag rejected", s.request(&"task_move", STATION, {"generation": gen, "move": "rack", "value": int(fallen[0]), "complete": true}).reason == &"bad_request")
-	_check("unknown move fails closed", _move(1, "solve", 0).reason == &"invalid_move")
-	_check("out-of-range tube fails closed", _move(1, "rack", 9).reason == &"invalid_move")
-	_check("negative value fails closed", s.request(&"task_move", STATION, {"generation": gen, "move": "rack", "value": -5}).reason == &"invalid_move")
-	_check("future step fails closed", _move(1, "rack", int(fallen[0]), 3).reason == &"invalid_move")
-	_check("pour before the rack is refilled fails closed", _move(1, "pour", 1).reason == &"invalid_move")
-	_check("stale generation refused", s.request(&"task_move", STATION, {"generation": gen + 1, "move": "rack", "value": int(fallen[0])}).reason == &"stale_fault")
-	_check("rejections changed nothing", (task.puzzle_state as Dictionary).is_empty() and float(task.progress) == 0.0)
-	var first := _move(1, "rack", int(fallen[0]))
-	_check("rack a fallen tube", first.ok and float(task.progress) > 0.0 and float(task.progress) < 1.0)
-	_check("replayed rack request fails closed", _move(1, "rack", int(fallen[0]), 0).reason == &"invalid_move")
-	_check("racking a standing tube fails closed", _move(1, "rack", int(fallen[0])).reason == &"invalid_move")
-	for k in range(1, fallen.size()):
-		_move(1, "rack", int(fallen[k]))
 	var racked := Rule.current_state(task)
-	_check("all tubes back in the rack", (racked.racked as Array).all(func(r: bool) -> bool: return r))
+	_check("first run in the session: every tube standing", not bool(task.first_completed) and (racked.racked as Array).all(func(r: bool) -> bool: return r))
 	var wrong := _wrong_pour(racked.tubes)
+	var path := solve(racked.tubes)
+	var pour0: Array = path[0]
+	var p0 := int(pour0[0]) * 10 + int(pour0[1])
+	_check("forged completion flag rejected", s.request(&"task_move", STATION, {"generation": gen, "move": "pour", "value": p0, "complete": true}).reason == &"bad_request")
+	_check("unknown move fails closed", _move(1, "solve", 0).reason == &"invalid_move")
+	_check("out-of-range tube fails closed", _move(1, "pour", 9).reason == &"invalid_move")
+	_check("negative value fails closed", s.request(&"task_move", STATION, {"generation": gen, "move": "pour", "value": -5}).reason == &"invalid_move")
+	_check("future step fails closed", _move(1, "pour", p0, 3).reason == &"invalid_move")
+	_check("racking a standing tube fails closed", _move(1, "rack", 0).reason == &"invalid_move")
+	_check("stale generation refused", s.request(&"task_move", STATION, {"generation": gen + 1, "move": "pour", "value": p0}).reason == &"stale_fault")
 	_check("wrong pour fails closed", wrong.x >= 0 and _move(1, "pour", wrong.x * 10 + wrong.y).reason == &"invalid_move")
 	_check("pour to itself fails closed", _move(1, "pour", 11).reason == &"invalid_move")
-	var path := solve(racked.tubes)
-	_check("solvable from the racked start", path != [-1] and path.size() > 0, str(path))
+	_check("rejections changed nothing", (task.puzzle_state as Dictionary).is_empty() and float(task.progress) == 0.0)
+	_check("solvable from the start", path != [-1] and path.size() > 1, str(path))
 	# Partial progress, then a save / JSON / restore round trip: T09 supports resume, so it must survive.
-	var pour0: Array = path[0]
-	var r0 := _move(1, "pour", int(pour0[0]) * 10 + int(pour0[1]))
-	_check("first pour accepted", r0.ok and bool(task.resume_supported))
+	var r0 := _move(1, "pour", p0)
+	_check("first pour accepted", r0.ok and bool(task.resume_supported) and float(task.progress) < 1.0)
 	var replay := s.request(&"task_move", STATION, {"generation": gen, "move": "pour", "value": (int(Rule.current_state(task).step) - 1) * Rule.STEP_BASE + int(pour0[0]) * 10 + int(pour0[1])})
 	_check("replayed pour request fails closed", replay.reason == &"invalid_move")
 	var before := Rule.current_state(task)
@@ -267,11 +292,8 @@ func _panel_checks() -> void:
 	_check("Tab reaches every tube", buttons.all(func(b: Button) -> bool: return visited.has(b)))
 	var task: Dictionary = s.state.repair.tasks[TASK]
 	var state := Rule.current_state(task)
-	for i in Rule.TUBES:
-		if not bool(state.racked[i]):
-			await _press(buttons[i])
-	state = Rule.current_state(task)
-	_check("keyboard racks the fallen tubes", (state.racked as Array).all(func(r: bool) -> bool: return r), panel.status_label.text)
+	_check("first run: every tube standing, no bench mat, the pick cue", (state.racked as Array).all(func(r: bool) -> bool: return r)
+		and not bool(panel.get("mat_shown")) and String(panel.cue_text).begins_with("Pick a tube"), String(panel.cue_text))
 	var wrong := _wrong_pour(state.tubes)
 	await _press(buttons[wrong.x])
 	await _press(buttons[wrong.y])
@@ -283,5 +305,21 @@ func _panel_checks() -> void:
 		await _press(buttons[int(p[1])])
 	_check("keyboard path solves T09 through the session", bool(task.first_completed) and float(task.progress) >= 1.0, panel.status_label.text)
 	_check("panel shows the host's success", panel.succeeded and panel.status_label.text == panel.solved_text() and "sorted" in panel.status_label.text, panel.status_label.text)
+	ui.close_all()
+	await _frames()
+	# A later breakdown (completed once before): one tube lies on the bench mat and the keyboard racks it first.
+	s.repair_runtime.begin_fault(s.state, TASK, 4243)
+	var later := PuzzleRegistry.make_panel(TASK, STATION, services)
+	ui.open(later)
+	await _frames(6)
+	var lstate := Rule.current_state(task)
+	var lying := (lstate.racked as Array).find(false)
+	_check("later breakdown: one tube fallen, the bench mat shown, focus on it", (lstate.racked as Array).count(false) == Rule.FALLEN_TUBES
+		and bool(later.get("mat_shown")) and lying >= 0 and root.gui_get_focus_owner() == later.get("tube_buttons")[lying] and String(later.cue_text).begins_with("Put the tube"),
+		"%s / %s" % [lstate.racked, later.cue_text])
+	await _press(later.get("tube_buttons")[lying])
+	lstate = Rule.current_state(task)
+	_check("later breakdown: Enter racks it, then the pick cue", (lstate.racked as Array).all(func(r: bool) -> bool: return r) and float(task.progress) > 0.0
+		and String(later.cue_text).begins_with("Pick a tube") and bool(later.get("mat_shown")), "%s %s" % [later.cue_text, later.status_label.text])
 	ui.close_all()
 	await _frames()

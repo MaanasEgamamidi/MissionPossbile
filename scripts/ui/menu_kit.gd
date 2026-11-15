@@ -21,6 +21,21 @@ static func pic(kind: StringName, px := 28.0, ink: Variant = &"text") -> Texture
 	return p
 
 
+## A pictogram whose size follows the player's text size, also when it changes while the panel is open: `base_px` at
+## text size 1. Use it wherever a size was `px * UiTheme.text_scale()`.
+static func scaled_pic(kind: StringName, base_px := 28.0, ink: Variant = &"text") -> Texture2D:
+	var p := Pic.make(kind, base_px, ink)
+	p.follow_text(base_px)
+	return p
+
+
+## A pictogram on its own that follows the player's text size live (see scaled_pic).
+static func scaled_picture(kind: StringName, base_px := 28.0, ink: Variant = &"text") -> TextureRect:
+	var t := picture(kind, base_px, ink)
+	t.texture = scaled_pic(kind, base_px, ink)
+	return t
+
+
 ## A pictogram on its own (not focusable, ignores the mouse).
 static func picture(kind: StringName, px := 28.0, ink: Variant = &"text") -> TextureRect:
 	var t := TextureRect.new()
@@ -246,12 +261,30 @@ class Pic extends Texture2D:
 	var px := 28.0
 	var ink: Variant = &"text"
 
+	## The size at text size 1 when the pictogram follows the text size (follow_text); 0 = a fixed size.
+	var base_px := 0.0
+
 	static func make(p_kind: StringName, p_px: float, p_ink: Variant) -> Pic:
 		var p := Pic.new()
 		p.kind = p_kind
 		p.px = p_px
 		p.ink = p_ink
 		return p
+
+	## From now on the side is `p_base` times the player's text size. A text-size change resizes it at once: the
+	## texture reports `changed`, so the TextureRect or Button showing it lays out again.
+	func follow_text(p_base: float) -> void:
+		base_px = p_base
+		px = roundf(p_base * UiTheme.text_scale())
+		var t := UiTheme.get_theme()
+		if not t.changed.is_connected(_on_theme_changed):
+			t.changed.connect(_on_theme_changed)
+
+	func _on_theme_changed() -> void:
+		var want := roundf(base_px * UiTheme.text_scale())
+		if base_px > 0.0 and not is_equal_approx(want, px):
+			px = want
+			emit_changed()
 
 	func _get_width() -> int:
 		return roundi(px)

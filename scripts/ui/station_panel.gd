@@ -101,32 +101,41 @@ class Reading extends HBoxContainer:
 			bar.set(&"share", clampf(p_share, 0.0, 1.0))
 
 
-## One upgrade path in the "Upgrades" part of a station panel (owner request 2026-11-14): the track's name and V1..V4
-## pips, the stage now, what the next level gives, its cost against the colony's parts, who can do it, the upgrade
-## button and why it is greyed out. StationPanel builds and refreshes it; it only shows.
+## One upgrade path in the "Upgrades" part of a station panel (owner request 2026-11-14). UI overhaul (2026-11-15): one
+## line per card. On screen: the track's name and V1..V4 pips, the next stage in words, its cost as a gear and a number,
+## the upgrade button and why it is greyed out. The rest (the stage now, what the next level gives, the cost against
+## the colony's parts, who can do it) is the card's tooltip (`details`). StationPanel builds and refreshes it; it
+## only shows.
 class UpgradeRow extends PanelContainer:
 	var track := ""
 	var name_label: Label
 	var pips: Array[Label] = []
-	var now_label: Label
+	## The one line: "Next: Two-layer rack with LED bars".
 	var next_label: Label
-	var gives_label: Label
+	## The cost chip (a gear pictogram and this number).
+	var cost_chip: Control
 	var cost_label: Label
-	var who_label: Label
 	var button: Button
 	var reason_label: Label
 	## True while an upgrade request waits for the host's answer.
 	var pending := false
 
-	## Every line shown now, top to bottom (for tests and the layout check).
+	## Every line shown now, top to bottom (for tests and the layout check). The cost chip reads "⚙ 2".
 	func shown_lines() -> PackedStringArray:
 		var out := PackedStringArray([name_label.text, pips_text()])
-		for l: Label in [now_label, next_label, gives_label, cost_label, who_label, reason_label]:
-			if l.visible and l.text != "":
-				out.append(l.text)
+		if next_label.visible and next_label.text != "":
+			out.append(next_label.text)
+		if cost_chip.visible:
+			out.append("⚙ " + cost_label.text)
+		if reason_label.visible and reason_label.text != "":
+			out.append(reason_label.text)
 		if button.visible:
 			out.append("[%s]%s" % [button.text, " (greyed out)" if button.disabled else ""])
 		return out
+
+	## The card's tooltip: the stage now, the next stage, what it gives, its cost and who can do it, one per line.
+	func details() -> String:
+		return tooltip_text
 
 	## The pips as text: "● V1 ● V2 ○ V3 ○ V4".
 	func pips_text() -> String:
@@ -446,6 +455,11 @@ static func equipment_status(st: ColonyState, balance: GameBalance, id: String) 
 ## The name of a piece of equipment in words ("Water recycler").
 static func equipment_name(id: String) -> String:
 	return words(String(PowerModel.LABELS.get(id, id)))
+
+
+## The tooltip of a machine's control with its science name ("Water splitter (electrolyser): ..."), or "".
+static func equipment_tip(id: String) -> String:
+	return words(String(PowerModel.SCIENCE_TIPS.get(id, "")))
 
 
 # ---------------------------------------------------------------- building
@@ -879,6 +893,8 @@ func _add_equipment_switch(parent: Control, id: String, text := "") -> CheckButt
 	button.text = text if text != "" else equipment_switch_text(services.balance, id, services.state())
 	button.set_pressed_no_signal(services.state().is_on(id))
 	button.toggled.connect(_on_equipment_toggled.bind(id))
+	if equipment_tip(id) != "":
+		button.tooltip_text = equipment_tip(id)
 	row.add_child(button)
 	var status := Label.new()
 	status.name = "Status_%s" % id
@@ -1020,6 +1036,12 @@ func upgrade_lines(track: String) -> PackedStringArray:
 	return row.shown_lines() if row != null else PackedStringArray()
 
 
+## The tooltip of the upgrade row of `track` (the details that are not on screen), or "".
+func upgrade_details(track: String) -> String:
+	var row := upgrade_rows.get(track) as UpgradeRow
+	return row.details() if row != null else ""
+
+
 ## What the next level of a track gives, in plain words: only the effects that change ("3 grow layers · 2.8× the
 ## food of the first rack"). "" when nothing listed changes.
 static func upgrade_gives_text(track: String, next_level: int) -> String:
@@ -1103,18 +1125,18 @@ func _build_upgrades() -> void:
 			pip.name = "V%d" % lvl
 			pip_row.add_child(pip)
 			row.pips.append(pip)
-		row.now_label = _add_text(col, "")
-		row.now_label.name = "Now"
-		row.next_label = _add_text(col, "")
+		# the one line: the next stage in words, the cost as a gear and a number, the button
+		var line := HBoxContainer.new()
+		line.name = "Line"
+		line.add_theme_constant_override(&"separation", 10)
+		col.add_child(line)
+		row.next_label = _add_text(line, "")
 		row.next_label.name = "Next"
-		row.gives_label = _add_text(col, "", UiTheme.MUTED)
-		row.gives_label.name = "Gives"
-		row.cost_label = _add_text(col, "")
-		row.cost_label.name = "Cost"
-		row.who_label = _add_text(col, "", UiTheme.MUTED)
-		row.who_label.name = "Who"
-		var buttons := HBoxContainer.new()
-		col.add_child(buttons)
+		row.cost_chip = StationKit.chip(&"gear", "")
+		row.cost_chip.name = "Cost"
+		row.cost_label = row.cost_chip.find_child("Text", true, false) as Label
+		line.add_child(row.cost_chip)
+		var buttons := line
 		row.button = Button.new()
 		row.button.name = "UpgradeButton"
 		row.button.theme_type_variation = UiTheme.PRIMARY_BUTTON
@@ -1138,36 +1160,43 @@ func _refresh_upgrades(st: ColonyState) -> void:
 			var reached := i + 1 <= lvl
 			row.pips[i].text = "%s V%d" % ["●" if reached else "○", i + 1]
 			row.pips[i].theme_type_variation = UiTheme.GOOD if reached else UiTheme.MUTED
-		row.now_label.text = "Now: %s" % AreaLevels.stage_text(track, lvl)
+		var details := PackedStringArray(["Now: %s" % AreaLevels.stage_text(track, lvl)])
 		var derived := AreaLevels.is_derived(track)
 		var at_top := lvl >= top_level
 		var has_next := not derived and not at_top
 		row.next_label.visible = has_next
-		row.gives_label.visible = has_next
-		row.cost_label.visible = has_next
-		row.who_label.visible = has_next
+		row.cost_chip.visible = has_next
 		row.button.visible = has_next
 		if derived:
 			row.reason_label.text = "Upgrade modules in the garage"
 			row.reason_label.theme_type_variation = UiTheme.MUTED
 			row.reason_label.visible = true
+			row.tooltip_text = "\n".join(details)
 			continue
 		if at_top:
 			row.reason_label.text = "✓ Fully upgraded (V%d)." % lvl
 			row.reason_label.theme_type_variation = UiTheme.GOOD
 			row.reason_label.visible = true
+			row.tooltip_text = "\n".join(details)
 			continue
 		var next := lvl + 1
-		row.next_label.text = "Next: %s" % AreaLevels.stage_text(track, next)
+		var stages: Array = AreaLevels.track(track).get("stages", [])
+		row.next_label.text = "Next: %s" % (String(stages[next - 1]) if next - 1 < stages.size() else "V%d" % next)
+		details.append("Next: %s" % AreaLevels.stage_text(track, next))
 		var gives := upgrade_gives_text(track, next)
-		row.gives_label.text = "It gives: %s" % gives
-		row.gives_label.visible = gives != ""
+		if gives != "":
+			details.append("It gives: %s" % gives)
 		var cost := AreaLevels.cost_to_reach(track, next)
-		row.cost_label.text = "Costs %d spare part%s · the colony has %d" % [cost, "" if cost == 1 else "s", st.parts]
+		var cost_words := "Costs %d spare part%s · the colony has %d" % [cost, "" if cost == 1 else "s", st.parts]
+		details.append(cost_words)
+		row.cost_label.text = "%d" % cost
 		row.cost_label.theme_type_variation = UiTheme.GOOD if st.parts >= cost else UiTheme.WARN
+		row.cost_chip.tooltip_text = cost_words
 		var spec := StringName(String(AreaLevels.track(track).get("specialty", "")))
 		var mine := me != null and spec != &"" and me.specialty == spec
-		row.who_label.text = "Who can do it: %s%s" % [upgrade_who_text(track), " (you)" if mine else ""]
+		details.append("Who can do it: %s%s" % [upgrade_who_text(track), " (you)" if mine else ""])
+		row.tooltip_text = "\n".join(details)
+		row.button.tooltip_text = row.tooltip_text
 		row.button.text = "Upgrade to V%d" % next
 		var blockers := AreaLevels.blockers(st, track, me)
 		row.button.disabled = row.pending or not blockers.is_empty()

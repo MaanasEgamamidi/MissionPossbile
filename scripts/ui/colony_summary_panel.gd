@@ -59,7 +59,6 @@ func setup(p_services: GameServices) -> void:
 	name = "ColonySummaryPanel"
 	theme_type_variation = UiTheme.PANEL
 	max_height = -1.0               # UiRoot.HUG: as tall as the glance while the details are closed
-	var ts := UiTheme.text_scale()
 	var box := VBoxContainer.new()
 	box.name = "Box"
 	box.add_theme_constant_override(&"separation", 10)
@@ -68,7 +67,7 @@ func setup(p_services: GameServices) -> void:
 	header.name = "Header"
 	header.add_theme_constant_override(&"separation", 12)
 	box.add_child(header)
-	header.add_child(MenuKit.picture(&"dome", 34.0 * ts, &"heading"))
+	header.add_child(MenuKit.scaled_picture(&"dome", 34.0, &"heading"))
 	var title := Label.new()
 	title.name = "Title"
 	title.text = "Colony"
@@ -87,7 +86,7 @@ func setup(p_services: GameServices) -> void:
 	var chip_row := HBoxContainer.new()
 	chip_row.add_theme_constant_override(&"separation", 8)
 	chip.add_child(chip_row)
-	chip_row.add_child(MenuKit.picture(&"gear", 24.0 * ts, &"heading"))
+	chip_row.add_child(MenuKit.scaled_picture(&"gear", 24.0, &"heading"))
 	_parts_chip = Label.new()
 	_parts_chip.theme_type_variation = UiTheme.HEADING
 	chip_row.add_child(_parts_chip)
@@ -123,7 +122,8 @@ func setup(p_services: GameServices) -> void:
 	content.add_child(_tile_grid)
 	for s: Dictionary in STOCKS:
 		_tile_grid.add_child(_make_tile(s))
-	_details_button = MenuKit.button("Details", &"down", &"", 22.0 * ts, 1.0, 46.0)
+	_details_button = MenuKit.button("Details", &"down", &"", 22.0, 1.0, 46.0)
+	_details_button.icon = MenuKit.scaled_pic(&"down", 22.0)
 	_details_button.name = "Details"
 	_details_button.toggle_mode = true
 	_details_button.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
@@ -293,7 +293,7 @@ func refresh() -> void:
 	var o_net: float = f.oxygen_per_sol
 	(_flow_rows["oxygen"] as ReadingRow).set_value(signed_amount(o_net, "kg per sol", 2), &"warn" if o_net < -1e-6 else &"ok", trend_word(o_net))
 	(_cause_labels["oxygen"] as Label).text = oxygen_cause(f)
-	(_cause_labels["oxygen_made"] as Label).text = "Oxygen made by each process: electrolyser %s kg per sol (uses water), CO₂-oxygen unit %s kg per sol (uses Mars air)." % [
+	(_cause_labels["oxygen_made"] as Label).text = "Oxygen made by each process: water splitter %s kg per sol (uses water), CO₂ splitter %s kg per sol (uses Mars air)." % [
 		num(f.electrolyser_kg_per_sol), num(f.co2_unit_kg_per_sol)]
 	var w_net: float = f.water_per_sol
 	(_flow_rows["water"] as ReadingRow).set_value(signed_amount(w_net, "L per sol", 1), &"warn" if w_net < -1e-6 else &"ok", trend_word(w_net))
@@ -428,7 +428,7 @@ func _fit_tiles() -> void:
 func _on_details_toggled(open: bool) -> void:
 	_details.visible = open
 	_details_button.text = "Hide details" if open else "Details"
-	_details_button.icon = MenuKit.pic(&"up" if open else &"down", 22.0 * UiTheme.text_scale())
+	_details_button.icon = MenuKit.scaled_pic(&"up" if open else &"down", 22.0)
 	_fit_height()
 
 
