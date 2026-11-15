@@ -25,9 +25,9 @@ const SuitRadio := preload("res://scripts/voice/suit_radio.gd")
 const RadioFx := preload("res://scripts/voice/radio_fx.gd")
 ## The speaker's "No signal" line stays this long after the press that triggered it, seconds.
 const NO_SIGNAL_HOLD_S := 3.0
-## Opus encoder settings (engineering): 24 kbit/s, complexity 5, tuned for voice.
-const OPUS_BITRATE := 24000
-const OPUS_COMPLEXITY := 5
+## Opus encoder settings (engineering): 64 kbit/s, complexity 10 (best quality), tuned for voice.
+const OPUS_BITRATE := 64000
+const OPUS_COMPLEXITY := 10
 ## The microphone stays open this long after the talk key is let go, so quick presses do not keep reopening it.
 const MIC_HANG_S := 3.0
 ## An open microphone that gives no samples for this long is reported as "no signal".

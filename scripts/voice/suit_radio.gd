@@ -53,6 +53,11 @@ const SCIENCE_NOTE := ("Suit radio: in real life, radio between two spacesuits o
 	+ "depending on where the two planets are; that is why Mission Control's messages arrive late, and no upgrade "
 	+ "of the colony can change it.")
 
+## Owner 2026-11-15: crew voice is always at the top Communication level for every player (instant and clear on the
+## whole map, never "no signal"), whatever the colony's level. The level tables above still drive the build vote's
+## comms reach and the upgrade screens. Set false to bring the per-level delay and crackle back.
+const VOICE_ALWAYS_MAX := true
+
 const ROUTE_NONE := &"none"
 const ROUTE_PROXIMITY := &"proximity"
 const ROUTE_RADIO := &"radio"
@@ -152,7 +157,7 @@ static func decide(state: ColonyState, speaker: Dictionary, listener: Dictionary
 			out.reason = g.reason
 			out.via_door = g.via_door
 			return out
-	if not has_radio_signal(state):
+	if not VOICE_ALWAYS_MAX and not has_radio_signal(state):
 		out.reason = "no_signal"
 		return out
 	out.route = ROUTE_RADIO
@@ -160,7 +165,7 @@ static func decide(state: ColonyState, speaker: Dictionary, listener: Dictionary
 	out.reason = "speaker_outside" if s_out else ("listener_outside" if l_out else "out_of_earshot")
 	var away := not near_comms(state, speaker, zones) or not near_comms(state, listener, zones)
 	out.away = away
-	if away:
+	if away and not VOICE_ALWAYS_MAX:
 		out.delay_s = maxf(0.0, delay_s(state))
 		out.garble = garble(state)
 	return out
@@ -175,7 +180,9 @@ static func speaker_status(state: ColonyState, me: Dictionary, others: Array, zo
 	if others.is_empty():
 		if bool(me.get("outside", false)):
 			st.radio = true
-			if not has_radio_signal(state):
+			if VOICE_ALWAYS_MAX:
+				pass
+			elif not has_radio_signal(state):
 				st.no_signal = true
 			elif not near_comms(state, me, zones):
 				st.delay_s = maxf(0.0, delay_s(state))

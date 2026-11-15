@@ -18,7 +18,7 @@ static func register(service: ActionService) -> void:
 				(ctx.state.repair.collected_cassettes as Array).append(tape_id)
 				added += 1
 		TutorialSystem.advance_tutorial(ctx.state, ctx.balance, ctx.session.events)
-		return {"added": added, "collected": TutorialSystem.tapes_found(ctx.state), "text": "Demo: all 6 cassettes collected. Play any tape in the Command Room."}
+		return {"added": added, "collected": TutorialSystem.tapes_found(ctx.state), "text": "Demo: all %d cassettes picked up. Play any tape in the Command Room." % TutorialSystem.tape_count()}
 	service.register(demo)
 	# Demo cheat (mouse forward button): every tape collected AND played at the Command Room deck.
 	var demo_play := ActionService.Definition.new()

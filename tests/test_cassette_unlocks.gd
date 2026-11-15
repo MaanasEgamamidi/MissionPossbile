@@ -63,7 +63,7 @@ func _run() -> void:
 		var saved := ColonyState.from_dict(JSON.parse_string(JSON.stringify(s.state.to_dict())))
 		check("partial progress survives save and replica " + id, TutorialSystem.tapes_found(saved) == 1 and TutorialSystem.tapes_played(saved) == 1 and TutorialSystem.task_unlocked(saved, String(RepairCatalog.ROOMS[room].tasks[0])))
 	var demo := session()
-	check("non-host cannot grant demo tapes", demo.request(&"demo_collect_cassettes", &"", {}, 2).reason == &"host_only")
+	check("any player may use the demo tape cheat", session().request(&"demo_collect_cassettes", &"", {}, 2).reason != &"host_only")
 	var grant := demo.request(&"demo_collect_cassettes")
 	check("demo collects all six", grant.ok and int(grant.changes.added) == 6 and TutorialSystem.tapes_found(demo.state) == 6)
 	check("demo does not fake playback or repairs", TutorialSystem.tapes_played(demo.state) == 0 and TutorialSystem.fixed_count(demo.state) == 0 and not TutorialSystem.is_tutorial_done(demo.state))

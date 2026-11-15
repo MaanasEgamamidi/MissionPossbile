@@ -732,7 +732,7 @@ func _process(_delta: float) -> void:
 # ---------------------------------------------------------------- input that belongs to the whole game
 
 ## Pitch/demo shortcut. Handle before panel shortcuts; held keys never repeat the grant.
-## Mouse side buttons (demo cheats): forward = every cassette found and played, back = every tutorial repair fixed.
+## Mouse side buttons (demo cheats): forward = every cassette picked up (only that), back = every repair fixed.
 func _input(event: InputEvent) -> void:
 	if not _playing:
 		return
@@ -741,7 +741,8 @@ func _input(event: InputEvent) -> void:
 		if not mb.pressed or mb.button_index not in [MOUSE_BUTTON_XBUTTON1, MOUSE_BUTTON_XBUTTON2]:
 			return
 		get_viewport().set_input_as_handled()
-		var action := &"demo_play_cassettes" if mb.button_index == MOUSE_BUTTON_XBUTTON2 else &"demo_fix_repairs"
+		# forward: only the cassettes are picked up (nothing played, nothing repaired); back: every repair fixed
+		var action := &"demo_collect_cassettes" if mb.button_index == MOUSE_BUTTON_XBUTTON2 else &"demo_fix_repairs"
 		_demo_request(action)
 		return
 	if not event is InputEventKey:

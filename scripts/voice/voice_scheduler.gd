@@ -47,9 +47,9 @@ const FRAME_S := 0.02
 const CHANNELS := 1
 
 ## Reorder window after the schedule, seconds (engineering).
-const JITTER_S := 0.08
+const JITTER_S := 0.04
 ## Audio queued in the player before it starts, seconds (engineering; used by VoiceService).
-const PLAYBACK_TARGET_S := 0.04
+const PLAYBACK_TARGET_S := 0.02
 ## Waiting audio per speaker, seconds and frames (40 s = 2000 frames of 20 ms; above the 30 s longest delay).
 const MAX_QUEUE_S := 40.0
 const MAX_QUEUE_FRAMES := 2000
