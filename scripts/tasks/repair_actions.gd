@@ -6,7 +6,7 @@ static func register(service: ActionService) -> void:
 	# Demo cheat (mouse back button): every tutorial repair finished as if its mini-game was solved.
 	var demo := ActionService.Definition.new()
 	demo.id = &"demo_fix_repairs"
-	demo.host_only = true
+	demo.host_only = false  # demo cheats: every player may use them
 	demo.needs_actor = false
 	demo.check_distance = false
 	demo.allowed_while_paused = true
@@ -23,7 +23,7 @@ static func register(service: ActionService) -> void:
 	# the replicated character_recovered event, flagged demo_teleport).
 	var comms := ActionService.Definition.new()
 	comms.id = &"demo_max_comms"
-	comms.host_only = true
+	comms.host_only = false  # demo cheats: every player may use them
 	comms.needs_actor = false
 	comms.check_distance = false
 	comms.allowed_while_paused = true

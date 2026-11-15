@@ -4,7 +4,7 @@ extends RefCounted
 static func register(service: ActionService) -> void:
 	var demo := ActionService.Definition.new()
 	demo.id = &"demo_collect_cassettes"
-	demo.host_only = true
+	demo.host_only = false  # demo cheats: every player may use them
 	demo.needs_actor = false
 	demo.check_distance = false
 	demo.allowed_while_paused = true
@@ -23,7 +23,7 @@ static func register(service: ActionService) -> void:
 	# Demo cheat (mouse forward button): every tape collected AND played at the Command Room deck.
 	var demo_play := ActionService.Definition.new()
 	demo_play.id = &"demo_play_cassettes"
-	demo_play.host_only = true
+	demo_play.host_only = false  # demo cheats: every player may use them
 	demo_play.needs_actor = false
 	demo_play.check_distance = false
 	demo_play.allowed_while_paused = true

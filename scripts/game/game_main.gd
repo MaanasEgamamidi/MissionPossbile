@@ -74,6 +74,7 @@ var _sun_timer := 0.0
 var _layer_timer := 0.0
 var _zone_now := ""
 var _playing := false
+var _demo_pending := {}  ## Request ids of demo cheats sent to the host by this client, waiting for an answer.
 var _demo_summoned := false  ## P demo cheat: the other player was already brought over once.
 var _main_menu: MainMenu
 var _confirm_new := false
@@ -740,12 +741,8 @@ func _input(event: InputEvent) -> void:
 		if not mb.pressed or mb.button_index not in [MOUSE_BUTTON_XBUTTON1, MOUSE_BUTTON_XBUTTON2]:
 			return
 		get_viewport().set_input_as_handled()
-		if not services.is_authority():
-			hud.show_message("Only the host can use the demo mouse buttons.", 4.0)
-			return
 		var action := &"demo_play_cassettes" if mb.button_index == MOUSE_BUTTON_XBUTTON2 else &"demo_fix_repairs"
-		var res := services.request(action)
-		hud.show_message(String(res.changes.get("text", res.message)), 5.0)
+		_demo_request(action)
 		return
 	if not event is InputEventKey:
 		return
@@ -757,15 +754,9 @@ func _input(event: InputEvent) -> void:
 		if focus is LineEdit or focus is TextEdit:
 			return
 		get_viewport().set_input_as_handled()
-		if not services.is_authority():
-			hud.show_message("Only the host can use the P demo cheat.", 4.0)
-			return
-		var res_p := services.request(&"demo_max_comms", &"", {"summon": not _demo_summoned})
+		_demo_request(&"demo_max_comms", {"summon": not _demo_summoned})
 		if services.net != null and services.net.has_method("flush_now"):
 			services.net.flush_now()
-		if bool(res_p.changes.get("summoned", false)):
-			_demo_summoned = true
-		hud.show_message(String(res_p.changes.get("text", res_p.message)), 5.0)
 		return
 	if not key.pressed or key.echo or not key.ctrl_pressed or key.alt_pressed or key.shift_pressed or key.meta_pressed:
 		return
@@ -775,11 +766,31 @@ func _input(event: InputEvent) -> void:
 	if focused is LineEdit or focused is TextEdit:
 		return
 	get_viewport().set_input_as_handled()
-	if not services.is_authority():
-		hud.show_message("The host can press Ctrl+M to collect the demo cassettes.", 4.0)
+	_demo_request(&"demo_collect_cassettes")
+
+
+## Demo cheats work for every player (2026-11-15): the host applies them at once; a client's request goes to the host
+## and its answer is shown when it comes back (_on_demo_resolved).
+func _demo_request(action: StringName, params := {}) -> void:
+	var res := services.request(action, &"", params)
+	if res.pending:
+		_demo_pending[res.request_id] = true
+		if not services.events.action_resolved.is_connected(_on_demo_resolved):
+			services.events.action_resolved.connect(_on_demo_resolved)
 		return
-	var result := services.request(&"demo_collect_cassettes")
-	hud.show_message(String(result.changes.get("text", result.message)), 5.0)
+	_show_demo_result(res)
+
+
+func _on_demo_resolved(res: ActionResult) -> void:
+	if res != null and _demo_pending.has(res.request_id):
+		_demo_pending.erase(res.request_id)
+		_show_demo_result(res)
+
+
+func _show_demo_result(res: ActionResult) -> void:
+	if bool(res.changes.get("summoned", false)):
+		_demo_summoned = true
+	hud.show_message(String(res.changes.get("text", res.message)), 5.0)
 
 
 ## Esc, panels, the pause menu and the M / I / C / Shift+Backspace screens belong to UiRoot.
