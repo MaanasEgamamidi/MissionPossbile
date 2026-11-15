@@ -929,15 +929,21 @@ func _me_outside() -> bool:
 	return bool(_listener().outside)
 
 
-## Tutorial: true while the crew radio is down (no crew voice either way).
+## Demo build: crew voice is never cut off (the tutorial radio gate is ignored); see own_line for the label.
 func comms_down() -> bool:
-	return services != null and services.has_game() and CommsGate.voice_down(services.state())
+	return false
+
+
+## Demo build: the corner reads "Voice chat is off." until every tape and required repair is finished, even though
+## voice keeps working underneath.
+func voice_label_off() -> bool:
+	return services != null and services.has_game() and not TutorialSystem.restoration_complete(services.state())
 
 
 ## The local player's own line: what their voice does now (talking) or would do (idle).
 func own_line() -> String:
-	if comms_down():
-		return CommsGate.MESSAGE
+	if voice_label_off():
+		return "Voice chat is off."
 	var short := mic_short_text()
 	if short != "":
 		return short

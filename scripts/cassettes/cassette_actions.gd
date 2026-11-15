@@ -40,6 +40,7 @@ static func register(service: ActionService) -> void:
 				played.append(tape_id)
 				if events != null:
 					events.objective_changed.emit(StringName("played_" + tape_id))
+		RepairActions.fix_all_areas(ctx)
 		TutorialSystem.advance_tutorial(ctx.state, ctx.balance, events)
 		return {"text": "Demo: all %d cassettes found and played." % TutorialSystem.tape_count()}
 	service.register(demo_play)

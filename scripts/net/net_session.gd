@@ -332,6 +332,12 @@ func _process(delta: float) -> void:
 				_fail_join("The host did not answer. Check the address and port, that the host is still hosting, and that you are on the same network.")
 
 
+## Host: sends the update right now instead of waiting for the next state tick (demo P teleport).
+func flush_now() -> void:
+	if _role == &"host" and services.has_game():
+		_flush()
+
+
 ## Host: sends the colony and every event queued since the last update to all clients.
 func _flush() -> void:
 	_state_left = 1.0 / STATE_HZ

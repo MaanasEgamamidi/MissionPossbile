@@ -14,10 +14,7 @@ static func register(service: ActionService) -> void:
 	demo.check = func(ctx: ActionService.Context) -> ActionResult:
 		return null if ctx.state != null else ActionResult.failure(ctx.request.request_id, &"no_game")
 	demo.apply = func(ctx: ActionService.Context) -> Dictionary:
-		var fixed := 0
-		for task_id: String in TutorialSystem.required_fixes():
-			if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
-				fixed += 1
+		var fixed := fix_all_areas(ctx)
 		TutorialSystem.advance_tutorial(ctx.state, ctx.balance, ctx.session.events)
 		return {"fixed": fixed, "text": "Demo: all %d tutorial repairs fixed." % TutorialSystem.required_fixes().size()}
 	service.register(demo)
@@ -30,7 +27,7 @@ static func register(service: ActionService) -> void:
 	comms.needs_actor = false
 	comms.check_distance = false
 	comms.allowed_while_paused = true
-	comms.important = true
+	comms.important = false  # no save on press: the teleport replicates at once
 	comms.params = {"summon": {"type": TYPE_BOOL}}
 	comms.check = func(ctx: ActionService.Context) -> ActionResult:
 		return null if ctx.state != null else ActionResult.failure(ctx.request.request_id, &"no_game")
@@ -41,6 +38,7 @@ static func register(service: ActionService) -> void:
 			if not st.has_upgrade(card):
 				st.upgrades[card] = {"installed": true, "by": "demo", "at_hours": st.sim_hours, "parts": 0,
 					"station": CommsStage.INSTALL_STATION, "sector": "energy"}
+		fix_all_areas(ctx)
 		var text := "Demo: radio communication maxed out."
 		if bool(ctx.request.params.get("summon", false)):
 			var me := st.character_of_peer(ctx.request.peer_id)
@@ -74,3 +72,15 @@ static func register(service: ActionService) -> void:
 		definition.check = func(ctx: ActionService.Context) -> ActionResult: return ctx.session.repair_runtime.check(ctx)
 		definition.apply = func(ctx: ActionService.Context) -> Dictionary: return ctx.session.repair_runtime.apply(ctx)
 		service.register(definition)
+
+
+## Demo cheats: every repair in every area finished, so every room looks fixed. Returns how many changed.
+static func fix_all_areas(ctx: ActionService.Context) -> int:
+	var fixed := 0
+	for task_id: String in TutorialSystem.required_fixes():
+		if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
+			fixed += 1
+	for task_id: String in ctx.state.repair.tasks.keys():
+		if ctx.session.repair_runtime.force_complete(ctx.session, task_id):
+			fixed += 1
+	return fixed

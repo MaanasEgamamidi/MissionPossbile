@@ -761,6 +761,8 @@ func _input(event: InputEvent) -> void:
 			hud.show_message("Only the host can use the P demo cheat.", 4.0)
 			return
 		var res_p := services.request(&"demo_max_comms", &"", {"summon": not _demo_summoned})
+		if services.net != null and services.net.has_method("flush_now"):
+			services.net.flush_now()
 		if bool(res_p.changes.get("summoned", false)):
 			_demo_summoned = true
 		hud.show_message(String(res_p.changes.get("text", res_p.message)), 5.0)
