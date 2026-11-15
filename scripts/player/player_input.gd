@@ -13,10 +13,13 @@ const ACTIONS: Dictionary = {
 	&"inventory": [KEY_I], &"crew": [KEY_C],
 	# Scout update (mission-control HUD, remappable): power drawer, build drawer at the solar field, fold the supplies,
 	# fold the goals, close a Mission Control message, the science behind the numbers.
-	&"power_view": [KEY_P], &"build": [KEY_B], &"hud_details": [KEY_H], &"goals": [KEY_J], &"advisor_ok": [KEY_K],
+	# Owner 2026-11-15 (upgrade plan §1.6): folding the supplies moved from H to U; H is the help key below.
+	&"power_view": [KEY_P], &"build": [KEY_B], &"hud_details": [KEY_U], &"goals": [KEY_J], &"advisor_ok": [KEY_K],
 	&"vitals_help": [KEY_F1],
-	# Added in Prompt 12 (remappable): a tutorial hint on request (N) and the colony journal / story log (L). H and J are the mission HUD's folds.
+	# Added in Prompt 12 (remappable): a tutorial hint on request (N) and the colony journal / story log (L). U and J are the mission HUD's folds.
 	&"tutorial_hint": [KEY_N], &"journal": [KEY_L],
+	# Owner 2026-11-15: "H should make the sparkle lines pop up" (scripts/guide/help_key.gd).
+	&"help": [KEY_H],
 }
 ## Plain names for the settings screen, in display order.
 const ACTION_NAMES: Dictionary = {
@@ -24,9 +27,9 @@ const ACTION_NAMES: Dictionary = {
 	&"sprint": "Sprint", &"jump": "Jump", &"interact": "Use (interact)", &"grab": "Grab, drop, throw",
 	&"toggle_view": "First / third person", &"map": "Blueprint map (off for now)", &"inventory": "Cargo", &"crew": "Crew",
 	&"push_to_talk": "Push to talk", &"back": "Close / pause", &"source_register": "Source register",
-	&"power_view": "Power and life support", &"build": "Build (at the solar field)", &"hud_details": "Fold the supplies",
+	&"power_view": "Power and life support", &"build": "Build (at the solar field)", &"hud_details": "Fold the supplies bar",
 	&"goals": "Goals (list / map / compact)", &"advisor_ok": "Close a Mission Control message", &"vitals_help": "Science behind the numbers",
-	&"tutorial_hint": "Tutorial hint", &"journal": "Colony journal",
+	&"tutorial_hint": "Tutorial hint", &"journal": "Colony journal", &"help": "Help: show the way (gold sparkles)",
 }
 static var _remapped: Dictionary = {}
 
@@ -102,6 +105,13 @@ static func load(path: String) -> Error:
 				return ERR_INVALID_DATA
 			events.append(event)
 		decoded[StringName(action)] = events
+	# Owner 2026-11-15: H is the help key now. A saved fold-the-supplies binding on H (from before the move) goes back
+	# to its new default U, so H shows the way instead of folding the bar. Kept when the player also saved their own help key.
+	if decoded.has(&"hud_details") and not decoded.has(&"help") and _has_key(decoded[&"hud_details"], KEY_H):
+		decoded.erase(&"hud_details")
+		_remapped.erase(&"hud_details")
+		if InputMap.has_action(&"hud_details"):
+			InputMap.action_erase_events(&"hud_details")
 	ensure_actions()
 	for action: StringName in decoded:
 		InputMap.action_erase_events(action)
@@ -122,6 +132,15 @@ static func describe(action: StringName) -> String:
 		else:
 			names.append(event.as_text())
 	return " / ".join(names)
+
+## True when one of `events` is the plain key `key` (physical or logical code, no Shift).
+static func _has_key(events: Array[InputEvent], key: Key) -> bool:
+	for event: InputEvent in events:
+		var k := event as InputEventKey
+		if k != null and not k.shift_pressed and (k.physical_keycode == key or k.keycode == key):
+			return true
+	return false
+
 
 static func _default_event(code: int) -> InputEvent:
 	if code < 0:

@@ -1,29 +1,38 @@
 extends StationPanel
-## The scout drone's pad outside (2026-11-14 upgrade paths). No class_name (loaded by StationPanels by path).
-## Shows the drone's level and what it can do, its battery, the command room's radio range and the places it surveyed.
-##   * Take control (any level): E again on this panel, or the button. The drone lifts off and the player flies it
-##     (DronePresenter); E while flying hands it back and it flies home by itself.
-##   * Autopilot (V3+): tick places and press Send. V3 flies to one place, V4 to a route of up to max_waypoints places.
-##     Below V3 the list is shown greyed out with a plain note saying what the upgrade gives.
+## The scout drone's pad outside (upgrade paths plan §6.2). No class_name (loaded by StationPanels by path).
+## Shows the drone's level and ability, its battery and charging time, the flights left today, the command room's
+## radio range and how far one battery reaches, and the last mineral report.
+##   * Take control (any level): E again on this panel, or the button. Only with a full battery and a flight left
+##     today. The player flies it (DronePresenter): R flies it home, E hands it back.
+##   * V2 revisit: pick an explored spot (DroneSystem.revisit_places) and it flies there, scans it and comes back.
+##   * V3 find: pick an ore; it flies to the nearest KNOWN deposit with units left and confirms it is still there.
+##   * V4 scan: pick an ore; it flies a search pattern to the nearest UNREVEALED deposit and reveals it.
+##   Locked controls are shown with a plain note saying which upgrade gives them.
 ## The upgrade strip for the scout_drone track is added by the base StationPanel (UI worker).
 
 const DroneSystem := preload("res://scripts/drone/drone_system.gd")
+const ABILITY_NAMES := {"manual": "fly it yourself", "prescout": "pre-scouts ore, revisits spots",
+	"find_known": "finds known ore", "scan_anywhere": "scans anywhere for ore"}
 
-## Site check boxes by site id, and the buttons (tests).
-var site_checks: Dictionary = {}
 var fly_button: Button
 var hand_back_button: Button
-var send_button: Button
 var recall_button: Button
+var revisit_button: Button
+var find_button: Button
+var scan_button: Button
+## Pickers: explored spots (metadata = place id) and ores (metadata = ore id).
+var spot_pick: OptionButton
+var find_pick: OptionButton
+var scan_pick: OptionButton
 
 var _status: Label
-var _route_label: Label
-var _autopilot_note: Label
-var _sites: VBoxContainer
+var _launch_note: Label
+var _revisit_note: Label
+var _find_note: Label
+var _scan_note: Label
 var _report: Label
 var _sig := ""
 var _opened_frame := -1
-var _picked: Array = []
 
 
 func _shows_later_note() -> bool:
@@ -35,10 +44,10 @@ func _shows_room_power() -> bool:
 
 
 func _what_you_can_do() -> PackedStringArray:
-	return PackedStringArray(["Fly the scout drone yourself: press E here (or Take control). W A S D fly, the mouse turns, Space climbs, Shift or Ctrl goes down, E hands it back.",
-		"Fly it near a place the scout could visit: its camera surveys the place and marks the ore there on the map.",
-		"Stay inside the command room's radio range. Upgrade the command room to fly further.",
-		"From V3 the drone has an autopilot: pick places here and it flies there, films them and comes back by itself."])
+	return PackedStringArray(["Fly the scout drone yourself: press E here (or Take control). W A S D fly the way it faces, the mouse turns, Space climbs, Ctrl or Shift goes down, Tab switches the camera, R flies it home, E hands it back.",
+		"It takes off only with a full battery, and only so many times per sol. After every flight it charges here on the pad.",
+		"It always keeps enough battery to come home: when the battery holds only the trip back, it turns home by itself.",
+		"V2 spots ore while it flies and can fly back to explored spots by itself; V3 finds an ore you already know; V4 scans anywhere for the ore you ask for."])
 
 
 func first_focus() -> Control:
@@ -53,141 +62,166 @@ func _enter_tree() -> void:
 
 func _build_body() -> void:
 	_add_reading(&"level", "✈", "Drone level", "upgrades")
+	# Merged 2026-11-15: the drone helper's controls (flights per sol, V2-V4 abilities) in the UI overhaul's style
+	# (action buttons with pictures, notes, readings with a bar).
 	_add_reading(&"battery", "▮", "Battery", "battery")
-	_add_reading(&"range", "◎", "Radio range", "upgrades")
-	_add_reading(&"surveyed", "◉", "Places surveyed", "sources")
+	_add_reading(&"flights", "◷", "Flights left today", "upgrades")
+	_add_reading(&"range", "◎", "Reach on one battery (radio range)", "upgrades")
 	_status = _add_text(_body, "", UiTheme.HEADING)
 	_status.name = "DroneStatus"
-	fly_button = _add_action("Fly the drone", &"drone", take_control)
+	_launch_note = _add_note(_body, "")
+	fly_button = _add_action("Take control (E)", &"drone", take_control)
 	fly_button.name = "TakeControl"
 	hand_back_button = _add_action("Hand it back", &"back", func() -> void: _ask_free(&"drone_land"), false)
 	hand_back_button.name = "HandBack"
 	recall_button = _add_action("Call it home", &"home", func() -> void: _ask(&"drone_recall", {}, _on_answer), false)
 	recall_button.name = "Recall"
-	_add_heading(_body, "Autopilot")
-	_autopilot_note = _add_note(_body, "")
-	_sites = VBoxContainer.new()
-	_sites.name = "Sites"
-	_body.add_child(_sites)
-	var send_row := HBoxContainer.new()
-	send_row.add_theme_constant_override(&"separation", 10)
-	_body.add_child(send_row)
-	send_button = Button.new()
-	send_button.name = "Send"
-	send_button.text = "Send on this route"
-	send_button.pressed.connect(send_route)
-	send_row.add_child(send_button)
-	_route_label = _add_text(send_row, "", UiTheme.MUTED)
-	_route_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_add_heading(_body, "Last drone report")
+
+	_add_heading(_body, "Revisit an explored spot (V2)")
+	_revisit_note = _add_note(_body, "")
+	var r1 := HBoxContainer.new()
+	r1.add_theme_constant_override(&"separation", 10)
+	_body.add_child(r1)
+	spot_pick = _picker(r1, "SpotPick")
+	revisit_button = _button(r1, "Revisit", "Fly there", func() -> void: send(&"revisit", _picked(spot_pick)))
+
+	_add_heading(_body, "Find a known ore (V3)")
+	_find_note = _add_note(_body, "")
+	var r2 := HBoxContainer.new()
+	r2.add_theme_constant_override(&"separation", 10)
+	_body.add_child(r2)
+	find_pick = _picker(r2, "FindPick")
+	find_button = _button(r2, "Find", "Find it", func() -> void: send(&"find", _picked(find_pick)))
+
+	_add_heading(_body, "Scan anywhere for an ore (V4)")
+	_scan_note = _add_note(_body, "")
+	var r3 := HBoxContainer.new()
+	r3.add_theme_constant_override(&"separation", 10)
+	_body.add_child(r3)
+	scan_pick = _picker(r3, "ScanPick")
+	scan_button = _button(r3, "Scan", "Scan for it", func() -> void: send(&"scan", _picked(scan_pick)))
+
+	_add_heading(_body, "Last mineral report")
 	_report = _add_text(_body, "", UiTheme.MUTED)
 
 
+func _button(parent: Control, n: String, label: String, on_press: Callable) -> Button:
+	var b := Button.new()
+	b.name = n
+	b.text = label
+	b.pressed.connect(on_press)
+	parent.add_child(b)
+	return b
+
+
+func _picker(parent: Control, n: String) -> OptionButton:
+	var o := OptionButton.new()
+	o.name = n
+	o.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	o.fit_to_longest_item = false
+	parent.add_child(o)
+	return o
+
+
+func _picked(o: OptionButton) -> String:
+	if o == null or o.selected < 0 or o.item_count == 0:
+		return ""
+	return String(o.get_item_metadata(o.selected))
+
+
 func _refresh_body(st: ColonyState) -> void:
+	DroneSystem.ensure(st)
 	var lvl := DroneSystem.level(st)
 	var d := st.drone
-	_show_reading(&"level", "V%d" % lvl, &"ok")
+	var ab := DroneSystem.ability(st)
+	_show_reading(&"level", "V%d · %s" % [lvl, String(ABILITY_NAMES.get(ab, ab))], &"ok")
 	var b := DroneSystem.battery(st)
-	_show_reading(&"battery", "%d %% · %d s of flight" % [roundi(b * 100.0), roundi(DroneSystem.seconds_left(st))],
-		&"urgent" if b < DroneSystem.num("launch_min_battery", 0.2) else (&"warn" if b < 0.5 else &"ok"), b)
-	_show_reading(&"range", "%d m" % roundi(DroneSystem.range_m(st)), &"ok")
-	_show_reading(&"surveyed", "%d of %d" % [(d.get("surveyed", {}) as Dictionary).size(), ScoutSystem.sites().size()], &"ok")
-	_status.text = "● " + DroneSystem.status_text(st)
-	var me := services.local_character()
 	var docked := DroneSystem.status(st) == "docked"
-	fly_button.disabled = not docked or b < DroneSystem.num("launch_min_battery", 0.2)
-	fly_button.tooltip_text = "Fly the drone yourself." if not fly_button.disabled else ("Let it charge first." if docked else "The drone is out flying.")
-	hand_back_button.visible = me != null and DroneSystem.pilot(st) == String(me.id)
+	var charge := ""
+	if docked and b < 0.999:
+		charge = " · charging, %s to full" % _time_words(DroneSystem.seconds_to_full(st))
+	_show_reading(&"battery", "%d %% · %d s of flight%s" % [floori(b * 100.0), roundi(DroneSystem.seconds_left(st)), charge],
+		&"ok" if b >= 0.999 else (&"warn" if b >= 0.5 else &"urgent"), b)
+	var left := DroneSystem.flights_left_today(st)
+	_show_reading(&"flights", "%d of %d" % [left, DroneSystem.flights_per_sol(st)], &"ok" if left > 0 else &"warn")
+	_show_reading(&"range", "about %d m out and back · radio %d m" % [roundi(DroneSystem.reach_m(st)), roundi(DroneSystem.range_m(st))], &"ok")
+	_status.text = "● " + DroneSystem.status_text(st)
+	var why := DroneSystem.launch_refusal(st)
+	var me := services.local_character()
+	fly_button.disabled = why != ""
+	fly_button.tooltip_text = "Fly the drone yourself." if why == "" else why
+	_launch_note.text = why if docked and why != "" else ""
+	_launch_note.visible = _launch_note.text != ""
+	hand_back_button.visible = me != null and DroneSystem.watcher(st) == String(me.id)
 	recall_button.visible = DroneSystem.status(st) == "auto"
-	var auto := DroneSystem.has_autopilot(st)
-	var most := DroneSystem.max_waypoints(st)
-	if not auto:
-		_autopilot_note.text = "Needs the V3 upgrade (programmable autopilot). Then pick a place below and the drone flies there, films it and comes back by itself. V4 flies a route of up to %d places." % int(AreaLevels.effect_at(DroneSystem.TRACK, "max_waypoints", 4, 4))
-	elif most <= 1:
-		_autopilot_note.text = "Pick one place. The drone flies there by itself, films it and comes back. V4 can fly a route of several places."
-	else:
-		_autopilot_note.text = "Pick up to %d places, in the order to visit them. The drone flies the route by itself and comes back." % most
-	var sig := "%d|%s|%s|%s" % [lvl, DroneSystem.status(st), JSON.stringify(d.get("surveyed", {})), DroneSystem.range_m(st)]
+	var sig := "%d|%s|%s|%s" % [lvl, DroneSystem.status(st), JSON.stringify(d.get("spots", [])), JSON.stringify(d.get("surveyed", {}))]
 	if sig != _sig:
 		_sig = sig
-		_build_sites(st)
-	_update_route(st)
+		_build_pickers(st)
+	var can_launch := why == ""
+	# V2 revisit
+	var has_revisit := DroneSystem.has_ability(st, "prescout")
+	spot_pick.disabled = not has_revisit or spot_pick.item_count == 0
+	revisit_button.disabled = not has_revisit or not can_launch or _picked(spot_pick) == ""
+	if not has_revisit:
+		_revisit_note.text = "Needs the V2 upgrade (multispectral camera): the drone then spots ore while it flies, radios a mineral report, and can fly back to an explored spot by itself."
+	elif spot_pick.item_count == 0:
+		_revisit_note.text = "No explored spots yet: fly the drone yourself first. The farthest point of each flight and every place it finds ore are remembered here."
+	else:
+		_revisit_note.text = "Pick a spot. The drone flies there by itself, scans it again and comes back."
+	# V3 find
+	var has_find := DroneSystem.has_ability(st, "find_known")
+	find_pick.disabled = not has_find
+	find_button.disabled = not has_find or not can_launch or _picked(find_pick) == ""
+	_find_note.text = "Pick an ore. The drone flies to the nearest place where the colony already found it (with some left to mine) and checks it is still there." if has_find \
+		else "Needs the V3 upgrade (neutron and gamma spectrometer): the drone then finds an ore you already know about."
+	# V4 scan
+	var has_scan := DroneSystem.has_ability(st, "scan_anywhere")
+	scan_pick.disabled = not has_scan
+	scan_button.disabled = not has_scan or not can_launch or _picked(scan_pick) == ""
+	_scan_note.text = "Pick an ore. The drone flies a search pattern with its ground radar toward the nearest place nobody has mapped yet, and marks it on the map." if has_scan \
+		else "Needs the V4 upgrade (ground radar): the drone then scans anywhere in reach for the ore you ask for."
 	var rep: Dictionary = d.get("last_report", {})
-	_report.text = "No reports yet: fly the drone near one of the places." if rep.is_empty() else "%s (sol %d): %s" % [String(rep.get("name", "")), int(rep.get("sol", 1)), String(rep.get("text", ""))]
+	_report.text = "No reports yet." if rep.is_empty() else "%s (sol %d): %s" % [String(rep.get("name", "")), int(rep.get("sol", 1)), String(rep.get("text", ""))]
 
 
-func _build_sites(st: ColonyState) -> void:
-	for c in _sites.get_children():
-		_sites.remove_child(c)
-		c.queue_free()
-	site_checks.clear()
-	var auto := DroneSystem.has_autopilot(st)
-	var pad := DroneSystem.pad_position(st)
-	var r := DroneSystem.range_m(st)
-	for site: Dictionary in ScoutSystem.sites():
-		var id := String(site.id)
-		var p := ScoutSystem.site_position(id)
-		var far := Vector2(p.x - pad.x, p.z - pad.z).length()
-		var cb := CheckBox.new()
-		cb.name = "Site_%s" % id
-		var mark := "✓ " if DroneSystem.is_surveyed(st, id) or ScoutSystem.is_surveyed(st, id) else ""
-		cb.text = "%s%s · %d m away%s" % [mark, String(site.name), roundi(far), " (out of radio range)" if far > r else ""]
-		cb.disabled = not auto or far > r or DroneSystem.status(st) != "docked"
-		cb.button_pressed = _picked.has(id) and not cb.disabled
-		cb.toggled.connect(_on_pick.bind(id))
-		_sites.add_child(cb)
-		site_checks[id] = cb
-	var keep: Array = []
-	for id: Variant in _picked:
-		if site_checks.has(id) and not (site_checks[id] as CheckBox).disabled:
-			keep.append(id)
-	_picked = keep
+func _build_pickers(st: ColonyState) -> void:
+	var keep_spot := _picked(spot_pick)
+	var keep_find := _picked(find_pick)
+	var keep_scan := _picked(scan_pick)
+	spot_pick.clear()
+	for p: Dictionary in DroneSystem.revisit_places(st):
+		spot_pick.add_item("%s · %d m" % [String(p.name), roundi(float(p.far_m))])
+		spot_pick.set_item_metadata(spot_pick.item_count - 1, String(p.id))
+	for o: OptionButton in [find_pick, scan_pick]:
+		o.clear()
+		for ore_id: String in DroneSystem.ore_ids():
+			o.add_item(DroneSystem.ore_name(ore_id))
+			o.set_item_metadata(o.item_count - 1, ore_id)
+	_select(spot_pick, keep_spot)
+	_select(find_pick, keep_find)
+	_select(scan_pick, keep_scan)
 
 
-func _on_pick(on: bool, id: String) -> void:
-	if not services.has_game():
-		return
-	var st := services.state()
-	if on:
-		if not _picked.has(id):
-			_picked.append(id)
-		var most := maxi(1, DroneSystem.max_waypoints(st))
-		while _picked.size() > most:
-			var drop := String(_picked.pop_front())
-			var cb := site_checks.get(drop) as CheckBox
-			if cb != null:
-				cb.set_pressed_no_signal(false)
-	else:
-		_picked.erase(id)
-	_update_route(st)
+func _select(o: OptionButton, value: String) -> void:
+	for i in o.item_count:
+		if String(o.get_item_metadata(i)) == value:
+			o.select(i)
+			return
+	if o.item_count > 0:
+		o.select(0)
 
 
-## Ticks exactly these places (tests and keyboard users), in this order.
-func pick(ids: Array) -> void:
-	_picked.clear()
-	for id: Variant in ids:
-		var cb := site_checks.get(String(id)) as CheckBox
-		if cb != null and not cb.disabled:
-			cb.set_pressed_no_signal(true)
-			_picked.append(String(id))
-	_update_route(services.state())
+func _time_words(seconds: float) -> String:
+	var s := ceili(seconds)
+	if s < 60:
+		return "%d s" % s
+	return "%d min %02d s" % [floori(s / 60.0), s % 60]
 
 
-func _update_route(st: ColonyState) -> void:
-	var names := PackedStringArray()
-	for id: Variant in _picked:
-		names.append(String(ScoutSystem.site(String(id)).get("name", id)))
-	var auto := DroneSystem.has_autopilot(st)
-	send_button.disabled = not auto or _picked.is_empty() or DroneSystem.status(st) != "docked"
-	if names.is_empty():
-		_route_label.text = "" if auto else "Locked until V3."
-	else:
-		_route_label.text = "Route: pad → %s → pad · about %d s" % [" → ".join(names), roundi(DroneSystem.route_seconds(st, _picked))]
-
-
-## Sends the drone on the ticked route (drone_send).
-func send_route() -> ActionResult:
-	return _ask(&"drone_send", {"route": ",".join(PackedStringArray(_picked))}, _on_answer)
+## Sends the drone by itself (drone_send): mode "revisit" (target = place id), "find" or "scan" (target = ore id).
+func send(mode: StringName, target: String) -> ActionResult:
+	return _ask(&"drone_send", {"mode": String(mode), "target": target}, _on_answer)
 
 
 ## Takes the controls (drone_fly). On success the panel closes so the flight can start.
@@ -216,8 +250,6 @@ func _on_answer(result: ActionResult) -> void:
 	if result.ok:
 		_show_message("")
 		_show_cause(answer_text(result))
-		if String(result.changes.get("action", "")) == "drone_send":
-			_picked.clear()
 	else:
 		_show_refusal(result)
 	_sig = ""

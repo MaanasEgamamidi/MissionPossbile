@@ -84,6 +84,8 @@ static func _check(ctx: ActionService.Context) -> ActionResult:
 			if not RoverModel.seat_free(st, seat):
 				return ActionResult.failure(rid, &"missing_prerequisite", "That seat is taken. %s" % _free_seats_text(st))
 			if _rover_outside(ctx) and not ctx.actor.suit_on:
+				if RoverModel.has_cabin(st):
+					return ActionResult.failure(rid, &"missing_prerequisite", "Put your suit on first: the rover is outside, and you dock your suit at its suitport to get in.")
 				return ActionResult.failure(rid, &"missing_prerequisite", "Put your suit on first: the rover is outside and its cabin has no air.")
 		&"rover_exit":
 			if RoverModel.seat_of(st, String(ctx.actor.id)) < 0:
@@ -234,11 +236,13 @@ static func _enter(ctx: ActionService.Context, changes: Dictionary) -> void:
 	changes["seat"] = seat
 	changes["driver"] = seat == 0
 	changes["position"] = [pos.x, pos.y, pos.z]
+	var cabin := " The cabin is sealed: you breathe cabin air, not your suit tank, and it shelters you from solar storms." if RoverModel.has_cabin(st) else ""
+	changes["cabin_sheltered"] = RoverModel.has_cabin(st)
 	if seat == 0:
 		var battery := float(st.rover.battery_kwh)
-		changes["text"] = "You are in the driver's seat. Battery %s kWh: about %s of driving. Space brakes; E gets out." % [_n(battery), _range_text(RoverModel.range_now_km(st))]
+		changes["text"] = "You are in the driver's seat. Battery %s kWh: about %s of driving. Space brakes; E gets out.%s" % [_n(battery), _range_text(RoverModel.range_now_km(st)), cabin]
 	else:
-		changes["text"] = "You are in passenger seat %d. E gets out." % seat
+		changes["text"] = "You are in passenger seat %d. E gets out.%s" % [seat, cabin]
 
 
 static func _exit(ctx: ActionService.Context, changes: Dictionary) -> void:
@@ -302,6 +306,8 @@ static func _set_charging(ctx: ActionService.Context, changes: Dictionary) -> vo
 	if on:
 		var b := RoverBalance.get_current()
 		var extra := "" if String(r.charge_status) == "charging" else " %s." % String(RoverSystem.STATUS_TEXT.get(String(r.charge_status), ""))
+		if RoverModel.has_fuel_cell(st):
+			extra += " The fuel cell refills too, using %s kg of the colony's oxygen per kWh." % _n(b.fuel_cell_o2_kg_per_kwh)
 		changes["text"] = "Rover plugged in. The charger takes %s kW from the colony battery while it charges.%s" % [_n(b.charger_kw), extra]
 	else:
 		changes["text"] = "Rover unplugged. Battery: %s kWh." % _n(float(r.battery_kwh))

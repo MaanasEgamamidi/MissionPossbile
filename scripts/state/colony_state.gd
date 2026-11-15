@@ -102,6 +102,20 @@ var levels := {}
 ## Scout drone (2026-11-14): the flying scout, its battery, flight mode and route. Plain JSON; the field list is in the
 ## header of scripts/drone/drone_system.gd (DroneSystem fills it on the first host tick).
 var drone := {}
+## Upgrade paths plan (docs/revisions/UPGRADE_PATHS_PLAN.md, 2026-11-15). Plain JSON dictionaries, saved and replicated;
+## each one's field list lives in the header of the script that owns it:
+##   build        one build a day for the whole colony, forks, the day's vote  (scripts/upgrades/colony_builds.gd)
+##   ores         ore deposits: revealed / identified / taken                  (scripts/science/ore_catalog.gd)
+##   schedule     the crew's strict day: current block, attendance, lateness   (scripts/schedule/crew_day.gd)
+##   comms        suit radio state                                             (scripts/voice/suit_radio.gd)
+##   radiation    solar storms, shelter, colony dose bookkeeping              (scripts/survival/radiation_system.gd)
+##   colony_over  life-store countdown and the end of the colony               (scripts/survival/colony_over.gd)
+var build := {}
+var ores := {}
+var schedule := {}
+var comms := {}
+var radiation := {}
+var colony_over := {}
 
 var data_snapshot_id := ""
 var weather_queue: Array = []
@@ -317,6 +331,7 @@ func to_dict() -> Dictionary:
 		"crops": crops.duplicate(true), "science": science.duplicate(true), "progress": progress.duplicate(true), "weather": weather.duplicate(true),
 		"campaign": campaign.duplicate(true), "scout": scout.duplicate(true),
 		"levels": levels.duplicate(true), "drone": drone.duplicate(true),
+		"build": build.duplicate(true), "ores": ores.duplicate(true), "schedule": schedule.duplicate(true), "comms": comms.duplicate(true), "radiation": radiation.duplicate(true), "colony_over": colony_over.duplicate(true),
 		"data_snapshot_id": data_snapshot_id, "weather_queue": weather_queue.duplicate(true), "event_queue": event_queue.duplicate(true),
 		"ledger": ledger.duplicate(true), "counters": counters.duplicate(true),
 		# 64-bit values go out as strings: JSON numbers are doubles and would lose the low bits
@@ -475,6 +490,12 @@ static func from_dict(d: Dictionary) -> ColonyState:
 	for k in (d.get("levels", {}) as Dictionary):
 		s.levels[String(k)] = int(d.levels[k])
 	s.drone = (d.get("drone", {}) as Dictionary).duplicate(true)
+	s.build = (d.get("build", {}) as Dictionary).duplicate(true)
+	s.ores = (d.get("ores", {}) as Dictionary).duplicate(true)
+	s.schedule = (d.get("schedule", {}) as Dictionary).duplicate(true)
+	s.comms = (d.get("comms", {}) as Dictionary).duplicate(true)
+	s.radiation = (d.get("radiation", {}) as Dictionary).duplicate(true)
+	s.colony_over = (d.get("colony_over", {}) as Dictionary).duplicate(true)
 	s.event_queue = (d.get("event_queue", []) as Array).duplicate(true)
 	for k in (d.get("ledger", {}) as Dictionary):
 		s.ledger[String(k)] = float(d.ledger[k])

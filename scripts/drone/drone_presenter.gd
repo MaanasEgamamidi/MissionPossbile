@@ -1,5 +1,5 @@
 extends Node
-## Scene side of the scout drone (2026-11-14 upgrade paths). No class_name: GameMain loads it by path and adds it in
+## Scene side of the scout drone (upgrade paths plan §6.2). No class_name: GameMain loads it by path and adds it in
 ## _begin_play(), before AreaStages.attach_all:
 ##     drone = load("res://scripts/drone/drone_presenter.gd").new(); add_child(drone); drone.setup(world, services, self)
 ## Found by others through the group GROUP.
@@ -9,14 +9,19 @@ extends Node
 ##   - owns `body`, the flying drone. The scout_drone stage presenter (scripts/upgrades/stages/scout_drone_stages.gd)
 ##     puts the model of the current level in it (stage_parent), so the drone on the pad and in the air always shows
 ##     its level. Without that presenter it builds the level's model itself. The body follows state.drone on every
-##     machine, gliding between the 5 Hz updates with the replicated velocity, tilting as it flies; the rotor hubs
-##     (RotorHub_*) spin while it flies;
-##   - manual control (V1+): when state.drone.pilot is this machine's character, a follow camera takes over, W A S D
-##     fly, the mouse turns, Space climbs, Shift or Ctrl goes down, Tab switches the chase / onboard camera and E hands
-##     the drone back (host action drone_land; it then flies home by itself). The inputs reach the host like the
-##     rover's driving: on the host straight into DroneSystem.set_input, on a client as the motion extra "drone"
-##     (~20 Hz), which the host accepts only from the peer that owns the pilot character;
-##   - a small drone HUD (scripts/drone/drone_hud.gd) while piloting.
+##     machine, gliding between the host updates with the replicated velocity; the rotor hubs (RotorHub_*) spin while
+##     it flies;
+##   - flight feel of the owner's FPV example (docs/revisions/reference/fpv_drone/flight_controller.gd): the model and
+##     the onboard camera tilt with the stick (forward 7°, back 5°, pitch response 8); for other players the tilt
+##     follows the drone's forward speed;
+##   - manual control: when state.drone.pilot is this machine's character, the drone camera takes over, W A S D fly
+##     the way it faces, the mouse turns, Space climbs, Ctrl or Shift goes down, Tab switches chase / FPV camera, R flies
+##     it home (host action drone_home; the camera stays on it, AUTO on the screen, until it lands) and E hands it back
+##     (drone_land; the player's own camera comes back). Esc pauses as everywhere in the game. The inputs reach the host
+##     like the rover's driving: on the host straight into DroneSystem.set_input, on a client as the motion extra
+##     "drone" (~20 Hz), which the host accepts only from the peer that owns the pilot character;
+##   - the drone's on-screen display (scripts/drone/drone_hud.gd) while its camera is on, with the mineral report popping
+##     up when a new one arrives.
 ## GameMain keeps the walking body still while blocks_player_input() is true.
 
 const DroneSystem := preload("res://scripts/drone/drone_system.gd")
@@ -29,7 +34,10 @@ const SEND_HZ := 20.0
 const CHASE_DISTANCE_M := 3.4
 const CHASE_LIFT_M := 0.6
 const ROTOR_SPEED := 55.0          # rad/s while flying (looks right at 60 fps; not a real rotor speed)
-const DEFAULT_MOUSE := 0.0025
+const DEFAULT_MOUSE := 0.0025      # rad per pixel (the example's 0.15 ° per pixel)
+const YAW_RESPONSE := 28.0
+const PITCH_RESPONSE := 8.0
+const FPV_LOOK_DOWN := -0.12       # the onboard camera looks a little down by default (rad)
 
 var services: GameServices
 var world: Node3D
@@ -39,9 +47,11 @@ var body: Node3D
 var pad_model: Node3D
 var camera: Camera3D
 var hud_widget: Control
-## True while this machine's player flies the drone.
+## True while this machine's player looks through the drone (flying it, or watching it fly home after R).
 var piloting := false
-## Tab: onboard camera instead of the chase camera.
+## True while this machine's player has the sticks (status "manual").
+var controls_active := false
+## Tab: onboard (FPV) camera instead of the chase camera.
 var onboard_view := false
 ## Host counters: inputs taken from a client pilot, and refused ones (wrong sender or bad values).
 var inputs_accepted := 0
@@ -60,6 +70,9 @@ var _cam_pitch := -0.3
 var _send_left := 0.0
 var _e_down := false
 var _tab_down := false
+var _r_down := false
+var _stick := Vector2.ZERO
+var _tilt := 0.0
 var _hold_after_release := false
 var _rotors: Array[Node3D] = []
 var _rotor_sig := ""
@@ -68,6 +81,7 @@ var _fallback: Node3D
 var _fallback_level := 0
 var _staged_check := 0.0
 var _staged := false
+var _report_seen := -1
 
 
 func setup(p_world: Node3D, p_services: GameServices, p_game: Node = null) -> void:
@@ -111,8 +125,9 @@ func setup(p_world: Node3D, p_services: GameServices, p_game: Node = null) -> vo
 		body.position = _shown_pos
 		body.rotation.y = _shown_yaw
 		_placed = true
+		_report_seen = int(st.drone.get("report_n", 0))
 	_set_layers(pad_model, _exterior_layers())
-	# follow camera (made current only while piloting)
+	# drone camera (made current only while looking through the drone)
 	camera = Camera3D.new()
 	camera.name = "DroneCamera"
 	camera.near = 0.05
@@ -136,8 +151,8 @@ static func find(tree: SceneTree) -> Node:
 	return tree.get_first_node_in_group(GROUP) if tree != null else null
 
 
-## True while the walking body must ignore the keys: while flying, and after E handed the drone back until E is let go
-## (so the same key press does not also open the pad panel).
+## True while the walking body must ignore the keys: while looking through the drone, and after E handed the drone
+## back until E is let go (so the same key press does not also open the pad panel).
 func blocks_player_input() -> bool:
 	if piloting:
 		return true
@@ -173,21 +188,26 @@ func _physics_process(delta: float) -> void:
 	var focus := _gameplay_focus()
 	var move := Vector2.ZERO
 	var climb := 0.0
-	if focus:
+	if focus and controls_active:
 		move = Input.get_vector(&"move_left", &"move_right", &"move_back", &"move_forward")
 		if Input.is_action_pressed(&"jump"):
 			climb += 1.0
 		if Input.is_action_pressed(&"sprint") or Input.is_physical_key_pressed(KEY_CTRL):
 			climb -= 1.0
+	_stick = move
 	var e := focus and Input.is_action_pressed(&"interact")
 	if e and not _e_down:
 		hand_back()
 	_e_down = e
+	var r := focus and Input.is_physical_key_pressed(KEY_R)
+	if r and not _r_down and controls_active:
+		fly_home()
+	_r_down = r
 	var tab := focus and Input.is_action_pressed(&"toggle_view")
 	if tab and not _tab_down:
 		onboard_view = not onboard_view
 	_tab_down = tab
-	if not piloting:
+	if not piloting or not controls_active:
 		return
 	send_input(String(me.id), move, climb, _pilot_yaw, delta)
 
@@ -207,9 +227,17 @@ func send_input(pilot_id: String, move: Vector2, climb: float, yaw: float, delta
 	inputs_sent += 1
 
 
-## E while flying: ask the host to take the controls back. The drone flies home by itself.
+## E while flying or watching: ask the host to take the drone back. It flies home by itself.
 func hand_back() -> ActionResult:
 	var r := services.request(&"drone_land")
+	if not r.ok and not r.pending:
+		_say(r.message)
+	return r
+
+
+## R while flying: the drone flies home by itself now; the camera stays on it until it lands.
+func fly_home() -> ActionResult:
+	var r := services.request(&"drone_home")
 	if not r.ok and not r.pending:
 		_say(r.message)
 	return r
@@ -225,7 +253,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		sens = p.tuning.mouse_sensitivity
 		invert = p.invert_y
 	var rel := (event as InputEventMouseMotion).relative
-	_pilot_yaw = wrapf(_pilot_yaw - rel.x * sens, -PI, PI)
+	if controls_active:
+		_pilot_yaw = wrapf(_pilot_yaw - rel.x * sens, -PI, PI)
 	_cam_pitch = clampf(_cam_pitch + (1.0 if invert else -1.0) * rel.y * sens, -1.2, 0.6)
 
 
@@ -259,20 +288,29 @@ func _on_motion_extra(sender: int, key: String, value: Variant) -> void:
 
 func _update_pilot(st: ColonyState) -> void:
 	var me := services.local_character()
-	var mine := me != null and DroneSystem.pilot(st) == String(me.id)
+	var mine := me != null and DroneSystem.watcher(st) == String(me.id)
 	if mine and not piloting:
 		_start_piloting(st)
 	elif not mine and piloting:
 		_stop_piloting()
+	var sticks := mine and DroneSystem.pilot(st) == String(me.id)
+	if sticks and not controls_active:
+		_pilot_yaw = float(st.drone.get("yaw", 0.0))
+	controls_active = sticks
+	if not controls_active:
+		_stick = Vector2.ZERO
 
 
 func _start_piloting(st: ColonyState) -> void:
 	piloting = true
-	onboard_view = false
+	onboard_view = String(DroneSystem.data().get("start_view", "chase")) == "fpv"
 	_pilot_yaw = float(st.drone.get("yaw", 0.0))
+	_shown_yaw = _pilot_yaw
 	_cam_pitch = -0.3
 	_e_down = Input.is_action_pressed(&"interact")      # the press that started it does not hand it back
 	_tab_down = Input.is_action_pressed(&"toggle_view")
+	_r_down = Input.is_physical_key_pressed(KEY_R)
+	_report_seen = int(st.drone.get("report_n", 0))
 	var p := _player()
 	if p != null:
 		var cam := p.camera_rig().camera()
@@ -286,6 +324,7 @@ func _start_piloting(st: ColonyState) -> void:
 
 func _stop_piloting() -> void:
 	piloting = false
+	controls_active = false
 	camera.current = false
 	_hold_after_release = Input.is_action_pressed(&"interact")
 	var p := _player()
@@ -298,12 +337,14 @@ func _stop_piloting() -> void:
 func _update_camera() -> void:
 	if not piloting or camera == null or not camera.is_inside_tree():
 		return
-	var yaw_basis := Basis(Vector3.UP, _pilot_yaw)
+	var yaw_basis := Basis(Vector3.UP, _shown_yaw)
 	if onboard_view:
+		# FPV: the camera rides the nose and tilts with the model (the example's PitchPivot/FPV)
 		var marker := body.find_child("Camera", true, false) as Node3D
 		var at := marker.global_position if marker != null else body.global_position + yaw_basis * Vector3(0, 0.25, -0.2)
-		camera.global_transform = Transform3D(yaw_basis * Basis(Vector3.RIGHT, _cam_pitch), at)
+		camera.global_transform = Transform3D(yaw_basis * Basis(Vector3.RIGHT, clampf(FPV_LOOK_DOWN + _cam_pitch + 0.3 + _tilt, -1.3, 0.8)), at)
 		return
+	# chase: behind and above, not tilted by the stick (the example's ChaseArm)
 	var offset := yaw_basis * (Basis(Vector3.RIGHT, _cam_pitch) * Vector3(0.0, 0.0, CHASE_DISTANCE_M)) + Vector3(0.0, CHASE_LIFT_M, 0.0)
 	var pos := body.global_position + offset
 	pos.y = maxf(pos.y, DroneSystem.ground(pos.x, pos.z) + 0.4)
@@ -318,27 +359,59 @@ func _update_hud(st: ColonyState) -> void:
 	if not piloting:
 		if bool(hud_widget.call(&"is_showing")):
 			hud_widget.call(&"hide_flight")
+		_report_seen = int(st.drone.get("report_n", 0))
 		return
+	var d := st.drone
 	var warning := ""
 	match DroneSystem.range_state(st):
 		"edge":
-			warning = "⚠ Edge of the radio range: the drone cannot fly further. Upgrade the command room for more range."
+			warning = "EDGE OF RADIO RANGE"
 		"warn":
-			warning = "⚠ Near the edge of the radio range."
-	if DroneSystem.battery(st) <= DroneSystem.battery_to_home(st) + 0.12:
-		warning = "⚠ Battery low: soon it flies home by itself."
-	var v := DroneSystem._v3(st.drone.get("vel", []))
-	hud_widget.call(&"show_flight", {"level": DroneSystem.level(st), "mode": "you are flying",
-		"battery": DroneSystem.battery(st), "seconds_left": DroneSystem.seconds_left(st), "distance_m": DroneSystem.distance_from_pad(st),
-		"range_m": DroneSystem.range_m(st), "range_state": DroneSystem.range_state(st), "height_m": DroneSystem.altitude(st),
-		"speed_mps": v.length(), "warning": warning, "keys": keys_text()})
+			warning = "NEAR RADIO RANGE EDGE"
+	var mission: Dictionary = d.get("mission", {})
+	var total := int(d.get("targets_total", 0))
+	var done := int(d.get("targets_done", 0))
+	var label := ""
+	if total > 0:
+		label = "%s %02d / %02d" % [String(mission.get("mode", "route")).to_upper(), mini(done, total), total]
+	else:
+		var found := (d.get("found", []) as Array).size()
+		label = "FOUND %02d" % found if DroneSystem.has_ability(st, "prescout") else ""
+		total = found
+		done = found
+	var status := DroneSystem.status(st)
+	var info := {
+		"level": DroneSystem.level(st),
+		"mode": "MANUAL" if status == "manual" else "AUTO",
+		"returning": status == "returning",
+		"chase": not onboard_view,
+		"heading": DroneSystem.heading_deg(_shown_yaw),
+		"battery": DroneSystem.battery(st),
+		"seconds_left": DroneSystem.seconds_left(st),
+		"ground_speed": DroneSystem.ground_speed(st),
+		"home_m": DroneSystem.distance_from_pad(st),
+		"alt_m": DroneSystem.altitude(st),
+		"flight_s": float(d.get("flight_s", 0.0)),
+		"targets_total": total,
+		"targets_done": done,
+		"targets_label": label,
+		"warning": warning,
+		"keys": keys_text() if status == "manual" else "%s  CAMERA    %s  HAND BACK" % [_key(&"toggle_view", "Tab").to_upper(), _key(&"interact", "E").to_upper()],
+	}
+	hud_widget.call(&"show_flight", info)
+	var n := int(d.get("report_n", 0))
+	if n != _report_seen:
+		_report_seen = n
+		var rep: Dictionary = d.get("last_report", {})
+		if not rep.is_empty():
+			hud_widget.call(&"show_report", String(rep.get("name", "Report")), String(rep.get("text", "")))
 
 
-## The keys while flying, from the player's own bindings.
+## The keys while flying, from the player's own bindings (OSD style).
 static func keys_text() -> String:
-	return "%s fly · mouse turns · %s up · %s / Ctrl down · %s camera · %s hand back" % [
-		_keys_of([&"move_forward", &"move_left", &"move_back", &"move_right"]), _key(&"jump", "Space"), _key(&"sprint", "Shift"),
-		_key(&"toggle_view", "Tab"), _key(&"interact", "E")]
+	return "%s  MOVE    MOUSE  TURN    %s  UP    CTRL  DOWN    %s  CAMERA    R  FLY HOME    %s  HAND BACK" % [
+		_keys_of([&"move_forward", &"move_left", &"move_back", &"move_right"]).to_upper(), _key(&"jump", "Space").to_upper(),
+		_key(&"toggle_view", "Tab").to_upper(), _key(&"interact", "E").to_upper()]
 
 
 static func _key(action: StringName, fallback: String) -> String:
@@ -415,20 +488,27 @@ func _place_body(st: ColonyState, delta: float) -> void:
 		_since_update = 0.0
 	else:
 		_since_update += delta
+	var docked := DroneSystem.status(st) == "docked"
 	var predicted := target + vel * minf(_since_update, 0.3)
-	if not _placed or predicted.distance_to(_shown_pos) > 25.0 or DroneSystem.status(st) == "docked":
-		_shown_pos = predicted if DroneSystem.status(st) != "docked" else target
+	if not _placed or predicted.distance_to(_shown_pos) > 25.0 or docked:
+		_shown_pos = predicted if not docked else target
 		_placed = true
 	else:
 		_shown_pos = _shown_pos.lerp(predicted, 1.0 - exp(-delta * 10.0))
 	var yaw := float(st.drone.get("yaw", 0.0))
-	_shown_yaw = _pilot_yaw if piloting else lerp_angle(_shown_yaw, yaw, 1.0 - exp(-delta * 6.0))
+	var yaw_goal := _pilot_yaw if controls_active else yaw
+	_shown_yaw = lerp_angle(_shown_yaw, yaw_goal, 1.0 - exp(-delta * (YAW_RESPONSE if controls_active else 6.0)))
 	body.position = _shown_pos
-	# lean into the flight a little (pitch forward, roll sideways)
-	var local := Basis(Vector3.UP, _shown_yaw).inverse() * vel
-	var pitch := clampf(local.z * 0.035, -0.3, 0.3)
-	var roll := clampf(-local.x * 0.035, -0.3, 0.3)
-	body.rotation = Vector3(lerpf(body.rotation.x, pitch, clampf(delta * 5.0, 0.0, 1.0)), _shown_yaw, lerpf(body.rotation.z, roll, clampf(delta * 5.0, 0.0, 1.0)))
+	# the example's tilt: nose down 7° pushing forward, up 5° pulling back, eased with the pitch response
+	var forward := _stick.y
+	if not controls_active:
+		var local := Basis(Vector3.UP, _shown_yaw).inverse() * vel
+		forward = clampf(-local.z / maxf(0.5, DroneSystem.speed_mps(st)), -1.0, 1.0)
+	if docked:
+		forward = 0.0
+	var limit := DroneSystem.num("forward_pitch_deg", 7.0) if forward > 0.0 else DroneSystem.num("reverse_pitch_deg", 5.0)
+	_tilt = lerpf(_tilt, -deg_to_rad(limit) * forward, 1.0 - exp(-PITCH_RESPONSE * delta))
+	body.rotation = Vector3(_tilt, _shown_yaw, 0.0)
 
 
 func _spin_rotors(st: ColonyState, delta: float) -> void:
@@ -447,6 +527,11 @@ func _spin_rotors(st: ColonyState, delta: float) -> void:
 ## Rotor speed now (rad/s; tests).
 func rotor_speed() -> float:
 	return _spin
+
+
+## Model tilt now (rad, negative = nose down; tests).
+func tilt() -> float:
+	return _tilt
 
 
 # ---------------------------------------------------------------- helpers

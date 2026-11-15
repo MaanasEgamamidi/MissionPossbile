@@ -2,7 +2,9 @@ class_name MissionHud
 extends Control
 ## The mission-control HUD of the scout update, laid around GameHud's own corners (time and alerts top left, your crew
 ## member top right, the crosshair in the middle):
-##   top centre     VitalsBar: electricity, oxygen, water, food, parts, science, ore. ⋯ (H) folds it, ? (F1) explains.
+##   top centre     VitalsBar: electricity, oxygen, water, food, parts, science, ore. ⋯ (U) folds it, ? (F1) explains.
+##   H              owner 2026-11-15: the gold sparkle line to what matters now (scripts/guide/help_key.gd) and, above
+##                  the dock, the "Press H for help" pop-up of a timed emergency (scripts/ui/hud/help_prompt.gd).
 ##                  Under it the battery chip: sun or moon, battery %, and while it drains how fast and how long it lasts.
 ##   left           GoalsCard under the time. Owner 2026-11-14, J cycles three looks: the goal list (a new game starts
 ##                  here) -> the big goals screen with the base map (scripts/ui/hud/goals_big_panel.gd, a UiRoot panel)
@@ -37,6 +39,15 @@ const PuzzleKit := preload("res://scripts/tasks/puzzles/kit.gd")
 ## The dock's keys, left to right: [name, pictogram (HudKit), action, fallback key].
 const DOCK := [["Build", &"build", &"build", "B"], ["Power", &"power", &"power_view", "P"], ["Cargo", &"cargo", &"inventory", "I"],
 	["Crew", &"crew", &"crew", "C"], ["Science", &"science", &"vitals_help", "F1"]]
+## Owner 2026-11-15: H shows the gold sparkle line to what matters now; the "Press H for help" pop-up.
+const HelpKeyScript := preload("res://scripts/guide/help_key.gd")
+const HelpPromptScript := preload("res://scripts/ui/hud/help_prompt.gd")
+## Upgrade paths plan phase 1 (2026-11-15): colony balance chip, build vote card, solar storm banner, COLONY OVER.
+const BalanceChipScript := preload("res://scripts/ui/hud/balance_chip.gd")
+const BuildVoteCardScript := preload("res://scripts/ui/hud/build_vote_card.gd")
+const SolarStormBannerScript := preload("res://scripts/ui/hud/solar_storm_banner.gd")
+const ColonyOverBannerScript := preload("res://scripts/ui/hud/colony_over_banner.gd")
+const ColonyOverScreenScript := preload("res://scripts/ui/hud/colony_over_screen.gd")
 
 var services: GameServices
 var game: Node
@@ -54,6 +65,14 @@ var mission_control: MissionControlCard
 var dock: PanelContainer
 var build_chip: PanelContainer
 var feed: PanelContainer
+## The H key (scripts/guide/help_key.gd) and its "Press H for help" pop-up (scripts/ui/hud/help_prompt.gd).
+var help_key: Node
+var help_prompt: Control
+var balance_chip: PanelContainer
+var vote_card: PanelContainer
+var storm_banner: Control
+var over_banner: Control
+var _over_screen_open := false
 
 var _feed_tex: TextureRect
 var _feed_status: Label
@@ -97,6 +116,19 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 	energy = EnergyChipScript.new()
 	add_child(energy)
 	energy.setup(services)
+	balance_chip = BalanceChipScript.new()
+	add_child(balance_chip)
+	balance_chip.call(&"setup", services)
+	vote_card = BuildVoteCardScript.new()
+	add_child(vote_card)
+	vote_card.call(&"setup", services)
+	storm_banner = SolarStormBannerScript.new()
+	storm_banner.set(&"services", services)
+	add_child(storm_banner)
+	over_banner = ColonyOverBannerScript.new()
+	over_banner.set(&"services", services)
+	add_child(over_banner)
+	over_banner.connect(&"colony_over_reached", func(_record: Dictionary) -> void: _open_colony_over())
 	goals = GoalsCard.new()
 	add_child(goals)
 	goals.setup(services)
@@ -111,6 +143,12 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 	add_child(toasts)
 	mission_control = MissionControlCard.new()
 	add_child(mission_control)
+	help_key = HelpKeyScript.new()
+	add_child(help_key)
+	help_key.call(&"setup", services, self)
+	help_prompt = HelpPromptScript.new()
+	add_child(help_prompt)
+	help_prompt.call(&"setup", services, self, help_key)
 	_build_feed()
 	_build_dock()
 	_load()
@@ -317,7 +355,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed(&"build"):
 		open_build()
 	elif event.is_action_pressed(&"hud_details"):
+		# Owner 2026-11-15: U (it was H) folds the supplies bar.
 		vitals.toggle_compact()
+	elif event.is_action_pressed(&"help"):
+		# Owner 2026-11-15: H shows the gold sparkle line to what matters now (H again ends it).
+		help_key.call(&"toggle")
 	elif event.is_action_pressed(&"goals"):
 		# Owner 2026-11-14: J cycles list -> big screen with the map -> compact -> list ... The big screen handles its
 		# own J (and Esc / ✕); closing it lands on compact (_on_goals_big_closed). Here: list -> map, compact -> list.
@@ -441,6 +483,7 @@ func refresh() -> void:
 		return
 	vitals.refresh()
 	energy.call(&"refresh")
+	balance_chip.call(&"refresh")
 	goals.refresh()
 	# Owner 2026-11-14: hidden for now.
 	#map.refresh()
@@ -518,8 +561,16 @@ func _layout() -> void:
 	var es := energy.get_combined_minimum_size()
 	energy.size = es
 	energy.position = Vector2(roundf(vitals.position.x + (vs.x - es.x) * 0.5), vitals.position.y + vs.y + 6.0)
-	var top_band := energy.position.y + es.y
+	# the colony balance chip under the battery chip, then the build vote card at the top right under the crew box
+	var bs := balance_chip.get_combined_minimum_size()
+	balance_chip.size = bs
+	balance_chip.position = Vector2(roundf(vitals.position.x + (vs.x - bs.x) * 0.5), energy.position.y + es.y + 6.0)
+	var top_band := balance_chip.position.y + bs.y
 	hud.top_reserved = top_band
+	if vote_card.visible:
+		var cs := vote_card.get_combined_minimum_size()
+		vote_card.size = cs
+		vote_card.position = Vector2(screen.x - EDGE - cs.x, right.end.y + 12.0)
 	# left column: goals under the time
 	goals.size = goals.get_combined_minimum_size()
 	goals.position = Vector2(EDGE, maxf(left.end.y + 12.0, top_band + 12.0 if vitals.position.x < goals.size.x + EDGE else 0.0))
@@ -567,7 +618,7 @@ func _load() -> void:
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(SETTINGS_PATH))
 	if d is Dictionary:
 		# UI overhaul: the calm look is the default. The choice is kept under "numbers" (true only after the player
-		# pressed H for the numbers look); the old "compact" key is ignored, since older builds wrote false for everyone.
+		# pressed U for the numbers look; H is the help key since 2026-11-15); the old "compact" key is ignored, since older builds wrote false for everyone.
 		_user_compact = not bool((d as Dictionary).get("numbers", false))
 		vitals.set_compact(_user_compact)
 		# Owner 2026-11-14: the goals card always starts in small mode (open).
@@ -578,3 +629,14 @@ func _save() -> void:
 	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f != null:
 		f.store_string(JSON.stringify({"numbers": not _user_compact, "goals_open": goals.open if not _goals_folded_for_mc else true}))
+
+
+## COLONY OVER (2026-11-15): the full screen with the reason; its buttons go to GameMain (main menu / load last save).
+func _open_colony_over() -> void:
+	if _over_screen_open or ui == null:
+		return
+	_over_screen_open = true
+	var screen: UiPanel = ColonyOverScreenScript.new()
+	ui.open(screen)
+	screen.connect(&"main_menu_pressed", func() -> void: game.call(&"colony_over_main_menu"))
+	screen.connect(&"load_last_save_pressed", func() -> void: game.call(&"colony_over_load_last_save"))

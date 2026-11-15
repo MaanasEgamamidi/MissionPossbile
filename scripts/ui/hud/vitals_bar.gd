@@ -4,7 +4,7 @@ extends PanelContainer
 ## UI overhaul (2026-11-15): each supply is ONE picture and ONE small level bar, and nothing else while it is fine.
 ##   * A supply that needs attention grows a number with its unit and a mark (triangle = low, octagon = very low) and
 ##     turns amber or red: colour is never the only cue.
-##   * Key H (hud_details) switches the numbers on for all four ("numbers look": amount, unit and which way it is
+##   * Key U (hud_details; owner 2026-11-15: H is the help key now) switches the numbers on for all four ("numbers look": amount, unit and which way it is
 ##     going: "▲ rising", "▼ 2.1 sols" until it runs out, "▲ +2.4 kW"), and off again. `compact` is the calm look.
 ##   * Clicking a supply (or key P) opens the Power & life support drawer; spare parts, the science score and the ore
 ##     (once counters on this strip) are listed there now: see extra_counts().
@@ -16,6 +16,8 @@ signal help_requested
 signal compact_changed(compact: bool)
 
 const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
+## Ore survey (2026-11-15): real ore in the colony store (state.ores.stock).
+const OreCatalog := preload("res://scripts/science/ore_catalog.gd")
 const STOCKS := [
 	{"key": &"battery_kwh", "symbol": "⚡", "icon": &"power", "name": "Electricity", "unit": "kWh", "color": AstraStyle.C_POWER},
 	{"key": &"oxygen_kg", "symbol": "O₂", "icon": &"air", "name": "Oxygen", "unit": "kg", "color": AstraStyle.C_O2},
@@ -169,10 +171,18 @@ static func extra_counts(st: ColonyState) -> Array[Dictionary]:
 	var ore := 0
 	for k: String in (st.scout.get("ores", {}) as Dictionary):
 		ore += int(st.scout.ores[k])
+	# Ore survey (2026-11-15): the identified ore in the colony store plus the scout's ore still at the workbench.
+	var stocked := OreCatalog.total_stock(st)
+	var ore_note := "Upgrades spend it."
+	var lines := OreCatalog.stock_lines(st)
+	if not lines.is_empty():
+		ore_note = ", ".join(lines) + ". Upgrades spend it."
+	elif ore == 0:
+		ore_note = "Nothing yet: walk out in a suit, or send the drone, to find ore deposits."
 	return [
 		{"symbol": "⚙", "name": "Spare parts", "value": str(st.parts), "color": AstraStyle.C_PARTS, "note": "Upgrades and the scout rover use them."},
 		{"symbol": "✦", "name": "Science score", "value": str(ScoutSystem.science_points(st)), "color": AstraStyle.C_SCIENCE, "note": "Ores studied at the workbench."},
-		{"symbol": "◆", "name": "Ore", "value": str(ore), "color": AstraStyle.C_ORE, "note": "Collected outside, waiting at the workbench."},
+		{"symbol": "◆", "name": "Ore", "value": str(stocked + ore), "color": AstraStyle.C_ORE, "note": ore_note},
 	]
 
 

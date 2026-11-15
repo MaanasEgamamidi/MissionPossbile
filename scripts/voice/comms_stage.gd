@@ -8,6 +8,9 @@ extends RefCounted
 ## electrical and comms specialist): communications is not a sixth tier sector of ProgressionSystem. They are chained
 ## by prerequisites, so they install in order: comms_radio_1 needs no sector level, 2 needs Energy level 1, 3 Energy
 ## level 2, 4 Energy level 3. Messages from Earth are a separate system and are never made faster by these cards.
+## 2026-11-15: crew voice no longer reads this stage. Who is heard by radio, and with what delay and garble, follows
+## the Communication level (AreaLevels "command") in scripts/voice/suit_radio.gd. stage() stays for the tutorial's
+## certification check and the old panels.
 
 ## Upgrade card ids, one per stage, installed in order.
 const CARD_IDS: PackedStringArray = ["comms_radio_1", "comms_radio_2", "comms_radio_3", "comms_radio_4"]
@@ -67,10 +70,14 @@ static func stage_text(p_stage: int) -> String:
 	return "Radio stage %d of 4: speech is heard %s." % [p_stage, delay_words(p_stage)]
 
 
-## Why the radio is slow, in plain words (shown in the voice settings and on the HUD help).
+## Why the radio is slow, in plain words (shown in the voice settings and on the HUD help). Since 2026-11-15 the voice
+## path follows the suit radio (scripts/voice/suit_radio.gd, the Communication level), so this returns its honest
+## science note (read by path to keep the class_name scripts free of a preload cycle).
 static func explanation() -> String:
-	return ("The colony radio is damaged. It has to store your words and clean them up before it can send them, "
-		+ "so people hear you later. That wait is the radio's own buffering and processing. It is not the computer "
-		+ "network and not the distance to Earth. Each repair at the comms console makes the wait shorter: 30 s, 15 s, "
-		+ "5 s, then almost none. Messages from Earth still take many minutes, because radio waves need that long to "
-		+ "cross the space between the planets; repairing the colony radio cannot change that.")
+	var script := load("res://scripts/voice/suit_radio.gd") as Script
+	if script != null:
+		var note: Variant = script.get_script_constant_map().get("SCIENCE_NOTE", "")
+		if note is String and String(note) != "":
+			return String(note)
+	return ("Suit radio between spacesuits on Mars is almost instant in real life; the game's delay stands for a weak "
+		+ "signal through a busy base relay. The real Earth-Mars delay is 4 to 24 minutes.")

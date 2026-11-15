@@ -10,12 +10,24 @@ extends RefCounted
 ##   rover_charge_loss_kwh    lost as heat in the charger
 ##   rover_drive_kwh          used from the rover battery by driving
 ##   rover_refit_clamped_kwh  energy that did not fit in a smaller battery after a refit (it left with the removed modules)
-##   Rover battery identity:  rover now = start + rover_charge_kwh - rover_charge_loss_kwh - rover_drive_kwh - rover_refit_clamped_kwh
+## Rover upgrade path (RoverModel.track_level, RoverBalance "Rover upgrade path"):
+##   rover_rtg_kwh            put into the rover battery by the RTG cart (L5), parked or driving
+##   rover_fuel_cell_kwh      moved from the fuel-cell tanks into the rover battery by the range extender (L4+)
+##   rover_fuel_cell_o2_kg    taken from the colony's oxygen store to refill the fuel cell at the charger (L4+), at
+##                            RoverBalance.fuel_cell_o2_kg_per_kwh (0.45 kg O2 per kWh: 6.3 kg for a full 14 kWh)
+##   rover_cabin_o2_kg        breathed by crew seated in the pressurized cabin (L3+), from the colony's oxygen store
+##   Rover battery identity:  rover now = start + rover_charge_kwh - rover_charge_loss_kwh - rover_drive_kwh
+##                            - rover_refit_clamped_kwh + rover_rtg_kwh + rover_fuel_cell_kwh
+##   Fuel-cell identity:      tanks now = rover_fuel_cell_o2_kg / fuel_cell_o2_kg_per_kwh - rover_fuel_cell_kwh
 
 const LEDGER_CHARGE := "rover_charge_kwh"
 const LEDGER_LOSS := "rover_charge_loss_kwh"
 const LEDGER_DRIVE := "rover_drive_kwh"
 const LEDGER_CLAMP := "rover_refit_clamped_kwh"
+const LEDGER_RTG := "rover_rtg_kwh"
+const LEDGER_FC := "rover_fuel_cell_kwh"
+const LEDGER_FC_O2 := "rover_fuel_cell_o2_kg"
+const LEDGER_CABIN_O2 := "rover_cabin_o2_kg"
 ## Kind of the charger station (data/stations_rover.json).
 const CHARGER_KIND := "rover_charger"
 ## Kind of the garage station.
@@ -41,6 +53,61 @@ func step(state: ColonyState, balance: GameBalance, _phase: float, dt_hours: flo
 	follow_pose(state, _last_pose != JSON.stringify(state.rover.pose))
 	_last_pose = JSON.stringify(state.rover.pose)
 	_charge(state, balance, dt_hours, events)
+	run_upgrade_power(state, dt_hours)
+
+
+## The rover upgrade path's energy (host, every tick): the RTG trickle (L5) into the battery, and the fuel cell (L4+):
+## refilled from the colony's oxygen store while the rover is plugged in at the charger, otherwise feeding the battery
+## once it is below RoverBalance.fuel_cell_start_fraction (a range extender).
+static func run_upgrade_power(state: ColonyState, dt_hours: float) -> void:
+	var r := state.rover
+	if not bool(r.get("built", false)) or dt_hours <= 0.0:
+		return
+	var b := RoverBalance.get_current()
+	var cap := float(RoverModel.stats(r.levels, 0.0).battery_capacity_kwh)
+	var battery := float(r.battery_kwh)
+	var rtg := RoverModel.rtg_kw(state) * dt_hours
+	if rtg > 0.0:
+		var add := minf(rtg, maxf(0.0, cap - battery))
+		if add > 0.0:
+			battery += add
+			state.ledger[LEDGER_RTG] = float(state.ledger.get(LEDGER_RTG, 0.0)) + add
+	var fc_cap := RoverModel.fuel_cell_capacity_kwh(state)
+	var fc := clampf(float(r.get("fuel_cell_kwh", 0.0)), 0.0, fc_cap)
+	if fc_cap > 0.0:
+		if bool(r.charging) and in_charge_reach(state):
+			var rate := maxf(1e-6, b.fuel_cell_o2_kg_per_kwh)
+			var want_kwh := minf(fc_cap - fc, b.fuel_cell_refill_kwh_per_hour * dt_hours)
+			var o2_floor := b.fuel_cell_o2_reserve_fraction * float(state.capacities.get(&"oxygen_kg", 0.0))
+			var o2_free := maxf(0.0, state.store(&"oxygen_kg") - o2_floor)
+			var kg := minf(maxf(0.0, want_kwh) * rate, o2_free)
+			if kg > 0.0:
+				var taken := -state.add_to_store(&"oxygen_kg", -kg)
+				fc = minf(fc_cap, fc + taken / rate)
+				state.ledger[LEDGER_FC_O2] = float(state.ledger.get(LEDGER_FC_O2, 0.0)) + taken
+		elif fc > 0.0 and battery < cap * b.fuel_cell_start_fraction:
+			var move := minf(minf(b.fuel_cell_kw * dt_hours, fc), maxf(0.0, cap - battery))
+			if move > 0.0:
+				battery += move
+				fc -= move
+				state.ledger[LEDGER_FC] = float(state.ledger.get(LEDGER_FC, 0.0)) + move
+	r["fuel_cell_kwh"] = fc
+	if battery > float(r.battery_kwh):
+		r["empty_announced"] = false
+		r["battery_kwh"] = battery
+
+
+## Life-support hook (L3+ cabin): air for one crew member seated in the pressurized cabin over `dt` game hours,
+## breathed instead of suit oxygen. The cabin's tanks are filled from the colony's oxygen store (game simplification:
+## taken from the store directly). Returns the share of air it did not get (0..1), like LifeSupportModel.run_suit.
+static func cabin_breathe(state: ColonyState, balance: GameBalance, _c: CharacterState, dt: float) -> float:
+	var need := balance.oxygen_kg_per_hour * dt
+	if need <= 0.0:
+		return 0.0
+	var got := -state.add_to_store(&"oxygen_kg", -need)
+	state.ledger[LEDGER_CABIN_O2] = float(state.ledger.get(LEDGER_CABIN_O2, 0.0)) + got
+	state.ledger["oxygen_used_kg"] = float(state.ledger.get("oxygen_used_kg", 0.0)) + got
+	return (need - got) / need
 
 
 ## Frees the seat of a character on a disconnect (no owner any more) or a recovery, at once (also while paused).

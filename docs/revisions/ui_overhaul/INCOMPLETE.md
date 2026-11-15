@@ -8,6 +8,15 @@ how to do it. `UI_OVERHAUL.md` is the full record; `AFTER_TOKENS_RESET.md` the s
 Checked and already done (no action): T03's wider timing window (`t03_rule.gd` `ASSIST_WINDOW_DEG` 32 vs 20, the
 "wide window" accessibility help); T11's fewer patches on the first run (added in the third session, see §0).
 
+## Status (third session, after the merge with upgrade paths phase 1)
+
+Done: §2 mid-game screenshots, §3 T02 locked badge, §4 lab and weather text, §5 upgrade cards (merged with phase 1:
+the station strip is display-only, builds are chosen at the section's core spot), §6 T09 standing start, §7 "Water
+splitter" / "CO2 splitter", §8 live pictogram sizes, §9 old tests updated to the switched-off features.
+Still open: **§1 a real playthrough** (solo and with a second player), and a full test run on the merged `main`
+(skipped at the owner's request). Small polish seen in screenshots: the wrong-socket cross reads small, and the locked
+T02 screen names the role twice ("Electrical engineer only" and "Electrical and comms").
+
 ## Size at a glance
 
 | # | Item | Size | Needs |

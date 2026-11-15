@@ -19,6 +19,12 @@ extends Node
 const GROUP := &"voice_service"
 ## Tutorial (2026-11-14): crew voice is off until the T01 radio is fixed (scripts/voice/comms_gate.gd).
 const CommsGate := preload("res://scripts/voice/comms_gate.gd")
+## Suit radio (2026-11-15, UPGRADE_PATHS_PLAN.md §7.1): which route, no signal / delay / garble by the Communication
+## level (suit_radio.gd), and how the garbled radio sounds (radio_fx.gd). Face to face inside is unchanged.
+const SuitRadio := preload("res://scripts/voice/suit_radio.gd")
+const RadioFx := preload("res://scripts/voice/radio_fx.gd")
+## The speaker's "No signal" line stays this long after the press that triggered it, seconds.
+const NO_SIGNAL_HOLD_S := 3.0
 ## Opus encoder settings (engineering): 24 kbit/s, complexity 5, tuned for voice.
 const OPUS_BITRATE := 24000
 const OPUS_COMPLEXITY := 5
@@ -96,6 +102,8 @@ var _last_outside := -1
 var _transition_text := ""
 var _transition_until := 0.0
 var _peer_check_left := 0.0
+var _fx: RadioFx                   # radio_fx.gd: the SuitRadio bus, clicks, hiss, dropouts, the no-signal beep
+var _no_signal_until := -1.0       # the speaker's "No signal" line shows until then (once per press)
 
 
 ## One speaker's player on one route. Proximity: AudioStreamPlayer3D at the speaker (no engine attenuation: the
@@ -111,6 +119,8 @@ class VoiceOut extends RefCounted:
 	var fec := 0
 	var overflow := 0
 	var seq := -1
+	## Suit radio garble of the utterance playing now (0 = clear; proximity is always 0).
+	var garble := 0.0
 
 	func ensure_playing() -> void:
 		var p := player
@@ -208,6 +218,10 @@ func setup(p_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 		_make_encoder()
 	_probe_mic()
 	_build_portals()
+	if _fx == null:
+		_fx = RadioFx.new()
+		_fx.name = "RadioFx"
+		add_child(_fx)
 	if services != null and services.net != null:
 		var net := services.net
 		if not net.voice_packet_received.is_connected(_on_voice_packet):
@@ -433,6 +447,7 @@ func _capture(now: float) -> void:
 	var talk := held and can_capture() and services != null and services.has_game() and services.local_character() != null and not comms_down()
 	if talk and not _transmitting:
 		_start_transmit()
+		_on_press(now)
 	var got_audio := false
 	while true:
 		var chunk := _next_chunk()
@@ -455,6 +470,35 @@ func _capture(now: float) -> void:
 		_set_mic_state(&"no_signal")
 	if _transmitting and not talk:
 		_stop_transmit()
+
+
+## A new press of the talk key (not the restart of a very long hold): once per press, tell the speaker when the suit
+## radio has no signal (line + beep), or key the suit radio with a click when it carries the voice.
+func _on_press(now: float) -> void:
+	var st := speaker_radio_status()
+	var vol := settings.voice_volume if settings != null else 1.0
+	if bool(st.no_signal):
+		_no_signal_until = now + NO_SIGNAL_HOLD_S
+		if _fx != null:
+			_fx.no_signal_beep(vol)
+	else:
+		_no_signal_until = -1.0
+		if bool(st.radio) and _fx != null:
+			_fx.click(vol)
+
+
+## What the local player's voice does now over the suit radio (SuitRadio.speaker_status), {} pieces filled with
+## defaults when there is no game.
+func speaker_radio_status() -> Dictionary:
+	if services == null or not services.has_game() or services.local_character() == null:
+		return {"radio": false, "no_signal": false, "delay_s": 0.0, "garble": 0.0, "nearby": 0}
+	var st := services.state()
+	var mine := services.local_peer()
+	var others: Array = []
+	for c: CharacterState in st.active_characters():
+		if c.owner_peer != mine:
+			others.append(SuitRadio.participant(st, c, services.zones))
+	return SuitRadio.speaker_status(st, _listener(), others, services.zones, portals, door_openings())
 
 
 func _character_id() -> String:
@@ -531,8 +575,10 @@ func _on_voice_packet(from_peer: int, packet: PackedByteArray) -> void:
 		&"new":
 			var route := route_for(from_peer)
 			var lane: StringName = route.route if route.route != VoiceRouter.ROUTE_NONE else &""
+			# the suit radio's delay (real seconds) is applied here on the listener's side by the scheduler; its
+			# garble rides in the utterance info to the player (radio_fx.gd)
 			scheduler.open(from_peer, stream, seq, lane, now - VoiceScheduler.elapsed_s(h), float(route.delay_s),
-				{"reason": route.reason, "character": h.character}, now)
+				{"reason": route.reason, "character": h.character, "garble": float(route.get("garble", 0.0))}, now)
 			if lane == &"":
 				_unheard[from_peer] = {"reason": String(route.reason), "until": now + HEARD_HOLD_S, "seq": seq}
 				return
@@ -544,21 +590,22 @@ func _on_voice_packet(from_peer: int, packet: PackedByteArray) -> void:
 			scheduler.end(from_peer, stream, seq, int(h.index), now)
 
 
-## The route from `peer`'s character to this machine's player now (VoiceRouter.decide).
+## The route from `peer`'s character to this machine's player now: face to face inside (VoiceRouter's proximity rule,
+## unchanged) or the suit radio with its delay and garble (SuitRadio.decide, by the Communication level).
 func route_for(peer: int) -> Dictionary:
 	var st := services.state() if services != null and services.has_game() else null
 	var speaker := st.character_of_peer(peer) if st != null else null
 	if speaker == null:
-		return {"route": VoiceRouter.ROUTE_NONE, "gain": 0.0, "delay_s": 0.0, "reason": "unknown_speaker", "via_door": -1}
+		return {"route": VoiceRouter.ROUTE_NONE, "gain": 0.0, "delay_s": 0.0, "garble": 0.0, "reason": "unknown_speaker", "via_door": -1}
 	var zones := services.zones
-	return VoiceRouter.decide(VoiceRouter.participant(st, speaker, zones), _listener(), CommsStage.stage(st), portals, door_openings())
+	return SuitRadio.decide(st, SuitRadio.participant(st, speaker, zones), _listener(), zones, portals, door_openings())
 
 
 func _listener() -> Dictionary:
 	var me := services.local_character() if services != null and services.has_game() else null
 	if me == null:
-		return {"id": &"", "position": Vector3(1e6, 0.0, 1e6), "outside": false, "zone": "(nobody)", "seated": false}
-	return VoiceRouter.participant(services.state(), me, services.zones)
+		return {"id": &"", "position": Vector3(1e6, 0.0, 1e6), "outside": false, "zone": "(nobody)", "seated": false, "suit": false}
+	return SuitRadio.participant(services.state(), me, services.zones)
 
 
 ## How far each known door is open now, by door id (0..1).
@@ -643,6 +690,8 @@ func _play(now: float) -> void:
 		match e.type:
 			&"start":
 				out.begin(int(e.seq))
+				if out.lane == VoiceRouter.ROUTE_RADIO:
+					_radio_begin(out, e)
 			&"frame":
 				var key := "%d|%d|%d" % [peer, int(e.seq), int(e.index)]
 				if _arrived.has(key):
@@ -658,7 +707,8 @@ func _play(now: float) -> void:
 						counters.fec_frames += 1
 				else:
 					counters.overflow_frames += 1
-				_heard[peer] = {"lane": e.lane, "until": now + HEARD_HOLD_S, "delay_s": float(e.delay_s), "start_local": float(e.start_local)}
+				_heard[peer] = {"lane": e.lane, "until": now + HEARD_HOLD_S, "delay_s": float(e.delay_s), "start_local": float(e.start_local),
+					"garble": out.garble}
 			&"lost":
 				counters.lost_frames += 1
 			&"end":
@@ -667,16 +717,45 @@ func _play(now: float) -> void:
 						out.finish()
 					_:
 						out.stop()
+				if out.lane == VoiceRouter.ROUTE_RADIO:
+					_radio_end(out)
 	_apply_levels()
+
+
+## A suit radio utterance starts playing here: its bus (garbled -> SuitRadio, clear -> Master), the bus tuning and the
+## squelch click.
+func _radio_begin(out: VoiceOut, e: Dictionary) -> void:
+	var info: Dictionary = e.get("info", {})
+	out.garble = clampf(float(info.get("garble", 0.0)), 0.0, 1.0)
+	out.player.set(&"bus", RadioFx.bus_for(out.garble))
+	if _fx != null:
+		if out.garble > 0.0:
+			_fx.tune(out.garble)
+		_fx.click(settings.voice_volume if settings != null else 1.0)
+
+
+## A suit radio utterance ended (or was cleared): the closing click; its hiss and dropouts stop.
+func _radio_end(out: VoiceOut) -> void:
+	out.garble = 0.0
+	if _fx != null:
+		_fx.forget("%d|%s" % [out.peer, out.lane])
+		_fx.click(settings.voice_volume if settings != null else 1.0)
 
 
 ## Sets each player's level and position: the router's gain for proximity (re-read every frame), and the volumes.
 func _apply_levels() -> void:
 	var master := settings.voice_volume if settings != null else 1.0
+	var now := _now()
+	var hiss := 0.0
 	for key: String in _outs:
 		var out: VoiceOut = _outs[key]
 		var vol := master * player_volume(out.peer)
 		var gain := 1.0
+		if out.lane == VoiceRouter.ROUTE_RADIO and out.garble > 0.0 and _fx != null:
+			# suit radio garble: short random dropouts, and the hiss while it plays
+			gain = _fx.gate(key, out.garble, now)
+			if bool(out.player.get(&"playing")):
+				hiss = maxf(hiss, out.garble)
 		if out.lane == VoiceRouter.ROUTE_PROXIMITY:
 			var r := route_for(out.peer)
 			# the utterance keeps its proximity route; if the pair is no longer both inside, it simply fades out
@@ -687,6 +766,8 @@ func _apply_levels() -> void:
 				var pos: Vector3 = VoiceRouter.participant(st, c, services.zones).position
 				(out.player as Node3D).global_position = pos + Vector3(0.0, MOUTH_HEIGHT_M, 0.0)
 		out.player.set(&"volume_db", linear_to_db(maxf(gain * vol, 1e-5)))
+	if _fx != null:
+		_fx.set_hiss(hiss, master)
 
 
 func _out_for(peer: int, lane: StringName) -> VoiceOut:
@@ -821,9 +902,15 @@ func _watch_session(delta: float) -> void:
 
 # ================================================================ words for the HUD
 
-## Radio stage now (0..4).
+## Old radio card stage (0..4, CommsStage). The voice path no longer uses it: the suit radio follows the
+## Communication level (suit_radio_level()).
 func stage() -> int:
 	return CommsStage.stage(services.state()) if services != null and services.has_game() else 0
+
+
+## Communication level that drives the suit radio (AreaLevels "command"), 1 without a game.
+func suit_radio_level() -> int:
+	return SuitRadio.level(services.state()) if services != null and services.has_game() else 1
 
 
 ## Number of other players outside right now.
@@ -854,12 +941,18 @@ func own_line() -> String:
 	var short := mic_short_text()
 	if short != "":
 		return short
-	if _transmitting:
-		var text := VoiceRouter.speaking_text(_me_outside(), stage(), crew_outside())
-		if services != null and services.net != null and not services.net.is_online():
+	if _transmitting or _now() < _no_signal_until:
+		var status := speaker_radio_status()
+		# the "No signal" line of this press stays for NO_SIGNAL_HOLD_S even after a quick press
+		if _now() < _no_signal_until:
+			status.no_signal = true
+		var text := SuitRadio.speaking_text(status)
+		if _transmitting and services != null and services.net != null and not services.net.is_online():
 			text += " (playing alone: nobody else is here)"
 		return text
-	return VoiceRouter.idle_text(_me_outside(), stage())
+	if services == null or not services.has_game():
+		return "Hold V to talk to people near you."
+	return SuitRadio.idle_text(services.state(), _listener(), services.zones)
 
 
 ## Lines about other players: heard now, waiting in the radio, or talking with no route to this player.
@@ -874,16 +967,17 @@ func heard_lines() -> PackedStringArray:
 		if now > float(h.until):
 			_heard.erase(peer)
 			continue
-		out.append(VoiceRouter.heard_text(_name_of(peer), h.lane, now - float(h.start_local) if float(h.delay_s) >= 1.0 else 0.0))
+		out.append(SuitRadio.heard_text(_name_of(peer), h.lane, now - float(h.start_local) if float(h.delay_s) >= 1.0 else 0.0,
+			float(h.get("garble", 0.0))))
 	for u: Dictionary in scheduler.utterances():
 		if not bool(u.started) and String(u.lane) == String(VoiceRouter.ROUTE_RADIO) and float(u.due0) - now >= 1.0:
-			out.append(VoiceRouter.pending_text(_name_of(int(u.peer)), float(u.due0) - now))
+			out.append(SuitRadio.pending_text(_name_of(int(u.peer)), float(u.due0) - now))
 	for peer: int in _unheard.keys():
 		var u: Dictionary = _unheard[peer]
 		if now > float(u.until):
 			_unheard.erase(peer)
 			continue
-		var line := VoiceRouter.unheard_text(_name_of(peer), String(u.reason), _me_outside())
+		var line := SuitRadio.unheard_text(_name_of(peer), String(u.reason))
 		if line != "":
 			out.append(line)
 	return out
@@ -900,7 +994,7 @@ func _watch_transition(now: float) -> void:
 		return
 	var outside := 1 if _me_outside() else 0
 	if _last_outside >= 0 and outside != _last_outside:
-		_transition_text = VoiceRouter.transition_text(outside == 1, stage())
+		_transition_text = SuitRadio.transition_text(services.state(), outside == 1)
 		_transition_until = now + TRANSITION_NOTE_S
 	_last_outside = outside
 

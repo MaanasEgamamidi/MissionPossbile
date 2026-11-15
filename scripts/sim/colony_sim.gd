@@ -63,7 +63,8 @@ func step(state: ColonyState, balance: GameBalance, phase: float, dt_hours: floa
 	var no_air := {}
 	for c in crew:
 		if c.outside:
-			no_air[c.id] = LifeSupportModel.run_suit(state, balance, c, dt)
+			# Rover L3 sealed cabin (2026-11-15): seated crew breathe cabin air from the colony store, not suit air.
+			no_air[c.id] = RoverSystem.cabin_breathe(state, balance, c, dt) if RoverModel.cabin_sheltered(state, c) else LifeSupportModel.run_suit(state, balance, c, dt)
 			o2_short += float(no_air[c.id]) * balance.oxygen_kg_per_hour * dt
 	state.unmet["oxygen_kg"] = o2_short
 

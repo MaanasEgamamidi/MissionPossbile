@@ -1,115 +1,384 @@
 {
-	"_about": "Visible upgrade paths (2026-11-14 owner request): every interactable area, the scout drone and the rover get levels V1..V4. V1 is today's model. Each level up costs spare parts (state.parts), is done at one of the track's stations by its specialist (empty = anyone), and changes both what the area looks like (scripts/upgrades/stages/<track>_stages.gd) and what it does (the effect tables below, read with AreaLevels.effect). Effect numbers are designer balance, never NASA figures, unless a source id is given in source_ids. The rover's look follows its existing module levels (state.rover.levels, 1..5), so its entry has no costs of its own: it is upgraded in the garage as before.",
-	"max_level": 4,
+	"_about": "Upgrade paths (owner 2026-11-14, rebuilt for the upgrade paths plan 2026-11-15: docs/revisions/UPGRADE_PATHS_PLAN.md). Every track belongs to one of five sections (Energy, Biology, Health, Science, Communication); a section's tracks are chosen at its core spot (sections[].core_station_ids). The colony finishes ONE build a day, voted in the evening Plan block (scripts/upgrades/colony_builds.gd). A track has `levels` levels (V1..Vn, V1 = today's model); its level lives in state.levels[track] (missing = 1). costs[i] is what reaching level i+1 costs: spare parts (state.parts) and ores (state.ores.stock[ore_id]); costs[0] is always {}. upkeep_kw[i] is the extra power the track draws at level i+1 (total, not per step). Effects are lists indexed by level - 1, read with AreaLevels.effect(state, track, key, default). A fork (forks{}) is a permanent choice at one level of a track; the chosen side's effects override the track's (state.build.forks[fork_id]). requires{level: {track: level}} = another track must be at least that level first. Numbers follow the plan's big-jump-first curve (+60 %, +30 %, +15 %, +8 %) and are designer balance, never NASA figures, unless source_ids say so. The rover is bought like every track since 2026-11-15; its garage modules still upgrade on their own.",
+	"max_level": 5,
+	"sections": [
+		{
+			"id": "energy",
+			"name": "Energy",
+			"symbol": "⚡",
+			"spot": "the power panel in the Power Room",
+			"core_station_ids": ["pw_panel"],
+			"core_kinds": ["power"],
+			"tracks": ["day_power", "energy", "storm_power", "use_less"]
+		},
+		{
+			"id": "biology",
+			"name": "Biology",
+			"symbol": "❀",
+			"spot": "the Greenhouse console",
+			"core_station_ids": ["gh_console"],
+			"core_kinds": ["food"],
+			"tracks": ["food", "garden", "life_support"]
+		},
+		{
+			"id": "health",
+			"name": "Health",
+			"symbol": "✚",
+			"spot": "the med station in the Med Bay",
+			"core_station_ids": ["md_heal_station"],
+			"core_kinds": ["heal"],
+			"tracks": ["health", "protection"]
+		},
+		{
+			"id": "science",
+			"name": "Science",
+			"symbol": "✦",
+			"spot": "the workbench or the lab glovebox",
+			"core_station_ids": ["hg_control_board", "mb_glovebox"],
+			"core_kinds": ["workbench", "lab"],
+			"tracks": ["lab", "scout_drone", "rover", "ore_survey"]
+		},
+		{
+			"id": "communication",
+			"name": "Communication",
+			"symbol": "✉",
+			"spot": "the comms console in the Command Room",
+			"core_station_ids": ["cm_comms_console"],
+			"core_kinds": ["comms"],
+			"tracks": ["command"]
+		}
+	],
+	"forks": {
+		"night_power": {
+			"track": "energy",
+			"level": 3,
+			"title": "Night power: pick one",
+			"choices": [
+				{
+					"id": "fuel_cell",
+					"name": "Regenerative fuel cells",
+					"symbol": "◇",
+					"renewable": true,
+					"badge": "Renewable",
+					"text": "Sun power by day splits water into gas; at night the fuel cells turn it back into power.",
+					"stages": {"3": "Fuel cell tank farm: sun power by day becomes night power", "4": "Bigger tank farm and a second fuel cell stack"},
+					"effects": {"night_kw": [0.0, 0.0, 6.0, 8.0], "day_kw": [0.0, 0.0, 0.0, 0.0]}
+				},
+				{
+					"id": "reactor",
+					"name": "Small fission reactor (10 kW)",
+					"symbol": "☢",
+					"renewable": false,
+					"badge": "Not renewable",
+					"text": "A small nuclear reactor parked away from the base behind a dirt wall. Steady power day and night, dust or not.",
+					"stages": {"3": "10 kW fission reactor behind a dirt wall", "4": "Bigger reactor: 13 kW day and night"},
+					"effects": {"night_kw": [0.0, 0.0, 10.0, 13.0], "day_kw": [0.0, 0.0, 10.0, 13.0]}
+				}
+			]
+		}
+	},
 	"tracks": [
 		{
+			"id": "day_power",
+			"name": "Day power",
+			"section": "energy",
+			"helps": ["power"],
+			"zone": "Exterior",
+			"station_kinds": ["solar"],
+			"specialty": "electrical_comms",
+			"levels": 5,
+			"stages": ["Dusty solar panels", "Crew cleans the panels every sol", "Dust shield: the panels clean themselves", "Sun trackers turn the panels to the sun", "Multi-junction cells: dark, high-power panels"],
+			"effects": {
+				"solar_factor": [1.0, 1.6, 2.08, 2.39, 2.58],
+				"panel_cleaning": [false, true, true, true, true],
+				"dust_shield": [false, false, true, true, true],
+				"trackers": [false, false, false, true, true],
+				"multi_junction": [false, false, false, false, true]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"regolith": 2}}, {"parts": 3, "ores": {"magnetite": 2, "hematite": 1}}, {"parts": 4, "ores": {"hematite": 2, "olivine": 2}}, {"parts": 5, "ores": {"silica": 3, "iron_meteorite": 1}}],
+			"upkeep_kw": [0.0, 0.0, 0.05, 0.3, 0.3],
+			"requires": {"5": {"lab": 5}},
+			"effect_notes": {"solar_factor": "balance: multiplies every tracker's daytime output on top of the dust and storm rules. Was energy.solar_factor before 2026-11-15 (energy is now night power, its solar_factor stays 1.0)."}
+		},
+		{
+			"id": "energy",
+			"name": "Night power",
+			"section": "energy",
+			"helps": ["power"],
+			"zone": "Power Room",
+			"station_kinds": ["power"],
+			"specialty": "electrical_comms",
+			"levels": 4,
+			"stages": ["Today's battery rows", "Second battery bank and a bigger inverter", "Fork: fuel cells or a fission reactor", "Bigger fuel cells or a bigger reactor"],
+			"effects": {
+				"solar_factor": [1.0, 1.0, 1.0, 1.0],
+				"battery_capacity_factor": [1.0, 1.6, 1.6, 1.6],
+				"night_kw": [0.0, 0.0, 0.0, 0.0],
+				"day_kw": [0.0, 0.0, 0.0, 0.0]
+			},
+			"fork": "night_power",
+			"costs": [{}, {"parts": 2, "ores": {"magnetite": 2}}, {"parts": 4, "ores": {"hematite": 2, "clay": 1}}, {"parts": 5, "ores": {"hematite": 2, "sulfur": 1, "iron_meteorite": 1}}],
+			"upkeep_kw": [0.0, 0.1, 0.4, 0.6],
+			"effect_notes": {"battery_capacity_factor": "balance: applied once to capacities.battery_kwh at the level change (AreaLevelActions / ColonyBuilds). 700 -> 1,120 kWh.", "night_kw": "from the night_power fork choice (fuel_cell 6/8 kW at night only, reactor 10/13 kW day and night).", "solar_factor": "kept for old code: solar now grows with day_power.solar_factor."}
+		},
+		{
+			"id": "storm_power",
+			"name": "Storm power",
+			"section": "energy",
+			"helps": ["power"],
+			"zone": "Exterior",
+			"station_kinds": [],
+			"specialty": "electrical_comms",
+			"levels": 4,
+			"stages": ["No wind power", "Test wind turbine (about 0.5 kW)", "One big wind turbine on the ridge", "Wind farm: more turbines on the ridge"],
+			"effects": {
+				"wind_kw": [0.0, 0.5, 10.0, 13.0]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"magnetite": 1, "regolith": 1}}, {"parts": 4, "ores": {"hematite": 3}}, {"parts": 5, "ores": {"hematite": 2, "carbonate": 1, "silica": 1}}],
+			"upkeep_kw": [0.0, 0.02, 0.2, 0.3],
+			"effect_notes": {"wind_kw": "balance: turbine power in clear, calm daytime air; the power model may raise it at night and in dust storms (wind is strongest then, Hartwick et al. 2023)."}
+		},
+		{
+			"id": "use_less",
+			"name": "Use less power",
+			"section": "energy",
+			"helps": ["power"],
+			"zone": "Whole base",
+			"station_kinds": [],
+			"specialty": "electrical_comms",
+			"levels": 5,
+			"stages": ["Old lights and heaters", "LED lights: 10 % less power", "Insulation: 10 % less again", "Heat recovery: 15 % less again", "The oxygen plant runs by day, when the sun shines"],
+			"effects": {
+				"load_factor": [1.0, 0.9, 0.81, 0.69, 0.66],
+				"o2_by_day": [false, false, false, false, true]
+			},
+			"costs": [{}, {"parts": 1, "ores": {}}, {"parts": 2, "ores": {"regolith": 3}}, {"parts": 3, "ores": {"clay": 1, "gypsum": 1}}, {"parts": 3, "ores": {"silica": 1}}],
+			"upkeep_kw": [0.0, 0.0, 0.0, 0.0, 0.0]
+		},
+		{
 			"id": "food",
-			"name": "Greenhouse grow racks",
+			"name": "Food, water and recycling",
+			"section": "biology",
+			"helps": ["food", "water"],
 			"zone": "Greenhouse",
 			"station_kinds": ["food"],
 			"specialty": "biology_food",
-			"cost_parts": [0, 2, 3, 4],
-			"stages": ["One layer of grow beds", "Two-layer rack with LED bars", "Three-layer rack with drip lines", "Four-layer vertical farm with full LED canopy"],
+			"levels": 5,
+			"stages": ["One layer of grow beds: fresh salad", "Two-layer rack, urine processor and a compost bin", "Three-layer staple farm and a brine processor (98 % water back)", "Four-layer vertical farm, water from clay and ice", "Closed loop: aeroponics, insects eat the scraps"],
 			"effects": {
-				"grow_layers": [1, 2, 3, 4],
-				"yield_factor": [1.0, 1.9, 2.8, 3.6]
-			}
+				"grow_layers": [1, 2, 3, 4, 4],
+				"yield_factor": [1.0, 1.9, 2.8, 3.6, 3.9],
+				"calorie_share": [0.0, 0.05, 0.35, 1.0, 1.0],
+				"water_recovery": [0.93, 0.95, 0.98, 0.98, 0.98],
+				"urine_processor": [false, true, true, true, true],
+				"brine_processor": [false, false, true, true, true],
+				"laundry_reuse": [false, false, true, true, true],
+				"water_from_ore": [false, false, false, true, true],
+				"compost": [false, true, true, true, true],
+				"compost_feeds_farm": [false, false, true, true, true],
+				"food_storage_factor": [1.0, 1.6, 2.08, 2.39, 2.58],
+				"grow_power_factor": [1.0, 1.0, 1.0, 1.0, 0.8],
+				"closed_loop": [false, false, false, false, true]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"regolith": 1, "magnetite": 1}}, {"parts": 3, "ores": {"clay": 2, "gypsum": 1}}, {"parts": 4, "ores": {"clay": 2, "ice": 1}}, {"parts": 5, "ores": {"sulfate": 2, "silica": 1}}],
+			"upkeep_kw": [0.0, 1.5, 4.0, 8.0, 6.5],
+			"requires": {"5": {"lab": 5}},
+			"effect_notes": {"water_recovery": "share of used water the colony gets back (ISS reached 98 % with its brine processor, plan source 55).", "upkeep_kw": "grow lights: food is power-gated (plan §4.1)."}
 		},
 		{
 			"id": "garden",
-			"name": "Garden dome planting",
+			"name": "Garden dome",
+			"section": "biology",
+			"helps": ["food", "air"],
 			"zone": "Garden dome",
 			"station_kinds": ["upgrade_console"],
 			"station_ids": ["upgrade_garden"],
 			"specialty": "biology_food",
-			"cost_parts": [0, 2, 3, 4],
+			"levels": 4,
 			"stages": ["Bare planters", "Ground cover and herbs", "Shrubs and a raised bed ring", "Dwarf fruit trees and a full canopy"],
 			"effects": {
 				"plant_o2_kg_per_hour": [0.0, 0.01, 0.02, 0.035],
 				"meals_per_sol": [0.0, 0.5, 1.0, 2.0]
 			},
+			"costs": [{}, {"parts": 2, "ores": {"regolith": 2}}, {"parts": 3, "ores": {"clay": 1, "olivine": 1}}, {"parts": 4, "ores": {"carbonate": 1, "clay": 1}}],
+			"upkeep_kw": [0.0, 0.5, 1.0, 1.5],
 			"source_ids": {"plant_o2_kg_per_hour": ["S20"]},
 			"effect_notes": {"plant_o2_kg_per_hour": "NASA-derived (S20 BVAD Rev2 Table 4-91: lettuce gives 7.78 g O2 per m2 per day, a sol average). Planted area is balance: V2 31 m2, V3 62 m2, V4 108 m2 of leafy plants, so 31 x 7.78 / 24 = 0.010, 62 x 7.78 / 24 = 0.020, 108 x 7.78 / 24 = 0.035 kg O2 per game hour. One crew member breathes 0.0373 kg/h (S20 Table 3-31), so the full garden covers about one crew member in four. Plants also take up 1.375 kg CO2 per kg O2 (physics, agrees with Table 4-91)."}
 		},
 		{
-			"id": "energy",
-			"name": "Power room and solar field",
-			"zone": "Power Room",
-			"station_kinds": ["power"],
-			"specialty": "electrical_comms",
-			"cost_parts": [0, 2, 3, 4],
-			"stages": ["Today's battery rows", "New battery rack and a bigger inverter", "Third rack, cable trays and solar wings", "Battery wall, coolant loop and wide solar wings"],
-			"effects": {
-				"solar_factor": [1.0, 1.25, 1.5, 1.8],
-				"battery_capacity_factor": [1.0, 1.25, 1.5, 2.0]
-			},
-			"effect_notes": {"battery_capacity_factor": "balance (2026-11-14 energy worker): 700, 875, 1,050 and 1,400 kWh. Was 1.0/1.5/2.0/3.0; lowered so night still matters at V2 and V3 (a wasteful night uses about 340 kWh).", "solar_factor": "balance: bigger solar wings, multiplies every tracker's daytime output. At night solar is 0 kW at every level."}
-		},
-		{
 			"id": "life_support",
-			"name": "Life support plant",
+			"name": "Life support (air)",
+			"section": "biology",
+			"helps": ["air"],
 			"zone": "Life Support",
 			"station_kinds": ["lifesupport"],
 			"specialty": "medical_life_support",
-			"cost_parts": [0, 2, 3, 4],
-			"stages": ["Today's air plant", "Second scrubber bed and an O2 buffer tank", "Twin water splitters in a water loop", "Backup plant: three tanks, filter bank and labelled pipes"],
+			"levels": 5,
+			"stages": ["Today's air plant: tanks, CO₂ scrubber, water splitter", "Second scrubber bed and an O₂ buffer tank", "Twin water splitters and a Sabatier reactor: oxygen back from CO₂", "Backup plant that makes oxygen from Mars air", "Nearly closed loop: most oxygen comes back"],
 			"effects": {
-				"scrubber_factor": [1.0, 1.25, 1.5, 2.0],
-				"o2_production_factor": [1.0, 1.25, 1.5, 2.0],
-				"recycler_factor": [1.0, 1.1, 1.2, 1.35]
-			}
+				"scrubber_factor": [1.0, 1.25, 1.5, 2.0, 2.2],
+				"o2_production_factor": [1.0, 1.25, 1.5, 2.0, 2.2],
+				"recycler_factor": [1.0, 1.1, 1.2, 1.35, 1.45],
+				"sabatier": [false, false, true, true, true],
+				"o2_from_mars_air": [false, false, false, true, true],
+				"o2_recovery": [0.0, 0.0, 0.5, 0.6, 0.85]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"magnetite": 1}}, {"parts": 3, "ores": {"hematite": 2}}, {"parts": 4, "ores": {"hematite": 1, "carbonate": 1, "ice": 1}}, {"parts": 5, "ores": {"silica": 2, "sulfur": 1}}],
+			"upkeep_kw": [0.0, 0.4, 1.0, 2.0, 2.5],
+			"requires": {"5": {"lab": 5}},
+			"effect_notes": {"o2_recovery": "share of breathed oxygen won back from CO2 (Sabatier ~50 %, plan §4.3).", "o2_from_mars_air": "a scaled-up MOXIE (plan source 57)."}
 		},
 		{
 			"id": "health",
-			"name": "Med bay",
+			"name": "Medical care",
+			"section": "health",
+			"helps": ["health"],
 			"zone": "Med Bay",
 			"station_kinds": ["heal"],
 			"specialty": "medical_life_support",
-			"cost_parts": [0, 2, 3, 4],
-			"stages": ["Today's med bay", "Vitals monitors and an IV stand", "Second bed with a body scanner arch", "Surgical light and a full treatment corner"],
+			"levels": 4,
+			"stages": ["First aid and dosimeter badges", "Vitals monitors, ultrasound and an IV stand", "Second bed with a body scanner arch, small lab", "Surgical light, imaging and a long-life pharmacy"],
 			"effects": {
 				"heal_rate_factor": [1.0, 1.5, 2.0, 3.0],
-				"recovery_health_bonus": [0, 10, 20, 30]
-			}
+				"recovery_health_bonus": [0, 10, 20, 30],
+				"isolation_hours_factor": [1.0, 0.8, 0.6, 0.45],
+				"isolation_indoor_work": [false, false, true, true],
+				"radiation_care": [false, false, false, true]
+			},
+			"costs": [{}, {"parts": 2, "ores": {}}, {"parts": 3, "ores": {"olivine": 1, "gypsum": 1}}, {"parts": 4, "ores": {"silica": 1, "sulfate": 1}}],
+			"upkeep_kw": [0.0, 0.2, 0.5, 0.8],
+			"effect_notes": {"isolation_hours_factor": "multiplies how long a crewmate at the radiation limit stays in the isolation bed (plan §5.2).", "radiation_care": "researched, not proven (plan §5.1)."}
 		},
 		{
-			"id": "command",
-			"name": "Command room",
-			"zone": "Command Room",
-			"station_kinds": ["computer", "comms"],
-			"specialty": "",
-			"cost_parts": [0, 2, 3, 4],
-			"stages": ["Today's consoles", "Colony map on the wall", "Relay rack and a second row of screens", "Screen wall, holo table and a roof dish"],
+			"id": "protection",
+			"name": "Protection: shields, suits and airlocks",
+			"section": "health",
+			"helps": ["radiation"],
+			"zone": "Whole base",
+			"station_kinds": ["suits"],
+			"specialty": "medical_life_support",
+			"levels": 5,
+			"stages": ["Bare hab: 4 h suit oxygen, basic airlock", "Storm shelter lined with water tanks; 6 h suits", "Dirt bags on the roofs; dust-proof seals, faster airlock", "3D-printed dirt shell; 8 h suits and a storm vest", "Water and ice walls, buried; suitports"],
 			"effects": {
-				"drone_range_m": [150.0, 300.0, 600.0, 1200.0]
-			}
+				"radiation_indoor_factor": [1.0, 1.0, 0.92, 0.42, 0.15],
+				"storm_shelter": [false, true, true, true, true],
+				"storm_shelter_factor": [1.0, 0.25, 0.1, 0.02, 0.02],
+				"suit_o2_hours": [4, 6, 6, 8, 8],
+				"suitports": [false, false, false, false, true],
+				"dust_seals": [false, false, true, true, true],
+				"airlock_cycle_factor": [1.0, 1.0, 0.7, 0.7, 0.5]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"regolith": 1, "magnetite": 1}}, {"parts": 3, "ores": {"regolith": 4}}, {"parts": 4, "ores": {"regolith": 4, "hematite": 2}}, {"parts": 5, "ores": {"ice": 3, "gypsum": 1}}],
+			"upkeep_kw": [0.0, 0.1, 0.1, 0.3, 0.5],
+			"requires": {"5": {"lab": 5}},
+			"effect_notes": {"radiation_indoor_factor": "share of the ~0.67 mSv/sol surface dose (Curiosity RAD, plan source 43) that still reaches the crew indoors. A thin dirt layer helps very little (plan source 47).", "storm_shelter_factor": "share of a solar storm's dose that reaches crew in the shelter."}
+		},
+		{
+			"id": "lab",
+			"name": "Lab and materials",
+			"section": "science",
+			"helps": ["parts"],
+			"zone": "Hangar",
+			"station_kinds": ["workbench", "lab"],
+			"specialty": "field_engineering_geology",
+			"levels": 5,
+			"stages": ["Workbench: tell ores apart", "Laser spectrometer: see what is in a rock", "X-ray mineral analyser: find the exact minerals", "Materials lab: turns ore into spare parts, glass and bricks", "Research station: faster science, opens the last level of other paths"],
+			"effects": {
+				"identify": [true, true, true, true, true],
+				"assay": [false, true, true, true, true],
+				"xrd": [false, false, true, true, true],
+				"materials": [false, false, false, true, true],
+				"research": [false, false, false, false, true],
+				"parts_per_sol_from_ore": [0, 0, 0, 2, 3],
+				"science_factor": [1.0, 1.6, 2.08, 2.39, 2.58]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"regolith": 1}}, {"parts": 3, "ores": {"olivine": 1, "hematite": 1}}, {"parts": 4, "ores": {"hematite": 2, "clay": 1}}, {"parts": 5, "ores": {"silica": 1, "carbonate": 1, "sulfate": 1}}],
+			"upkeep_kw": [0.0, 0.2, 0.5, 1.5, 2.0],
+			"effect_notes": {"parts_per_sol_from_ore": "spare parts the materials lab can make each sol from ore in stock (the ores system spends the ore)."}
 		},
 		{
 			"id": "scout_drone",
 			"name": "Scout drone",
+			"section": "science",
+			"helps": ["ores"],
 			"zone": "Exterior",
 			"station_kinds": ["drone_pad"],
 			"specialty": "",
-			"cost_parts": [0, 2, 3, 4],
-			"stages": ["Manual-control drone", "Bigger battery and longer rotors", "Programmable autopilot and survey camera", "Long-range autopilot with routes, lights and sensor pod"],
+			"levels": 4,
+			"stages": ["Manual drone: you fly it yourself", "Semi-autonomous: pre-scouts an area and reports its minerals", "Smart search: \"find iron\" goes to known spots", "Full scan: ground radar scans anywhere"],
 			"effects": {
-				"speed_mps": [5.0, 7.0, 9.0, 12.0],
-				"flight_seconds": [90.0, 150.0, 240.0, 360.0],
-				"survey_radius_m": [20.0, 30.0, 45.0, 60.0],
-				"autopilot": [0, 0, 1, 1],
-				"max_waypoints": [0, 0, 1, 4]
-			}
+				"speed_mps": [3.0, 4.5, 5.5, 6.0],
+				"vertical_mps": [1.5, 2.5, 3.2, 3.6],
+				"flight_seconds": [50.0, 80.0, 95.0, 105.0],
+				"flights_per_sol": [1, 2, 3, 4],
+				"ability": ["manual", "prescout", "find_known", "scan_anywhere"],
+				"survey_radius_m": [20.0, 30.0, 45.0, 60.0]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"magnetite": 1}}, {"parts": 3, "ores": {"hematite": 1, "olivine": 1}}, {"parts": 4, "ores": {"silica": 1, "iron_meteorite": 1}}],
+			"upkeep_kw": [0.0, 0.05, 0.1, 0.15],
+			"effect_notes": {"flight_seconds": "game scale for a ~560 x 530 m map (plan §6.2); Ingenuity flew 90-169 s."}
 		},
 		{
 			"id": "rover",
 			"name": "Crew rover",
+			"section": "science",
+			"helps": ["ores"],
 			"zone": "Hangar bay",
 			"station_kinds": ["garage"],
+			"specialty": "field_engineering_geology",
+			"levels": 5,
+			"stages": ["Open rover: suit oxygen is the limit", "Bigger battery packs: reach the middle ring", "Sealed cabin with a suitport: also a storm shelter", "Fuel-cell range extender: reach the far ring", "Nuclear power cart and a sample arm with a laser"],
+			"effects": {
+				"pressurized_cabin": [false, false, true, true, true],
+				"suitport": [false, false, true, true, true],
+				"fuel_cell": [false, false, false, true, true],
+				"rtg": [false, false, false, false, true],
+				"sample_arm": [false, false, false, false, true]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"magnetite": 1, "regolith": 1}}, {"parts": 3, "ores": {"hematite": 2, "olivine": 1}}, {"parts": 4, "ores": {"hematite": 1, "ice": 1, "carbonate": 1}}, {"parts": 5, "ores": {"silica": 1, "iron_meteorite": 1, "sulfur": 1}}],
+			"upkeep_kw": [0.0, 0.1, 0.3, 0.4, 0.4],
+			"effect_notes": {"_": "The rover's driving numbers per level live in scripts/core/rover_balance.gd (cabin_level 3, fuel_cell_level 4, rtg_level 5, sample_arm_level 5); these flags only say the same in words. Bought like every other track since 2026-11-15 (was: followed the garage modules). The garage modules still upgrade as before; the look (scripts/upgrades/stages/rover_stages.gd) shows both."}
+		},
+		{
+			"id": "ore_survey",
+			"name": "Ore survey",
+			"section": "science",
+			"helps": ["ores"],
+			"zone": "Whole map",
+			"station_kinds": [],
 			"specialty": "",
-			"follows": "rover_modules",
-			"cost_parts": [0, 0, 0, 0],
-			"stages": ["Stock rover", "First upgrades show: battery packs, hub motors, axle covers, cargo rack, chunky tyres", "Many upgrades: roof light bar and antenna mast", "Most modules high: dust guards and a full roll cage"],
-			"effects": {}
+			"levels": 4,
+			"stages": ["Ores near the base", "Middle ring ores show on the map", "Far ring ores show on the map", "Every ore, with the mission that found it"],
+			"effects": {
+				"survey_rings": [1, 2, 3, 3],
+				"map_overlay": [false, true, true, true],
+				"ore_facts": [false, false, false, true]
+			},
+			"costs": [{}, {"parts": 1, "ores": {"regolith": 1}}, {"parts": 2, "ores": {"hematite": 1, "gypsum": 1}}, {"parts": 3, "ores": {"silica": 1}}],
+			"upkeep_kw": [0.0, 0.0, 0.05, 0.1]
+		},
+		{
+			"id": "command",
+			"name": "Comms",
+			"section": "communication",
+			"helps": ["comms"],
+			"zone": "Command Room",
+			"station_kinds": ["computer", "comms"],
+			"specialty": "electrical_comms",
+			"levels": 5,
+			"stages": ["Fixed radio: talk to people near you; the suit radio does not send", "Map wall and suit radio near the Command Room (30 s delay outside)", "Relay rack: suit radio across the base (10 s delay outside)", "Screen wall and roof mast: 2 s delay, clear words", "Big roof dish: instant, clear radio across the whole map"],
+			"effects": {
+				"suit_radio_delay_s": [-1.0, 30.0, 10.0, 2.0, 0.0],
+				"suit_radio_garble": [1.0, 0.6, 0.3, 0.05, 0.0],
+				"suit_radio_area_m": [0.0, 20.0, 1000.0, 1000.0, 1000.0],
+				"storm_warning_factor": [1.0, 1.5, 2.0, 2.5, 3.0],
+				"drone_range_m": [150.0, 200.0, 260.0, 300.0, 320.0],
+				"earth_link_factor": [1.0, 1.6, 2.08, 2.39, 2.58]
+			},
+			"costs": [{}, {"parts": 2, "ores": {"magnetite": 1}}, {"parts": 3, "ores": {"hematite": 2}}, {"parts": 4, "ores": {"hematite": 1, "silica": 1}}, {"parts": 5, "ores": {"silica": 2, "iron_meteorite": 1}}],
+			"upkeep_kw": [0.0, 0.2, 0.4, 0.8, 1.2],
+			"requires": {"5": {"lab": 5}},
+			"effect_notes": {"suit_radio_delay_s": "-1 = the suit radio does not send outside (after the tutorial's T01 fix only). The real suit-to-suit delay on Mars is near zero; the game's delay stands for a weak signal through a busy relay (plan §7.1).", "storm_warning_factor": "multiplies the warning time before dust storms and solar storms."}
 		}
 	]
 }

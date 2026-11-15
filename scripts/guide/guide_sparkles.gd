@@ -15,7 +15,9 @@ extends Node3D
 ##   - the repairs: the nearest still-broken part this player's crew member can fix (a general job or their own
 ##     specialty); when none is left for them, the Med Bay crew hub, where C changes crew member.
 ## After that week or once the tutorial is done it is off.
-## By hand (the coming H key): show_line_to(target) follows the player to a target, show_line(a, b) draws a fixed line
+## By hand (the H key, scripts/guide/help_key.gd): show_line_to(target, seated_ok) follows the player to a target (with
+## seated_ok also from the rover seat: a walk path, or off the walk grid a short straight run toward the target),
+## show_line(a, b) draws a fixed line
 ## from a to b, clear() ends either (the tutorial guidance then comes back if it applies). Find the node with
 ## get_tree().get_first_node_in_group(&"guide_sparkles").
 ## Cheap: one GPUParticles3D, one emission point every SPACING m (wider on long lines), MAX_SPARKLES at most (half on
@@ -53,6 +55,11 @@ const LOOK_S := 0.5
 const CHOOSE_S := 4.0
 ## Repairs compared by walking distance (the nearest ones in a straight line).
 const CHOOSE_BY_WALK := 3
+## H key in the rover (show_line_to(at, true)): off the walk grid the line is a straight run toward the target, starting
+## this far ahead of the seat (clear of the rover's body) and at most this long, metres. While seated the line is
+## re-pathed on the REPATH_S clock only (a driven rover moves REPATH_MOVE_M in a fraction of a second).
+const STRAIGHT_SKIP_M := 2.5
+const STRAIGHT_MAX_M := 30.0
 
 enum Mode { AUTO, FOLLOW, FIXED }
 
@@ -64,6 +71,8 @@ var particles: GPUParticles3D
 var _process_mat: ParticleProcessMaterial
 
 var mode := Mode.AUTO
+## True when the line asked for by hand also shows while seated (the H key in the rover, scripts/guide/help_key.gd).
+var allow_seated := false
 var _manual_target := Vector3.ZERO
 var _fixed_from := Vector3.ZERO
 
@@ -114,9 +123,11 @@ func _ready() -> void:
 
 # ---------------------------------------------------------------- public (the H key later)
 
-## A line from the player to `at`, following them, until clear().
-func show_line_to(at: Vector3) -> void:
+## A line from the player to `at`, following them, until clear(). seated_ok: it also shows while seated (the rover),
+## from the seat (the H key).
+func show_line_to(at: Vector3, seated_ok := false) -> void:
 	mode = Mode.FOLLOW
+	allow_seated = seated_ok
 	_manual_target = at
 	_has_line = false
 
@@ -124,6 +135,7 @@ func show_line_to(at: Vector3) -> void:
 ## A fixed line from `from` to `to` (it does not follow the player), until clear().
 func show_line(from: Vector3, to: Vector3) -> void:
 	mode = Mode.FIXED
+	allow_seated = false
 	_fixed_from = from
 	_manual_target = to
 	_has_line = false
@@ -136,6 +148,7 @@ func show_line(from: Vector3, to: Vector3) -> void:
 ## Ends a line asked for by hand; the first-week tutorial guidance comes back when it applies.
 func clear() -> void:
 	mode = Mode.AUTO
+	allow_seated = false
 	_has_line = false
 	_look_left = 0.0
 	_set_on(false)
@@ -178,13 +191,14 @@ func step(delta: float) -> void:
 		return
 	var moved := from.distance_to(_line_from) if _has_line else INF
 	var retarget := not _has_line or target.distance_to(_line_to) > RETARGET_M
-	if retarget or moved > REPATH_MOVE_M or (_since_path >= REPATH_S and moved > REPATH_MIN_MOVE_M):
+	var seated := _seated_line()
+	if retarget or (moved > REPATH_MOVE_M and not seated) or (_since_path >= REPATH_S and moved > REPATH_MIN_MOVE_M):
 		# A failed path is tried again only after the player moved (or the target did), not every frame.
 		_since_path = 0.0
 		_line_from = from
 		_line_to = target
 		_has_line = true
-		_set_on(_draw_path(from, target))
+		_set_on(_draw_path(from, target) or (seated and _draw_straight(from, target)))
 
 
 ## {"at": Vector3, "why": String} the line should point at now, or {}. The tutorial state is looked at every LOOK_S.
@@ -292,7 +306,7 @@ func _player_position() -> Vector3:
 ## True while the line must not show: a mini-game panel is open, the player is seated (rover) or flies the drone.
 func _blocked() -> bool:
 	var p := _player()
-	if p != null and p.is_seated():
+	if p != null and p.is_seated() and not _seated_line():
 		return true
 	if is_inside_tree():
 		var drone := get_tree().get_first_node_in_group(&"drone_presenter")
@@ -304,6 +318,14 @@ func _blocked() -> bool:
 		if top != null and bool(top.get_meta(&"station_surface", false)):
 			return true
 	return false
+
+
+## True while a line asked for by hand with seated_ok is shown from a seat (the H key in the rover).
+func _seated_line() -> bool:
+	if not allow_seated or mode != Mode.FOLLOW:
+		return false
+	var p := _player()
+	return p != null and p.is_seated()
 
 
 # ---------------------------------------------------------------- the sparkle line
@@ -367,6 +389,21 @@ func _draw_path(from: Vector3, to: Vector3) -> bool:
 		point_count = 0
 		return false
 	return _set_points(TapeTrails.rounded(pts))
+
+
+## Off the walk grid while seated (the rover out on the open ground): a straight run at seat height toward `to`, from
+## STRAIGHT_SKIP_M ahead, at most STRAIGHT_MAX_M long. It shows the way to head, not a path.
+func _draw_straight(from: Vector3, to: Vector3) -> bool:
+	var flat := Vector3(to.x - from.x, 0.0, to.z - from.z)
+	var d := flat.length()
+	if d < STRAIGHT_SKIP_M + SKIP_START_M + MIN_LINE_M:
+		point_count = 0
+		return false
+	var dir := flat / d
+	var a := from + dir * STRAIGHT_SKIP_M
+	var b := from + dir * minf(d, STRAIGHT_SKIP_M + STRAIGHT_MAX_M)
+	b.y = a.y
+	return _set_points(PackedVector3Array([a, b]))
 
 
 ## One emission point every SPACING m along the line from SKIP_START_M on (a little scatter, from a fixed seed), each

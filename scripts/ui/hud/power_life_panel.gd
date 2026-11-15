@@ -61,7 +61,7 @@ func setup(p_services: GameServices) -> void:
 	_numbers_button.name = "Numbers"
 	_numbers_button.text = "123"
 	_numbers_button.toggle_mode = true
-	_numbers_button.tooltip_text = "Show the numbers (%s)" % _key(&"hud_details", "H")
+	_numbers_button.tooltip_text = "Show the numbers (%s)" % _key(&"hud_details", "U")
 	_numbers_button.accessibility_name = "Show the numbers"
 	_numbers_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_numbers_button.toggled.connect(show_numbers)

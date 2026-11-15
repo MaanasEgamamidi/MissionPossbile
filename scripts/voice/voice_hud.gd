@@ -6,6 +6,9 @@ extends PanelContainer
 ## "✖ No microphone — you can still listen", or the hint for holding V. Then, for a few seconds, what changed when you
 ## went outside or came in. Then who you hear ("♪ Ana — nearby", "♪ Ben — by radio, said 15 s ago"), radio messages
 ## still in the radio ("… heard in 12 s") and anyone talking whom you cannot hear (no radio link).
+## Suit radio (2026-11-15, suit_radio.gd): while talking over it, "📡 Radio: delay 30 s (crackly, words drop out)" or
+## "✖ No signal: the suit radio needs a comms upgrade" (once per press, held a few seconds); a listener sees
+## "📡 Incoming (delayed) from Ana: heard in 12 s", then "📡 Ana — suit radio, said 30 s ago (crackly …)".
 ## VoiceService adds it under GameHud, so it hides with the HUD while a panel is open.
 
 ## Distance from the screen edges, pixels (the HUD's own margin).

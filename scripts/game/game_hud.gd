@@ -65,6 +65,11 @@ const BrokenParts := preload("res://scripts/tasks/broken_part_presenter.gd")
 const TutorialLock := preload("res://scripts/session/tutorial_lock.gd")
 ## UI overhaul (2026-11-15): pictograms, level bars and self-sizing labels.
 const HudKit := preload("res://scripts/ui/hud/hud_kit.gd")
+## Upgrade paths plan phase 1 (2026-11-15).
+const ScheduleGate := preload("res://scripts/schedule/schedule_gate.gd")
+const OreCatalog := preload("res://scripts/science/ore_catalog.gd")
+const DoseBadgeScript := preload("res://scripts/ui/hud/dose_badge.gd")
+const ScheduleChipScript := preload("res://scripts/ui/hud/schedule_chip.gd")
 
 var services: GameServices
 ## The death notice card (scripts/ui/hud/death_notice.gd).
@@ -631,6 +636,10 @@ func _build_colony_corner(top: HBoxContainer) -> void:
 	_hazard = HudKit.Txt.new("", 22.0, AstraStyle.WARN, "Countdown", true)
 	_hazard_row.add_child(_hazard)
 	_hazard_row.visible = false
+	# The crew's day (2026-11-15): the current block under the clock.
+	var schedule_chip: Control = ScheduleChipScript.new()
+	schedule_chip.call(&"setup", services)
+	left_box.add_child(schedule_chip)
 	var chips := HBoxContainer.new()
 	chips.name = "Readings"
 	chips.add_theme_constant_override(&"separation", 6)
@@ -690,6 +699,10 @@ func _build_crew_corner(top: HBoxContainer) -> void:
 	_health = _vital_row(_crew_box, "Health", &"heart", AstraStyle.GOOD)
 	_stamina = _vital_row(_crew_box, "BodyEnergy", &"run", AstraStyle.ACCENT)
 	_suit = _vital_row(_crew_box, "SuitTank", &"helmet", AstraStyle.C_O2)
+	# Radiation dose (2026-11-15): mSv toward the 600 mSv limit, under the vitals.
+	var dose_badge: Control = DoseBadgeScript.new()
+	dose_badge.set(&"services", services)
+	_crew_box.add_child(dose_badge)
 	_held_row = HBoxContainer.new()
 	_held_row.name = "Held"
 	_held_row.add_theme_constant_override(&"separation", 8)
@@ -943,7 +956,9 @@ func _update_cue() -> void:
 	var kind := String(_target.get("kind", ""))
 	var text := ""
 	var body := ""
-	if kind == "station" and services != null and services.has_game():
+	if kind == "station" and services != null and services.has_game() and OreCatalog.is_deposit(String(_target.get("id", ""))):
+		body = OreCatalog.cue_text(services.state(), String(_target.get("id", "")))
+	elif kind == "station" and services != null and services.has_game():
 		var rec: Dictionary = services.state().stations.get(String(_target.get("id", "")), {})
 		var station_kind := String(rec.get("kind", ""))
 		if station_kind == "suits":
@@ -960,7 +975,7 @@ func _update_cue() -> void:
 		else:
 			var nm := String(STATION_NAMES.get(station_kind, "station"))
 			body = "Use" if nm == "" else "Use %s" % nm
-		if not TutorialLock.station_usable(services.state(), rec):
+		if not TutorialLock.station_usable(services.state(), rec) or not ScheduleGate.station_usable(services.state(), rec, services.local_character()):
 			body = ""
 	elif kind == "ladder":
 		body = "Hold ladder; W/S climb, E or Space release"

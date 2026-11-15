@@ -13,6 +13,10 @@ extends RefCounted
 ##     a chain of doors), along speaker -> door -> listener, at half the level, scaled by how far the door is open; a
 ##     closed door (or no door between the zones) means silence. The gain is re-read every frame while the utterance
 ##     plays (people move), but the route itself does not change mid-utterance.
+## 2026-11-15: VoiceService now decides routes with scripts/voice/suit_radio.gd (SuitRadio.decide), which keeps the
+## proximity rule below exactly and replaces the radio half: the suit radio follows the Communication level (no signal
+## / delay and garble away from the Command Room / instant and clear). decide() and the text helpers here stay for the
+## older tests and callers.
 ## Zones are ColonyZones zones (rooms, the dome plaza, the garden dome, the exterior). Door portals come from the
 ## colony manifest (24 room doors) plus any other DoorController the game builds (airlock doors).
 

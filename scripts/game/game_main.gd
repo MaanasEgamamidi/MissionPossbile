@@ -8,6 +8,9 @@ const MANIFEST_PATH := "res://data/colony_manifest.json"
 const COLLIDERS_PATH := "res://data/colliders.json"
 const TERRAIN_HEIGHT_PATH := "res://data/terrain_height.res"
 const INPUT_PATH := "user://input.json"
+## Upgrade paths plan phase 1 (2026-11-15).
+const OreCatalog := preload("res://scripts/science/ore_catalog.gd")
+const ScheduleGate := preload("res://scripts/schedule/schedule_gate.gd")
 
 ## Tests switch this off to run without the 300 MB map.
 @export var load_world := true
@@ -144,6 +147,12 @@ func _ready() -> void:
 			_on_menu_join(target.get_slice(":", 0), int(target.get_slice(":", 1)) if target.contains(":") else NetSession.DEFAULT_PORT)
 			return
 
+	# COLONY OVER, "Load last save": the scene was reloaded to continue the saved colony straight away.
+	if continue_after_reload:
+		continue_after_reload = false
+		_start_or_continue()
+		_begin_play()
+		return
 	if show_menu:
 		_open_main_menu()
 	else:
@@ -234,7 +243,8 @@ func _begin_play() -> void:
 	area_stages = AreaStages.attach_all(self, world, services, self)
 	# 2026-11-14: broken parts: broken models, the fix sparkle, T12 door leaves, T11 hangar dust (loaded by path).
 	load("res://scripts/tasks/broken_part_presenter.gd").call(&"attach", self, world, services, self)
-	load("res://scripts/world/dome_plants_presenter.gd").call(&"attach", self, world, services, self)   # 2026-11-15: Garden dome plants look a bit dead until T08 (dome glass) is fixed
+	load("res://scripts/world/dome_plants_presenter.gd").call(&"attach", self, world, services, self)
+	load("res://scripts/science/ore_presenter.gd").call(&"attach", self, world, services, self)   # 2026-11-15: ore deposits in rings around the base   # 2026-11-15: Garden dome plants look a bit dead until T08 (dome glass) is fixed
 	load("res://scripts/cinematics/cinematics_presenter.gd").call(&"attach", self, world, services, self)   # 2026-11-14: new-game intro + "base operational" tour
 	if check_weather_updates and DisplayServer.get_name() != "headless":
 		var refresh := WeatherRefresh.new()
@@ -269,6 +279,21 @@ func _open_main_menu() -> void:
 
 ## A message for the next main menu, kept across the scene reload (for example "the host closed the colony").
 static var menu_notice := ""
+## Set by the COLONY OVER screen's "Load last save": the reloaded scene continues the save instead of opening the menu.
+static var continue_after_reload := false
+
+
+## COLONY OVER screen: back to the main menu (nothing is saved: the save still holds the colony before it ended).
+func colony_over_main_menu() -> void:
+	if services.net != null:
+		services.net.leave()
+	get_tree().reload_current_scene()
+
+
+## COLONY OVER screen: load the last save (the colony before it ended).
+func colony_over_load_last_save() -> void:
+	continue_after_reload = true
+	colony_over_main_menu()
 
 
 ## Host: open the colony (saved or new), then listen on `port` for up to three other players.
@@ -512,6 +537,9 @@ func _move_crew(delta: float) -> void:
 
 ## Everything the local player asks for goes to the host through here.
 func _submit(action: StringName, target: StringName, params: Dictionary) -> ActionResult:
+	# Ore deposits are aimed at like stations (their own Area3D); E collects ore.
+	if action == &"use_station" and OreCatalog.is_deposit(String(target)):
+		return services.request(&"ore_collect", target)
 	if action == &"use_station":
 		var record: Dictionary = services.state().stations.get(String(target), {})
 		if String(record.get("kind", "")) == "cassette_anchor":
@@ -520,6 +548,10 @@ func _submit(action: StringName, target: StringName, params: Dictionary) -> Acti
 		if not ActionService.TutorialLock.station_usable(services.state(), record):
 			hud.show_message(ActionService.TutorialLock.message_for(services.state(), record), 4.0)
 			return ActionResult.failure("", ActionService.TutorialLock.REASON)
+		# The crew's strict day (2026-11-15): outside its block a station stays closed after the tutorial.
+		if not ScheduleGate.station_usable(services.state(), record, services.local_character()):
+			hud.show_message(ScheduleGate.message_for_station(services.state(), record), 4.0)
+			return ActionResult.failure("", ScheduleGate.REASON)
 		# Opening a station's surface changes nothing; every control on it is its own validated request.
 		var panel := StationPanels.for_station(target, services)
 		if panel != null:
@@ -742,6 +774,11 @@ func _on_character_recovered(character_id: StringName, info: Dictionary) -> void
 	var mine := _local_character()
 	if mine != null and mine.id == character_id and player != null:
 		player.teleport(mine.position + Vector3(0.0, 0.05, 0.0), mine.yaw)
+	# Radiation isolation (2026-11-15) reuses this event to move the crewmate to their Med Bay bed.
+	if bool(info.get("isolation", false)):
+		ui.show_subtitle("%s is sick from radiation and is in isolation in the Med Bay." % services.state().character(character_id).display_name, 8.0, "Mission Control", true)
+		_rebuild_crew()
+		return
 	var text := "%s was brought back to the Med Bay. Cost: %.1f meals and %.1f L of water." % [
 		services.state().character(character_id).display_name, float(info.get("meals", 0.0)), float(info.get("water_l", 0.0))]
 	if String(info.get("cache_id", "")) != "":

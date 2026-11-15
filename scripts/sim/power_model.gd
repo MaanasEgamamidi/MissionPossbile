@@ -89,8 +89,25 @@ static func tracker_kw(state: ColonyState, balance: GameBalance, phase: float, t
 
 
 ## Area level effect energy.solar_factor (1.0 at V1): bigger solar wings at higher levels.
+## Upgrade paths plan (2026-11-15): Day power's solar_factor (cleaner panels, dust shield, trackers, better cells) on top.
 static func solar_level_factor(state: ColonyState) -> float:
-	return maxf(0.0, AreaLevels.effectf(state, "energy", "solar_factor", 1.0))
+	return maxf(0.0, AreaLevels.effectf(state, "energy", "solar_factor", 1.0) * AreaLevels.effectf(state, "day_power", "solar_factor", 1.0))
+
+
+## Power from the non-solar sources of the upgrade paths plan (2026-11-15), kW: Storm power's wind turbines (wind is
+## strongest at night, Hartwick et al. 2023: 1.5x after sunset here) and Night power's fork (fuel cells give night_kw
+## at night; a reactor gives day_kw by day and night_kw at night). 0 with no such upgrades.
+static func other_sources_kw(state: ColonyState, phase: float) -> float:
+	var p := fposmod(phase, 1.0)
+	var night := p <= SUNRISE or p >= SUNSET
+	var wind := maxf(0.0, AreaLevels.effectf(state, "storm_power", "wind_kw", 0.0)) * (1.5 if night else 1.0)
+	var fork := maxf(0.0, AreaLevels.effectf(state, "energy", "night_kw" if night else "day_kw", 0.0))
+	return wind + fork
+
+
+## Everything that makes power now: solar plus the other sources.
+static func generation_kw(state: ColonyState, balance: GameBalance, phase: float, tracking: bool) -> float:
+	return solar_kw(state, balance, phase, tracking) + other_sources_kw(state, phase)
 
 
 ## Battery energy kept for life support (kWh): with the energy_battery_reserve upgrade, room and greenhouse lights may
@@ -128,7 +145,8 @@ static func equipment_kw(state: ColonyState, balance: GameBalance, id: String, p
 
 ## Switched-on load groups with their kW, in SHED_ORDER. Critical room lights count as part of the base load.
 static func demand_groups(state: ColonyState, balance: GameBalance, process_kw: Dictionary) -> Array[Dictionary]:
-	var kw := {"base": balance.base_load_kw}
+	# Upgrade paths plan (2026-11-15): each upgrade level adds a little upkeep to the base load.
+	var kw := {"base": balance.base_load_kw + maxf(0.0, AreaLevels.total_upkeep_kw(state))}
 	for zone: String in state.zones:
 		if not state.is_zone_powered(zone):
 			continue
@@ -141,10 +159,12 @@ static func demand_groups(state: ColonyState, balance: GameBalance, process_kw: 
 	for id in ColonyState.EQUIPMENT_IDS:
 		if state.is_on(id):
 			kw[id] = equipment_kw(state, balance, id, process_kw)
+	# Use less (LEDs, insulation, heat recovery): every load is scaled down.
+	var load_factor := clampf(AreaLevels.effectf(state, "use_less", "load_factor", 1.0), 0.1, 1.0)
 	var out: Array[Dictionary] = []
 	for id in SHED_ORDER:
 		if kw.has(id):
-			out.append({"id": id, "kw": float(kw[id])})
+			out.append({"id": id, "kw": float(kw[id]) * load_factor})
 	return out
 
 
@@ -158,7 +178,7 @@ static func allocate(state: ColonyState, balance: GameBalance, phase: float, dt:
 	var wanted_kw := demand
 	var battery_max_kw := minf(balance.battery_discharge_kw_max, state.store(&"battery_kwh") / dt)
 	var tracking := trackers_can_track(state, balance)
-	var solar := solar_kw(state, balance, phase, tracking)
+	var solar := generation_kw(state, balance, phase, tracking)
 	var shed: Array[String] = []
 	for g in groups:
 		if demand <= solar + battery_max_kw + 1e-12:
@@ -167,7 +187,7 @@ static func allocate(state: ColonyState, balance: GameBalance, phase: float, dt:
 		demand -= float(g.kw)
 		if g.id == "trackers" and tracking:
 			tracking = false                                   # unpowered trackers stay fixed: less sun on the panels
-			solar = solar_kw(state, balance, phase, false)
+			solar = generation_kw(state, balance, phase, false)
 	# energy_battery_reserve: room and greenhouse lights may only use the sun and the battery above the life-support
 	# reserve; when that is not enough they are shed (in SHED_ORDER), and life support keeps the reserve.
 	var reserve := life_support_reserve_kwh(state)
@@ -308,6 +328,7 @@ static func outlook(state: ColonyState, balance: GameBalance, phase: float) -> D
 	var sun_up := p > SUNRISE and p < SUNSET
 	var tracking := trackers_can_track(state, balance) and not state.shed.has("trackers")
 	var solar := solar_kw(state, balance, p, tracking) if sun_up else 0.0
+	solar += other_sources_kw(state, p)          # wind and the night-power fork (2026-11-15)
 	var process := {"electrolyser": float(state.unit("electrolyser").get("kw", 0.0)), "co2_unit": float(state.unit("co2_unit").get("kw", 0.0))}
 	var load := 0.0
 	var next_shed := ""
