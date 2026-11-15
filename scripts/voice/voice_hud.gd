@@ -3,7 +3,7 @@ extends PanelContainer
 ## The voice corner of the HUD (Prompt 11), bottom right, clear of the colony corner (top left), your crew card (top
 ## right), the messages and hints (bottom centre), the session status (bottom left) and the crosshair (centre).
 ## Line 1: what your voice does — "● Speaking nearby", "● Radio — heard after 15 s", "✖ No radio link outside…",
-## "✖ No microphone — you can still listen", or the hint for holding V. Then, for a few seconds, what changed when you
+## "✖ No microphone — you can still listen", or the hint to press V (voice chat on/off). Then, for a few seconds, what changed when you
 ## went outside or came in. Then who you hear ("♪ Ana — nearby", "♪ Ben — by radio, said 15 s ago"), radio messages
 ## still in the radio ("… heard in 12 s") and anyone talking whom you cannot hear (no radio link).
 ## VoiceService adds it under GameHud, so it hides with the HUD while a panel is open.

@@ -9,8 +9,8 @@ extends Node
 ## catch-up (playing faster or slower with pitch_scale to steer the buffer) is NOT used: pitch_scale stays 1.0, so
 ## speech speed never changes and a radio delay is never shortened.
 ##
-## What leaves this computer: only Opus frames while the talk key (V, action push_to_talk) is held, to the other
-## players of this session. Nothing is recorded or written to disk; buffers live in memory and are cleared on mute,
+## What leaves this computer: only Opus frames while voice chat is toggled on (press V, action push_to_talk, once to
+## turn it on and again to turn it off; it starts off in each colony), to the other players of this session. Nothing is recorded or written to disk; buffers live in memory and are cleared on mute,
 ## on a player's disconnect and when the session ends. Without a microphone (none, blocked, or a headless run) the
 ## game plays on and listening still works. Voice keeps working while the game is paused.
 ## The extension's classes are looked up at run time (ClassDB) and every method is checked first, so a missing or
@@ -20,7 +20,7 @@ const GROUP := &"voice_service"
 ## Opus encoder settings (engineering): 24 kbit/s, complexity 5, tuned for voice.
 const OPUS_BITRATE := 24000
 const OPUS_COMPLEXITY := 5
-## The microphone stays open this long after the talk key is let go, so quick presses do not keep reopening it.
+## The microphone stays open this long after voice chat is turned off, so quick presses do not keep reopening it.
 const MIC_HANG_S := 3.0
 ## An open microphone that gives no samples for this long is reported as "no signal".
 const MIC_SIGNAL_TIMEOUT_S := 3.0
@@ -77,6 +77,8 @@ var _want_input_until := -1.0
 var _meter_requests := 0
 var _level := 0.0
 var _ptt_override := -1
+## Voice chat toggled on with V (off at the start of each colony).
+var _toggle_on := false
 var _synthetic: Array[PackedVector2Array] = []
 var _transmitting := false
 var _stream_id := 0
@@ -308,7 +310,7 @@ func mic_state_text() -> String:
 		return "✖ Your microphone is muted. Others cannot hear you; you can still hear them."
 	match _mic_state:
 		&"ready":
-			return "✓ Microphone ready. Hold V to talk."
+			return "✓ Microphone ready. Press V to turn voice chat on, again to turn it off."
 		&"synthetic":
 			return "✓ Test sound instead of a microphone (synthetic input)."
 		&"headless":
@@ -402,11 +404,34 @@ func _stop_mic() -> void:
 	_mic_active = false
 
 
+## True while voice chat is toggled on (V pressed once; pressed again turns it off).
+func is_voice_on() -> bool:
+	return _toggle_on
+
+
+func set_voice_on(on: bool) -> void:
+	_toggle_on = on
+	if not on:
+		_stop_transmit()
+
+
+func _input(event: InputEvent) -> void:
+	if not InputMap.has_action(&"push_to_talk") or not event.is_action_pressed(&"push_to_talk", false):
+		return
+	if not _key_free():
+		return
+	set_voice_on(not _toggle_on)
+	get_viewport().set_input_as_handled()
+
+
 func _ptt_held() -> bool:
 	if _ptt_override >= 0:
 		return _ptt_override == 1
-	if not InputMap.has_action(&"push_to_talk") or not Input.is_action_pressed(&"push_to_talk"):
-		return false
+	return _toggle_on
+
+
+## False while the keyboard belongs to something else (typing, or the settings panel waiting for a new key).
+func _key_free() -> bool:
 	# typing in a text field or changing a key binding is not talking
 	var vp := get_viewport()
 	var focus := vp.gui_get_focus_owner() if vp != null else null
@@ -806,6 +831,7 @@ func _on_peer_disconnected(peer: int) -> void:
 
 ## Clears every buffer and player (leaving the session or closing the game).
 func _end_session(reason: String) -> void:
+	_toggle_on = false
 	_stop_transmit()
 	scheduler.clear_all(reason)
 	scheduler.pop_due(_now())       # the end events of what was cleared; the players stop below

@@ -2,7 +2,7 @@ class_name VoiceSettingsPanel
 extends UiPanel
 ## Voice and microphone settings (Prompt 11), opened from Settings > Controls > "Voice and microphone…".
 ## Microphone state in words, the input device list, an input level meter (the microphone opens while this panel is
-## open, nothing is sent unless you hold V), mute my microphone, the volume of everyone's voices, and for each other
+## open, nothing is sent unless voice chat is on: press V), mute my microphone, the volume of everyone's voices, and for each other
 ## player a volume slider and a mute switch (for this session). Then how voice works: nearby inside, radio outside,
 ## the radio's stage and why it is slow. The microphone, mute and volume are saved with the other settings; per-player
 ## volume and mute last for the session only (there are no player accounts).
@@ -210,7 +210,7 @@ func _build() -> void:
 			v.set_input_device(value)
 		refresh())
 	body.add_child(_device)
-	_meter_label = _label(body, "Input level: speak to see the bar move. Nothing is sent to anyone unless you hold V.")
+	_meter_label = _label(body, "Input level: speak to see the bar move. Nothing is sent to anyone unless voice chat is on (press V to toggle it).")
 	_meter_label.theme_type_variation = UiTheme.MUTED
 	_meter = ProgressBar.new()
 	_meter.name = "Meter"
@@ -254,7 +254,7 @@ func _build() -> void:
 
 	var how := _label(body, "How voice works")
 	how.theme_type_variation = UiTheme.HEADING
-	_label(body, "Hold V to talk. Inside the base, people near you hear you at once: clearly up to 5 m, fading out by 25 m. "
+	_label(body, "Press V to turn voice chat on, and again to turn it off. Inside the base, people near you hear you at once: clearly up to 5 m, fading out by 25 m. "
 		+ "Walls stop your voice; an open door lets some of it through.")
 	_label(body, "If you or the listener is outside, your voice goes over the colony radio instead, to everyone on the map, "
 		+ "inside too. Outside there is almost no air to carry sound, so suits use the radio.")
@@ -262,7 +262,7 @@ func _build() -> void:
 	_stage_label.theme_type_variation = UiTheme.HEADING
 	var why := _label(body, CommsStage.explanation())
 	why.theme_type_variation = UiTheme.MUTED
-	var privacy := _label(body, "Your voice only goes to the other players in this colony, and only while you hold V. "
+	var privacy := _label(body, "Your voice only goes to the other players in this colony, and only while voice chat is on (V toggles it). "
 		+ "It is never recorded or saved.")
 	privacy.theme_type_variation = UiTheme.MUTED
 

@@ -216,7 +216,7 @@ static func _clean(g: float) -> float:
 
 # ---------------------------------------------------------------- words for the HUD
 
-## What the local player's own transmission does, in words, while they hold the talk key.
+## What the local player's own transmission does, in words, while voice chat is on (toggled with V).
 ## `crew_outside`: other players outside right now (only matters when the speaker is inside).
 static func speaking_text(me_outside: bool, p_stage: int, crew_outside: int) -> String:
 	if me_outside:
@@ -236,9 +236,9 @@ static func speaking_text(me_outside: bool, p_stage: int, crew_outside: int) -> 
 static func idle_text(me_outside: bool, p_stage: int) -> String:
 	if me_outside:
 		if CommsStage.has_link(p_stage):
-			return "Hold V to talk: you are outside, so the radio carries your voice (heard %s)." % CommsStage.delay_words(p_stage)
+			return "Voice chat is off. Press V to turn it on: you are outside, so the radio carries your voice (heard %s)." % CommsStage.delay_words(p_stage)
 		return "You are outside and the radio is broken: nobody can hear you. Repair it at the comms console."
-	return "Hold V to talk to people near you."
+	return "Voice chat is off. Press V to turn it on and talk to people near you."
 
 
 ## A line about someone the local player hears (or would hear).
