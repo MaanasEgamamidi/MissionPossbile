@@ -4,6 +4,8 @@ extends CanvasLayer
 ##   top-left      a sun or a moon and the sol number; a storm picture with its countdown only while a dust storm is
 ##                 coming or blowing; then one green "Colony OK" chip, or up to three small warning chips (the picture
 ##                 of what is low and a mark: triangle = low, octagon = very low)
+##                 (with the mission HUD's vitals strip there, only the room air: the strip has the supplies and the
+##                 crew corner the suit tank, so nothing is said twice)
 ##   top-right     your crew member: badge, specialist symbol and ONE role word, then three picture bars (heart =
 ##                 health, runner = body energy, helmet = suit air). A percentage shows only on a bar that is low; what
 ##                 you carry shows only while you carry something
@@ -137,6 +139,9 @@ var alert_sink := Callable()
 var message_sink := Callable()
 ## Screen units at the top kept free for the vitals bar; messages then show just under it.
 var top_reserved := 0.0
+## UI overhaul: true while the mission HUD's vitals strip shows the four supplies (electricity, oxygen, water, food).
+## The warning chips here then show only the room air (the suit tank has its bar in the crew corner): nothing twice.
+var supplies_on_strip := false
 # interim power menu, kept so game_main works until UiRoot hosts station surfaces
 var _menu: Control
 var _menu_station: StringName = &""
@@ -820,6 +825,17 @@ func refresh() -> void:
 	_time.text = "Sol %d" % (c.sol_index + 1)
 	HudKit.say(_time.get_parent() as Control, "Sol %d · %02d:%02d · %s" % [c.sol_index + 1, int(hour), int(fmod(hour, 1.0) * 60.0), "day" if day else "night"])
 	var low := low_readings(services)
+	_ok_chip.visible = low.is_empty()
+	if supplies_on_strip:
+		# the suit tank has its own bar in the crew corner, so only the room air is left for these chips
+		var on_strip: Array = [&"suit_tank"]
+		for s: Dictionary in ColonySummaryPanel.STOCKS:
+			on_strip.append(s.key)
+		var rest: Array[Dictionary] = []
+		for r: Dictionary in low:
+			if not on_strip.has(r.key):
+				rest.append(r)
+		low = rest
 	_reading_texts = PackedStringArray()
 	for i in _reading_rows.size():
 		var chip := _reading_rows[i]
@@ -843,7 +859,6 @@ func refresh() -> void:
 		var words := reading_words(r)
 		_reading_texts.append(words)
 		HudKit.say(chip, words)
-	_ok_chip.visible = low.is_empty()
 	var storm := StormOutlook.now(services.state())
 	var warned := String(storm.phase) == "warned"
 	_hazard_row.visible = String(storm.phase) != "calm"

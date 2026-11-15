@@ -174,7 +174,7 @@ func _send(action: StringName, cassette_id := "", index := 0) -> void:
 	_pending_page = index
 	_pending_id = ""
 	_clear_content()
-	_status.text = "Waiting for host validation..."
+	_status.text = "One moment…"
 	var params := {}
 	if action != &"cassette_open":
 		params["cassette_id"] = cassette_id
@@ -194,7 +194,7 @@ func _accept_result(result: ActionResult) -> void:
 		interrupt(result.message)
 		return
 	if String(result.changes.get("station_id", "")) != String(CassetteLibrary.PLAYER_ID) or String(result.changes.get("actor_id", "")) != String(_actor_id):
-		interrupt("The host did not authorize this player.")
+		interrupt("The tape player is busy. Try again.")
 		return
 	_authorized = true
 	_rebuild_library(true)

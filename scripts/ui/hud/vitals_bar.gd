@@ -46,13 +46,14 @@ func setup(p_services: GameServices) -> void:
 
 
 func _restyle() -> void:
+	# noted first: the override below sends THEME_CHANGED, which must see the new value or it restyles forever
+	set_meta(&"contrast", UiTheme.is_high_contrast())
 	var s := AstraStyle.glass(AstraStyle.RADIUS, 8, 6)
 	s.shadow_size = 6
 	s.shadow_offset = Vector2(0, 3)
 	if UiTheme.is_high_contrast():
 		s.set_border_width_all(2)
 	add_theme_stylebox_override(&"panel", s)
-	set_meta(&"contrast", UiTheme.is_high_contrast())
 
 
 func _notification(what: int) -> void:

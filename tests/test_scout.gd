@@ -290,6 +290,10 @@ func _test_hud() -> void:
 	holder.add_child(bar)
 	bar.setup(services)
 	bar.refresh()
+	# UI overhaul: the calm look (pictures and level bars) is the default; H opens the numbers look and folds it again
+	_check("vitals: a new bar starts in the calm look", bar.compact)
+	bar.set_compact(false)
+	await _frames(1)
 	var full := bar.get_combined_minimum_size().x
 	bar.set_compact(true)
 	await _frames(1)
@@ -297,14 +301,19 @@ func _test_hud() -> void:
 	var trend := bar.find_child("Trend", true, false) as Label
 	_check("vitals: ⋯ folds the bar down to the numbers and opens it again", small < full * 0.8 and not trend.visible, "%d -> %d" % [full, small])
 	bar.set_compact(false)
-	_check("vitals: four supplies with amounts and a trend in words", bar.find_children("Value", "Label", true, false).size() >= 7
-		and ["rising", "steady", "sols", " h", "kW", "falling"].any(func(w: String) -> bool: return trend.text.contains(w)), trend.text)
+	# the four supplies have amounts and a trend in words; parts, science and ore moved to the Power drawer
+	var extras := VitalsBar.extra_counts(st())
+	_check("vitals: four supplies with amounts and a trend in words", bar.find_children("Value", "Label", true, false).size() >= VitalsBar.STOCKS.size()
+		and trend.visible and ["rising", "steady", "sols", " h", "kW", "falling"].any(func(w: String) -> bool: return trend.text.contains(w))
+		and extras.size() == 3 and str(extras).contains("Spare parts") and str(extras).contains("Science") and str(extras).contains("Ore"), trend.text)
 	var goals := GoalsCard.new()
 	holder.add_child(goals)
 	goals.setup(services)
+	# UI overhaul: the card shows the ONE next goal (every goal is on the big goals screen, J) and folds to its header
 	var shown := (goals.find_child("List", true, false) as Control).get_child_count()
 	goals.toggle()
-	_check("goals card: lists goals and folds to its header", shown >= 4 and not (goals.find_child("List", true, false) as Control).visible, str(shown))
+	_check("goals card: lists goals and folds to its header", shown == 1 and not goals.next_goal().is_empty() and not (goals.find_child("List", true, false) as Control).visible
+		and (goals.find_child("Progress", true, false) as Control).visible, str(shown))
 	var map := MiniMap.new()
 	holder.add_child(map)
 	map.setup(services)

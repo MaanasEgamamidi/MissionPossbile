@@ -317,7 +317,19 @@ class Pen:
 		var pts := PackedVector2Array()
 		for i in range(0, coords.size() - 1, 2):
 			pts.append(at(float(coords[i]), float(coords[i + 1])))
-		RenderingServer.canvas_item_add_polygon(ci, pts, PackedColorArray([c]))
+		_poly(pts)
+
+	## Fills `pts` unless the shape is degenerate: doubled points (a full-circle pie, a tiny icon) and shapes with no
+	## area are dropped, so the renderer never reports "triangulation failed".
+	func _poly(pts: PackedVector2Array) -> void:
+		var out := PackedVector2Array()
+		for p in pts:
+			if out.is_empty() or out[out.size() - 1].distance_squared_to(p) > 0.0025:
+				out.append(p)
+		while out.size() > 1 and out[0].distance_squared_to(out[out.size() - 1]) <= 0.0025:
+			out.remove_at(out.size() - 1)
+		if out.size() >= 3 and not Geometry2D.triangulate_polygon(out).is_empty():
+			RenderingServer.canvas_item_add_polygon(ci, out, PackedColorArray([c]))
 
 	func dot(x: float, y: float, r: float) -> void:
 		RenderingServer.canvas_item_add_circle(ci, at(x, y), r * s, c, true)
@@ -349,7 +361,7 @@ class Pen:
 		for i in steps + 1:
 			var a := lerpf(a0, a1, float(i) / float(steps))
 			pts.append(at(x + cos(a) * r, y + sin(a) * r))
-		RenderingServer.canvas_item_add_polygon(ci, pts, PackedColorArray([c]))
+		_poly(pts)
 
 	static func draw_kind(p: Pen, kind: StringName) -> void:
 		match kind:

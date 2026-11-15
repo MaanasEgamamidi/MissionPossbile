@@ -146,3 +146,17 @@ T05 Elements and T07 Pipes keep the maintenance interface (no broken-part mini-g
 ## 5. What changed, by area
 
 (Filled in at the end of the work: see the section below.)
+
+### HUD in play (finished after the checkpoint)
+
+| Before | After |
+|---|---|
+| Resource strip "630/700 kWh ▲+7.1 kW", "59.9 kg ▼20 h" | A picture and a level bar per supply; a number, unit and mark only on a supply that is low. H still opens the numbers look. The choice is saved as `"numbers"` in `user://mission_hud.json`; the old `"compact"` key (false for everyone) is ignored |
+| Battery chip "Battery 90 % · charging 8 kW" | Sun or moon, battery, arrow; words only while it drains ("~9 h"). The share is on the strip, not repeated |
+| Low supply shown on the strip, the top-left chips and the battery chip | With the strip there, the top-left chips show only the room air; the suit tank stays a bar in the crew corner |
+| Mission Control "…Find out why on the Power & life support drawer (P), then fix it at the station in the base." | "Down to 1.0 kg. Press P to see why." |
+| Voice corner: a four-line radio-down paragraph over the mast camera | "✖ Radio down: Lock the Relay", placed above the mast camera card |
+| "More controls arrive…", "previews until the T section", "Waiting for host validation...", "The host did not authorize this player." | Gone or replaced with short player words |
+
+Drawing kits (`hud_kit.gd`, `goal_art.gd`, `menu_kit.gd`) fill polygons through a guard that drops doubled points and
+shapes with no area (the moon pictogram's tips were doubled: "triangulation failed").

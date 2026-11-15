@@ -31,8 +31,8 @@ func _build_body() -> void:
 	_cancel.text = "Cancel maintenance"
 	_cancel.pressed.connect(func() -> void: _send(&"maintenance_cancel"))
 	_body.add_child(_cancel)
-	_add_text(_body, "Stay at this station while the host completes maintenance. Leaving, switching crew, closing this panel or a critical warning cancels the job.", UiTheme.MUTED)
-	_add_text(_body, "Maintenance restores equipment condition. The room puzzles are previews until the T section; this control does not award their completion or rewards.", UiTheme.MUTED)
+	# UI overhaul: short, and nothing written for developers ("previews until the T section", "the host completes").
+	_add_text(_body, "Stay here until it is done. Walking away stops it.", UiTheme.MUTED)
 
 func _what_you_can_do() -> PackedStringArray:
 	var record: Dictionary = services.state().stations.get(String(station_id), {})

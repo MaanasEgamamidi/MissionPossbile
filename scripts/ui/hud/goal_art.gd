@@ -7,6 +7,7 @@ extends RefCounted
 ##   const GoalArt := preload("res://scripts/ui/hud/goal_art.gd")
 
 const GOLD := Color(1.0, 0.8, 0.22)
+const HudKitScript := preload("res://scripts/ui/hud/hud_kit.gd")
 const INK := Color(0.05, 0.07, 0.14)
 ## Pictograms in a 1 x 1 box (y down), as lists of strokes. A "!" after the stroke's name draws it in the tint colour.
 ##   line / loop   [x, y, x, y, ...] open / closed outline       fill   [x, y, ...] filled shape
@@ -108,7 +109,7 @@ static func draw_icon(c: CanvasItem, kind: String, rect: Rect2, ink: Color, tint
 					c.draw_circle(pts[0], w * 0.5, col)
 					c.draw_circle(pts[pts.size() - 1], w * 0.5, col)
 			"fill":
-				c.draw_colored_polygon(_points(stroke[1], o, s), col)
+				_fill(c, _points(stroke[1], o, s), col)
 			"arc":
 				var sweep := absf(float(stroke[5]) - float(stroke[4]))
 				c.draw_arc(o + Vector2(float(stroke[1]), float(stroke[2])) * s, float(stroke[3]) * s, deg_to_rad(float(stroke[4])),
@@ -123,7 +124,7 @@ static func draw_icon(c: CanvasItem, kind: String, rect: Rect2, ink: Color, tint
 				for i in 17:
 					var a := PI + PI * float(i) / 16.0
 					pts2.append(centre + Vector2(cos(a), sin(a)) * float(stroke[3]) * s)
-				c.draw_colored_polygon(pts2, col)
+				_fill(c, pts2, col)
 			"box":
 				c.draw_polyline(_round_rect(Rect2(o + Vector2(float(stroke[1]), float(stroke[2])) * s,
 					Vector2(float(stroke[3]) - float(stroke[1]), float(stroke[4]) - float(stroke[2])) * s), float(stroke[5]) * s), col, w, true)
@@ -135,7 +136,7 @@ static func draw_icon(c: CanvasItem, kind: String, rect: Rect2, ink: Color, tint
 					star.append(mid + Vector2(cos(a2), sin(a2)) * float(stroke[3]) * s * (1.0 if i % 2 == 0 else 0.45))
 				for i in 5:
 					# five kites around the middle: a star is not convex, so it is filled piece by piece
-					c.draw_colored_polygon(PackedVector2Array([mid, star[(i * 2 + 9) % 10], star[i * 2], star[i * 2 + 1]]), col)
+					_fill(c, PackedVector2Array([mid, star[(i * 2 + 9) % 10], star[i * 2], star[i * 2 + 1]]), col)
 
 
 static func _points(flat: Array, o: Vector2, s: float) -> PackedVector2Array:
@@ -162,7 +163,7 @@ static func _round_rect(r: Rect2, radius: float) -> PackedVector2Array:
 static func fill_round_rect(c: CanvasItem, r: Rect2, radius: float, col: Color) -> void:
 	var pts := _round_rect(r, radius)
 	pts.remove_at(pts.size() - 1)
-	c.draw_colored_polygon(pts, col)
+	_fill(c, pts, col)
 
 
 ## The status mark of a goal: an empty ring while it is open, a green disc with a tick once it is done.
@@ -216,7 +217,7 @@ static func draw_marker(c: CanvasItem, kind: String, at: Vector2, r: float, done
 	match kind:
 		"you":
 			var tri := PackedVector2Array([at + Vector2(0, -r), at + Vector2(r * 0.8, r * 0.7), at + Vector2(-r * 0.8, r * 0.7)])
-			c.draw_colored_polygon(tri, Color.WHITE)
+			_fill(c, tri, Color.WHITE)
 			tri.append(tri[0])
 			c.draw_polyline(tri, outline, 1.5, true)
 		"tape":
@@ -235,7 +236,7 @@ static func draw_marker(c: CanvasItem, kind: String, at: Vector2, r: float, done
 			if done:
 				draw_icon(c, "tick", inner, col, col, 1.6)
 			elif kind == "player":
-				c.draw_colored_polygon(PackedVector2Array([at + Vector2(-r * 0.26, -r * 0.42), at + Vector2(-r * 0.26, r * 0.42), at + Vector2(r * 0.46, 0)]), col)
+				_fill(c, PackedVector2Array([at + Vector2(-r * 0.26, -r * 0.42), at + Vector2(-r * 0.26, r * 0.42), at + Vector2(r * 0.46, 0)]), col)
 			else:
 				c.draw_line(at + Vector2(0, -r * 0.5), at + Vector2(0, r * 0.12), col, maxf(2.5, r * 0.26), true)
 				c.draw_circle(at + Vector2(0, r * 0.44), maxf(1.5, r * 0.15), col)
@@ -349,3 +350,9 @@ class Mark extends Control:
 	func _draw() -> void:
 		var r := minf(size.x, size.y) * (0.30 if kind == "tape" else 0.42)
 		Art.draw_marker(self, kind, size * 0.5, r, done)
+
+
+## Fills a polygon through HudKit's guard: doubled points (a round rect whose corners meet) or a shape with no area
+## never reach the renderer, which would fail to split it into triangles.
+static func _fill(c: CanvasItem, pts: PackedVector2Array, col: Color) -> void:
+	HudKitScript.Draw.fill_polygon(c, pts, col)

@@ -422,7 +422,8 @@ func _shows_room_power() -> bool:
 
 ## True: the "more controls later" note is shown (stations whose controls are not built yet).
 func _shows_later_note() -> bool:
-	return true
+	# UI overhaul: a note about future updates is for developers, not players; it is no longer shown.
+	return false
 
 
 func _what_you_can_do() -> PackedStringArray:

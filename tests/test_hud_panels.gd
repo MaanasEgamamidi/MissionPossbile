@@ -141,6 +141,22 @@ func _all_text(node: Node) -> String:
 	return "\n".join(parts)
 
 
+## What a player can read or hear on `node`: the visible labels plus the accessible names (also the tooltips) of the
+## visible pictures. UI overhaul: the HUD shows pictures and gives each its words this way (HudKit.say).
+func _all_words(node: Node) -> String:
+	var parts := PackedStringArray()
+	if node is Control and (node as Control).is_visible_in_tree():
+		if node is Label:
+			parts.append((node as Label).text)
+		if String((node as Control).accessibility_name) != "":
+			parts.append(String((node as Control).accessibility_name))
+	for child in node.get_children():
+		var t := _all_words(child)
+		if t != "":
+			parts.append(t)
+	return "\n".join(parts)
+
+
 # ------------------------------------------------------------------ HUD
 
 func _test_hud() -> void:
@@ -154,8 +170,10 @@ func _test_hud() -> void:
 	# nothing low: one quiet line
 	_fill_stores()
 	hud.refresh()
-	_check("hud: nothing low shows only 'Colony OK ✓'", hud.colony_ok_shown() and hud.shown_readings().is_empty() and _all_text(hud.root_control()).contains("Colony OK ✓"),
-		str(hud.shown_readings()))
+	# UI overhaul: the tick is drawn (a check pictogram) beside the words "Colony OK"
+	var ok_chip := hud.root_control().find_child("ColonyOk", true, false)
+	_check("hud: nothing low shows only 'Colony OK ✓'", hud.colony_ok_shown() and hud.shown_readings().is_empty() and _all_text(hud.root_control()).contains("Colony OK")
+		and ok_chip != null and StringName(ok_chip.find_child("Symbol", true, false).get("kind")) == &"check", str(hud.shown_readings()))
 
 	# each reading on its own
 	var cases := [
@@ -204,7 +222,9 @@ func _test_hud() -> void:
 	st.power_deficit = false
 
 	# body energy, never "energy" alone
-	var crew_text := _all_text(hud.root_control().find_child("TopRight", true, false))
+	# UI overhaul: the crew corner shows a badge, the symbol, one role word and three picture bars; each picture carries
+	# its words as tooltip and accessible name, so those count as what the corner says.
+	var crew_text := _all_words(hud.root_control().find_child("TopRight", true, false))
 	var bad_energy := false
 	for line in crew_text.split("\n"):
 		if (line.to_lower().contains("energy") and not line.contains("Body energy")) or line.to_lower().contains("stamina"):
@@ -233,24 +253,32 @@ func _test_hud() -> void:
 		hud.show_message("Message number %d." % (i + 1), 3.0)
 	hud.show_message("Message number 1.", 3.0)
 	var now := hud.current_messages()
-	_check("hud: messages queue (3 on screen, 2 waiting, no repeats)", now.size() == 3 and now[0] == "Message number 1." and hud.waiting_messages().size() == 2,
-		"%s / %s" % [now, hud.waiting_messages()])
+	# UI overhaul: GameHud.MAX_MESSAGES (two) short lines on screen; nothing is dropped, the rest wait in order
+	var on_screen := GameHud.MAX_MESSAGES
+	_check("hud: messages queue (%d on screen, %d waiting, no repeats)" % [on_screen, 5 - on_screen], now.size() == on_screen and now[0] == "Message number 1."
+		and hud.waiting_messages().size() == 5 - on_screen and not hud.waiting_messages().has("Message number 1."), "%s / %s" % [now, hud.waiting_messages()])
 	hud._process(3.1)
 	now = hud.current_messages()
-	_check("hud: waiting messages come next, in order", now.size() == 2 and now[0] == "Message number 4." and now[1] == "Message number 5.", str(now))
+	var expect := PackedStringArray()
+	for i in range(on_screen, mini(5, on_screen * 2)):
+		expect.append("Message number %d." % (i + 1))
+	_check("hud: waiting messages come next, in order", now == expect and hud.waiting_messages().size() == maxi(0, 5 - on_screen * 2), "%s / %s" % [now, hud.waiting_messages()])
 	hud.show_message("A long message to check wrapping: the colony computer says that the greenhouse lights are on and the battery is charging nicely in the sun today.", 5.0)
 
 	# key hints, status, pause banner, suit check bar
 	var hints := (hud.root_control().find_child("HintText", true, false) as Label).text
-	_check("hud: key hint strip", hints == "M map · I cargo · C crew · Esc pause · Shift+Backspace sources", hints)
+	# Owner 2026-11-14: the M map is hidden; J shows the goals (and the map in big mode)
+	_check("hud: key hint strip", hints == "J goals · I cargo · C crew · Esc pause · Shift+Backspace sources", hints)
 	hud.set_status("Connected to the host.")
 	_check("hud: status line shows", _all_text(hud.root_control()).contains("Connected to the host."))
 	services.session.request(&"vote_pause", &"", {"paused": true})
 	hud.refresh()
-	_check("hud: PAUSED banner while paused", _all_text(hud.root_control()).contains("PAUSED"))
+	# UI overhaul: the banner is a "⏸ Paused" card at the top centre
+	var banner := hud.root_control().find_child("Paused", true, false) as Control
+	_check("hud: PAUSED banner while paused", banner != null and banner.is_visible_in_tree() and _all_text(hud.root_control()).to_lower().contains("paused"))
 	services.session.request(&"vote_pause", &"", {"paused": false})
 	hud.refresh()
-	_check("hud: no banner when running", not _all_text(hud.root_control()).contains("PAUSED"))
+	_check("hud: no banner when running", banner != null and not banner.is_visible_in_tree() and not _all_text(hud.root_control()).to_lower().contains("paused"))
 	var rack: Dictionary = st.stations["al_suit_rack"]
 	me.position = CharacterState._v3(rack.position)
 	me.suit_on = false

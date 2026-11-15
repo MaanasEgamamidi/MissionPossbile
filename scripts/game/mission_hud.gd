@@ -50,7 +50,8 @@ var _feed_status: Label
 var _dock_build: Control
 var _refresh_left := 0.0
 var _auto_compact := false
-var _user_compact := false
+## The player's own choice: true = the calm look (pictures and bars, the default), false = the numbers look (key H).
+var _user_compact := true
 var _goals_folded_for_mc := false
 ## The player chose the goal list with J: Mission Control's card no longer folds it away (it would look like J did nothing).
 var _list_by_user := false
@@ -71,6 +72,7 @@ func setup(_world: Node3D, p_services: GameServices, p_game: Node) -> void:
 	if hud != null:
 		hud.add_child(self)
 		hud.alert_sink = _on_alert
+		hud.supplies_on_strip = true
 		hud.use_dock(true)
 	vitals = VitalsBar.new()
 	add_child(vitals)
@@ -345,8 +347,8 @@ func _check_low() -> void:
 		if now - float(_low_said.get(key, -1e9)) < LOW_REPEAT_S:
 			continue
 		_low_said[key] = now
-		mission_control.say("%s is very low" % String(r.name), "%s is down to %s. Find out why on the Power & life support drawer (P), then fix it at the station in the base." % [
-			String(r.name), String(r.value)], &"danger")
+		# UI overhaul: two short sentences; the Power drawer (P) has the why and the station to fix it at.
+		mission_control.say("%s is very low" % String(r.name), "Down to %s. Press %s to see why." % [String(r.value), GameHud._key(&"power_view", "P")], &"danger")
 
 
 # ---------------------------------------------------------------- refresh and layout
@@ -489,7 +491,9 @@ func _load() -> void:
 		return
 	var d: Variant = JSON.parse_string(FileAccess.get_file_as_string(SETTINGS_PATH))
 	if d is Dictionary:
-		_user_compact = bool((d as Dictionary).get("compact", false))
+		# UI overhaul: the calm look is the default. The choice is kept under "numbers" (true only after the player
+		# pressed H for the numbers look); the old "compact" key is ignored, since older builds wrote false for everyone.
+		_user_compact = not bool((d as Dictionary).get("numbers", false))
 		vitals.set_compact(_user_compact)
 		# Owner 2026-11-14: the goals card always starts in small mode (open).
 		#goals.set_open(bool((d as Dictionary).get("goals_open", true)))
@@ -498,4 +502,4 @@ func _load() -> void:
 func _save() -> void:
 	var f := FileAccess.open(SETTINGS_PATH, FileAccess.WRITE)
 	if f != null:
-		f.store_string(JSON.stringify({"compact": _user_compact, "goals_open": goals.open if not _goals_folded_for_mc else true}))
+		f.store_string(JSON.stringify({"numbers": not _user_compact, "goals_open": goals.open if not _goals_folded_for_mc else true}))

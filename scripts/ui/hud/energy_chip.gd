@@ -92,9 +92,9 @@ func refresh() -> void:
 	_arrow.kind = &"down" if draining else &"up"
 	_arrow.color = (AstraStyle.DANGER if level() == &"urgent" else AstraStyle.WARN) if draining else AstraStyle.GOOD
 	_battery.color = _color
+	# UI overhaul: the battery share is on the vitals strip right above (electricity), so the chip never repeats it:
+	# colour and mark say low, and the only words are how long the battery lasts while it drains.
 	var words := PackedStringArray()
-	if level() != &"ok":
-		words.append("%d %%" % roundi(float(current.percent)))
 	if draining:
 		words.append(hours_words(float(current.hours_left)))
 	_text.text = " · ".join(words)

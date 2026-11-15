@@ -354,7 +354,8 @@ class Draw:
 				for i in 21:
 					var a := deg_to_rad(60.0 + 240.0 * i / 20.0)
 					pts.append([0.52 + cos(a) * 0.42, 0.5 + sin(a) * 0.42])
-				for i in 21:
+				# the inner arc leaves out its two ends: they sit on the outer arc's tips (a doubled point breaks the fill)
+				for i in range(1, 20):
 					var a := deg_to_rad(245.0 - 130.0 * i / 20.0)
 					pts.append([0.90 + cos(a) * 0.402, 0.5 + sin(a) * 0.402])
 				_poly(ci, o, s, pts, col)
@@ -456,9 +457,34 @@ class Draw:
 		var out := PackedVector2Array()
 		for p: Array in pts:
 			out.append(o + Vector2(float(p[0]), float(p[1])) * s)
+		out = fill_polygon(ci, out, col)
+		if out.size() >= 3:
+			out.append(out[0])
+			ci.draw_polyline(out, col, 1.0, true)
+
+
+	## Fills a polygon safely and returns the points it used. Points closer than a twentieth of a pixel to the one
+	## before (and a closing copy of the first) are dropped; fewer than three points, or a shape with no area (a tiny
+	## icon, points in a line) draws nothing or an outline instead, so the renderer never gets a polygon it cannot
+	## split into triangles ("Invalid polygon data, triangulation failed").
+	static func fill_polygon(ci: CanvasItem, pts: PackedVector2Array, col: Color) -> PackedVector2Array:
+		var out := PackedVector2Array()
+		for p in pts:
+			if not p.is_finite():
+				continue
+			if out.is_empty() or out[out.size() - 1].distance_squared_to(p) > 0.0025:
+				out.append(p)
+		while out.size() > 1 and out[0].distance_squared_to(out[out.size() - 1]) <= 0.0025:
+			out.remove_at(out.size() - 1)
+		if out.size() < 3:
+			return PackedVector2Array()
+		if Geometry2D.triangulate_polygon(out).is_empty():
+			var ring := out.duplicate()
+			ring.append(out[0])
+			ci.draw_polyline(ring, col, 1.0, true)
+			return PackedVector2Array()
 		ci.draw_colored_polygon(out, col)
-		out.append(out[0])
-		ci.draw_polyline(out, col, 1.0, true)
+		return out
 
 
 	static func _line(ci: CanvasItem, o: Vector2, s: float, pts: Array, col: Color, width: float) -> void:
@@ -492,7 +518,7 @@ class Draw:
 		for i in range(7, 0, -1):
 			var t := i / 8.0
 			pts.append(a.lerp(mid - n, t).lerp((mid - n).lerp(b, t), t))
-		ci.draw_colored_polygon(pts, col)
+		fill_polygon(ci, pts, col)
 
 
 	## Head and shoulders, `size` tall, centred on `c`.
@@ -502,4 +528,4 @@ class Draw:
 		for i in 13:
 			var a := PI + PI * i / 12.0
 			pts.append(c + Vector2(cos(a) * 0.34, 0.44 + sin(a) * 0.40) * size)
-		ci.draw_colored_polygon(pts, col)
+		fill_polygon(ci, pts, col)
