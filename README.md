@@ -1,5 +1,13 @@
 # Mars Colony — Godot 4.7.2 project
 
+# 🚀 PLAY MARS NOW
+
+**Your colony. Your crew. Your mission.**
+
+[▶ PLAY THE GAME](YOUR_GAME_LINK_HERE)
+
+---
+
 The `revisions` branch implements F01-F06 foundations, C01-C04 cassettes and S01-S04 survival (pages 1-25). Collect six shared room tapes with E, then read their local NASA photos and two-page briefings at the Command Room cassette player. Inventory shows collection status only. See [the survival handoff](docs/revisions/SURVIVAL_HANDOFF.md), [cassette handoff](docs/revisions/CASSETTE_HANDOFF.md) and [foundation handoff](docs/revisions/HANDOFF.md) for APIs, verification and limitations.
 
 Unprotected exposure to unbreathable air causes recovery after four unpaused real seconds. A failed seal or open outer door depressurizes only the exit vestibule; retreat through the inner door or wear a sealed suit with oxygen. Use the safe interior T12 station as the field engineer for 20-second seal maintenance. All twelve repair stations provide role-checked operational maintenance as condition wears continuously. Maintenance preserves puzzle achievements; the twelve actual puzzles, restoration art and completion shots remain future T-section work. The performance update from `main` is merged. No human playtest has been run for these changes.
