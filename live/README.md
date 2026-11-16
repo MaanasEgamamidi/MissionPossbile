@@ -37,7 +37,7 @@ cp live/workflows/publish.yml .github/workflows/publish-live.yml
 
 Commit the `live/` sources and workflow, push, and run **Actions → Publish game → Run workflow**. No automatic deployment occurs on ordinary pushes. The workflow builds in temporary copies, publishes desktop ZIPs as GitHub Release assets, and publishes the page plus browser game to Pages. Desktop files are kept out of Pages to stay below its 1 GB site limit. Build outputs must not be committed to Git.
 
-Expected URL after successful deployment: https://maanasegamamidi.github.io/MissionPossbile/
+Expected URL after successful deployment: https://maanasegamamidi.github.io/MissionPossible/
 
 Add that URL to the repository's About → Website field if desired. This is an expected future URL, not a verified live deployment.
 
