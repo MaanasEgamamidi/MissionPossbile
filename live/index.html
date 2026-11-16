@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#111213">
+  <title>Mars Colony</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main aria-label="Choose how to play">
+    <div class="logo" role="img" aria-label="Mission Possible">
+      <svg viewBox="0 0 760 430" aria-hidden="true">
+        <path d="M 184 177 A 200 200 0 0 1 576 177 M 184 253 A 200 200 0 0 0 576 253" fill="none" stroke="#ed8a3a" stroke-width="9"/>
+        <text x="380" y="233" text-anchor="middle" fill="#f5f4f1" font-family="Arial, sans-serif" font-size="48" font-weight="600" letter-spacing="7">MISSION POSSIBLE</text>
+      </svg>
+    </div>
+    <div class="actions">
+    <a id="play-link" class="button" aria-disabled="true">Play in browser</a>
+    <button id="download-button" class="button" type="button">Download game</button>
+    </div>
+  </main>
+  <dialog id="browser-notice" aria-labelledby="browser-notice-title">
+    <h2 id="browser-notice-title">Before you play</h2>
+    <p>This game was designed for desktop. Browser play may have performance or visual issues. LAN multiplayer and voice chat are unavailable in the browser.</p>
+    <p>Download the game for the best experience.</p>
+    <div class="notice-actions"><button id="cancel-browser" class="button" type="button">Go back</button><a id="continue-browser" class="button" aria-disabled="true">Play anyway</a></div>
+  </dialog>
+  <dialog id="downloads" aria-label="Download game">
+    <a id="windows-link" class="button" aria-disabled="true">Windows</a>
+    <a id="macos-link" class="button" aria-disabled="true">Mac</a>
+    <form method="dialog"><button class="close" aria-label="Close">×</button></form>
+  </dialog>
+</body>
+</html>

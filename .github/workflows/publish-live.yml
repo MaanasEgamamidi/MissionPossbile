@@ -1,0 +1,39 @@
+name: Publish live game
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Release containing game-site.zip
+        required: true
+        default: live-web-20261115-v1
+        type: string
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download prepared game site
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+          GAME_REPOSITORY: ${{ github.repository }}
+        run: |
+          gh release download "$RELEASE_TAG" --repo "$GAME_REPOSITORY" --pattern game-site.zip --dir package
+          mkdir site
+          unzip -q package/game-site.zip -d site
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy game
+        id: deployment
+        uses: actions/deploy-pages@v4
