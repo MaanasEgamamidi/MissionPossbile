@@ -41,3 +41,12 @@ _test_weather/
 _locks/
 # Owner prompt pack copied in for reference (lives at E:\Prompt)
 Prompt/
+
+# Animation review captures belong in docs/captures/animations, not the root.
+/*_front_[0-9]*.png
+/*_front_[0-9]*.png.import
+/*_side_[0-9]*.png
+/*_side_[0-9]*.png.import
+
+# macOS Finder metadata
+.DS_Store

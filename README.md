@@ -6,6 +6,8 @@ Unprotected exposure to unbreathable air causes recovery after four unpaused rea
 
 Open `project.godot` with Godot 4.7.2. The main scene is `scenes/game.tscn` (the map alone is `scenes/world/colony_world.tscn`).
 
+Animation review screenshots live in [docs/captures/animations](docs/captures/animations/); runtime assets live in `assets/`.
+
 ## Play
 
 Run the project. It continues the last save or starts a new colony. Click the window to take the mouse.
