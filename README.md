@@ -1,10 +1,16 @@
 # Mars Colony — Godot 4.7.2 project
 
-# 🚀 PLAY MARS NOW
+```text
+███╗   ███╗ █████╗ ██████╗ ███████╗
+████╗ ████║██╔══██╗██╔══██╗██╔════╝
+██╔████╔██║███████║██████╔╝███████╗
+██║╚██╔╝██║██╔══██║██╔══██╗╚════██║
+██║ ╚═╝ ██║██║  ██║██║  ██║███████║
+╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝
+           C O L O N Y
+```
 
-**Your colony. Your crew. Your mission.**
-
-[▶ PLAY THE GAME](YOUR_GAME_LINK_HERE)
+**[▶ PLAY MARS NOW](PASTE_GAME_URL_HERE)** · Godot 4.7.2
 
 ---
 
