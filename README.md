@@ -18,7 +18,7 @@
                    P L A Y   N O W
 ```
 
-[**▶ Launch Game**](PASTE_GAME_URL_HERE) · [**MissionPossible**](https://udaykamboj.github.io/mission-possible-live/) · Godot 4.7.2
+[**▶ Launch Game**](https://udaykamboj.github.io/mission-possible-live/) · Godot 4.7.2
 
 ---
 
