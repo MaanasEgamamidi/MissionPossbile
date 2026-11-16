@@ -10,7 +10,7 @@ document.querySelector('#download-button').addEventListener('click', () => dialo
 dialog.addEventListener('click', event => {if (event.target === dialog) {const rect = dialog.getBoundingClientRect(); if(event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();}});
 function enableLink(id, path) {
   const url = new URL(path, location.href);
-  const releaseDownload = url.origin === 'https://github.com' && /^\/MaanasEgamamidi\/(?:MissionPossible|MissionPossbile)\/releases\/download\//.test(url.pathname);
+  const releaseDownload = url.origin === 'https://github.com' && /^\/(?:MaanasEgamamidi\/(?:MissionPossible|MissionPossbile)|udaykamboj\/mission-possible-live)\/releases\/download\//.test(url.pathname);
   if (url.origin !== location.origin && !releaseDownload) throw new Error('Invalid build URL');
   const link = document.querySelector(id);
   link.href = url.href;

@@ -78,3 +78,5 @@ Controls placement: no visible toolbar bar. The two icons sit vertically in the 
 ## Public hosting repository
 
 The Pages site is configured at https://udaykamboj.github.io/mission-possible-live/ using the dedicated repository https://github.com/udaykamboj/mission-possible-live. That account has administration access there. The original game repository's Pages setting is still disabled. The hosting workflow publishes `game-site.zip` from the original repository's `live-web-20261115-v1` release; Windows and Mac downloads remain in that same release. Hosting identity is recorded in `live/hosting.json`.
+
+Privacy preparation: exported game files and downloads are now hosted independently in the public hosting repository, so the original source repository can be made private by its owner without breaking the site. The original source is still public until the owner changes its visibility. GitHub Pages hosting remains public on the Free plan; browser HTML/JavaScript/WASM and exported game data remain publicly downloadable.
