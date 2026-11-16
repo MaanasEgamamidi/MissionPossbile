@@ -1,0 +1,8 @@
+{
+  "site_url": "https://udaykamboj.github.io/mission-possible-live/",
+  "hosting_repository": "udaykamboj/mission-possible-live",
+  "game_repository": "MaanasEgamamidi/MissionPossible",
+  "release_tag": "live-web-20261115-v1",
+  "release_url": "https://github.com/MaanasEgamamidi/MissionPossible/releases/tag/live-web-20261115-v1",
+  "workflow": "deploy.yml"
+}

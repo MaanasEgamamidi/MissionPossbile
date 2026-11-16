@@ -74,3 +74,7 @@ Controls placement: no visible toolbar bar. The two icons sit vertically in the 
 ## Prepared release deployment
 
 `.github/workflows/publish-live.yml` publishes an already-built site from a GitHub Release. Run **Publish live game** with the release tag containing `game-site.zip`. Windows and Mac downloads are separate release assets. This deployment path does not rebuild or playtest the game. The separate `live/workflows/publish.yml` template remains available for rebuilding exports in Actions.
+
+## Public hosting repository
+
+The Pages site is configured at https://udaykamboj.github.io/mission-possible-live/ using the dedicated repository https://github.com/udaykamboj/mission-possible-live. That account has administration access there. The original game repository's Pages setting is still disabled. The hosting workflow publishes `game-site.zip` from the original repository's `live-web-20261115-v1` release; Windows and Mac downloads remain in that same release. Hosting identity is recorded in `live/hosting.json`.
