@@ -44,6 +44,11 @@ func _process(delta: float) -> bool:
 		return false
 	var s := _summarise(_views[_ab_view], _ab_frames)
 	s["case"] = _cases[_ab_case]
+	if _args.has("shots"):
+		# one still per view and case, for comparing what a change does to the picture
+		var dir: String = _args.shots
+		DirAccess.make_dir_recursive_absolute(dir)
+		root.get_texture().get_image().save_png(dir.path_join("%s__%s.png" % [_views[_ab_view].name, _cases[_ab_case]]))
 	_ab_out.append(s)
 	print("CASE ", _views[_ab_view].name, " ", _cases[_ab_case], " frame ", snappedf(s.summary.frame_ms.mean, 0.1),
 		" gpu ", snappedf(s.summary.gpu_ms.mean, 0.1), " cpu ", snappedf(s.summary.cpu_ms.mean, 0.1),
@@ -63,6 +68,8 @@ func _next_view() -> bool:
 	if _ab_view >= _views.size():
 		return false
 	_enter_view(_views[_ab_view])
+	if _args.has("yaw"):
+		(_game.get("player") as PlayerController).camera_rig().add_look(deg_to_rad(float(_args.yaw)), 0.0)
 	_ab_case = 0
 	_start_case()
 	_ab_wait = 60
@@ -76,8 +83,15 @@ func _envs() -> Array:
 func _start_case() -> void:
 	_restore()
 	GraphicsQuality.apply(self, _base)
-	var c: String = _cases[_ab_case]
 	var lights := get_nodes_in_group(&"fixture_lights")
+	# "a+b" applies both changes
+	for c: String in String(_cases[_ab_case]).split("+"):
+		_apply_case(c, lights)
+	_ab_frames = []
+	_ab_wait = 30
+
+
+func _apply_case(c: String, lights: Array[Node]) -> void:
 	match c:
 		"no_vol_fog":
 			for e: Environment in _envs():
@@ -125,10 +139,51 @@ func _start_case() -> void:
 		# light experiments (not in the default list; pick them with --cases)
 		"cur_zone_lights_only":
 			var zm: ZoneManager = (_game.get_node("Perf") as PerfRig).zone_manager
-			var cur := String(zm.current.zone_id) if zm.current != null else ""
+			var cur := ColonyZones.slug(String(zm.current.zone_id)) if zm.current != null else ""
 			for l: Node in lights:
 				if ColonyZones.slug(String(l.get_meta("zone", ""))) != cur and l.get_parent().name != cur:
 					_ab_set(l, "visible", false)
+		"sun_160", "sun_2splits":
+			for s: Node in get_nodes_in_group(&"sun"):
+				if c == "sun_160":
+					_ab_set(s, "directional_shadow_max_distance", 160.0)
+				else:
+					_ab_set(s, "directional_shadow_mode", DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS)
+		"other_zone_noshadow":
+			var zm3: ZoneManager = (_game.get_node("Perf") as PerfRig).zone_manager
+			var cur3 := ColonyZones.slug(String(zm3.current.zone_id)) if zm3.current != null else ""
+			for l: Node in lights:
+				if ColonyZones.slug(String(l.get_meta("zone", ""))) != cur3:
+					_ab_set(l, "shadow_enabled", false)
+		"gh_area_x07", "gh_area_x05":
+			for l: Node in lights:
+				if l.get_class() == "AreaLight3D" and not bool(l.get("shadow_enabled")):
+					_ab_set(l, "area_range", float(l.get("area_range")) * (0.7 if c == "gh_area_x07" else 0.5))
+		"lod_px_4":
+			root.mesh_lod_threshold = 4.0
+		"tunnel_fade":
+			for l: Node in lights:
+				if l.get_class() == "AreaLight3D" and String(l.name).begins_with("FX_SFX_tunnel"):
+					_ab_set(l, "distance_fade_enabled", true)
+					_ab_set(l, "distance_fade_begin", 20.0)
+					_ab_set(l, "distance_fade_length", 10.0)
+					_ab_set(l, "distance_fade_shadow", 20.0)
+		"tunnel_range_15", "tunnel_noshadow", "tunnel_both", "tunnel_off":
+			for l: Node in lights:
+				if l.get_class() != "AreaLight3D" or not String(l.name).begins_with("FX_SFX_tunnel"):
+					continue
+				if c == "tunnel_off":
+					_ab_set(l, "visible", false)
+				if c == "tunnel_range_15" or c == "tunnel_both":
+					_ab_set(l, "area_range", 15.0)
+				if c == "tunnel_noshadow" or c == "tunnel_both":
+					_ab_set(l, "shadow_enabled", false)
+		"other_mask_zero":
+			var zm2: ZoneManager = (_game.get_node("Perf") as PerfRig).zone_manager
+			var cur2 := ColonyZones.slug(String(zm2.current.zone_id)) if zm2.current != null else ""
+			for l: Node in lights:
+				if ColonyZones.slug(String(l.get_meta("zone", ""))) != cur2:
+					_ab_set(l, "light_cull_mask", 0)
 		"range_x07":
 			for l: Node in lights:
 				if l is SpotLight3D:
@@ -155,14 +210,16 @@ func _start_case() -> void:
 		"fsr1_077":
 			root.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR
 			root.scaling_3d_scale = 0.77
+		"lv_hops1":
+			_ab_set(root.get_node("PerfSettings"), "light_view_hops", 1)
+		"light_view_off":
+			_ab_set(root.get_node("PerfSettings"), "light_view_enabled", false)
 		"postfx_off":
 			for n: Node in root.find_children("PostFX", "", true, false):
 				_ab_set(n, "visible", false)
 		"taa_nomsaa":
 			root.msaa_3d = Viewport.MSAA_DISABLED
 			root.use_taa = true
-	_ab_frames = []
-	_ab_wait = 30
 
 
 func _ab_set(o: Object, prop: String, v: Variant) -> void:

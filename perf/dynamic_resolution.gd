@@ -12,6 +12,8 @@ extends Node
 ##   - not a headless run, and PerfSettings.dynamic_resolution_mode is not 0
 ##   - mode 1 (forced on), or the player's "Fit to this computer" setting is on and HardwareProfile rates the card
 ##     MID or BASIC. On a STRONG card nothing changes: High stays the authored picture at the window's resolution.
+##   - or the preset is a temporal one (Ultra, 2026-11-18): FSR 2 rebuilds the full picture from a smaller one, so the
+##     scale moves between 77 % and min_scale() on every card to hold 60 FPS (changing it costs < 3 ms once, measured).
 ## When it turns off it puts the graphics preset's own render scale back.
 ##
 ## Rules, checked twice a second on the mean GPU time of that half second:
@@ -33,6 +35,8 @@ const SETTLE_TIME := 1.0
 const START_HOLD := 3.0
 const STEP := 0.1
 const BUDGET_SHARE := 0.9
+## Ultra (temporal): more headroom, so the frame-to-frame swing of the GPU time stays under one refresh (2026-11-18).
+const TEMPORAL_BUDGET_SHARE := 0.85
 const OVER_FACTOR := 1.08
 const FAR_OVER_FACTOR := 1.6
 const UP_MARGIN := 0.85
@@ -121,6 +125,10 @@ func wanted() -> bool:
 		return false
 	if mode == 1:
 		return true
+	# Ultra (2026-11-18): a temporal preset adapts its render scale on every card, so it holds 60 FPS in the heavy rooms
+	var level := GraphicsQuality.applied_level(get_tree())
+	if level >= 0 and bool(GraphicsQuality.value("temporal", level)):
+		return true
 	return settings != null and settings.graphics_auto and bool(HardwareProfile.current().get("dynamic", false))
 
 
@@ -141,8 +149,22 @@ func preset_scale() -> float:
 	return GraphicsQuality.render_scale(level, pixels)
 
 
+## Ultra's temporal upscaler rebuilds a full picture from half the pixels each way, so it may go down to TEMPORAL_MIN_SCALE
+## (only in the views that need it: the Greenhouse and the Power Room looking over the plaza, measured 2026-11-18).
+const TEMPORAL_MIN_SCALE := 0.5
+
+
+func budget_share() -> float:
+	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
+	return TEMPORAL_BUDGET_SHARE if level >= 0 and bool(GraphicsQuality.value("temporal", level)) else BUDGET_SHARE
+
+
 func min_scale() -> float:
-	return float(HardwareProfile.current().get("min_scale", 0.6))
+	var s := float(HardwareProfile.current().get("min_scale", 0.6))
+	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
+	if level >= 0 and bool(GraphicsQuality.value("temporal", level)):
+		s = minf(s, TEMPORAL_MIN_SCALE)
+	return s
 
 
 ## The highest scale allowed: the preset's own, lowered so the 3D pixels stay under the profile's max_pixels.
@@ -197,7 +219,7 @@ func _evaluate() -> void:
 			_floor_t = FLOOR_HOLD
 			_change(_probe_from, false)
 			return
-	var budget := 1000.0 / target_fps() * BUDGET_SHARE
+	var budget := 1000.0 / target_fps() * budget_share()
 	if gpu_ms > budget * OVER_FACTOR:
 		_under = 0
 		_over += 1
@@ -233,5 +255,5 @@ func _change(to: float, probe: bool) -> void:
 
 
 func _write(scale: float) -> void:
-	_window.scaling_3d_mode = GraphicsQuality.upscaler(scale)
+	_window.scaling_3d_mode = GraphicsQuality.upscaler(scale, GraphicsQuality.applied_level(get_tree()))
 	_window.scaling_3d_scale = scale

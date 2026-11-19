@@ -39,6 +39,12 @@ var extra_dynamic: Array[Node] = []  ## optional: nodes that throttle themselves
 var state: int = State.ACTIVE
 var drawn := true                ## what is applied right now (the target may differ while steps are queued)
 var lights_awake := true
+## Light view (ZoneManager, 2026-11-18): false while the camera cannot see into this zone, so its fixture lights are
+## switched off even though the zone is drawn. True whenever the light view switch is off.
+var in_view := true
+## Light view shadows: false while the camera is neither in this zone nor next to a door into it, so its fixture
+## lights draw no shadow maps (seen through glass the difference is within run-to-run noise). True when switched off.
+var shadows_on := true
 var neighbors: Array[Zone] = []
 
 var _tid := 0

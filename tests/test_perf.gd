@@ -92,7 +92,7 @@ func _run() -> void:
 			ok = ok and n.state >= Zone.State.WARM and n.drawn
 		for o in zm.zones:
 			ok = ok and (o.drawn == bool(cam.cull_mask & o.render_bit))
-			ok = ok and (lighting.is_zone_awake(String(o.zone_id)) == o.drawn)
+			ok = ok and (lighting.is_zone_awake(String(o.zone_id)) == (o.drawn and o.in_view))   # light view: drawn rooms out of view sleep
 		_check(ok, "%s: current room ACTIVE, neighbours WARM, camera mask and fixtures follow the zone states" % z.zone_id)
 	_check(true, "Mars hidden in: %s" % str(rooms_sealed))
 

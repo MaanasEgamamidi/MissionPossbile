@@ -16,6 +16,13 @@ var zones_enabled := true             # Phase 2: room sleep/wake (camera layer m
 var room_props_enabled := true        # Phase 2: props added at run time inside a room sleep with that room
 var exterior_cull_enabled := true     # Phase 3: hide Mars when no window/open door can see it
 var view_activation_enabled := true   # Phase 4: pause crew animation outside the view cone
+# Light view (2026-11-18, docs/perf/ultra_60fps.md): a drawn room's fixture lights are off while the camera cannot see
+# into that room through a door or window. Lights of rooms you cannot see cost about half of every frame at Ultra.
+var light_view_enabled := true
+# ... and a zone the camera is not in (nor standing next to a door into) draws its fixture lights without shadow maps:
+# the shadow redraws of the rooms seen through glass took up to half the draw calls (Greenhouse at Ultra: 14k -> 7k
+# draws, 18.3 -> 14.9 ms per frame), with no difference in the picture beyond run-to-run noise.
+var light_view_shadows_enabled := true
 var colony_lod_enabled := false       # Phase 5: HLOD proxies of the colony seen from far away (changes pixels)
 var visibility_ranges_enabled := false  # Phase 5: per-object draw distance for Mars rocks and props (changes pixels)
 var shader_warmup_enabled := false    # Phase 6: draw every zone once behind the loading overlay (Godot 4.7 precompiles)
@@ -36,6 +43,13 @@ var prewarm_distance := 4.0           # m: near a door, also warm the rooms behi
 var cold_delay := 2.0                 # s: grace period before a room is allowed to go COLD
 var step_budget_usec := 1500          # per-frame time slice for state changes (1.5 ms)
 var snap_distance := 6.0              # m the player may move between two frames before it counts as a teleport
+
+# --- Light view ---
+var light_view_margin_deg := 25.0     # degrees added around the camera's view (lights are already on when you turn)
+var light_view_hold := 1.0            # s a room stays lit after its last door or window left the view
+var light_view_near := 3.0            # m: standing this close to a door or window keeps the room behind it lit
+var light_view_hops := 2              # glass links in a row a sight line may pass to light a zone (doors / windows)
+var light_view_shadow_near := 2.0     # m: this close to a door, the room behind it gets its shadows back (before you cross)
 
 # --- Exterior (Mars) visibility ---
 var exterior_hide_delay := 1.5        # s: Mars must be unneeded this long before it is hidden
@@ -67,6 +81,7 @@ var dynamic_resolution_mode := -1     # -1 = follow the setting and the graphics
 var dynamic_resolution_target_fps := 60.0  # the frame rate it holds (the screen's refresh rate when that is lower)
 
 const SWITCHES: Array[StringName] = [&"zones_enabled", &"room_props_enabled", &"exterior_cull_enabled", &"view_activation_enabled",
+	&"light_view_enabled", &"light_view_shadows_enabled",
 	&"colony_lod_enabled", &"visibility_ranges_enabled", &"shader_warmup_enabled", &"sun_shadow_tuning_enabled",
 	&"light_distance_fade_enabled", &"background_throttle_enabled"]
 

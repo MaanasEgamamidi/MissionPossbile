@@ -41,7 +41,8 @@ func _initialize() -> void:
 
 	GraphicsQuality.apply(self, GraphicsQuality.Level.ULTRA)
 	_check(env.volumetric_fog_enabled and env.ssr_max_steps >= 96, "Ultra: volumetric haze and finer reflections")
-	_check(root.msaa_3d == Viewport.MSAA_4X and root.positional_shadow_atlas_size == 8192, "Ultra: 4x MSAA and 8K shadow atlas")
+	_check(root.msaa_3d == Viewport.MSAA_DISABLED and root.scaling_3d_mode in [Viewport.SCALING_3D_MODE_FSR2, Viewport.SCALING_3D_MODE_METALFX_TEMPORAL] \
+		and root.positional_shadow_atlas_size == 8192, "Ultra: FSR 2 (temporal anti-aliasing) instead of MSAA, 8K shadow atlas")
 	_check(sun.directional_shadow_max_distance > authored.sun_dist, "Ultra: longer sun shadow distance")
 
 	GraphicsQuality.apply(self, GraphicsQuality.Level.LOW)

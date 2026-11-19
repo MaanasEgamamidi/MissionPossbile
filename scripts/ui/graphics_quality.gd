@@ -21,17 +21,28 @@ const DESCRIPTIONS: PackedStringArray = [
 	"Fastest. Room lights cast no shadows, render at 75 % with FSR upscaling, no reflections or ambient shading.",
 	"Balanced. Nearby room lights cast shadows, lighter ambient shading, smaller shadow maps, FXAA.",
 	"The look the colony was designed with: all shadows, ambient shading, reflections, 2x MSAA.",
-	"Best looking. Volumetric dust haze, sharper and softer shadows, finer reflections, 4x MSAA. Needs a strong GPU.",
+	"Best looking. Volumetric dust haze, sharper and softer shadows, finer reflections, FSR 2 temporal anti-aliasing and upscaling that adapts to hold 60 FPS.",
 ]
 
 const _META := &"gq_authored"
+## Fixture shadow wanted by the preset (meta), and the perf light view's block on it (meta, see set_fixture_shadow_blocked).
+const _SHADOW_WANT := &"gq_shadow_want"
+const _SHADOW_BLOCKED := &"perf_shadow_blocked"
+## Distance from the camera (m) at which shadowed area lights start to fade out on the presets without a fixture fade.
+const ENCLOSED_AREA_FADE := 12.0
 
 ## Settings per preset, LOW .. ULTRA.
 const _P := {
 	# viewport
-	"msaa": [Viewport.MSAA_DISABLED, Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_4X],
+	# Ultra (2026-11-18, owner: "60fps stable on ultra on my 4060ti"): FSR 2 replaces 4x MSAA. It is a temporal
+	# anti-aliaser and upscaler in one: the 3D picture is drawn at 77 % (adaptive down to 60 % by DynamicResolution when a
+	# room cannot hold 60 FPS) and rebuilt at full size from the frames before. Measured at 2560x1369 on the RTX 4060 Ti:
+	# native 4x MSAA 24-45 ms per frame, FSR 2 at 67 % 12-19 ms, stills nearly identical (docs/perf/ultra_60fps.md).
+	"msaa": [Viewport.MSAA_DISABLED, Viewport.MSAA_DISABLED, Viewport.MSAA_2X, Viewport.MSAA_DISABLED],
 	"fxaa": [false, true, false, false],
-	"scale": [0.75, 1.0, 1.0, 1.0],
+	"scale": [0.75, 1.0, 1.0, 0.77],
+	## temporal upscaling (FSR 2; MetalFX temporal on macOS) at any render scale, and adaptive render scale on any card
+	"temporal": [false, false, false, true],
 	"lod_px": [4.0, 2.0, 2.0, 1.0],
 	"pos_atlas": [1024, 2048, 4096, 8192],
 	# rendering server
@@ -127,13 +138,16 @@ static func _apply_viewport(vp: Viewport, level: int) -> void:
 static func _apply_scale(vp: Viewport, level: int) -> void:
 	var size: Vector2i = (vp as Window).size if vp is Window else (vp as SubViewport).size if vp is SubViewport else Vector2i.ZERO
 	var scale := render_scale(level, float(size.x) * float(size.y))
-	vp.scaling_3d_mode = upscaler(scale)
+	vp.scaling_3d_mode = upscaler(scale, level)
 	vp.scaling_3d_scale = scale
 
 
 ## The upscaler for a render scale: MetalFX on macOS (Apple's own, sharper than FSR 1 on Apple GPUs), FSR elsewhere,
-## plain bilinear at full resolution. DynamicResolution uses this too.
-static func upscaler(scale: float) -> Viewport.Scaling3DMode:
+## plain bilinear at full resolution. A preset with "temporal" (Ultra) always uses the temporal upscaler (FSR 2,
+## MetalFX temporal on macOS), which is also its anti-aliasing. DynamicResolution uses this too.
+static func upscaler(scale: float, level := -1) -> Viewport.Scaling3DMode:
+	if level >= 0 and bool(value("temporal", level)):
+		return Viewport.SCALING_3D_MODE_METALFX_TEMPORAL if OS.has_feature("macos") else Viewport.SCALING_3D_MODE_FSR2
 	if scale >= 0.999:
 		return Viewport.SCALING_3D_MODE_BILINEAR
 	return Viewport.SCALING_3D_MODE_METALFX_SPATIAL if OS.has_feature("macos") else Viewport.SCALING_3D_MODE_FSR
@@ -172,18 +186,41 @@ static func _apply_sun(sun: DirectionalLight3D, level: int) -> void:
 	sun.directional_shadow_mode = int(a.mode) if level == Level.HIGH else int(value("sun_mode", level))
 
 
+## Perf light view: blocks (or lifts the block on) a fixture light's shadow map. Unblocked, the light casts what the
+## preset in effect wants (or what it cast before the first block when no preset has been applied).
+static func set_fixture_shadow_blocked(light: Light3D, blocked: bool) -> void:
+	if light == null or bool(light.get_meta(_SHADOW_BLOCKED, false)) == blocked:
+		return
+	if not light.has_meta(_SHADOW_WANT):
+		light.set_meta(_SHADOW_WANT, light.shadow_enabled)
+	light.set_meta(_SHADOW_BLOCKED, blocked)
+	light.shadow_enabled = bool(light.get_meta(_SHADOW_WANT)) and not blocked
+
+
 static func _apply_fixture(light: Light3D, level: int) -> void:
 	if not light.has_meta(_META):
 		light.set_meta(_META, {"shadow": light.shadow_enabled, "fade": light.distance_fade_enabled,
 			"begin": light.distance_fade_begin, "shadow_fade": light.distance_fade_shadow, "length": light.distance_fade_length})
 	var a: Dictionary = light.get_meta(_META)
-	light.shadow_enabled = bool(a.shadow) and value("fixture_shadows", level)
+	var shadow: bool = bool(a.shadow) and value("fixture_shadows", level)
+	light.set_meta(_SHADOW_WANT, shadow)
+	light.shadow_enabled = shadow and not bool(light.get_meta(_SHADOW_BLOCKED, false))
 	var fade: float = value("fixture_fade", level)
 	if fade > 0.0:
 		light.distance_fade_enabled = true
 		light.distance_fade_begin = fade
 		light.distance_fade_length = 8.0
 		light.distance_fade_shadow = fade * 0.6
+	elif level == Level.ULTRA and bool(a.shadow) and light.get_class() == "AreaLight3D" and not bool(a.fade):
+		# Shadowed area lights (the four exit tunnel panels, 30 m range) light only the inside of the tunnel, their own
+		# shadows keep the light in, yet their 30 m reach made every view near the tunnel pay for them: 15 ms of a 44 ms
+		# frame outdoors at Ultra, 1440p, with no visible change when they are off (docs/perf/ultra_60fps.md). Full
+		# strength within 12 m of the camera (the whole tunnel), faded out by 18 m (2026-11-18). Ultra only: High stays the authored scene,
+		# Medium and Low fade every fixture already.
+		light.distance_fade_enabled = true
+		light.distance_fade_begin = ENCLOSED_AREA_FADE
+		light.distance_fade_length = 6.0
+		light.distance_fade_shadow = ENCLOSED_AREA_FADE
 	else:
 		light.distance_fade_enabled = bool(a.fade)
 		light.distance_fade_begin = float(a.begin)

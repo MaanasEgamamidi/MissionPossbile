@@ -99,6 +99,9 @@ func _process(delta: float) -> void:
 			for z in zones:
 				z.apply_immediately(Zone.State.ACTIVE)
 			_apply_camera_mask()
+			_update_light_view(delta)
+			if lighting != null:
+				lighting.flush_queue()
 		return
 	if not _was_enabled:
 		_was_enabled = true
@@ -121,6 +124,7 @@ func _process(delta: float) -> void:
 		_update_targets(false)
 	_run_queue()
 	_apply_camera_mask()
+	_update_light_view(delta)
 
 
 func queue_length() -> int:
@@ -136,6 +140,10 @@ func snap() -> void:
 	if is_graph_ready and player() != null and Perf.cfg().zones_enabled:
 		_update_targets(true)
 	_apply_camera_mask()
+	# teleport, fast travel, load: the light view and every queued light change apply in this frame
+	_update_light_view(0.0)
+	if lighting != null:
+		lighting.flush_queue()
 
 
 # ---------------------------------------------------------------- building
@@ -237,10 +245,17 @@ func _build_windows() -> void:
 			if String(m3.name).contains("door") or not _mesh_has_glass(m3):
 				continue
 			var ids := _zone_ids_of_layers(m3.layers)
+			var box := m3.global_transform * m3.mesh.get_aabb()
 			for i in ids.size():
 				for j in range(i + 1, ids.size()):
-					pairs["%s|%s" % [ids[i], ids[j]]] = [ids[i], ids[j], m3.global_transform * m3.mesh.get_aabb().get_center()]
-	pairs["%s|%s" % [ColonyZones.PLAZA, ColonyZones.GARDEN]] = [ColonyZones.PLAZA, ColonyZones.GARDEN, Vector3.ZERO]
+					var key := "%s|%s" % [ids[i], ids[j]]
+					# every glazed mesh between the same two zones counts: the link's box covers all of them
+					var all: AABB = (pairs[key][3] as AABB).merge(box) if pairs.has(key) else box
+					pairs[key] = [ids[i], ids[j], all.get_center(), all]
+	var gc := Vector3(ColonyZones.GARDEN_CENTRE.x, 1.5, -ColonyZones.GARDEN_CENTRE.y)
+	var gr := float(ColonyZones.GARDEN_RADIUS)
+	pairs["%s|%s" % [ColonyZones.PLAZA, ColonyZones.GARDEN]] = [ColonyZones.PLAZA, ColonyZones.GARDEN, gc,
+		AABB(gc - Vector3(gr, 1.5, gr), Vector3(2.0 * gr, 12.0, 2.0 * gr))]
 	for k: String in pairs:
 		var pr: Array = pairs[k]
 		var za := zone(pr[0])
@@ -251,6 +266,7 @@ func _build_windows() -> void:
 		zd.name = "Window_%s_%s" % [ColonyZones.slug(pr[0]), ColonyZones.slug(pr[1])]
 		add_child(zd)
 		zd.global_position = pr[2]
+		zd.radius = maxf(1.0, (pr[3] as AABB).size.length() * 0.5)
 		zd.is_window = true
 		zd.transparent = true
 		zd.zone_a = za
@@ -768,7 +784,134 @@ func zone_drawn_changed(_z: Zone) -> void:
 
 func zone_lights_changed(z: Zone) -> void:
 	if lighting != null:
-		lighting.set_zone_awake(String(z.zone_id), z.lights_awake)
+		lighting.set_zone_awake(String(z.zone_id), z.lights_awake and z.in_view)
+
+
+# ---------------------------------------------------------------- light view (2026-11-18)
+# A drawn zone's fixture lights only matter for the part of that zone the camera can see. The colony's meshes are
+# merged across rooms, so the lights of a neighbouring room overlap the room you stand in and are shaded on every
+# pixel there (measured at Ultra, 1440p: 14-28 ms of a 32-44 ms frame), while what they add to the picture is the
+# neighbour seen through a door or window. So a zone other than the one the camera is in keeps its lights only while
+# a door or window leading to it is near the camera's view: directly from the camera's zone, or through more glass
+# links (glass_view_hops), each of them near the view. "Near the view": the opening's sphere is within the camera's
+# diagonal field of view plus light_view_margin_deg, or the camera is within light_view_near of it. Lights come on in
+# the frame the opening comes near the view and go off light_view_hold seconds after it left. Outside on Mars: the
+# domes are lit while their bounds are near the view, and a room while a door or window between it and a dome or
+# Mars is. Fixture lights are visual only (ZoneLighting, nothing in the game reads them).
+
+var _lv_unseen: Dictionary = {}    # Zone -> seconds since it was last in view
+
+
+func _update_light_view(delta: float) -> void:
+	var cam := get_viewport().get_camera_3d() if is_inside_tree() else null
+	var on: bool = Perf.cfg().light_view_enabled and Perf.cfg().zones_enabled and cam != null and is_graph_ready
+	var seen: Dictionary = zones_in_view(cam) if on else {}
+	var shadow_on: bool = on and Perf.cfg().light_view_shadows_enabled
+	var shadowed: Dictionary = zones_with_shadows(cam.global_position) if shadow_on else {}
+	# Switching on is done at once (it shows). Switching off waits its turn: one zone per frame, because switching the
+	# lights of several zones off in one frame made that frame 2x long (measured 33-39 ms at Ultra).
+	var offs := 0
+	for z in zones:
+		var want := true
+		if on:
+			_lv_unseen[z] = 0.0 if seen.has(z) else float(_lv_unseen.get(z, 1e9)) + delta
+			want = float(_lv_unseen[z]) <= Perf.cfg().light_view_hold
+		if want != z.in_view and (want or offs == 0):
+			offs += 0 if want else 1
+			z.in_view = want
+			zone_lights_changed(z)
+		var shadows: bool = shadowed.has(z) if shadow_on else true
+		if shadows != z.shadows_on and (shadows or offs == 0):
+			offs += 0 if shadows else 1
+			z.shadows_on = shadows
+			if lighting != null:
+				lighting.set_zone_shadows(String(z.zone_id), shadows)
+
+
+## The zones whose fixture lights keep their shadow maps: the camera's zone, the player's, and every zone behind a
+## door or window within light_view_shadow_near of the camera (so they are ready before the camera crosses).
+func zones_with_shadows(eye: Vector3) -> Dictionary:
+	var out := {}
+	for z in zones:
+		if z == current or z.contains_point(eye, 0.2):
+			out[z] = true
+	var near := float(Perf.cfg().light_view_shadow_near)
+	for d in doors:
+		if d.global_position.distance_to(eye) > d.radius + near:
+			continue
+		for z: Zone in [d.zone_a, d.zone_b]:
+			if z != null:
+				out[z] = true
+	return out
+
+
+## The zones the camera can see into right now (see the light view notes above), as a set.
+func zones_in_view(cam: Camera3D) -> Dictionary:
+	var out := {}
+	var eye := cam.global_position
+	var fwd := -cam.global_basis.z
+	var half: float = _half_view_angle(cam) + deg_to_rad(float(Perf.cfg().light_view_margin_deg))
+	var near := float(Perf.cfg().light_view_near)
+	var frontier: Array[Zone] = []
+	for z in zones:
+		if z == current or z.contains_point(eye, 0.2):
+			out[z] = true
+			frontier.append(z)
+	if frontier.is_empty():
+		# outside on Mars (or a camera flown away): domes by their bounds, rooms by their openings to a dome or Mars
+		for z in zones:
+			if z.kind != Zone.KIND_ROOM and _sphere_near_view(eye, fwd, half, near, z.centre, _dome_radius(z)):
+				out[z] = true
+		for d in doors:
+			if not d.lets_sight_through() or not _sphere_near_view(eye, fwd, half, near, d.global_position, d.radius):
+				continue
+			for z: Zone in [d.zone_a, d.zone_b]:
+				if z == null or z.kind != Zone.KIND_ROOM:
+					continue
+				var o := d.other(z)
+				if d.leads_outside or (o != null and o.kind != Zone.KIND_ROOM):
+					out[z] = true
+					frontier.append(z)
+	for _h in maxi(1, int(Perf.cfg().light_view_hops)):
+		var nxt: Array[Zone] = []
+		for z in frontier:
+			for d in doors:
+				if d.zone_a == null or d.zone_b == null or not d.joins(z) or not d.lets_sight_through():
+					continue
+				var o := d.other(z)
+				if o == null or out.has(o) or not _sphere_near_view(eye, fwd, half, near, d.global_position, d.radius):
+					continue
+				out[o] = true
+				nxt.append(o)
+		frontier = nxt
+	return out
+
+
+func _dome_radius(z: Zone) -> float:
+	if z.kind == Zone.KIND_GARDEN:
+		return z.radius + 2.0
+	return z.rect.size.length() * 0.5 + 2.0
+
+
+## Half the camera's diagonal field of view, radians.
+static func _half_view_angle(cam: Camera3D) -> float:
+	var vp := cam.get_viewport()
+	var size := vp.get_visible_rect().size if vp != null else Vector2(16, 9)
+	var aspect := size.x / maxf(1.0, size.y)
+	var t := tan(deg_to_rad(cam.fov) * 0.5)
+	var tv := t if cam.keep_aspect == Camera3D.KEEP_HEIGHT else t / aspect
+	var th := t if cam.keep_aspect == Camera3D.KEEP_WIDTH else t * aspect
+	return atan(sqrt(tv * tv + th * th))
+
+
+## Is a sphere within `half` radians of the view direction (or within `near` metres of the eye)?
+static func _sphere_near_view(eye: Vector3, fwd: Vector3, half: float, near: float, c: Vector3, r: float) -> bool:
+	var v := c - eye
+	var dist := v.length()
+	if dist <= r + near:
+		return true
+	var angle := acos(clampf(v.dot(fwd) / dist, -1.0, 1.0))
+	return angle - asin(clampf(r / dist, 0.0, 1.0)) <= half
 
 
 ## Other systems hide render layers through the same camera (ExteriorController: the Exterior layer).

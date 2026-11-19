@@ -16,6 +16,8 @@ var is_window := false
 var controller: DoorController   ## null for a window
 var closed_occluder: OccluderInstance3D  ## optional: only enabled while the door is closed
 var is_open := false: set = set_open
+## Radius of a sphere around global_position that holds the opening (light view: is the opening near the camera's view).
+var radius := 1.6
 
 
 func setup(door: DoorController) -> void:
