@@ -105,9 +105,9 @@ func _apply_case(c: String, lights: Array[Node]) -> void:
 		"msaa_off":
 			root.msaa_3d = Viewport.MSAA_DISABLED
 		"ssao_half":
-			RenderingServer.environment_set_ssao_quality(GraphicsQuality.value("ssao_q", _base), true, 0.5, 2, 50.0, 300.0)
+			RenderingServer.environment_set_ssao_quality(GraphicsQuality.ssao_quality(GraphicsQuality.preset_value("ao", _base)), true, 0.5, 2, 50.0, 300.0)
 		"ssil_half":
-			RenderingServer.environment_set_ssil_quality(GraphicsQuality.value("ssil_q", _base), true, 0.5, 4, 50.0, 300.0)
+			RenderingServer.environment_set_ssil_quality(GraphicsQuality.ssil_quality(GraphicsQuality.preset_value("ssil", _base)), true, 0.5, 4, 50.0, 300.0)
 		"ssil_off", "ssao_off", "ssr_off", "glow_off":
 			var prop: String = {"ssil_off": "ssil_enabled", "ssao_off": "ssao_enabled", "ssr_off": "ssr_enabled", "glow_off": "glow_enabled"}[c]
 			for e: Environment in _envs():

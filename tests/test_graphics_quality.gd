@@ -50,6 +50,33 @@ func _initialize() -> void:
 	_check(_snapshot(env, sun, fixtures) == authored, "Low then High restores the authored scene exactly")
 	_check(GraphicsQuality.applied_level(self) == GraphicsQuality.Level.HIGH, "applied level is remembered")
 
+	# Owner 2026-11-18: every feature is its own option; changing one makes Custom; no preset maxes everything.
+	for level in GraphicsQuality.NAMES.size():
+		var o := GraphicsQuality.options_for(level)
+		_check(GraphicsQuality.count_at_best(o) < GraphicsQuality.OPTIONS.size() - 5,
+			"%s leaves options below their best (%d of %d at best)" % [GraphicsQuality.level_name(level), GraphicsQuality.count_at_best(o), GraphicsQuality.OPTIONS.size()])
+	var maxed := {}
+	for opt: Dictionary in GraphicsQuality.OPTIONS:
+		maxed[String(opt.key)] = GraphicsQuality.best(opt)
+	_check(GraphicsQuality.count_at_best(GraphicsQuality.options_for(GraphicsQuality.Level.ULTRA, maxed)) == GraphicsQuality.OPTIONS.size(),
+		"every option can be turned to its best by hand")
+	GraphicsQuality.apply(self, GraphicsQuality.Level.HIGH, null, {"ssr": 0, "gi": 1, "aa": 4, "render_scale": 90})
+	_check(not env.ssr_enabled and env.sdfgi_enabled and root.msaa_3d == Viewport.MSAA_4X and is_equal_approx(root.scaling_3d_scale, 0.9),
+		"custom options on High: reflections off, global illumination on, 4x MSAA, 90 % resolution")
+	_check(GraphicsQuality.applied_level(self) == GraphicsQuality.Level.HIGH and int(GraphicsQuality.current(self, "ssr")) == 0, "custom options are kept as the options in effect")
+	GraphicsQuality.apply(self, GraphicsQuality.Level.HIGH, null, {})
+	_check(_snapshot(env, sun, fixtures) == authored and not env.sdfgi_enabled, "back to plain High restores the authored scene")
+	var cs := GameSettings.new()
+	cs.choose_preset(GraphicsQuality.Level.HIGH)
+	cs.set_graphics_option("ssr", 0)
+	_check(cs.is_custom_graphics() and not cs.graphics_auto and cs.graphics_option("ssr") == 0, "changing an option makes the settings Custom")
+	cs.set_graphics_option("ssr", GraphicsQuality.preset_value("ssr", GraphicsQuality.Level.HIGH))
+	_check(not cs.is_custom_graphics(), "setting it back to the preset's value leaves Custom")
+	cs.set_graphics_option("film_grain", 99)
+	_check(cs.graphics_option("film_grain") == 10, "slider options are clamped")
+	cs.choose_preset(GraphicsQuality.Level.ULTRA)
+	_check(not cs.is_custom_graphics() and cs.graphics_quality == GraphicsQuality.Level.ULTRA, "picking a preset drops hand changes")
+
 	# settings: stored, clamped, loaded
 	var dir := ProjectSettings.globalize_path("res://_test_saves/diag")
 	DirAccess.make_dir_recursive_absolute(dir)
@@ -70,6 +97,13 @@ func _initialize() -> void:
 	s.graphics_quality = GraphicsQuality.Level.MEDIUM
 	s.save(path)
 	_check(GameSettings.load_or_default(path).graphics_quality == GraphicsQuality.Level.MEDIUM, "preset survives save and load")
+	s.set_graphics_option("ao", 4)
+	s.brightness = 70
+	s.save(path)
+	var loaded := GameSettings.load_or_default(path)
+	_check(loaded.graphics_option("ao") == 4 and loaded.is_custom_graphics() and loaded.brightness == 70, "custom options and brightness survive save and load")
+	s.choose_preset(GraphicsQuality.Level.MEDIUM)
+	s.brightness = 50
 	s.apply(self)
 	_check(GraphicsQuality.applied_level(self) == GraphicsQuality.Level.MEDIUM and not env.ssil_enabled, "GameSettings.apply puts the preset into effect")
 	DirAccess.remove_absolute(path)
@@ -82,7 +116,9 @@ func _initialize() -> void:
 	panel.setup(null)
 	root.add_child(panel)
 	await process_frame
-	_check(panel.tabs().get_tab_title(2) == "Graphics" and panel.quality_button().item_count == 4, "Graphics tab offers four presets")
+	_check(panel.tabs().get_tab_title(2) == "Graphics" and panel.quality_button().item_count == 5, "Graphics tab offers four presets and Custom")
+	_check(panel.find_child("Option_shadows", true, false) != null and panel.find_child("Option_motion_blur", true, false) != null,
+		"Graphics tab lists the options (shadow quality, motion blur...)")
 	_check(panel.quality_button().selected == GraphicsQuality.default_level(), "panel shows the current preset")
 	panel.quality_button().select(GraphicsQuality.Level.LOW)
 	panel.quality_button().item_selected.emit(GraphicsQuality.Level.LOW)

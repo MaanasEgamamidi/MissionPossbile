@@ -11,7 +11,8 @@ const TEXT_SCALES: Array[float] = [1.0, 1.25, 1.5]
 const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov_degrees", &"mouse_sensitivity",
 	&"invert_y", &"toggle_sprint", &"reduce_motion", &"high_contrast", &"graphics_quality",
 	&"voice_input_device", &"voice_mic_muted", &"voice_volume", &"reduce_flashes", &"warning_sound_muted", &"warning_sound_volume",
-	&"narrator_voice", &"narrator_volume", &"graphics_auto"]
+	&"narrator_voice", &"narrator_volume", &"graphics_auto", &"graphics_custom", &"brightness", &"contrast",
+	&"window_mode", &"monitor", &"resolution", &"aspect_ratio", &"max_fps", &"vsync", &"low_latency", &"hdr", &"hdr_max_nits"]
 
 ## Size of all menus and the HUD (0.75 to 2.0).
 @export var ui_scale := 1.0:
@@ -120,6 +121,136 @@ const KEYS: Array[StringName] = [&"ui_scale", &"text_scale", &"subtitles", &"fov
 		if v != graphics_auto:
 			graphics_auto = v
 			emit_changed()
+## Owner 2026-11-18: graphics options changed by hand on top of the preset (GraphicsQuality.OPTIONS key -> choice index
+## or slider number). Not empty = the "Custom" preset. Change it with set_graphics_option / choose_preset.
+@export var graphics_custom := {}:
+	set(v):
+		v = _clean_custom(v)
+		if v != graphics_custom:
+			graphics_custom = v
+			emit_changed()
+## Settings > Display: picture brightness and contrast, 0..100 (50 = as the colony was lit).
+@export var brightness := 50:
+	set(v):
+		v = clampi(v, 0, 100)
+		if v != brightness:
+			brightness = v
+			emit_changed()
+@export var contrast := 50:
+	set(v):
+		v = clampi(v, 0, 100)
+		if v != contrast:
+			contrast = v
+			emit_changed()
+## Settings > Display (DisplaySettings): window mode (0 windowed, 1 maximized, 2 fullscreen, 3 exclusive fullscreen),
+## monitor (-1 = where the window opens), windowed size ("" = three quarters of the screen, else "1920x1080"), aspect
+## ratio (DisplaySettings.ASPECTS), frame rate limit (0 = none, -1 = the monitor's refresh rate), VSync
+## (DisplaySettings.VSYNC_NAMES), low latency, HDR output and its peak brightness in nits.
+@export var window_mode := 1:
+	set(v):
+		v = clampi(v, 0, 3)
+		if v != window_mode:
+			window_mode = v
+			emit_changed()
+@export var monitor := -1:
+	set(v):
+		v = clampi(v, -1, 15)
+		if v != monitor:
+			monitor = v
+			emit_changed()
+@export var resolution := "":
+	set(v):
+		v = v.strip_edges() if v.is_empty() or v.split("x").size() == 2 else ""
+		if v != resolution:
+			resolution = v
+			emit_changed()
+@export var aspect_ratio := 0:
+	set(v):
+		v = clampi(v, 0, 4)
+		if v != aspect_ratio:
+			aspect_ratio = v
+			emit_changed()
+@export var max_fps := 0:
+	set(v):
+		v = clampi(v, -1, 1000)
+		if v != max_fps:
+			max_fps = v
+			emit_changed()
+@export var vsync := 1:
+	set(v):
+		v = clampi(v, 0, 3)
+		if v != vsync:
+			vsync = v
+			emit_changed()
+@export var low_latency := false:
+	set(v):
+		if v != low_latency:
+			low_latency = v
+			emit_changed()
+@export var hdr := false:
+	set(v):
+		if v != hdr:
+			hdr = v
+			emit_changed()
+@export var hdr_max_nits := 600:
+	set(v):
+		v = clampi(v, 100, 2000)
+		if v != hdr_max_nits:
+			hdr_max_nits = v
+			emit_changed()
+
+
+## True when options were changed by hand (the "Custom" preset).
+func is_custom_graphics() -> bool:
+	return not graphics_custom.is_empty()
+
+
+## The value of a graphics option in effect: the hand-changed one, or the preset's.
+func graphics_option(key: String) -> int:
+	return int(graphics_custom.get(key, GraphicsQuality.preset_value(key, graphics_quality)))
+
+
+## Changes one graphics option by hand: the settings become Custom ("Fit to this computer" goes off). Setting it back
+## to the preset's own value removes it from the custom list.
+func set_graphics_option(key: String, value: int) -> void:
+	var o := GraphicsQuality.option(key)
+	if o.is_empty():
+		return
+	value = GraphicsQuality.clamp_value(o, value)
+	var c := graphics_custom.duplicate()
+	if value == GraphicsQuality.preset_value(key, graphics_quality):
+		c.erase(key)
+	else:
+		c[key] = value
+	graphics_auto = false
+	graphics_custom = c
+
+
+## Picks a preset by hand: every option goes back to that preset's ("Fit to this computer" goes off).
+func choose_preset(level: int) -> void:
+	graphics_auto = false
+	graphics_custom = {}
+	graphics_quality = level
+
+
+## What GraphicsQuality.apply takes: the hand-changed options plus the display values it applies.
+func graphics_options() -> Dictionary:
+	var d := graphics_custom.duplicate()
+	d["brightness"] = brightness
+	d["contrast"] = contrast
+	d["reduce_motion"] = reduce_motion
+	return d
+
+
+## Only known options, each made valid; numbers from JSON become whole numbers.
+static func _clean_custom(v: Dictionary) -> Dictionary:
+	var out := {}
+	for key: Variant in v:
+		var o := GraphicsQuality.option(String(key))
+		var value: Variant = v[key]
+		if not o.is_empty() and (value is int or value is float):
+			out[String(key)] = GraphicsQuality.clamp_value(o, value)
+	return out
 
 
 ## VoiceService resolves this computer's built-in microphone when capture starts.
@@ -166,6 +297,8 @@ static func load_or_default(path := DEFAULT_PATH) -> GameSettings:
 			s.set(key, int(v))
 		elif current is String and v is String:
 			s.set(key, v)
+		elif current is Dictionary and v is Dictionary:
+			s.set(key, v)
 	# A file written before graphics_auto existed: a preset other than the default was chosen by hand, so keep it.
 	if not d.has("graphics_auto"):
 		s.graphics_auto = s.graphics_quality == GraphicsQuality.default_level()
@@ -181,6 +314,7 @@ func fit_to_hardware() -> void:
 	var level := HardwareProfile.recommended_level()
 	if level >= 0:
 		graphics_quality = level
+		graphics_custom = {}
 
 
 ## Writes the settings as JSON.
@@ -193,13 +327,18 @@ func save(path := DEFAULT_PATH) -> Error:
 	return file.get_error()
 
 
-## Puts the screen settings into effect: UI scale, text size, high contrast colours and the graphics preset
-## (only when the preset changed; after loading a world call GraphicsQuality.apply() so its lights get it too).
+## Puts the screen settings into effect: UI scale, text size, high contrast colours, the graphics preset and options
+## (only when they changed; after loading a world call GraphicsQuality.apply() so its lights get them too - it keeps
+## these options) and the display settings (window, frame rate, VSync, HDR: DisplaySettings).
 func apply(tree: SceneTree) -> void:
 	if tree != null and tree.root != null:
 		tree.root.content_scale_factor = ui_scale
-		if GraphicsQuality.applied_level(tree) != graphics_quality:
-			GraphicsQuality.apply(tree, graphics_quality)
+		var options := graphics_options()
+		tree.root.set_meta(GraphicsQuality.PLAYER_META, options)
+		if GraphicsQuality.applied_level(tree) != graphics_quality or tree.root.get_meta(&"gq_settings_applied", {}) != options:
+			GraphicsQuality.apply(tree, graphics_quality, null, options)
+			tree.root.set_meta(&"gq_settings_applied", options)
+		DisplaySettings.apply(self, tree)
 	UiTheme.set_high_contrast(high_contrast)
 	UiTheme.apply_text_scale(text_scale)
 

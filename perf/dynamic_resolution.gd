@@ -12,8 +12,9 @@ extends Node
 ##   - not a headless run, and PerfSettings.dynamic_resolution_mode is not 0
 ##   - mode 1 (forced on), or the player's "Fit to this computer" setting is on and HardwareProfile rates the card
 ##     MID or BASIC. On a STRONG card nothing changes: High stays the authored picture at the window's resolution.
-##   - or the preset is a temporal one (Ultra, 2026-11-18): FSR 2 rebuilds the full picture from a smaller one, so the
-##     scale moves between 77 % and min_scale() on every card to hold 60 FPS (changing it costs < 3 ms once, measured).
+##   - or Adaptive resolution is on (Settings > Graphics; the Ultra preset has it, 2026-11-18): with FSR 2 the scale moves
+##     between the Render resolution (77 % on Ultra) and min_scale() on every card to hold 60 FPS (changing it costs
+##     < 3 ms once, measured).
 ## When it turns off it puts the graphics preset's own render scale back.
 ##
 ## Rules, checked twice a second on the mean GPU time of that half second:
@@ -130,9 +131,9 @@ func wanted() -> bool:
 		return false
 	if mode == 1:
 		return true
-	# Ultra (2026-11-18): a temporal preset adapts its render scale on every card, so it holds 60 FPS in the heavy rooms
-	var level := GraphicsQuality.applied_level(get_tree())
-	if level >= 0 and bool(GraphicsQuality.value("temporal", level)):
+	# Ultra (2026-11-18): Adaptive resolution (on in the Ultra preset, or chosen in Settings > Graphics) adapts the render
+	# scale on every card, so it holds 60 FPS in the heavy rooms
+	if GraphicsQuality.is_adaptive(get_tree()):
 		return true
 	return settings != null and settings.graphics_auto and bool(HardwareProfile.current().get("dynamic", false))
 
@@ -141,8 +142,7 @@ func wanted() -> bool:
 func target_fps() -> float:
 	var fps := maxf(float(Perf.cfg().dynamic_resolution_target_fps), 20.0)
 	# a chip built into the processor aims for 30 (HardwareProfile.INTEGRATED_TARGET_FPS) unless the preset is Ultra
-	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
-	if level < 0 or not bool(GraphicsQuality.value("temporal", level)):
+	if not is_inside_tree() or not GraphicsQuality.is_temporal(get_tree()):
 		fps = minf(fps, maxf(float(HardwareProfile.current().get("target_fps", fps)), 20.0))
 	var refresh := DisplayServer.screen_get_refresh_rate()
 	return minf(fps, refresh) if refresh > 20.0 else fps
@@ -150,12 +150,11 @@ func target_fps() -> float:
 
 ## The render scale of the graphics preset in effect.
 func preset_scale() -> float:
-	var level := GraphicsQuality.applied_level(get_tree())
-	if level < 0:
+	if GraphicsQuality.applied_level(get_tree()) < 0:
 		return 1.0
-	# on macOS this already includes the Retina pixel budget of that preset
+	# the Render resolution option; on macOS this already includes the Retina pixel budget of the preset
 	var pixels := float(_window.size.x) * float(_window.size.y) if _window != null else 0.0
-	return GraphicsQuality.render_scale(level, pixels)
+	return GraphicsQuality.scale_for(get_tree(), pixels)
 
 
 ## Ultra's temporal upscaler rebuilds a full picture from half the pixels each way, so it may go down to TEMPORAL_MIN_SCALE
@@ -164,14 +163,12 @@ const TEMPORAL_MIN_SCALE := 0.5
 
 
 func budget_share() -> float:
-	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
-	return TEMPORAL_BUDGET_SHARE if level >= 0 and bool(GraphicsQuality.value("temporal", level)) else BUDGET_SHARE
+	return TEMPORAL_BUDGET_SHARE if is_inside_tree() and GraphicsQuality.is_temporal(get_tree()) else BUDGET_SHARE
 
 
 func min_scale() -> float:
 	var s := float(HardwareProfile.current().get("min_scale", 0.6))
-	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
-	if level >= 0 and bool(GraphicsQuality.value("temporal", level)):
+	if is_inside_tree() and GraphicsQuality.is_temporal(get_tree()):
 		s = minf(s, TEMPORAL_MIN_SCALE)
 	return s
 
@@ -272,5 +269,5 @@ func _change(to: float, probe: bool) -> void:
 
 
 func _write(scale: float) -> void:
-	_window.scaling_3d_mode = GraphicsQuality.upscaler(scale, GraphicsQuality.applied_level(get_tree()))
+	_window.scaling_3d_mode = GraphicsQuality.upscaler(scale, GraphicsQuality.is_temporal(get_tree()))
 	_window.scaling_3d_scale = scale

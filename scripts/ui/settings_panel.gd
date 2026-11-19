@@ -46,6 +46,23 @@ var _toggle_sprint: CheckButton
 var _quality: Kit.Segmented
 var _quality_info: Label
 var _auto_quality: CheckButton
+var _option_controls := {}    # graphics option key -> HSlider or Kit.Segmented
+var _option_labels := {}      # graphics option key -> value Label
+var _screen: Kit.Segmented
+var _window_mode: Kit.Segmented
+var _window_size: Kit.Segmented
+var _aspect: Kit.Segmented
+var _fps_limit: Kit.Segmented
+var _vsync: Kit.Segmented
+var _low_latency: CheckButton
+var _hdr: CheckButton
+var _hdr_nits: HSlider
+var _hdr_nits_label: Label
+var _brightness: HSlider
+var _brightness_label: Label
+var _contrast: HSlider
+var _contrast_label: Label
+var _sizes: Array[Vector2i] = []
 var _change_buttons: Dictionary = {}     # action -> Button (shows the key; pressing it waits for a new one)
 var _reset_buttons: Dictionary = {}      # action -> Button
 var _reset_all: Button
@@ -262,6 +279,94 @@ func _tab(title: String, kind: StringName) -> VBoxContainer:
 
 
 func _build_display(box: VBoxContainer) -> void:
+	# Owner 2026-11-18: the screen settings of a PC game (DisplaySettings puts them into effect).
+	_heading(box, "Screen")
+	var screens := DisplayServer.get_screen_count() if DisplayServer.get_name() != "headless" else 1
+	if screens > 1:
+		_caption(box, "Monitor", &"monitor", "Which screen the game shows on.")
+		var names: Array = []
+		for i in screens:
+			names.append(DisplaySettings.screen_name(i))
+		_screen = _compact_choices(names, [])
+		_screen.name = "Monitor"
+		_screen.item_selected.connect(func(i: int) -> void:
+			settings.monitor = i
+			_apply())
+		box.add_child(_screen)
+	_caption(box, "Window mode", &"monitor", "Windowed, a maximized window, or fullscreen.")
+	_window_mode = _compact_choices(Array(DisplaySettings.WINDOW_MODES), Array(DisplaySettings.WINDOW_TIPS))
+	_window_mode.name = "WindowMode"
+	_window_mode.item_selected.connect(func(i: int) -> void:
+		settings.window_mode = i
+		_apply())
+	box.add_child(_window_mode)
+	_caption(box, "Window size", &"zoom", "The size of the game window in Windowed mode. Fullscreen always uses the screen's own resolution; set the 3D resolution under Graphics > Render resolution.")
+	_sizes = DisplaySettings.sizes()
+	var size_names: Array = []
+	for sz: Vector2i in _sizes:
+		size_names.append(DisplaySettings.size_text(sz))
+	_window_size = _compact_choices(size_names, [])
+	_window_size.name = "WindowSize"
+	_window_size.item_selected.connect(func(i: int) -> void:
+		settings.resolution = DisplaySettings.size_text(_sizes[i])
+		_apply())
+	box.add_child(_window_size)
+	_caption(box, "Aspect ratio", &"monitor", "Auto fills the screen. A fixed shape adds black bars around the picture.")
+	_aspect = _compact_choices(Array(DisplaySettings.ASPECTS), [])
+	_aspect.name = "AspectRatio"
+	_aspect.item_selected.connect(func(i: int) -> void:
+		settings.aspect_ratio = i
+		_apply())
+	box.add_child(_aspect)
+	_caption(box, "Frame rate limit", &"clock", "The most frames per second the game draws. Lower saves power and heat.")
+	var fps_names: Array = []
+	for f: int in DisplaySettings.FPS_LIMITS:
+		fps_names.append("Unlimited" if f == 0 else ("Monitor (%d Hz)" % DisplaySettings.refresh_rate()) if f < 0 else str(f))
+	_fps_limit = _compact_choices(fps_names, [])
+	_fps_limit.name = "FrameRateLimit"
+	_fps_limit.item_selected.connect(func(i: int) -> void:
+		settings.max_fps = DisplaySettings.FPS_LIMITS[i]
+		_apply())
+	box.add_child(_fps_limit)
+	_caption(box, "VSync", &"monitor", "Waits for the screen before showing a frame, so the picture never tears.")
+	_vsync = _compact_choices(Array(DisplaySettings.VSYNC_NAMES), Array(DisplaySettings.VSYNC_TIPS))
+	_vsync.name = "VSync"
+	_vsync.item_selected.connect(func(i: int) -> void:
+		settings.vsync = i
+		_apply())
+	box.add_child(_vsync)
+	var screen_grid := _switch_grid(box)
+	_low_latency = _check(screen_grid, "Low latency", &"fast", "With VSync on, keeps the game a few frames per second under the refresh rate so frames never wait in a queue: the mouse feels more direct.", func(on: bool) -> void:
+		settings.low_latency = on
+		_apply())
+	_low_latency.name = "LowLatency"
+	var hdr_ok := DisplaySettings.hdr_supported()
+	_hdr = _check(screen_grid, "HDR", &"star", "High dynamic range output for HDR screens: brighter highlights." if hdr_ok
+		else "This screen or graphics driver does not offer HDR (turn on HDR in Windows display settings first).", func(on: bool) -> void:
+		settings.hdr = on
+		_apply())
+	_hdr.name = "HDR"
+	_hdr.disabled = not hdr_ok
+	_hdr_nits_label = _caption(box, "HDR peak brightness", &"star", "The brightest highlights in HDR, in nits. Match your screen's peak brightness.")
+	_hdr_nits = _slider(box, 100.0, 2000.0, 10.0)
+	_hdr_nits.name = "HDRPeak"
+	_hdr_nits.editable = hdr_ok
+	_hdr_nits.value_changed.connect(func(v: float) -> void:
+		settings.hdr_max_nits = roundi(v)
+		_apply())
+	_brightness_label = _caption(box, "Brightness", &"star", "Makes the whole picture brighter or darker. 50 is how the colony was lit.")
+	_brightness = _slider(box, 0.0, 100.0, 1.0)
+	_brightness.name = "Brightness"
+	_brightness.value_changed.connect(func(v: float) -> void:
+		settings.brightness = roundi(v)
+		_apply())
+	_contrast_label = _caption(box, "Contrast", &"contrast", "Difference between dark and bright. 50 is how the colony was lit.")
+	_contrast = _slider(box, 0.0, 100.0, 1.0)
+	_contrast.name = "Contrast"
+	_contrast.value_changed.connect(func(v: float) -> void:
+		settings.contrast = roundi(v)
+		_apply())
+	_heading(box, "Menus and text")
 	_ui_scale_label = _caption(box, "Menu size", &"zoom", "Makes every menu and the HUD bigger or smaller.")
 	_ui_scale = _slider(box, 0.75, 2.0, 0.05)
 	_ui_scale.value_changed.connect(func(v: float) -> void:
@@ -393,16 +498,21 @@ func _build_controls(box: VBoxContainer) -> void:
 
 
 func _build_graphics(box: VBoxContainer) -> void:
-	_caption(box, "Graphics quality", &"image", "Lower runs faster on slower computers. High is how the colony was designed to look.")
+	_caption(box, "Preset", &"image", "Lower runs faster on slower computers. High is how the colony was designed to look. Change any option below and it becomes Custom.")
 	_quality = Kit.Segmented.new()
 	_quality.name = "Quality"
 	for i in GraphicsQuality.NAMES.size():
 		_quality.add_item(GraphicsQuality.NAMES[i], StringName("bars%d" % (i + 1)), GraphicsQuality.DESCRIPTIONS[i], 0.0, 44.0)
+	_quality.add_item(GraphicsQuality.CUSTOM_NAME, &"gear", GraphicsQuality.CUSTOM_DESCRIPTION, 0.0, 44.0)
 	_quality.item_selected.connect(func(i: int) -> void:
-		# A preset picked by hand stays exactly as picked: "Fit to this computer" goes off.
-		settings.graphics_auto = false
-		settings.graphics_quality = i
-		_apply())
+		if i >= GraphicsQuality.NAMES.size():
+			# "Custom" is where the options below lead; pressing it changes nothing
+			_refresh_graphics()
+			return
+		# A preset picked by hand stays exactly as picked: "Fit to this computer" goes off, hand changes are dropped.
+		settings.choose_preset(i)
+		_apply()
+		_refresh_graphics())
 	box.add_child(_quality)
 	_quality_info = _label(box, QUALITY_HINT)
 	_quality_info.theme_type_variation = UiTheme.MUTED
@@ -410,9 +520,74 @@ func _build_graphics(box: VBoxContainer) -> void:
 	_auto_quality = _check(_switch_grid(box), "Fit to this computer", &"image", auto_tip, func(on: bool) -> void:
 		settings.graphics_auto = on
 		settings.fit_to_hardware()
-		_quality.select(settings.graphics_quality)
-		_apply())
+		_apply()
+		_refresh_graphics())
 	_auto_quality.name = "AutoQuality"
+	# Owner 2026-11-18: every feature as its own option, in sections like a PC game's graphics menu.
+	for section: String in GraphicsQuality.SECTIONS:
+		_heading(box, section)
+		for o: Dictionary in GraphicsQuality.OPTIONS:
+			if String(o.section) == section:
+				_option_row(box, o)
+
+
+## One graphics option: its name and value (a * marks a value changed from the preset) over a row of choices or a slider.
+func _option_row(box: VBoxContainer, o: Dictionary) -> void:
+	var key := String(o.key)
+	_option_labels[key] = _caption(box, String(o.name), StringName(o.icon), String(o.tip))
+	if GraphicsQuality.is_slider(o):
+		var r: Array = o.slider
+		var s := _slider(box, float(r[0]), float(r[1]), float(r[2]))
+		s.name = "Option_" + key
+		s.value_changed.connect(func(v: float) -> void:
+			settings.set_graphics_option(key, roundi(v))
+			_apply()
+			_refresh_graphics())
+		_option_controls[key] = s
+	else:
+		var seg := _compact_choices(o.choices as Array, [])
+		seg.name = "Option_" + key
+		seg.item_selected.connect(func(i: int) -> void:
+			settings.set_graphics_option(key, i)
+			_apply()
+			_refresh_graphics())
+		box.add_child(seg)
+		_option_controls[key] = seg
+
+
+## A row of small "pick one" buttons (the settings list is long; full-size buttons would make it twice as tall).
+func _compact_choices(names: Array, tips: Array) -> Kit.Segmented:
+	var seg := Kit.Segmented.new()
+	for i in names.size():
+		var b := seg.add_item(String(names[i]), &"", String(tips[i]) if i < tips.size() else "")
+		b.custom_minimum_size = Vector2(64, 46)
+	return seg
+
+
+func _heading(box: VBoxContainer, text: String) -> Label:
+	var l := Label.new()
+	l.text = text
+	l.theme_type_variation = UiTheme.HEADING
+	box.add_child(l)
+	return l
+
+
+## The preset row (a preset, or Custom), every option's control and value, and the auto switch, from the settings.
+func _refresh_graphics() -> void:
+	if _quality == null:
+		return
+	_quality.select(GraphicsQuality.NAMES.size() if settings.is_custom_graphics() else settings.graphics_quality)
+	for o: Dictionary in GraphicsQuality.OPTIONS:
+		var key := String(o.key)
+		var v := settings.graphics_option(key)
+		var c: Control = _option_controls.get(key)
+		if c is HSlider:
+			(c as HSlider).set_value_no_signal(v)
+		elif c is Kit.Segmented:
+			(c as Kit.Segmented).select(v)
+		var text := (str(v) + String(o.get("unit", ""))) if GraphicsQuality.is_slider(o) else String((o.choices as Array)[v])
+		(_option_labels[key] as Label).text = text + ("  *" if settings.graphics_custom.has(key) else "")
+	_update_quality_info()
 
 
 ## The button that opens the voice and microphone panel with these settings.
@@ -430,7 +605,22 @@ func _voice_button(node_name: String) -> Button:
 
 
 func _read_settings() -> void:
-	_quality.select(settings.graphics_quality)
+	if _screen != null:
+		_screen.select(settings.monitor if settings.monitor >= 0 else DisplayServer.window_get_current_screen())
+	_window_mode.select(settings.window_mode)
+	var size_i := -1
+	for i in _sizes.size():
+		if DisplaySettings.size_text(_sizes[i]) == settings.resolution:
+			size_i = i
+	_window_size.select(size_i)
+	_aspect.select(settings.aspect_ratio)
+	_fps_limit.select(maxi(0, DisplaySettings.FPS_LIMITS.find(settings.max_fps)))
+	_vsync.select(settings.vsync)
+	_low_latency.set_pressed_no_signal(settings.low_latency)
+	_hdr.set_pressed_no_signal(settings.hdr)
+	_hdr_nits.set_value_no_signal(settings.hdr_max_nits)
+	_brightness.set_value_no_signal(settings.brightness)
+	_contrast.set_value_no_signal(settings.contrast)
 	_ui_scale.set_value_no_signal(settings.ui_scale)
 	_text_size.select(maxi(0, GameSettings.TEXT_SCALES.find(settings.text_scale)))
 	_high_contrast.set_pressed_no_signal(settings.high_contrast)
@@ -446,6 +636,7 @@ func _read_settings() -> void:
 	_fov.set_value_no_signal(settings.fov_degrees)
 	_toggle_sprint.set_pressed_no_signal(settings.toggle_sprint)
 	_update_value_labels()
+	_refresh_graphics()
 
 
 func _apply() -> void:
@@ -468,6 +659,9 @@ func _update_value_labels() -> void:
 	_fov_label.text = "%d°" % roundi(settings.fov_degrees)
 	_warning_volume_label.text = "%d %%" % roundi(settings.warning_sound_volume * 100.0)
 	_narrator_volume_label.text = "%d %%" % roundi(settings.narrator_volume * 100.0)
+	_brightness_label.text = str(settings.brightness)
+	_contrast_label.text = str(settings.contrast)
+	_hdr_nits_label.text = "%d nits" % settings.hdr_max_nits
 	_update_quality_info()
 
 
@@ -477,7 +671,11 @@ func _update_quality_info() -> void:
 		return
 	_auto_quality.set_pressed_no_signal(settings.graphics_auto)
 	var card := HardwareProfile.summary()
-	if settings.graphics_auto and card != "":
+	if settings.is_custom_graphics():
+		var n := settings.graphics_custom.size()
+		_quality_info.text = "Custom: %d option%s changed from %s (marked *). Pick a preset to go back to it." % [n,
+			"" if n == 1 else "s", GraphicsQuality.level_name(settings.graphics_quality)]
+	elif settings.graphics_auto and card != "":
 		_quality_info.text = "This computer: %s. Picked %s to keep the game smooth." % [card, GraphicsQuality.level_name(settings.graphics_quality)]
 	elif card != "":
 		_quality_info.text = "%s This computer: %s." % [QUALITY_HINT, card]

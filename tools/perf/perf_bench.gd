@@ -124,7 +124,7 @@ func _force_window() -> void:
 func _setup() -> void:
 	_force_window()
 	var quality := int(_args.get("quality", "2"))
-	GraphicsQuality.apply(self, quality)
+	GraphicsQuality.apply(self, quality, null, {})   # the plain preset, whatever the player changed by hand
 	_vp_rid = root.get_viewport_rid()
 	RenderingServer.viewport_set_measure_render_time(_vp_rid, true)
 	var services: GameServices = _game.get("services")
@@ -278,7 +278,7 @@ func _quality_switches() -> void:
 		mem["static_mb"] = Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
 		mem["video_mb"] = Performance.get_monitor(Performance.RENDER_VIDEO_MEM_USED) / 1048576.0
 		_switch_memory.append(mem)
-	GraphicsQuality.apply(self, quality)
+	GraphicsQuality.apply(self, quality, null, {})   # the plain preset, whatever the player changed by hand
 
 
 func _sample(frame_ms: float) -> Dictionary:

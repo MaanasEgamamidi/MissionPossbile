@@ -141,7 +141,7 @@ func _update_particles(tau: float) -> void:
 	if not particles.emitting:
 		return
 	particles.global_position = me.position + Vector3(0, 1.0, 0)
-	particles.amount_ratio = clampf((tau - _default_tau - config.dust_particles_from_tau) / 1.5, 0.1, 1.0)
+	particles.amount_ratio = clampf((tau - _default_tau - config.dust_particles_from_tau) / 1.5, 0.1, 1.0) * GraphicsQuality.particle_share(get_tree())   # Settings > Graphics > Weather particles
 	var wind := float(services.state().weather.get("wind_ms", 3.0))
 	var process := particles.process_material as ParticleProcessMaterial
 	process.initial_velocity_min = clampf(0.2 * wind, 0.2, 3.0)
