@@ -119,6 +119,24 @@ A chip built into the processor now aims for 30 FPS (`HardwareProfile.INTEGRATED
 stays as high as 30 FPS allows instead of dropping to 50 % to chase 60. CPU: game logic is ~3 ms a frame after the two
 stall fixes; a post-2020 laptop CPU at ~60 % of an i7-12700KF needs ~10-18 ms a frame on Low, well under 33 ms.
 
+## Station panels and an FSR 2 particle error (2026-11-18, later)
+
+- **Opening a station panel** (Colony computer, bench colony, Command Room, `probe_panel_open.gd`): the first open
+  takes 25 ms on the main thread (7 ms to build the panel, 18 ms in `ui.open`), and the slowest of the next 10 frames
+  is 53 ms (first-time UI shaders and glyphs). Later opens take 13 ms (4 + 9), and the slowest following frame is about
+  35 ms against a ~25 ms baseline at the 1110 MHz underclock. So after the first time, opening a panel costs about one
+  frame. Not changed: caching built panels could change how panels keep their state.
+- **`Parameter "uniform_set" is null` once per frame on Ultra**: found in the probe logs. One GPU particle system (the
+  green-dome tape's idle sparkles) that already ran before the game switched from a non-temporal preset to FSR 2 kept
+  printing it every frame, even with the camera turned away. It happens when you switch Low → Ultra in Settings (or the bench boots on the owner's Low
+  settings and then applies Ultra). Starting a new colony on Ultra never does (checked live through the MCP: 0
+  errors). Switching the upscaler off and on later does not bring it back. Fix: `GraphicsQuality.apply` hides the
+  visible GPU particle systems for one drawn frame when a temporal preset replaces a non-temporal one, then shows them
+  (`_refresh_particles`; nothing restarts). Low boot → Ultra after the fix: 0 errors in the whole run (was ~30 a
+  second). `tools/perf/probe_fsr2_errors.gd` bisects this kind of error by node type (`--each`, `--only=`, `--seq`,
+  `--modes`). Bench numbers measured before the fix included this error printing, so they slightly overstate the
+  frame time.
+
 ## Tried and not kept
 
 - Separate render thread (`thread_model=2`): small gain, engine prints "experimental", errors on exit.
@@ -130,4 +148,5 @@ stall fixes; a post-2020 laptop CPU at ~60 % of an i7-12700KF needs ~10-18 ms a 
 
 `tools/perf/ultra_ablation.gd` (cases, `a+b` combos, `--shots`, `--yaw`), `compare_images.gd` (mean / changed /
 p99 and diff images), `probe_hitch.gd` (main-thread stall bisection), `probe_hud_cost.gd`, `probe_spikes.gd`
-(what changed in a long frame), `probe_scale_switch.gd`, `perf_bench.gd --window=WxH`.
+(what changed in a long frame), `probe_scale_switch.gd`, `probe_panel_open.gd` (station panel first / later opens), `probe_fsr2_errors.gd`,
+`perf_bench.gd --window=WxH`.

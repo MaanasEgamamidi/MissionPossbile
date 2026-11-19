@@ -111,7 +111,11 @@ static func apply(tree: SceneTree, level: int, viewport: Viewport = null) -> voi
 	level = clampi(level, 0, Level.ULTRA)
 	if tree == null or tree.root == null:
 		return
+	var had_level := tree.root.has_meta(_META)
+	var was_temporal := had_level and bool(value("temporal", int(tree.root.get_meta(_META))))
 	tree.root.set_meta(_META, level)
+	if had_level and not was_temporal and bool(value("temporal", level)):
+		_refresh_particles(tree)
 	_apply_viewport(viewport if viewport != null else tree.root, level)
 	_apply_server(level)
 	for we: Node in tree.root.find_children("*", "WorldEnvironment", true, false):
@@ -124,6 +128,28 @@ static func apply(tree: SceneTree, level: int, viewport: Viewport = null) -> voi
 	for light: Node in tree.get_nodes_in_group(&"fixture_lights"):
 		if light is Light3D:
 			_apply_fixture(light as Light3D, level)
+
+
+## Godot 4.7.2: a GPU particle system that already ran before the game switched from a non-temporal preset to FSR 2
+## (Low -> Ultra in Settings, with tapes still out) can be left without its motion-vector buffers: every frame the
+## engine then prints 'Parameter "uniform_set" is null' (one tape's sparkles did, measured). Starting a colony on
+## Ultra never does. Hiding the particle systems for one drawn frame and showing them again rebuilds them; nothing is
+## restarted, so they look the same a frame later.
+static func _refresh_particles(tree: SceneTree) -> void:
+	if DisplayServer.get_name() == "headless":
+		return   # nothing is drawn (and frame_post_draw, which shows them again, may never come)
+	var hidden: Array[GPUParticles3D] = []
+	for n: Node in tree.root.find_children("*", "GPUParticles3D", true, false):
+		var p := n as GPUParticles3D
+		if p.visible:
+			p.visible = false
+			hidden.append(p)
+	if hidden.is_empty():
+		return
+	RenderingServer.frame_post_draw.connect(func() -> void:
+		for p: GPUParticles3D in hidden:
+			if is_instance_valid(p):
+				p.visible = true, CONNECT_ONE_SHOT)
 
 
 static func _apply_viewport(vp: Viewport, level: int) -> void:
