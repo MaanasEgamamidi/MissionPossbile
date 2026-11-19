@@ -92,54 +92,17 @@ func set_zone_awake(zone: String, awake: bool) -> void:
 	if not _lights.has(zone) or bool(_awake.get(zone, true)) == awake:
 		return
 	_awake[zone] = awake
-	_queue_lights(zone)
-
-
-## Perf (2026-11-18): switching a zone's 15-50 lights in one frame made that frame 6-8 ms longer (the engine re-pairs
-## every light with the geometry it reaches). Sleep / wake changes therefore go through a queue: up to
-## VIEW_ON_PER_FRAME lights come on and VIEW_OFF_PER_FRAME go off per frame. Power changes stay immediate, and
-## flush_queue() applies everything at once (ZoneManager.snap: teleport, fast travel, load).
-const VIEW_ON_PER_FRAME := 8
-const VIEW_OFF_PER_FRAME := 4
-var _view_q: Dictionary = {}     # Light3D -> wanted visible
-
-
-func _queue_lights(zone: String) -> void:
-	var on := bool(_powered.get(zone, true)) and bool(_awake.get(zone, true))
 	for l in _lights[zone]:
-		var light := l as Light3D
-		if light.visible == on:
-			_view_q.erase(light)
-		else:
-			_view_q[light] = on
+		GraphicsQuality.set_fixture_view_off(l as Light3D, not awake)
 
 
+## Perf (2026-11-18): sleep / wake (the zone system and the light view) switch lights through their distance fade
+## (GraphicsQuality.set_fixture_view_off), not `visible`. A light made visible again is re-paired by Godot with every
+## mesh in its reach, ~1-1.5 ms of CPU per light (snap turns that lit 5 rooms: 28-33 ms frames), and hiding lights with
+## soft shadows prints "softshadow_count==0 - BUG!". `visible` stays with the power simulation (set_zone_powered).
+## Kept for ZoneManager.snap(); nothing is queued any more.
 func flush_queue() -> void:
-	for l: Variant in _view_q:
-		if is_instance_valid(l):
-			(l as Light3D).visible = bool(_view_q[l])
-	_view_q.clear()
-
-
-func _process(_delta: float) -> void:
-	if _view_q.is_empty():
-		return
-	var ons := 0
-	var offs := 0
-	for l: Variant in _view_q.keys():
-		if not is_instance_valid(l):
-			_view_q.erase(l)
-			continue
-		var on := bool(_view_q[l])
-		if on and ons < VIEW_ON_PER_FRAME:
-			ons += 1
-		elif not on and offs < VIEW_OFF_PER_FRAME:
-			offs += 1
-		else:
-			continue
-		(l as Light3D).visible = on
-		_view_q.erase(l)
-
+	pass
 
 func is_zone_awake(zone: String) -> bool:
 	return bool(_awake.get(zone, true))
@@ -154,10 +117,11 @@ func set_zone_shadows(zone: String, allowed: bool) -> void:
 
 
 func _apply_lights(zone: String) -> void:
-	var on := bool(_powered.get(zone, true)) and bool(_awake.get(zone, true))
+	var powered := bool(_powered.get(zone, true))
+	var awake := bool(_awake.get(zone, true))
 	for l in _lights[zone]:
-		_view_q.erase(l)
-		(l as Light3D).visible = on
+		(l as Light3D).visible = powered
+		GraphicsQuality.set_fixture_view_off(l as Light3D, not awake)
 
 
 ## 0.0 = midnight, 0.5 = local noon, 1.0 = next midnight. The authored reference sun is the noon state.

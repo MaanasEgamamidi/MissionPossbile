@@ -14,6 +14,8 @@ const HISTORY := 600
 
 var _label := Label.new()
 var _frames := PackedFloat32Array()
+## stats() of the last HISTORY frames, refreshed twice a second (read by tools: MCP runtime queries, benches)
+var summary := {}
 var _since_update := 0.0
 var _log: FileAccess = null
 var _log_t0 := 0.0
@@ -98,6 +100,7 @@ func _process(delta: float) -> void:
 	if _since_update < 0.5:
 		return
 	_since_update = 0.0
+	summary = stats()
 	if visible:
 		_label.text = _build_text()
 
@@ -109,10 +112,17 @@ func stats() -> Dictionary:
 	var sum := 0.0
 	for f in _frames:
 		sum += f
+	var over := [0, 0, 0]
+	for f in _frames:
+		over[0] += 1 if f > 16.7 else 0
+		over[1] += 1 if f > 20.0 else 0
+		over[2] += 1 if f > 25.0 else 0
 	return {
+		"frames": n,
 		"avg": sum / maxf(float(n), 1.0),
 		"p99": sorted[mini(int(n * 0.99), n - 1)] if n > 0 else 0.0,
 		"worst": sorted[n - 1] if n > 0 else 0.0,
+		"over_16_7": over[0], "over_20": over[1], "over_25": over[2],
 	}
 
 

@@ -9,6 +9,8 @@ extends "res://tools/perf/perf_bench.gd"
 var _sp_t := 0.0
 var _sp_view := -1
 var _sp_prev := {}
+var _snap_t := 0.0
+var _snap_dir := 1.0
 
 
 func _process(delta: float) -> bool:
@@ -21,7 +23,15 @@ func _process(delta: float) -> bool:
 	var now := Time.get_ticks_usec()
 	var frame_ms := float(now - _last_us) / 1000.0
 	_last_us = now
-	_update_view(_views[_sp_view], delta)
+	if _args.has("snap"):
+		# instant turns (a mouse flick): --snap=degrees every 1.5 s, alternating direction
+		_snap_t += delta
+		if _snap_t >= 1.5:
+			_snap_t = 0.0
+			_snap_dir = -_snap_dir
+			(_game.get("player") as PlayerController).camera_rig().add_look(deg_to_rad(float(_args.snap)) * _snap_dir, 0.0)
+	else:
+		_update_view(_views[_sp_view], delta)
 	var st := _state()
 	if frame_ms > float(_args.get("over", "25")) and _sp_t > 1.0:
 		var what: Array = []
@@ -41,6 +51,9 @@ func _process(delta: float) -> bool:
 
 
 func _sp_next() -> bool:
+	if _sp_view < 0 and _args.has("noshadows"):
+		for l: Node in get_nodes_in_group(&"fixture_lights"):
+			(l as Light3D).shadow_enabled = false
 	_sp_view += 1
 	if _sp_view >= _views.size():
 		return false

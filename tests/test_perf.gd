@@ -105,13 +105,13 @@ func _run() -> void:
 	if cold_zone != null:
 		var cz := String(cold_zone.zone_id)
 		var lights: Array = lighting._lights[cz]
-		_check(lights.all(func(l: Light3D) -> bool: return not l.visible), "%s (COLD): fixtures off while asleep" % cz)
+		_check(lights.all(func(l: Light3D) -> bool: return not l.visible or GraphicsQuality.is_fixture_view_off(l)), "%s (COLD): fixtures off while asleep (hidden, or faded off by the light view)" % cz)
 		lighting.set_zone_powered(cz, false)
 		player.teleport(Vector3(cold_zone.centre.x, 0.15, cold_zone.centre.z), 0.0)
 		await _wait(0.4)
 		_check(cold_zone.drawn and lights.all(func(l: Light3D) -> bool: return not l.visible), "%s woken while unpowered: still dark" % cz)
 		lighting.set_zone_powered(cz, true)
-		_check(lights.all(func(l: Light3D) -> bool: return l.visible), "%s powered again while awake: lights on" % cz)
+		_check(lights.all(func(l: Light3D) -> bool: return l.visible and not GraphicsQuality.is_fixture_view_off(l)), "%s powered again while awake: lights on" % cz)
 
 	# ---------------- teleport snap: no time slicing, correct at the next poll
 	var garden := zm.zone(ColonyZones.GARDEN)
@@ -160,7 +160,7 @@ func _run() -> void:
 	var all_lit := true
 	for zone_name in lighting._lights:
 		for l: Light3D in lighting._lights[zone_name]:
-			all_lit = all_lit and l.visible == lighting.is_zone_powered(String(zone_name))
+			all_lit = all_lit and l.visible == lighting.is_zone_powered(String(zone_name)) and not GraphicsQuality.is_fixture_view_off(l)
 	_check(all_lit, "all switches off: every fixture light follows power only")
 	var world: Node3D = _game.get("world")
 	_check(world.get_node("Terrain").visible and world.get_node("Environment").visible, "all switches off: Mars visible")

@@ -23,6 +23,7 @@ var view_activator: ViewActivator
 var colony_lod: ColonyLod
 var visibility_ranges: VisibilityRanges
 var tweaks: EngineTweaks
+var shadow_proxies: ShadowProxies
 var warmup: ShaderWarmup
 var route: BenchmarkRoute
 var _tag_t := 0.0
@@ -81,6 +82,11 @@ func _build(game_main: Node, world: Node3D) -> void:
 	add_child(visibility_ranges)
 	var env := world.get_node_or_null("Environment") as Node3D
 	visibility_ranges.setup([env] as Array[Node3D] if env != null else [] as Array[Node3D])
+
+	shadow_proxies = ShadowProxies.new()
+	shadow_proxies.name = "ShadowProxies"
+	add_child(shadow_proxies)
+	shadow_proxies.setup(world.get_node_or_null("Colony") as Node3D)
 
 	tweaks = EngineTweaks.new()
 	tweaks.name = "EngineTweaks"

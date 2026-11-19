@@ -23,6 +23,8 @@ var light_view_enabled := true
 # the shadow redraws of the rooms seen through glass took up to half the draw calls (Greenhouse at Ultra: 14k -> 7k
 # draws, 18.3 -> 14.9 ms per frame), with no difference in the picture beyond run-to-run noise.
 var light_view_shadows_enabled := true
+# Shadow proxies (perf/shadow_proxies.gd): the colony's plain opaque meshes cast shadows through one-surface copies.
+var shadow_proxies_enabled := true
 var colony_lod_enabled := false       # Phase 5: HLOD proxies of the colony seen from far away (changes pixels)
 var visibility_ranges_enabled := false  # Phase 5: per-object draw distance for Mars rocks and props (changes pixels)
 var shader_warmup_enabled := false    # Phase 6: draw every zone once behind the loading overlay (Godot 4.7 precompiles)
@@ -81,7 +83,7 @@ var dynamic_resolution_mode := -1     # -1 = follow the setting and the graphics
 var dynamic_resolution_target_fps := 60.0  # the frame rate it holds (the screen's refresh rate when that is lower)
 
 const SWITCHES: Array[StringName] = [&"zones_enabled", &"room_props_enabled", &"exterior_cull_enabled", &"view_activation_enabled",
-	&"light_view_enabled", &"light_view_shadows_enabled",
+	&"light_view_enabled", &"light_view_shadows_enabled", &"shadow_proxies_enabled",
 	&"colony_lod_enabled", &"visibility_ranges_enabled", &"shader_warmup_enabled", &"sun_shadow_tuning_enabled",
 	&"light_distance_fade_enabled", &"background_throttle_enabled"]
 

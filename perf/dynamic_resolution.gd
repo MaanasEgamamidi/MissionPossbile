@@ -23,7 +23,7 @@ extends Node
 ##               85 % of the budget, so a step up never causes the next step down
 ##   limits      top = the preset's scale, lowered so the 3D pixels stay under HardwareProfile max_pixels;
 ##               bottom = HardwareProfile min_scale
-##   no gain     a step down that saves less than 4 % is undone and not tried again for 30 s (the view is limited by
+##   no gain     after two step downs in a row that each saved less than 4 %, the last is undone and not tried again for 8 s (the view is limited by
 ##               geometry, not pixels, so a blurrier picture would buy nothing)
 ## After every change it waits one second (the render buffers are rebuilt) before measuring again.
 
@@ -36,14 +36,18 @@ const START_HOLD := 3.0
 const STEP := 0.1
 const BUDGET_SHARE := 0.9
 ## Ultra (temporal): more headroom, so the frame-to-frame swing of the GPU time stays under one refresh (2026-11-18).
-const TEMPORAL_BUDGET_SHARE := 0.85
+## 0.8: the measured time is the 3D view's only; the full-size upscale, post and UI add ~2 ms (MCP play test: 14.9 ms
+## measured at the tutorial start = 17 ms frames).
+const TEMPORAL_BUDGET_SHARE := 0.8
 const OVER_FACTOR := 1.08
 const FAR_OVER_FACTOR := 1.6
 const UP_MARGIN := 0.85
 const OVER_EVALS := 2
 const UNDER_EVALS := 6
 const MIN_GAIN := 0.04
-const FLOOR_HOLD := 30.0
+const FLOOR_HOLD := 8.0
+## probes in a row that must find no gain before a step down is undone and held
+const NO_GAIN_PROBES := 2
 
 var settings: GameSettings
 ## True while this node is steering the render scale.
@@ -65,6 +69,7 @@ var _probe_ms := -1.0
 var _probe_from := 1.0
 var _floor := 0.0
 var _floor_t := 0.0
+var _no_gain := 0
 
 
 ## Adds the node to `game_main` (once) and returns it.
@@ -219,10 +224,18 @@ func _evaluate() -> void:
 		var before := _probe_ms
 		_probe_ms = -1.0
 		if gpu_ms > before * (1.0 - MIN_GAIN) and _probe_from <= top:
-			_floor = _probe_from
-			_floor_t = FLOOR_HOLD
-			_change(_probe_from, false)
-			return
+			# 2026-11-18: one probe right after loading (the frames still settling) wrongly held Ultra at 77 % for 30 s
+			# at the tutorial start (MCP play test, 22 ms frames). The step is undone and held only after two probes
+			# in a row found no gain.
+			_no_gain += 1
+			if _no_gain >= NO_GAIN_PROBES:
+				_no_gain = 0
+				_floor = _probe_from
+				_floor_t = FLOOR_HOLD
+				_change(_probe_from, false)
+				return
+		else:
+			_no_gain = 0
 	var budget := 1000.0 / target_fps() * budget_share()
 	if gpu_ms > budget * OVER_FACTOR:
 		_under = 0

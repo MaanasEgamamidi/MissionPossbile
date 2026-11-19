@@ -50,6 +50,10 @@ func _process(delta: float) -> bool:
 		DirAccess.make_dir_recursive_absolute(dir)
 		root.get_texture().get_image().save_png(dir.path_join("%s__%s.png" % [_views[_ab_view].name, _cases[_ab_case]]))
 	_ab_out.append(s)
+	var spx: ShadowProxies = (_game.get_node("Perf") as PerfRig).shadow_proxies
+	print("PROXIES built ", spx.built, " skipped ", spx.skipped, " build_ms ", spx.build_ms)
+	var zmx: ZoneManager = (_game.get_node("Perf") as PerfRig).zone_manager
+	print("ZONES ", _cases[_ab_case], " drawn: ", ",".join(zmx.zones.filter(func(z: Zone) -> bool: return z.drawn).map(func(z: Zone) -> String: return ColonyZones.slug(String(z.zone_id)))))
 	print("CASE ", _views[_ab_view].name, " ", _cases[_ab_case], " frame ", snappedf(s.summary.frame_ms.mean, 0.1),
 		" gpu ", snappedf(s.summary.gpu_ms.mean, 0.1), " cpu ", snappedf(s.summary.cpu_ms.mean, 0.1),
 		" draws ", int(s.summary.draw_calls.mean), " prims ", snappedf(s.summary.primitives.mean / 1e6, 0.01), "M")
@@ -159,6 +163,28 @@ func _apply_case(c: String, lights: Array[Node]) -> void:
 			for l: Node in lights:
 				if l.get_class() == "AreaLight3D" and not bool(l.get("shadow_enabled")):
 					_ab_set(l, "area_range", float(l.get("area_range")) * (0.7 if c == "gh_area_x07" else 0.5))
+		"rocks_hidden", "rocks_noshadow":
+			var env := (_game.get("world") as Node).get_node_or_null("Environment")
+			if env != null:
+				for r: Node in env.find_children("rock_*", "MeshInstance3D", true, false):
+					if c == "rocks_hidden":
+						_ab_set(r, "visible", false)
+					else:
+						_ab_set(r, "cast_shadow", GeometryInstance3D.SHADOW_CASTING_SETTING_OFF)
+		"fewer_zones":
+			var ps := root.get_node("PerfSettings")
+			_ab_set(ps, "entrance_prewarm_distance", 0.0)
+			_ab_set(ps, "glass_view_hops", 1)
+			_ab_set(ps, "outside_interior_distance", 10.0)
+			var zm4: ZoneManager = (_game.get_node("Perf") as PerfRig).zone_manager
+			zm4.snap()
+		"no_particles":
+			for p: Node in root.find_children("*", "GPUParticles3D", true, false) + root.find_children("*", "CPUParticles3D", true, false):
+				_ab_set(p, "visible", false)
+				_ab_set(p, "emitting", false)
+			print("PARTICLES ", root.find_children("*", "GPUParticles3D", true, false).size(), " gpu, ", root.find_children("*", "CPUParticles3D", true, false).size(), " cpu")
+		"no_occlusion":
+			root.use_occlusion_culling = false
 		"fade_15":
 			for l: Node in lights:
 				if bool(l.get("distance_fade_enabled")):
@@ -220,6 +246,8 @@ func _apply_case(c: String, lights: Array[Node]) -> void:
 			root.scaling_3d_scale = 0.77
 		"lv_hops1":
 			_ab_set(root.get_node("PerfSettings"), "light_view_hops", 1)
+		"proxies_off":
+			_ab_set(root.get_node("PerfSettings"), "shadow_proxies_enabled", false)
 		"light_view_off":
 			_ab_set(root.get_node("PerfSettings"), "light_view_enabled", false)
 		"postfx_off":
@@ -244,6 +272,7 @@ func _restore() -> void:
 	root.scaling_3d_mode = Viewport.SCALING_3D_MODE_BILINEAR
 	root.scaling_3d_scale = 1.0
 	root.use_taa = false
+	root.use_occlusion_culling = bool(ProjectSettings.get_setting("rendering/occlusion_culling/use_occlusion_culling", false))
 
 
 func _write() -> void:

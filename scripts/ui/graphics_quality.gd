@@ -26,7 +26,8 @@ const DESCRIPTIONS: PackedStringArray = [
 
 const _META := &"gq_authored"
 ## Fixture shadow wanted by the preset (meta), and the perf light view's block on it (meta, see set_fixture_shadow_blocked).
-const _SHADOW_WANT := &"gq_shadow_want"
+const _FADE_BASE := &"perf_fade_base"
+const _VIEW_OFF := &"perf_view_off"
 const _SHADOW_BLOCKED := &"perf_shadow_blocked"
 ## Distance from the camera (m) at which shadowed area lights start to fade out on the presets without a fixture fade.
 const ENCLOSED_AREA_FADE := 12.0
@@ -186,15 +187,59 @@ static func _apply_sun(sun: DirectionalLight3D, level: int) -> void:
 	sun.directional_shadow_mode = int(a.mode) if level == Level.HIGH else int(value("sun_mode", level))
 
 
-## Perf light view: blocks (or lifts the block on) a fixture light's shadow map. Unblocked, the light casts what the
-## preset in effect wants (or what it cast before the first block when no preset has been applied).
+## Perf light view: blocks (or lifts the block on) a fixture light's shadow map. The block never touches
+## shadow_enabled: in Godot 4.7, switching shadow_enabled on a light paired with meshes (soft shadows, light_size > 0)
+## leaves the engine's per-mesh soft-shadow count wrong, and later switches of that light print
+## "geom->softshadow_count==0 - BUG!" with a script backtrace (2026-11-18 snap-turn probe). It sets the light's shadow
+## fade distance to 0 m instead (no shadow map is drawn; the light keeps its full reach). Lifting the block puts the
+## preset's fade back (_FADE_BASE, written by _apply_fixture).
 static func set_fixture_shadow_blocked(light: Light3D, blocked: bool) -> void:
 	if light == null or bool(light.get_meta(_SHADOW_BLOCKED, false)) == blocked:
 		return
-	if not light.has_meta(_SHADOW_WANT):
-		light.set_meta(_SHADOW_WANT, light.shadow_enabled)
 	light.set_meta(_SHADOW_BLOCKED, blocked)
-	light.shadow_enabled = bool(light.get_meta(_SHADOW_WANT)) and not blocked
+	_apply_light_fade(light)
+
+
+## Perf light view: switches a fixture light off (or back on) through its distance fade instead of `visible`. A light
+## made visible again is re-paired by Godot with every mesh in its reach (~1-1.5 ms of CPU per light here: a snap turn
+## that lit 5 rooms cost a 28-33 ms frame); a light past its fade is skipped at draw time and stays paired.
+static func set_fixture_view_off(light: Light3D, off: bool) -> void:
+	if light == null or bool(light.get_meta(_VIEW_OFF, false)) == off:
+		return
+	light.set_meta(_VIEW_OFF, off)
+	_apply_light_fade(light)
+
+
+static func is_fixture_view_off(light: Light3D) -> bool:
+	return bool(light.get_meta(_VIEW_OFF, false))
+
+
+## The light's distance fade = the preset's (saved in _FADE_BASE) with the light view's overrides on top.
+static func _apply_light_fade(light: Light3D) -> void:
+	if not light.has_meta(_FADE_BASE):
+		light.set_meta(_FADE_BASE, [light.distance_fade_enabled, light.distance_fade_begin, light.distance_fade_shadow,
+			light.distance_fade_length])
+	var b: Array = light.get_meta(_FADE_BASE)
+	var enabled := bool(b[0])
+	var begin := float(b[1])
+	var shadow := float(b[2])
+	var length := float(b[3])
+	if bool(light.get_meta(_SHADOW_BLOCKED, false)):
+		if not enabled:
+			begin = 100000.0   # the light keeps its full reach
+			length = 1.0
+		enabled = true
+		shadow = 0.0
+	if bool(light.get_meta(_VIEW_OFF, false)):
+		# off: past its fade at any distance, so the renderer skips it; it stays paired with the meshes
+		enabled = true
+		begin = 0.0
+		length = 0.001
+		shadow = 0.0
+	light.distance_fade_enabled = enabled
+	light.distance_fade_begin = begin
+	light.distance_fade_shadow = shadow
+	light.distance_fade_length = length
 
 
 static func _apply_fixture(light: Light3D, level: int) -> void:
@@ -202,9 +247,7 @@ static func _apply_fixture(light: Light3D, level: int) -> void:
 		light.set_meta(_META, {"shadow": light.shadow_enabled, "fade": light.distance_fade_enabled,
 			"begin": light.distance_fade_begin, "shadow_fade": light.distance_fade_shadow, "length": light.distance_fade_length})
 	var a: Dictionary = light.get_meta(_META)
-	var shadow: bool = bool(a.shadow) and value("fixture_shadows", level)
-	light.set_meta(_SHADOW_WANT, shadow)
-	light.shadow_enabled = shadow and not bool(light.get_meta(_SHADOW_BLOCKED, false))
+	light.shadow_enabled = bool(a.shadow) and value("fixture_shadows", level)
 	var fade: float = value("fixture_fade", level)
 	if fade > 0.0:
 		light.distance_fade_enabled = true
@@ -226,3 +269,7 @@ static func _apply_fixture(light: Light3D, level: int) -> void:
 		light.distance_fade_begin = float(a.begin)
 		light.distance_fade_shadow = float(a.shadow_fade)
 		light.distance_fade_length = float(a.length)
+	# the preset's fade is the base; the light view's shadow block (if any) goes back on top
+	light.set_meta(_FADE_BASE, [light.distance_fade_enabled, light.distance_fade_begin, light.distance_fade_shadow,
+		light.distance_fade_length])
+	_apply_light_fade(light)

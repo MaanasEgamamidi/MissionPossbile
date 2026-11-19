@@ -164,6 +164,9 @@ func _make_views(services: GameServices) -> Array:
 	if not plaza.is_empty() and plaza.has("cx"):
 		var c := Vector3(float(plaza.cx), 0.05, -float(plaza.cy))
 		views.append({"name": "plaza_through_glass", "kind": "glass", "at": c, "look": c + Vector3(30.0, 4.0, 10.0)})
+	# 2026-11-18: where a new colony's tutorial starts (suits on, at the exit tunnel's outer door, looking in): the
+	# first thing a player sees, found slow in an MCP play test (the earlier views missed it).
+	views.append({"name": "tutorial_start", "kind": "exterior", "at": Vector3(20.8, -0.05, 17.2), "look": Vector3(21.0, 0.0, 8.0)})
 	var garage := _object_position("sf_print_garage")
 	if garage != Vector3.INF:
 		var at := garage + Vector3(-14.0, 0.0, 10.0)
