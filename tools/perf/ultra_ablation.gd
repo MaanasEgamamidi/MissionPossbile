@@ -143,10 +143,10 @@ func _apply_case(c: String, lights: Array[Node]) -> void:
 			for l: Node in lights:
 				if ColonyZones.slug(String(l.get_meta("zone", ""))) != cur and l.get_parent().name != cur:
 					_ab_set(l, "visible", false)
-		"sun_160", "sun_2splits":
+		"sun_160", "sun_2splits", "sun_80", "sun_60":
 			for s: Node in get_nodes_in_group(&"sun"):
-				if c == "sun_160":
-					_ab_set(s, "directional_shadow_max_distance", 160.0)
+				if c in ["sun_160", "sun_80", "sun_60"]:
+					_ab_set(s, "directional_shadow_max_distance", {"sun_160": 160.0, "sun_80": 80.0, "sun_60": 60.0}[c])
 				else:
 					_ab_set(s, "directional_shadow_mode", DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS)
 		"other_zone_noshadow":
@@ -159,6 +159,14 @@ func _apply_case(c: String, lights: Array[Node]) -> void:
 			for l: Node in lights:
 				if l.get_class() == "AreaLight3D" and not bool(l.get("shadow_enabled")):
 					_ab_set(l, "area_range", float(l.get("area_range")) * (0.7 if c == "gh_area_x07" else 0.5))
+		"fade_15":
+			for l: Node in lights:
+				if bool(l.get("distance_fade_enabled")):
+					_ab_set(l, "distance_fade_begin", 15.0)
+					_ab_set(l, "distance_fade_shadow", 9.0)
+		"scale_050":
+			root.scaling_3d_mode = Viewport.SCALING_3D_MODE_FSR
+			root.scaling_3d_scale = 0.5
 		"lod_px_4":
 			root.mesh_lod_threshold = 4.0
 		"tunnel_fade":
@@ -190,10 +198,10 @@ func _apply_case(c: String, lights: Array[Node]) -> void:
 					_ab_set(l, "spot_range", (l as SpotLight3D).spot_range * 0.7)
 				elif l.get_class() == "AreaLight3D":
 					_ab_set(l, "area_range", float(l.get("area_range")) * 0.7)
-		"spot_angle_x08":
+		"spot_angle_x08", "spot_angle_x09":
 			for l: Node in lights:
 				if l is SpotLight3D:
-					_ab_set(l, "spot_angle", (l as SpotLight3D).spot_angle * 0.8)
+					_ab_set(l, "spot_angle", (l as SpotLight3D).spot_angle * (0.8 if c == "spot_angle_x08" else 0.9))
 		"no_light_size":
 			for l: Node in lights:
 				_ab_set(l, "light_size", 0.0)

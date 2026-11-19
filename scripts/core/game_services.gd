@@ -29,6 +29,9 @@ var mode: StringName = &"offline"
 
 var _autosave_left := 0.0
 var _pending_save: StringName = &""
+## Background autosave (2026-11-18): WorkerThreadPool task id, -1 = none; its result is read on the main thread.
+var _save_task := -1
+var _save_task_err: Error = OK
 
 
 ## The services node of a scene tree, or null.
@@ -198,6 +201,7 @@ func save_now(reason: StringName = &"manual") -> Error:
 	# COLONY OVER (2026-11-15): never save the ended colony over the last live save ("Load last save" uses it).
 	if session.is_colony_over():
 		return ERR_UNAVAILABLE
+	_finish_background_save(true)   # never two writers on the save files
 	var err := saves.write(snapshot(), reason)
 	_pending_save = &""
 	_autosave_left = config.autosave_seconds
@@ -214,7 +218,41 @@ func quit_game() -> void:
 	get_tree().quit()
 
 
+## Perf (2026-11-18): the interval autosave writes in the background. A save took ~23 ms on the main thread (checksum,
+## JSON, write, read-back check, backup rotation), one long frame every minute. The colony is copied on the main
+## thread (snapshot, 0.5 ms), so the file holds exactly what a save at this frame would; the same SaveService.write()
+## then runs on a worker. Saves for a reason (important actions, manual, quit) stay immediate and first wait for a
+## background save still running. Headless runs (tests, tools) save in place.
+func _autosave() -> void:
+	if DisplayServer.get_name() == "headless" or session.is_colony_over():
+		save_now(&"autosave")
+		return
+	if _save_task != -1:
+		return   # the last one is still writing: try again next frame
+	var payload := snapshot().duplicate(true)
+	var store := saves
+	_save_task = WorkerThreadPool.add_task(func() -> void: _save_task_err = store.write(payload, &"autosave"), false, "autosave")
+	_autosave_left = config.autosave_seconds
+
+
+## Reports a finished background save (or waits for it when `wait`).
+func _finish_background_save(wait: bool) -> void:
+	if _save_task == -1 or (not wait and not WorkerThreadPool.is_task_completed(_save_task)):
+		return
+	WorkerThreadPool.wait_for_task_completion(_save_task)
+	_save_task = -1
+	if _save_task_err == OK:
+		events.game_saved.emit(saves.main_path(), &"autosave")
+	else:
+		push_warning("Save failed (autosave): %s. The previous save is still in place." % error_string(_save_task_err))
+
+
+func _exit_tree() -> void:
+	_finish_background_save(true)
+
+
 func _process(delta: float) -> void:
+	_finish_background_save(false)
 	if not has_game() or not is_authority():
 		return
 	session.advance(delta)
@@ -223,7 +261,7 @@ func _process(delta: float) -> void:
 	elif not session.paused:
 		_autosave_left -= delta
 		if _autosave_left <= 0.0:
-			save_now(&"autosave")
+			_autosave()
 
 
 func _notification(what: int) -> void:

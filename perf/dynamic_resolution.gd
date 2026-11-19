@@ -135,6 +135,10 @@ func wanted() -> bool:
 ## The frame rate to hold: PerfSettings.dynamic_resolution_target_fps, or the screen's refresh rate when that is lower.
 func target_fps() -> float:
 	var fps := maxf(float(Perf.cfg().dynamic_resolution_target_fps), 20.0)
+	# a chip built into the processor aims for 30 (HardwareProfile.INTEGRATED_TARGET_FPS) unless the preset is Ultra
+	var level := GraphicsQuality.applied_level(get_tree()) if is_inside_tree() else -1
+	if level < 0 or not bool(GraphicsQuality.value("temporal", level)):
+		fps = minf(fps, maxf(float(HardwareProfile.current().get("target_fps", fps)), 20.0))
 	var refresh := DisplayServer.screen_get_refresh_rate()
 	return minf(fps, refresh) if refresh > 20.0 else fps
 

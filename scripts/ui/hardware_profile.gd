@@ -26,6 +26,7 @@ const MID_SCORE := 0.5
 ## A laptop chip runs at lower power than the desktop card of the same name.
 const LAPTOP_FACTOR := 0.9
 const TARGET_FPS := 60.0
+const INTEGRATED_TARGET_FPS := 30.0
 const MID_MAX_PIXELS := 1920 * 1200
 const BASIC_MAX_PIXELS := 1600 * 900
 
@@ -89,6 +90,10 @@ static func classify(adapter: String, device_type: int = -1) -> Dictionary:
 		out["dynamic"] = true
 		out["max_pixels"] = BASIC_MAX_PIXELS
 		out["min_scale"] = 0.5
+	if integrated and not upper.contains("APPLE") and tier != Tier.UNKNOWN:
+		# Owner 2026-11-18: "30 fps low on any recent computer ... with a decent cpu and igpu". A chip in the processor
+		# holds 30 FPS at a sharper picture instead of chasing 60 at the lowest render scale (docs/perf/ultra_60fps.md).
+		out["target_fps"] = INTEGRATED_TARGET_FPS
 	return out
 
 

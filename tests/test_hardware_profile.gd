@@ -36,6 +36,9 @@ func _initialize() -> void:
 	p = HardwareProfile.classify("AMD Radeon(TM) 610M", INTEGRATED)
 	_check(int(p["tier"]) == HardwareProfile.Tier.BASIC and int(p["level"]) == GraphicsQuality.Level.LOW and bool(p["dynamic"]),
 		"Radeon 610M (integrated) is Basic: Low with adaptive resolution")
+	_check(is_equal_approx(float(p["target_fps"]), HardwareProfile.INTEGRATED_TARGET_FPS), "an integrated chip aims for 30 FPS")
+	_check(is_equal_approx(float(HardwareProfile.classify("NVIDIA GeForce RTX 3050", DISCRETE)["target_fps"]), HardwareProfile.TARGET_FPS),
+		"a discrete Basic card (RTX 3050) still aims for 60 FPS")
 	_check(_tier("Intel(R) UHD Graphics 770", INTEGRATED) == HardwareProfile.Tier.BASIC, "Intel UHD is Basic")
 	_check(_tier("Apple M1", INTEGRATED) == HardwareProfile.Tier.BASIC, "Apple M1 is Basic")
 	_check(_tier("Apple M3 Max", INTEGRATED) != HardwareProfile.Tier.BASIC, "Apple M3 Max is not Basic")
