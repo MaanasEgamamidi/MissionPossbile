@@ -70,6 +70,7 @@ some stretches ran faster). The owner's save and settings were backed up first a
 | Loaded save, airlock / Power Room, standing | 9.4 | 10.8 | 0 | 18.5 |
 | Same, instant 60-110 degree camera snaps | 11.3 | 14.6 | 2 | 24.2 |
 | Walking Power Room -> airlock with turns | 14.0 | 21.1 | 9 (1.5 %) | 27.3 |
+| Command Room: walk to the colony computer, hold E, panel opens (colony summary, upgrades, rover tabs, live data) | 9.0 | 13.6 | 3 | 147 (the frame the panel is built) |
 
 What the play test found that the bench had missed (all fixed above): the tutorial start view (shadow proxies),
 DynamicResolution held at 77 % by one bad probe after loading, its budget leaving out the full-size passes, and the
