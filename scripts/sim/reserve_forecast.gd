@@ -60,6 +60,7 @@ static func _battery(state: ColonyState, balance: GameBalance, phase: float) -> 
 	for g in PowerModel.demand_groups(state, balance, process):
 		demand += float(g.kw)
 	var tracking := PowerModel.trackers_can_track(state, balance)
+	var solar_in := PowerModel.solar_inputs(state, balance, tracking)
 	var battery := state.store(&"battery_kwh")
 	var cap := float(state.capacities.get(&"battery_kwh", 0.0))
 	var to_sunrise := fposmod(PowerModel.SUNRISE - phase, 1.0) * GameConfig.SOL_HOURS
@@ -74,7 +75,7 @@ static func _battery(state: ColonyState, balance: GameBalance, phase: float) -> 
 		if not sunrise_done and t + dt >= to_sunrise:
 			dt = to_sunrise - t
 		var p := fposmod(phase + (t + 0.5 * dt) / GameConfig.SOL_HOURS, 1.0)
-		var solar := PowerModel.solar_kw(state, balance, p, tracking)
+		var solar := PowerModel.solar_kw_with(solar_in, p)
 		if solar >= demand:
 			var e_in := minf((solar - demand) * dt, balance.battery_charge_kw_max * dt)
 			battery = minf(cap, battery + e_in * balance.battery_charge_efficiency)

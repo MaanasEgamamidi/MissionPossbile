@@ -126,6 +126,42 @@ static func solar_kw(state: ColonyState, balance: GameBalance, phase: float, tra
 	return total
 
 
+## Speed (2026-11-18): the inputs of tracker_kw() that do not depend on the time of day, read once. Loops that step
+## the sun forward over a state that does not change (ReserveForecast: about 1500 steps, 4 times a second for the HUD)
+## call solar_kw_with() instead of solar_kw(): it evaluates the same expression in the same order, so the result is
+## exactly the same number, without the upgrade, level and condition lookups on every step (those took ~94 ms).
+## Keep the expression in solar_kw_with() identical to tracker_kw().
+static func solar_inputs(state: ColonyState, balance: GameBalance, tracking: bool) -> Dictionary:
+	var dust := PackedFloat64Array()
+	for i in ColonyState.TRACKER_COUNT:
+		dust.append(clampf(float(state.panel_dust[i]), 0.0, 1.0))
+	return {
+		"tracking": tracking,
+		"peak": balance.solar_kw_peak / float(ColonyState.TRACKER_COUNT),
+		"atmosphere": atmosphere_term(state, balance),
+		"condition": clampf(state.condition_of("trackers"), 0.0, 1.0),
+		"upgrade": ProgressionBalance.shared().tracking_output_factor if tracking and state.has_upgrade("energy_solar_tracking") else 1.0,
+		"level": solar_level_factor(state),
+		"dust": dust,
+	}
+
+
+## solar_kw() for the state that `inputs` (solar_inputs()) was read from.
+static func solar_kw_with(inputs: Dictionary, phase: float) -> float:
+	var sun := sun_term(phase, bool(inputs.tracking))
+	if sun <= 0.0:
+		return 0.0
+	var peak: float = inputs.peak
+	var atmosphere: float = inputs.atmosphere
+	var condition: float = inputs.condition
+	var upgrade: float = inputs.upgrade
+	var level: float = inputs.level
+	var total := 0.0
+	for dust: float in (inputs.dust as PackedFloat64Array):
+		total += peak * sun * atmosphere * (1.0 - dust) * condition * upgrade * level
+	return total
+
+
 ## Power one piece of equipment asks for while switched on. Equipment below working condition does not run.
 ## The two oxygen processes ask for what their planned output needs (`process_kw`).
 static func equipment_kw(state: ColonyState, balance: GameBalance, id: String, process_kw: Dictionary) -> float:

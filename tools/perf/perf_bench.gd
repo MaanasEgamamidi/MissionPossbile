@@ -19,7 +19,8 @@ extends SceneTree
 ## memory. Whole-process memory is read between views (Windows Get-Process, private bytes and working set).
 ## Results are written as JSON (one record per view) with the renderer, adapter, driver and build.
 
-const WINDOW := Vector2i(1920, 1080)
+## --window=WxH overrides the 1920x1080 benchmark window (the owner's screen maximized is 2560x1369).
+var WINDOW := Vector2i(1920, 1080)
 
 var _args := {}
 var _game: Node = null
@@ -41,6 +42,9 @@ func _initialize() -> void:
 		if a.begins_with("--"):
 			var kv := a.substr(2).split("=", true, 1)
 			_args[kv[0]] = kv[1] if kv.size() > 1 else "1"
+	if _args.has("window"):
+		var wh := String(_args.window).split("x")
+		WINDOW = Vector2i(int(wh[0]), int(wh[1]))
 	var cap := int(_args.get("cap", "0"))
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if cap > 0 else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = cap
