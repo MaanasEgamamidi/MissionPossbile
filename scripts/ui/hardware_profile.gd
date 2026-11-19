@@ -5,7 +5,7 @@ extends RefCounted
 ## (score 1.0 = that card: 14-35 ms GPU per frame at 1080p High, docs/perf/benchmark_2026-11-14.md) and says what to run:
 ##
 ##   tier     score                          preset   3D render resolution
-##   STRONG   0.90 and up                    High     the window's own, never changed (the authored look)
+##   STRONG   0.90 and up                    Ultra    FSR 2 at 77 %, adapting to hold 60 FPS (Ultra's own, 2026-11-18)
 ##   MID      0.50 to 0.90                   Medium   at most 1920x1200 pixels, then adaptive to hold 60 FPS
 ##   BASIC    under 0.50, integrated chips   Low      at most 1600x900 pixels, then adaptive to hold 60 FPS
 ##   UNKNOWN  name not recognised            nothing is changed (also every headless run: tests, build tools)
@@ -80,7 +80,9 @@ static func classify(adapter: String, device_type: int = -1) -> Dictionary:
 		"level": -1, "dynamic": false, "max_pixels": 0, "min_scale": 0.6, "target_fps": TARGET_FPS,
 	}
 	if tier == Tier.STRONG:
-		out["level"] = GraphicsQuality.Level.HIGH
+		# 2026-11-18: Ultra adapts its render scale (FSR 2) to hold 60 FPS and looks better than High, which draws every
+		# pixel natively and ran 36-50 FPS at 1440p on the RTX 4060 Ti; the adaptive scale lives in the preset itself.
+		out["level"] = GraphicsQuality.Level.ULTRA
 	elif tier == Tier.MID:
 		out["level"] = GraphicsQuality.Level.MEDIUM
 		out["dynamic"] = true

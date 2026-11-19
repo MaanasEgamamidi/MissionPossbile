@@ -22,8 +22,8 @@ func _initialize() -> void:
 
 	# the card the colony was tuned on keeps the authored picture
 	p = HardwareProfile.classify("NVIDIA GeForce RTX 4060 Ti", DISCRETE)
-	_check(int(p["tier"]) == HardwareProfile.Tier.STRONG and int(p["level"]) == GraphicsQuality.Level.HIGH
-		and not bool(p["dynamic"]) and int(p["max_pixels"]) == 0, "RTX 4060 Ti is Strong: High, resolution never changed")
+	_check(int(p["tier"]) == HardwareProfile.Tier.STRONG and int(p["level"]) == GraphicsQuality.Level.ULTRA
+		and not bool(p["dynamic"]) and int(p["max_pixels"]) == 0, "RTX 4060 Ti is Strong: Ultra (its own adaptive FSR 2), no profile resolution cap")
 
 	_check(_tier("NVIDIA GeForce RTX 4060", DISCRETE) == HardwareProfile.Tier.MID, "RTX 4060 is Mid-range")
 	_check(_tier("NVIDIA GeForce RTX 5070", DISCRETE) == HardwareProfile.Tier.STRONG, "RTX 5070 is Strong")
