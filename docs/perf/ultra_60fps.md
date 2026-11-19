@@ -80,9 +80,27 @@ session costs one 70-90 ms frame (pipeline warm-up, it does not repeat), and roo
 
 ## Low on integrated graphics and RTX 3050 (estimate, not measured on those machines)
 
-The owner allowed underclocking the RTX 4060 Ti to imitate these cards (`nvidia-smi -lgc 1100,1100` for a 3050,
-the 210 MHz floor for an iGPU, `nvidia-smi -rgc` to reset). It needs an elevated prompt; the UAC request was not
-accepted in this session, so the table below is still scaled, not measured.
+### Measured with the RTX 4060 Ti underclocked (owner's go-ahead, 2026-11-18)
+
+`nvidia-smi -lgc 1100,1100` (elevated) locked the card at 1110 MHz, ~40 % of its boost clock: about an RTX 3050's
+compute (its memory bandwidth stays higher than a 3050's, 288 vs 224 GB/s). The second lock (270 MHz, Iris Xe-like)
+and the reset prompt were not accepted, so the iGPU numbers are scaled from the 1110 MHz runs (x 1110 / 270 = 4.1).
+
+**RTX 3050-like (1110 MHz), Low at 1920x1080, adaptive resolution on (aims for 60)** (`bench_low_3050emu.json`):
+67-99 FPS in all 11 views (p99 13-26 ms). One single 1.6 s frame on first entering the Med Bay (render thread:
+a first-use pipeline compile; it did not repeat).
+
+**Low made lighter for chips in the processor** (Low only; High / Ultra unchanged): fixture lights fade from 15 m
+(was 25 m), the light view goes one glass link deep, unshadowed area lights (greenhouse grow panels) reach half
+their range. At the adaptive floor (render scale 0.5, 1600x900 window, 1110 MHz), GPU ms before -> after:
+Greenhouse 9.5 -> 7.0, Plaza 8.6 -> 7.2, tutorial start 8.3 -> 7.6, Command Room 6.2 -> 4.9, exterior 6.8 -> 5.5,
+Power Room 5.8, Med Bay 4.0 (`ablation_low_1110*.json`).
+
+Scaled to Iris Xe-class compute (x4.1): 16-31 ms, i.e. 32+ FPS in every view at the floor; Radeon 680M/780M-class
+(x2.6): 10-20 ms. Optimistic for real iGPUs, whose shared memory (~68 GB/s) is far slower than this card's; CPU side
+(game logic ~3 ms, render thread 3-7 ms at Low here) leaves a post-2020 laptop CPU well under 33 ms.
+
+Older estimate, kept for the record:
 
 Measured here: Low at 1600x900 (the cap for Basic cards), adaptive resolution off: 3.5-6.1 ms GPU, 2-6 ms render CPU,
 105-240 FPS; at render scale 0.5 the heaviest rooms (Greenhouse, Plaza) still take ~4 ms, half of it fixture lights

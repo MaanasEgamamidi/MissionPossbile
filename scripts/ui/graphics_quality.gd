@@ -71,7 +71,10 @@ const _P := {
 		DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS, DirectionalLight3D.SHADOW_PARALLEL_4_SPLITS],
 	"fixture_shadows": [false, true, true, true],
 	## fixture lights fade out past this distance (0 = never); their shadows stop at 60 % of it
-	"fixture_fade": [25.0, 40.0, 0.0, 0.0],
+	"fixture_fade": [15.0, 40.0, 0.0, 0.0],
+	## unshadowed area lights (the greenhouse grow panels) reach this share of their authored range (Low: chips in the
+	## processor, 2026-11-18: -18 % of the Greenhouse frame at Low)
+	"area_range": [0.5, 1.0, 1.0, 1.0],
 }
 
 
@@ -245,8 +248,11 @@ static func _apply_light_fade(light: Light3D) -> void:
 static func _apply_fixture(light: Light3D, level: int) -> void:
 	if not light.has_meta(_META):
 		light.set_meta(_META, {"shadow": light.shadow_enabled, "fade": light.distance_fade_enabled,
-			"begin": light.distance_fade_begin, "shadow_fade": light.distance_fade_shadow, "length": light.distance_fade_length})
+			"begin": light.distance_fade_begin, "shadow_fade": light.distance_fade_shadow, "length": light.distance_fade_length,
+			"area_range": float(light.get("area_range")) if light.get_class() == "AreaLight3D" else 0.0})
 	var a: Dictionary = light.get_meta(_META)
+	if light.get_class() == "AreaLight3D" and float(a.get("area_range", 0.0)) > 0.0:
+		light.set("area_range", float(a.area_range) * (1.0 if bool(a.shadow) else float(value("area_range", level))))
 	light.shadow_enabled = bool(a.shadow) and value("fixture_shadows", level)
 	var fade: float = value("fixture_fade", level)
 	if fade > 0.0:

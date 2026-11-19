@@ -872,7 +872,10 @@ func zones_in_view(cam: Camera3D) -> Dictionary:
 				if d.leads_outside or (o != null and o.kind != Zone.KIND_ROOM):
 					out[z] = true
 					frontier.append(z)
-	for _h in maxi(1, int(Perf.cfg().light_view_hops)):
+	var hops := maxi(1, int(Perf.cfg().light_view_hops))
+	if GraphicsQuality.applied_level(get_tree()) == GraphicsQuality.Level.LOW:
+		hops = 1   # Low (chips in the processor): rooms two glass panes away stay dark
+	for _h in hops:
 		var nxt: Array[Zone] = []
 		for z in frontier:
 			for d in doors:
